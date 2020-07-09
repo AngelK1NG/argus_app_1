@@ -25,7 +25,7 @@ class SideNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedPositioned(
-      duration: Duration(milliseconds: 100),
+      duration: Duration(milliseconds: 200),
       curve: Curves.ease,
       top: 0,
       bottom: 0,

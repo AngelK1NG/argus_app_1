@@ -9,8 +9,10 @@ class NavBurger extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 32, top: 50),
+    return Container(
+      width: 102,
+      height: 102,
+      padding: EdgeInsets.only(top: 36),
       child: IconButton(
         onPressed: onTap,
         icon: icon,
