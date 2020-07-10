@@ -91,16 +91,19 @@ class _HomePageState extends State<HomePage> {
               curve: Curves.ease,
               opacity: _navActive ? 0.5 : 1,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Container(
-                    width: 315,
-                    padding: const EdgeInsets.only(bottom: 70),
-                    child: Text(_swatchDisplay, textAlign: TextAlign.center, style: TextStyle(
-                      fontSize: 80,
-                      fontWeight: FontWeight.w500,
-                      color: _doingTask ? Colors.white : Colors.black,
-                    ),),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 50),
+                    child: Container(
+                      width: 315,
+                      padding: const EdgeInsets.only(bottom: 70),
+                      child: Text(_swatchDisplay, textAlign: TextAlign.center, style: TextStyle(
+                        fontSize: 80,
+                        fontWeight: FontWeight.w500,
+                        color: _doingTask ? Colors.white : Colors.black,
+                      ),),
+                    ),
                   ),
                   Text(_taskDisplay, textAlign: TextAlign.center, style: TextStyle(
                     fontSize: 36,
@@ -135,7 +138,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 5, bottom: MediaQuery.of(context).size.width * 0.35,),
+                    padding: EdgeInsets.only(top: 5),
                     child: Container(
                       alignment: Alignment.centerRight,
                       width: 315,
