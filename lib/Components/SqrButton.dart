@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class AbandonButton extends StatelessWidget {
+class SqrButton extends StatelessWidget {
   final VoidCallback onTap;
+  final Color buttonColor;
+  final FaIcon icon; 
 
-  const AbandonButton({this.onTap});
+  const SqrButton({this.onTap, @required this.buttonColor, @required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +19,10 @@ class AbandonButton extends StatelessWidget {
         height: 60,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Theme.of(context).accentColor,
+          color: buttonColor,
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
-        child: FaIcon(FontAwesomeIcons.running, color: Colors.white, size: 32,),
+        child: icon,
       ),
     );
   }
