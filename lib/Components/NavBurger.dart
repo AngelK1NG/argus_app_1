@@ -3,9 +3,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class NavBurger extends StatelessWidget {
   final VoidCallback onTap;
-  final FaIcon icon;
+  final bool active;
 
-  const NavBurger({this.onTap, this.icon});
+  const NavBurger({this.onTap, this.active});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class NavBurger extends StatelessWidget {
       padding: EdgeInsets.only(top: 36),
       child: IconButton(
         onPressed: onTap,
-        icon: icon,
+        icon: active ? FaIcon(FontAwesomeIcons.times, size: 32,) : FaIcon(FontAwesomeIcons.bars, size: 32,),
       ),
     );
   }

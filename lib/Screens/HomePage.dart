@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../Components/NavBurger.dart';
 import '../Components/SideNav.dart';
-import '../Components/HomeButton.dart';
-import '../Components/AbandonButton.dart';
+import '../Components/RctButton.dart';
+import '../Components/SqrButton.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -29,34 +29,40 @@ class _HomePageState extends State<HomePage> {
   }
 
   void startTask() {
-    timer = new Timer.periodic(
-      const Duration(seconds: 1), (Timer timer) => setState(() {
-        if (_doingTask) {
-          final currentTime = DateTime.now();
-          _swatchDisplay = currentTime.difference(_startTime).inMinutes.toString().padLeft(2, "0") + ":" + (currentTime.difference(_startTime).inSeconds % 60).toString().padLeft(2, "0");
-        } else {
-          timer.cancel();
-        }
-      })
-    );
-    setState(() {
-      _doingTask = true;
-      _startTime = DateTime.now();
-    });
+    if (!_navActive) {
+      timer = new Timer.periodic(
+        const Duration(seconds: 1), (Timer timer) => setState(() {
+          if (_doingTask) {
+            final currentTime = DateTime.now();
+            _swatchDisplay = currentTime.difference(_startTime).inMinutes.toString().padLeft(2, "0") + ":" + (currentTime.difference(_startTime).inSeconds % 60).toString().padLeft(2, "0");
+          } else {
+            timer.cancel();
+          }
+        })
+      );
+      setState(() {
+        _doingTask = true;
+        _startTime = DateTime.now();
+      });
+    }
   }
 
   void stopTask() {
-    setState(() {
-      _doingTask = false;
-      _swatchDisplay = "00:00";
-    });
+    if (!_navActive) {
+      setState(() {
+        _doingTask = false;
+        _swatchDisplay = "00:00";
+      });
+    }
   }
 
   void abandonTask() {
-    setState(() {
-      _doingTask = false;
-      _swatchDisplay = "00:00";
-    });
+    if (!_navActive) {
+      setState(() {
+        _doingTask = false;
+        _swatchDisplay = "00:00";
+      });
+    }
   }
 
   @override
@@ -67,6 +73,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onHorizontalDragUpdate: (details) {
         if (details.delta.dx > 10 && !_doingTask) {
           setState(() {
@@ -115,10 +122,10 @@ class _HomePageState extends State<HomePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        _doingTask ? HomeButton(onTap: stopTask, buttonColor: Colors.white, buttonText: "Complete") : HomeButton(onTap: startTask, buttonColor: Colors.black, buttonText: "Start",),
+                        _doingTask ? RctButton(onTap: stopTask, buttonWidth: 240, buttonText: "Complete", buttonColor: Colors.white, textColor: Colors.black, textSize: 32,) : RctButton(onTap: startTask, buttonWidth: 240, buttonText: "Start", buttonColor: Colors.black, textColor: Colors.white, textSize: 32,),
                         Padding(
                           padding: const EdgeInsets.only(left: 15),
-                          child: AbandonButton(onTap: abandonTask),
+                          child: SqrButton(onTap: abandonTask, buttonColor: Theme.of(context).accentColor, icon: FaIcon(FontAwesomeIcons.running, size: 32, color: Colors.white,)),
                         ),
                       ],
                     ),
@@ -160,7 +167,7 @@ class _HomePageState extends State<HomePage> {
           Positioned(
             child: Offstage(
               offstage: _doingTask,
-              child: NavBurger(onTap: toggleNav, icon: _navActive ? FaIcon(FontAwesomeIcons.times, size: 32,) : FaIcon(FontAwesomeIcons.bars, size: 32,)),
+              child: NavBurger(onTap: toggleNav, active: _navActive),
             ),
           ),
         ]

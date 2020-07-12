@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'Screens/HomePage.dart';
 import 'Screens/TasksPage.dart';
 import 'Screens/StatisticsPage.dart';
 import 'Screens/SettingsPage.dart';
+import 'Screens/LoginPage.dart';
 
 void main() {
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]).then((_) {
+    runApp(MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -18,6 +26,7 @@ class MyApp extends StatelessWidget {
           minWidth: 60,
         ),
         accentColor: const Color(0xff3c25d7),
+        splashColor: Colors.transparent,
       ),
       home: Scaffold(
         body: SizedBox.expand(
@@ -52,6 +61,15 @@ class MyApp extends StatelessWidget {
             )
           );
         },
+        'login': (context) {
+          return(
+            Scaffold(
+              body: SizedBox.expand(
+                child: LoginPage(),
+              ),
+            )
+          );
+        }
       }
     );
   }
