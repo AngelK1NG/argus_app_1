@@ -1,3 +1,4 @@
+import 'package:Focal/Screens/HomePage.dart';
 import 'package:Focal/utils/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -18,7 +19,11 @@ class LoginPage extends StatelessWidget {
             child: RctButton(
               onTap: () async {
                 bool res = await AuthProvider().googleSignIn();
-                if (!res) print('error logging in with google');
+                if (!res)
+                  print('error logging in with google');
+                else {
+                  Navigator.pushNamed(context, '/');
+                }
               },
               buttonWidth: 300,
               buttonColor: Colors.white,
