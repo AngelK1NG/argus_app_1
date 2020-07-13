@@ -32,37 +32,37 @@ class MyApp extends StatelessWidget {
         body: SizedBox.expand(
           child: HomePage(),
         ),
-        routes: {
-          '/tasks': (context) {
-            return (Scaffold(
-              body: SizedBox.expand(
-                child: TasksPage(),
-              ),
-            ));
-          },
-          '/statistics': (context) {
-            return (Scaffold(
-              body: SizedBox.expand(
-                child: StatisticsPage(),
-              ),
-            ));
-          },
-          '/settings': (context) {
-            return (Scaffold(
-              body: SizedBox.expand(
-                child: SettingsPage(),
-              ),
-            ));
-          },
-          '/login': (context) {
-            return (Scaffold(
-              body: SizedBox.expand(
-                child: LoginPage(),
-              ),
-            ));
-          },
-        }
       ),
+      routes: {
+        '/tasks': (context) {
+          return (Scaffold(
+            body: SizedBox.expand(
+              child: TasksPage(),
+            ),
+          ));
+        },
+        '/statistics': (context) {
+          return (Scaffold(
+            body: SizedBox.expand(
+              child: StatisticsPage(),
+            ),
+          ));
+        },
+        '/settings': (context) {
+          return (Scaffold(
+            body: SizedBox.expand(
+              child: SettingsPage(),
+            ),
+          ));
+        },
+        '/login': (context) {
+          return (Scaffold(
+            body: SizedBox.expand(
+              child: LoginPage(),
+            ),
+          ));
+        },
+      },
     );
   }
 }
