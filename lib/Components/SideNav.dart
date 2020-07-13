@@ -33,12 +33,13 @@ class SideNav extends StatelessWidget {
       left: active ? 0 : -280,
       width: 280,
       child: Container(
-        padding: EdgeInsets.only(top: 150, bottom: 150, left: 32),
+        padding: EdgeInsets.only(top: 120, bottom: 120, left: 32),
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
               spreadRadius: -5,
               blurRadius: 15,
+              offset: Offset(0, 10),
             )
           ],
           color: Colors.white,
@@ -49,7 +50,7 @@ class SideNav extends StatelessWidget {
           children: <Widget>[
             FlatButton(
               onPressed: () {
-                goToRoute(context, '/');
+                goToRoute(context, '/home');
               },
               child: Text("Focus",
                   style: TextStyle(

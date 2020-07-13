@@ -12,7 +12,6 @@ class NavBurger extends StatelessWidget {
     return Container(
       width: 102,
       height: 102,
-      padding: EdgeInsets.only(top: 36),
       child: IconButton(
         onPressed: onTap,
         icon: active ? FaIcon(FontAwesomeIcons.times, size: 32,) : FaIcon(FontAwesomeIcons.bars, size: 32,),

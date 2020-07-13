@@ -17,9 +17,12 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final navigatorKey = GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       theme: ThemeData(
         buttonTheme: ButtonThemeData(
           height: 60,
@@ -31,33 +34,19 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/home': (context) {
-          return Scaffold(
-            body: SizedBox.expand(child: HomePage()),
-          );
+          return HomePage();
         },
         '/tasks': (context) {
-          return Scaffold(
-            body: SizedBox.expand(child: TasksPage()),
-          );
+          return TasksPage();
         },
         '/statistics': (context) {
-          return Scaffold(
-            body: SizedBox.expand(child: StatisticsPage()),
-          );
+          return StatisticsPage();
         },
         '/settings': (context) {
-          return Scaffold(
-            body: SizedBox.expand(
-              child: SettingsPage(),
-            ),
-          );
+          return SettingsPage();
         },
         '/login': (context) {
-          return Scaffold(
-            body: SizedBox.expand(
-              child: LoginPage(),
-            ),
-          );
+          return LoginPage();
         }
       },
     );
