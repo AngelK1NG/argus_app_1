@@ -6,28 +6,40 @@ import 'package:flutter/material.dart';
 
 class AuthProvider {
   FirebaseAuth _auth = FirebaseAuth.instance;
+  GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  Future<bool> googleSignIn() async {
-    print('runned');
+  // Firebase user a realtime stream
+  Stream<FirebaseUser> get user => _auth.onAuthStateChanged;
+
+  // Sign in with Google
+  Future<FirebaseUser> googleSignIn() async {
     try {
-      GoogleSignIn googleSignIn = GoogleSignIn();
-      GoogleSignInAccount account = await googleSignIn.signIn();
-      if (account == null) {
-        print('no google popup');
-        return false;
-      }
-      AuthResult res = await _auth.signInWithCredential(
-          GoogleAuthProvider.getCredential(
-              idToken: (await account.authentication).idToken,
-              accessToken: (await account.authentication).accessToken));
-      if (res.user == null) {
-        print('no google account');
-        return false;
-      }
-      return true;
+      GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
+      GoogleSignInAuthentication googleAuth =
+          await googleSignInAccount.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      AuthResult result = await _auth.signInWithCredential(credential);
+      FirebaseUser user = result.user;
+      print(user.uid);
+      return user;
+    } catch (error) {
+      print(error);
+      return null;
+    }
+  }
+
+  // Sign out
+  Future signOut() async {
+    try {
+      return await _auth.signOut();
     } catch (e) {
       print(e);
-      return false;
+      return null;
     }
   }
 }

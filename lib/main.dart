@@ -7,6 +7,7 @@ import 'Screens/StatisticsPage.dart';
 import 'Screens/SettingsPage.dart';
 import 'Screens/LoginPage.dart';
 import 'package:Focal/utils/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,11 +25,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  FirebaseAuth _auth = FirebaseAuth.instance;
-  bool _loggedIn = false;
-
   Widget checkCurrentUser(Widget screen) {
-    if (_loggedIn) {
+    print(AuthProvider().user);
+    if (AuthProvider().user != null) {
       return Scaffold(
         body: SizedBox.expand(
           child: screen,
@@ -46,38 +45,39 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _auth.onAuthStateChanged.listen((firebaseUser) {
-      if (firebaseUser != null) {
-        _loggedIn = false;
-      } else {
-        _loggedIn = true;
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        buttonTheme: ButtonThemeData(
-          height: 60,
-          minWidth: 60,
+    return MultiProvider(
+      providers: [
+        StreamProvider<FirebaseUser>.value(value: AuthProvider().user),
+      ],
+      child: MaterialApp(
+        theme: ThemeData(
+          buttonTheme: ButtonThemeData(
+            height: 60,
+            minWidth: 60,
+          ),
+          accentColor: const Color(0xff3c25d7),
+          splashColor: Colors.transparent,
         ),
-        accentColor: const Color(0xff3c25d7),
-        splashColor: Colors.transparent,
+        home: checkCurrentUser(HomePage()),
+        routes: {
+          '/tasks': (context) {
+            return checkCurrentUser(TasksPage());
+          },
+          '/statistics': (context) {
+            return checkCurrentUser(StatisticsPage());
+          },
+          '/settings': (context) {
+            return checkCurrentUser(SettingsPage());
+          },
+          '/login': (context) {
+            return checkCurrentUser(LoginPage());
+          }
+        },
       ),
-      home: checkCurrentUser(HomePage()),
-      routes: {
-        '/tasks': (context) {
-          return checkCurrentUser(TasksPage());
-        },
-        '/statistics': (context) {
-          return checkCurrentUser(StatisticsPage());
-        },
-        '/settings': (context) {
-          return checkCurrentUser(SettingsPage());
-        },
-      },
     );
   }
 }

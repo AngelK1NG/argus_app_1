@@ -17,8 +17,8 @@ class LoginPage extends StatelessWidget {
             padding: const EdgeInsets.only(top: 100),
             child: RctButton(
               onTap: () async {
-                bool res = await AuthProvider().googleSignIn();
-                if (!res) print('error logging in with google');
+                dynamic user = await AuthProvider().googleSignIn();
+                if (user != null) Navigator.pushReplacementNamed(context, '/');
               },
               buttonWidth: 300,
               buttonColor: Colors.white,

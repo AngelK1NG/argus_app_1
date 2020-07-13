@@ -1,4 +1,7 @@
+import 'package:Focal/utils/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SideNav extends StatelessWidget {
   final VoidCallback onTap;
@@ -33,7 +36,8 @@ class SideNav extends StatelessWidget {
       width: 280,
       child: Container(
         padding: EdgeInsets.only(top: 150, bottom: 150, left: 32),
-        decoration: BoxDecoration(boxShadow: [
+        decoration: BoxDecoration(
+          boxShadow: [
             BoxShadow(
               spreadRadius: -5,
               blurRadius: 15,
@@ -49,25 +53,52 @@ class SideNav extends StatelessWidget {
               onPressed: () {
                 goToRoute(context, '/');
               },
-              child: Text("Focus", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w400,)),
+              child: Text("Focus",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w400,
+                  )),
             ),
             FlatButton(
               onPressed: () {
                 goToRoute(context, '/tasks');
               },
-              child: Text("All Tasks", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w400,)),
+              child: Text("All Tasks",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w400,
+                  )),
             ),
             FlatButton(
               onPressed: () {
                 goToRoute(context, '/statistics');
               },
-              child: Text("Statistics", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w400,)),
+              child: Text("Statistics",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w400,
+                  )),
             ),
             FlatButton(
               onPressed: () {
                 goToRoute(context, '/settings');
               },
-              child: Text("Settings", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w400,)),
+              child: Text("Settings",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w400,
+                  )),
+            ),
+            FlatButton(
+              onPressed: () {
+                AuthProvider().signOut();
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+              child: Text("Sign Out",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w400,
+                  )),
             ),
           ],
         ),
