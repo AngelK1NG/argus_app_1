@@ -17,51 +17,37 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final navigatorKey = GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: ThemeData(
-          buttonTheme: ButtonThemeData(
-            height: 60,
-            minWidth: 60,
-          ),
-          accentColor: const Color(0xff3c25d7),
-          splashColor: Colors.transparent,
+      navigatorKey: navigatorKey,
+      theme: ThemeData(
+        buttonTheme: ButtonThemeData(
+          height: 60,
+          minWidth: 60,
         ),
-      home: Scaffold(
-        body: SizedBox.expand(
-          child: HomePage(),
-        ),
+        accentColor: const Color(0xff3c25d7),
+        splashColor: Colors.transparent,
       ),
+      initialRoute: '/login',
       routes: {
+        '/home': (context) {
+          return HomePage();
+        },
         '/tasks': (context) {
-          return (Scaffold(
-            body: SizedBox.expand(
-              child: TasksPage(),
-            ),
-          ));
+          return TasksPage();
         },
         '/statistics': (context) {
-          return (Scaffold(
-            body: SizedBox.expand(
-              child: StatisticsPage(),
-            ),
-          ));
+          return StatisticsPage();
         },
         '/settings': (context) {
-          return (Scaffold(
-            body: SizedBox.expand(
-              child: SettingsPage(),
-            ),
-          ));
+          return SettingsPage();
         },
         '/login': (context) {
-          return (Scaffold(
-            body: SizedBox.expand(
-              child: LoginPage(),
-            ),
-          ));
-        },
+          return LoginPage();
+        }
       },
     );
   }

@@ -10,9 +10,15 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment. center,
-      child: Text("Settings"),
+    return Scaffold(
+      body: SafeArea(
+        child: SizedBox.expand(
+          child: Container(
+            alignment: Alignment. center,
+            child: Text("Settings"),
+          ),
+        ),
+      ),
     );
   }
 }

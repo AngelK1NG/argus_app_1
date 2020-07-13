@@ -66,92 +66,98 @@ class _TasksPageState extends State<TasksPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onHorizontalDragUpdate: (details) {
-        if (details.delta.dx > 10) {
-          setState(() {
-            _navActive = true;
-          });
-        }
-        if (details.delta.dx < -10) {
-          setState(() {
-            _navActive = false;
-          });
-        }
-      },
-      child: Stack(
-        children: <Widget>[
-          Positioned (
-            right: 0,
-            top: 0,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 38, top: 50,),
-              child: Row(
-                children: <Widget>[
-                  Text("Today", style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w500,
-                  ),),
-                  Container(
-                    padding: const EdgeInsets.only(left: 10,),
-                    width: 35,
-                    child: IconButton(
-                      onPressed: () {},
-                      icon: FaIcon(FontAwesomeIcons.calendar)
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            right: 0,
-            left: 0,
-            top: 125,
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height - 125,
-              child: ReorderableListView(
-                header: GestureDetector(
-                  onTap: () {},
-                  child: Container(
+    return Scaffold(
+      body: SafeArea(
+        child: SizedBox.expand(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onHorizontalDragUpdate: (details) {
+              if (details.delta.dx > 10) {
+                setState(() {
+                  _navActive = true;
+                });
+              }
+              if (details.delta.dx < -10) {
+                setState(() {
+                  _navActive = false;
+                });
+              }
+            },
+            child: Stack(
+              children: <Widget>[
+                Positioned (
+                  right: 0,
+                  top: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 38, top: 30,),
                     child: Row(
                       children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 31, right: 11),
-                          child: FaIcon(FontAwesomeIcons.plus, size: 15, color: Color(0xffc1c1c1),),
+                        Text("Today", style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w500,
+                        ),),
+                        Container(
+                          padding: const EdgeInsets.only(left: 10,),
+                          width: 35,
+                          child: IconButton(
+                            onPressed: () {},
+                            icon: FaIcon(FontAwesomeIcons.calendar)
+                          ),
                         ),
-                        Text("Add task", style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xffc1c1c1),
-                        )),
                       ],
                     ),
-                    height: 50,
-                    width: MediaQuery.of(context).size.width,
-                    alignment: Alignment.centerLeft,
-                    decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1, color: Color(0xffe2e2e2)))),
                   ),
                 ),
-                onReorder: ((oldIndex, newIndex) {
-                  if (oldIndex < newIndex) {
-                    newIndex -= 1;
-                  }
-                  setState(() {
-                    final task = _tasks.removeAt(oldIndex);
-                    _tasks.insert(newIndex, task);
-                  });
-                }),
-                children: mapTasks(),
-              ),
+                Positioned(
+                  right: 0,
+                  left: 0,
+                  top: 100,
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height - 100,
+                    child: ReorderableListView(
+                      header: GestureDetector(
+                        onTap: () {},
+                        child: Container(
+                          child: Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(left: 31, right: 11),
+                                child: FaIcon(FontAwesomeIcons.plus, size: 15, color: Color(0xffc1c1c1),),
+                              ),
+                              Text("Add task", style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xffc1c1c1),
+                              )),
+                            ],
+                          ),
+                          height: 50,
+                          width: MediaQuery.of(context).size.width,
+                          alignment: Alignment.centerLeft,
+                          decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1, color: Color(0xffe2e2e2)))),
+                        ),
+                      ),
+                      onReorder: ((oldIndex, newIndex) {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+                        setState(() {
+                          final task = _tasks.removeAt(oldIndex);
+                          _tasks.insert(newIndex, task);
+                        });
+                      }),
+                      children: mapTasks(),
+                    ),
+                  ),
+                ),
+                SideNav(onTap: toggleNav, active: _navActive,),
+                Positioned(
+                  child: NavBurger(onTap: toggleNav, active: _navActive,),
+                ),
+              ]
             ),
           ),
-          SideNav(onTap: toggleNav, active: _navActive,),
-          Positioned(
-            child: NavBurger(onTap: toggleNav, active: _navActive,),
-          ),
-        ]
+        ),
       ),
     );
   }
