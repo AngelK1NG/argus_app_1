@@ -28,10 +28,9 @@ class MyApp extends StatelessWidget {
           accentColor: const Color(0xff3c25d7),
           splashColor: Colors.transparent,
         ),
-        home: Scaffold(
-          body: SizedBox.expand(
-            child: LoginPage(),
-          ),
+      home: Scaffold(
+        body: SizedBox.expand(
+          child: HomePage(),
         ),
         routes: {
           '/tasks': (context) {
@@ -55,13 +54,15 @@ class MyApp extends StatelessWidget {
               ),
             ));
           },
-          'login': (context) {
+          '/login': (context) {
             return (Scaffold(
               body: SizedBox.expand(
                 child: LoginPage(),
               ),
             ));
-          }
-        });
+          },
+        }
+      ),
+    );
   }
 }
