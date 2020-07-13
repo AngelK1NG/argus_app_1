@@ -20,14 +20,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: ThemeData(
-          buttonTheme: ButtonThemeData(
-            height: 60,
-            minWidth: 60,
-          ),
-          accentColor: const Color(0xff3c25d7),
-          splashColor: Colors.transparent,
+      theme: ThemeData(
+        buttonTheme: ButtonThemeData(
+          height: 60,
+          minWidth: 60,
         ),
+        accentColor: const Color(0xff3c25d7),
+        splashColor: Colors.transparent,
+      ),
       home: Scaffold(
         body: SizedBox.expand(
           child: HomePage(),

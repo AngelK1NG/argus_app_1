@@ -18,7 +18,11 @@ class LoginPage extends StatelessWidget {
             child: RctButton(
               onTap: () async {
                 bool res = await AuthProvider().googleSignIn();
-                if (!res) print('error logging in with google');
+                if (!res)
+                  print('error logging in with google');
+                else {
+                  Navigator.pushNamed(context, '/');
+                }
               },
               buttonWidth: 300,
               buttonColor: Colors.white,
