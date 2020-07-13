@@ -10,7 +10,15 @@ class RctButton extends StatelessWidget {
   final double textSize;
   final FaIcon icon;
 
-  const RctButton({this.onTap, @required this.buttonWidth, @required this.buttonColor, @required this.buttonText, @required this.textColor, @required this.textSize, this.icon,});
+  const RctButton({
+    this.onTap,
+    @required this.buttonWidth,
+    @required this.buttonColor,
+    @required this.buttonText,
+    @required this.textColor,
+    @required this.textSize,
+    this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,19 +35,32 @@ class RctButton extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
         child: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20,),
+          padding: const EdgeInsets.only(
+            left: 20,
+            right: 20,
+          ),
           child: Row(
-            mainAxisAlignment: icon == null ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: icon == null
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              icon == null ? Container() : Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: icon,
+              icon == null
+                  ? Container()
+                  : Padding(
+                      padding: const EdgeInsets.only(right: 15),
+                      child: icon,
+                    ),
+              Text(
+                this.buttonText,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: textSize,
+                  fontWeight: FontWeight.w500,
+                  color: this.buttonColor == Colors.black
+                      ? Colors.white
+                      : Colors.black,
+                ),
               ),
-              Text(this.buttonText, textAlign: TextAlign.center, style: TextStyle(
-                fontSize: textSize,
-                fontWeight: FontWeight.w500,
-                color: this.buttonColor == Colors.black ? Colors.white : Colors.black,
-              ),),
             ],
           ),
         ),
@@ -47,3 +68,4 @@ class RctButton extends StatelessWidget {
     );
   }
 }
+
