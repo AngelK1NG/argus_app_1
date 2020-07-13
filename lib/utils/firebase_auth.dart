@@ -1,8 +1,5 @@
-import 'package:Focal/Screens/HomePage.dart';
-import 'package:Focal/Screens/LoginPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter/material.dart';
 
 class AuthProvider {
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -29,16 +26,6 @@ class AuthProvider {
       return user;
     } catch (error) {
       print(error);
-      return null;
-    }
-  }
-
-  // Sign out
-  Future signOut() async {
-    try {
-      return await _auth.signOut();
-    } catch (e) {
-      print(e);
       return null;
     }
   }

@@ -1,7 +1,5 @@
-import 'package:Focal/utils/firebase_auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:Focal/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class SideNav extends StatelessWidget {
   final VoidCallback onTap;
@@ -91,8 +89,7 @@ class SideNav extends StatelessWidget {
             ),
             FlatButton(
               onPressed: () {
-                AuthProvider().signOut();
-                Navigator.pushReplacementNamed(context, '/login');
+                auth.signOut();
               },
               child: Text("Sign Out",
                   style: TextStyle(

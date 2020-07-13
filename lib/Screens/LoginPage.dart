@@ -2,9 +2,27 @@ import 'package:Focal/utils/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../Components/RctButton.dart';
+import 'package:Focal/constants.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({Key key}) : super(key: key);
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    super.initState();
+    auth.onAuthStateChanged.listen((user) {
+      if (user == null) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      } else {
+        Navigator.pushNamed(context, '/home');
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +35,7 @@ class LoginPage extends StatelessWidget {
             padding: const EdgeInsets.only(top: 100),
             child: RctButton(
               onTap: () async {
-                dynamic user = await AuthProvider().googleSignIn();
-                if (user != null) Navigator.pushReplacementNamed(context, '/');
+                await AuthProvider().googleSignIn();
               },
               buttonWidth: 300,
               buttonColor: Colors.white,
