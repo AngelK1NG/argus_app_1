@@ -1,6 +1,7 @@
 import 'package:Focal/utils/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../Components/WrapperWidget.dart';
 import '../Components/RctButton.dart';
 import 'package:Focal/constants.dart';
 
@@ -26,51 +27,46 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SizedBox.expand(
-          child: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Image(image: AssetImage("Images/Focal Logo_Full.png")),
-                Padding(
-                  padding: const EdgeInsets.only(top: 100),
-                  child: RctButton(
-                    onTap: () async {
-                      await AuthProvider().googleSignIn();
-                    },
-                    buttonWidth: 300,
-                    buttonColor: Colors.white,
-                    textColor: Colors.black,
-                    buttonText: "Sign in with Google",
-                    textSize: 24,
-                    icon: FaIcon(
-                      FontAwesomeIcons.google,
-                      size: 32,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 15),
-                  child: RctButton(
-                    onTap: () {},
-                    buttonWidth: 300,
-                    buttonColor: Colors.black,
-                    textColor: Colors.black,
-                    buttonText: "Sign in with Apple",
-                    textSize: 24,
-                    icon: FaIcon(
-                      FontAwesomeIcons.apple,
-                      size: 40,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
+    return WrapperWidget(
+      nav: false,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Image(image: AssetImage("Images/Focal Logo_Full.png")),
+          Padding(
+            padding: const EdgeInsets.only(top: 100),
+            child: RctButton(
+              onTap: () async {
+                await AuthProvider().googleSignIn();
+              },
+              buttonWidth: 300,
+              buttonColor: Colors.white,
+              textColor: Colors.black,
+              buttonText: "Sign in with Google",
+              textSize: 24,
+              icon: FaIcon(
+                FontAwesomeIcons.google,
+                size: 30,
+              ),
             ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.only(top: 15),
+            child: RctButton(
+              onTap: () {},
+              buttonWidth: 300,
+              buttonColor: Colors.black,
+              textColor: Colors.black,
+              buttonText: "Sign in with Apple",
+              textSize: 24,
+              icon: FaIcon(
+                FontAwesomeIcons.apple,
+                size: 38,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
