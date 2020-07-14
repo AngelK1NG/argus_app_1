@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class NavBurger extends StatelessWidget {
   final VoidCallback onTap;
-  final bool active;
+  final active;
 
   const NavBurger({this.onTap, this.active});
 
