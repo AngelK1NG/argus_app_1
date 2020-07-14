@@ -27,12 +27,12 @@ class SideNav extends StatelessWidget {
     return AnimatedPositioned(
       duration: Duration(milliseconds: 200),
       curve: Curves.ease,
-      top: -30,
-      bottom: 0,
+      top: -50,
+      bottom: -50,
       left: active ? 0 : -280,
       width: 280,
       child: Container(
-        padding: EdgeInsets.only(top: 150, bottom: 120, left: 32),
+        padding: EdgeInsets.only(top: 170, bottom: 170, left: 32),
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
