@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'Screens/HomePage.dart';
-import 'Screens/TasksPage.dart';
-import 'Screens/StatisticsPage.dart';
-import 'Screens/SettingsPage.dart';
-import 'Screens/LoginPage.dart';
+import 'screens/home.dart';
+import 'screens/tasks.dart';
+import 'screens/statistics.dart';
+import 'screens/settings.dart';
+import 'screens/login.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

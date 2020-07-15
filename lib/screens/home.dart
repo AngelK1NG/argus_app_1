@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../Components/WrapperWidget.dart';
-import '../Components/RctButton.dart';
-import '../Components/SqrButton.dart';
+import '../components/wrapper.dart';
+import '../components/rct_button.dart';
+import '../components/sqr_button.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);

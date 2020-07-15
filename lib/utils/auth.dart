@@ -9,7 +9,7 @@ class AuthProvider {
     try {
       GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
       GoogleSignInAuthentication googleAuth =
-          await googleSignInAccount.authentication;
+        await googleSignInAccount.authentication;
 
       final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken,
@@ -18,9 +18,9 @@ class AuthProvider {
 
       AuthResult result = await _auth.signInWithCredential(credential);
       FirebaseUser user = result.user;
-      print(user.uid);
+      print("Login successful, uid: " + user.uid);
       return user;
-    } catch (error) {
+    } catch(error) {
       print(error);
       return null;
     }
