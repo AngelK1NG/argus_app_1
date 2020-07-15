@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../Components/NavBurger.dart';
-import '../Components/SideNav.dart';
+import 'nav_burger.dart';
+import 'side_nav.dart';
 
 class WrapperWidget extends StatefulWidget {
   final Widget child;

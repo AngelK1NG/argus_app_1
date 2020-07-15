@@ -1,8 +1,8 @@
-import 'package:Focal/utils/firebase_auth.dart';
+import 'package:Focal/utils/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../Components/WrapperWidget.dart';
-import '../Components/RctButton.dart';
+import '../components/wrapper.dart';
+import '../components/rct_button.dart';
 import 'package:Focal/constants.dart';
 
 class LoginPage extends StatefulWidget {
@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Image(image: AssetImage("Images/Focal Logo_Full.png")),
+          Image(image: AssetImage("assets/images/Focal Logo_Full.png")),
           Padding(
             padding: const EdgeInsets.only(top: 100),
             child: RctButton(
