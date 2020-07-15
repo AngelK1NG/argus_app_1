@@ -17,52 +17,41 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final navigatorKey = GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: ThemeData(
-          buttonTheme: ButtonThemeData(
-            height: 60,
-            minWidth: 60,
-          ),
-          accentColor: const Color(0xff3c25d7),
-          splashColor: Colors.transparent,
+      navigatorKey: navigatorKey,
+      theme: ThemeData(
+        buttonTheme: ButtonThemeData(
+          height: 60,
+          minWidth: 60,
         ),
-      home: Scaffold(
-        body: SizedBox.expand(
-          child: HomePage(),
-        ),
-        routes: {
-          '/tasks': (context) {
-            return (Scaffold(
-              body: SizedBox.expand(
-                child: TasksPage(),
-              ),
-            ));
-          },
-          '/statistics': (context) {
-            return (Scaffold(
-              body: SizedBox.expand(
-                child: StatisticsPage(),
-              ),
-            ));
-          },
-          '/settings': (context) {
-            return (Scaffold(
-              body: SizedBox.expand(
-                child: SettingsPage(),
-              ),
-            ));
-          },
-          '/login': (context) {
-            return (Scaffold(
-              body: SizedBox.expand(
-                child: LoginPage(),
-              ),
-            ));
-          },
-        }
+        primaryColor: const Color(0xff3c25d7),
+        accentColor: const Color(0xff3c25d7),
+        hintColor: const Color(0xffb0b0b0),
+        dividerColor: const Color(0xffe2e2e2),
+        splashColor: Colors.transparent,
       ),
+      initialRoute: '/login',
+      routes: {
+        '/home': (context) {
+          return HomePage();
+        },
+        '/tasks': (context) {
+          return TasksPage();
+        },
+        '/statistics': (context) {
+          return StatisticsPage();
+        },
+        '/settings': (context) {
+          return SettingsPage();
+        },
+        '/login': (context) {
+          return LoginPage();
+        }
+      },
     );
   }
 }

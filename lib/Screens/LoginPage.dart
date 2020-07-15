@@ -1,14 +1,34 @@
 import 'package:Focal/utils/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../Components/WrapperWidget.dart';
 import '../Components/RctButton.dart';
+import 'package:Focal/constants.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({Key key}) : super(key: key);
 
   @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    super.initState();
+    auth.onAuthStateChanged.listen((user) {
+      if (user == null) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      } else {
+        Navigator.pushNamed(context, '/home');
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
+    return WrapperWidget(
+      nav: false,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -17,8 +37,7 @@ class LoginPage extends StatelessWidget {
             padding: const EdgeInsets.only(top: 100),
             child: RctButton(
               onTap: () async {
-                bool res = await AuthProvider().googleSignIn();
-                if (!res) print('error logging in with google');
+                await AuthProvider().googleSignIn();
               },
               buttonWidth: 300,
               buttonColor: Colors.white,
@@ -27,7 +46,7 @@ class LoginPage extends StatelessWidget {
               textSize: 24,
               icon: FaIcon(
                 FontAwesomeIcons.google,
-                size: 32,
+                size: 30,
               ),
             ),
           ),
@@ -42,7 +61,7 @@ class LoginPage extends StatelessWidget {
               textSize: 24,
               icon: FaIcon(
                 FontAwesomeIcons.apple,
-                size: 40,
+                size: 38,
                 color: Colors.white,
               ),
             ),

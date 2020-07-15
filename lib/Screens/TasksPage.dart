@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../Components/SideNav.dart';
-import '../Components/NavBurger.dart';
+import '../Components/WrapperWidget.dart';
 
 class TasksPage extends StatefulWidget {
   TasksPage({Key key}) : super(key: key);
@@ -48,7 +47,7 @@ class _TasksPageState extends State<TasksPage> {
           height: 50,
           width: MediaQuery.of(context).size.width,
           alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1, color: Color(0xffe2e2e2)))),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1, color: Theme.of(context).dividerColor,))),
         ),
       ));
     });
@@ -66,27 +65,15 @@ class _TasksPageState extends State<TasksPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onHorizontalDragUpdate: (details) {
-        if (details.delta.dx > 10) {
-          setState(() {
-            _navActive = true;
-          });
-        }
-        if (details.delta.dx < -10) {
-          setState(() {
-            _navActive = false;
-          });
-        }
-      },
+    return WrapperWidget(
+      nav: true,
       child: Stack(
         children: <Widget>[
           Positioned (
             right: 0,
             top: 0,
             child: Padding(
-              padding: const EdgeInsets.only(right: 38, top: 50,),
+              padding: const EdgeInsets.only(right: 38, top: 30,),
               child: Row(
                 children: <Widget>[
                   Text("Today", style: TextStyle(
@@ -108,9 +95,9 @@ class _TasksPageState extends State<TasksPage> {
           Positioned(
             right: 0,
             left: 0,
-            top: 125,
+            top: 100,
             child: SizedBox(
-              height: MediaQuery.of(context).size.height - 125,
+              height: MediaQuery.of(context).size.height - 100,
               child: ReorderableListView(
                 header: GestureDetector(
                   onTap: () {},
@@ -119,19 +106,19 @@ class _TasksPageState extends State<TasksPage> {
                       children: <Widget>[
                         Padding(
                           padding: const EdgeInsets.only(left: 31, right: 11),
-                          child: FaIcon(FontAwesomeIcons.plus, size: 15, color: Color(0xffc1c1c1),),
+                          child: FaIcon(FontAwesomeIcons.plus, size: 15, color: Theme.of(context).hintColor,),
                         ),
                         Text("Add task", style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
-                          color: Color(0xffc1c1c1),
+                          color: Theme.of(context).hintColor,
                         )),
                       ],
                     ),
                     height: 50,
                     width: MediaQuery.of(context).size.width,
                     alignment: Alignment.centerLeft,
-                    decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1, color: Color(0xffe2e2e2)))),
+                    decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1, color: Theme.of(context).dividerColor,))),
                   ),
                 ),
                 onReorder: ((oldIndex, newIndex) {
@@ -146,10 +133,6 @@ class _TasksPageState extends State<TasksPage> {
                 children: mapTasks(),
               ),
             ),
-          ),
-          SideNav(onTap: toggleNav, active: _navActive,),
-          Positioned(
-            child: NavBurger(onTap: toggleNav, active: _navActive,),
           ),
         ]
       ),
