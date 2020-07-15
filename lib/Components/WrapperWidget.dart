@@ -31,43 +31,51 @@ class _WrapperWidgetState extends State<WrapperWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SizedBox.expand(
-        child: Stack(
-          children: <Widget>[
-            AnimatedContainer(
-              duration: Duration(milliseconds: 200),
-              curve: Curves.ease,
-              color: widget.backgroundColor,
-              child: SafeArea(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onHorizontalDragUpdate: (details) {
-                    if (details.delta.dx > 10 && widget.nav) {
-                      setState(() {
-                        _navActive = true;
-                      });
-                    }
-                    if (details.delta.dx < -10 && widget.nav) {
-                      setState(() {
-                        _navActive = false;
-                      });
-                    }
-                  },
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onHorizontalDragUpdate: (details) {
+            if (details.delta.dx > 10 && widget.nav) {
+              setState(() {
+                _navActive = true;
+              });
+            }
+            if (details.delta.dx < -10 && widget.nav) {
+              setState(() {
+                _navActive = false;
+              });
+            }
+          },
+          child: Stack(
+            children: <Widget>[
+              GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  setState(() {
+                    _navActive = false;
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  curve: Curves.ease,
+                  color: widget.backgroundColor,
                   child: AnimatedOpacity(
                     duration: Duration(milliseconds: 200),
                     opacity: _navActive ? 0.5 : 1,
-                    child: widget.child
+                    child: SafeArea(
+                      child: _navActive ? IgnorePointer(child: widget.child) : Container(child: widget.child),
+                    ),
                   ),
                 ),
               ),
-            ),
-            SideNav(onTap: toggleNav, active: _navActive,),
-            SafeArea(
-              child: Offstage(
-                offstage: !widget.nav,
-                child: NavBurger(onTap: toggleNav, active: _navActive),
-              ),
-            )
-          ],
+              SideNav(onTap: toggleNav, active: _navActive,),
+              SafeArea(
+                child: Offstage(
+                  offstage: !widget.nav,
+                  child: NavBurger(onTap: toggleNav, active: _navActive),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
