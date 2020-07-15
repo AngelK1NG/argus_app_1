@@ -1,9 +1,9 @@
-import 'package:Focal/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SideNav extends StatelessWidget {
   final VoidCallback onTap;
-  final bool active;
+  final active;
 
   const SideNav({this.onTap, this.active});
 
@@ -19,8 +19,9 @@ class SideNav extends StatelessWidget {
 
     if (!isNewRouteSameAsCurrent) {
       Navigator.pushNamed(context, newRoute);
-      onTap();
     }
+    
+    onTap();
   }
 
   @override
@@ -30,73 +31,90 @@ class SideNav extends StatelessWidget {
       curve: Curves.ease,
       top: 0,
       bottom: 0,
-      left: active ? 0 : -280,
+      left: active ? 0 : -300,
       width: 280,
       child: Container(
-        padding: EdgeInsets.only(top: 120, bottom: 120, left: 32),
+        padding: EdgeInsets.only(top: 60, bottom: 60, left: 32),
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
               spreadRadius: -5,
               blurRadius: 15,
-              offset: Offset(0, 10),
             )
           ],
           color: Colors.white,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: <Widget>[
-            FlatButton(
-              onPressed: () {
-                goToRoute(context, '/home');
-              },
-              child: Text("Focus",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w400,
-                  )),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                FlatButton(
+                  padding: EdgeInsets.all(16),
+                  onPressed: () {
+                    goToRoute(context, '/home');
+                  },
+                  child: Text("Focus",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w400,
+                      )),
+                ),
+                FlatButton(
+                  padding: EdgeInsets.all(16),
+                  onPressed: () {
+                    goToRoute(context, '/tasks');
+                  },
+                  child: Text("All Tasks",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w400,
+                      )),
+                ),
+                FlatButton(
+                  padding: EdgeInsets.all(16),
+                  onPressed: () {
+                    goToRoute(context, '/statistics');
+                  },
+                  child: Text("Statistics",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w400,
+                      )),
+                ),
+                FlatButton(
+                  padding: EdgeInsets.all(16),
+                  onPressed: () {
+                    goToRoute(context, '/settings');
+                  },
+                  child: Text("Settings",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w400,
+                      )),
+                ),
+              ],
             ),
-            FlatButton(
-              onPressed: () {
-                goToRoute(context, '/tasks');
-              },
-              child: Text("All Tasks",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w400,
-                  )),
-            ),
-            FlatButton(
-              onPressed: () {
-                goToRoute(context, '/statistics');
-              },
-              child: Text("Statistics",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w400,
-                  )),
-            ),
-            FlatButton(
-              onPressed: () {
-                goToRoute(context, '/settings');
-              },
-              child: Text("Settings",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w400,
-                  )),
-            ),
-            FlatButton(
-              onPressed: () {
-                auth.signOut();
-              },
-              child: Text("Sign Out",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w400,
-                  )),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              child: FlatButton(
+                onPressed: () {},
+                child: Row(
+                  children: <Widget>[
+                    Text("Feedback", style: TextStyle(
+                      color: Theme.of(context).hintColor,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w400,
+                    ),),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: FaIcon(FontAwesomeIcons.fileAlt, color: Theme.of(context).hintColor, size: 24,),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
