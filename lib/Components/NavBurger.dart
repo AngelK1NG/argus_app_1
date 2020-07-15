@@ -9,7 +9,7 @@ class NavBurger extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 102,
       height: 102,
       child: IconButton(

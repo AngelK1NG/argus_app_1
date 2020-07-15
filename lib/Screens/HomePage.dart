@@ -105,7 +105,7 @@ class _HomePageState extends State<HomePage> {
                   visible: !_doingTask,
                   child: LinearProgressIndicator(
                     value: _taskPercent,
-                    backgroundColor: Colors.black,                ),
+                    backgroundColor: Colors.black,),
                 ),
               ),
             ),

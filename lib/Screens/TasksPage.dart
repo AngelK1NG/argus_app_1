@@ -47,7 +47,7 @@ class _TasksPageState extends State<TasksPage> {
           height: 50,
           width: MediaQuery.of(context).size.width,
           alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1, color: Color(0xffe2e2e2)))),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1, color: Theme.of(context).dividerColor,))),
         ),
       ));
     });
