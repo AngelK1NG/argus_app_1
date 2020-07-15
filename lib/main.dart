@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color(0xff3c25d7),
         accentColor: const Color(0xff3c25d7),
         hintColor: const Color(0xffb0b0b0),
-        dividerColor: const Color(0xe2e2e2),
+        dividerColor: const Color(0xffe2e2e2),
         splashColor: Colors.transparent,
       ),
       initialRoute: '/login',
