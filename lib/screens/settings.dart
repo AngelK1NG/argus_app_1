@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Focal/constants.dart';
-import '../Components/WrapperWidget.dart';
+import '../components/wrapper.dart';
 
 class SettingsPage extends StatefulWidget {
   SettingsPage({Key key}) : super(key: key);

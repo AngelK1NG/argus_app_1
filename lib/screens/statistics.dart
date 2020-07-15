@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../Components/WrapperWidget.dart';
+import '../components/wrapper.dart';
 
 class StatisticsPage extends StatefulWidget {
   StatisticsPage({Key key}) : super(key: key);
