@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Image(image: AssetImage("Images/Focal Logo_Full.png")),
+          Image(image: AssetImage("assets/images/Focal Logo_Full.png")),
           Padding(
             padding: const EdgeInsets.only(top: 100),
             child: RctButton(
