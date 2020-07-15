@@ -4,6 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../components/wrapper.dart';
 import '../components/rct_button.dart';
 import 'package:Focal/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:Focal/utils/firestore.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -32,12 +34,13 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Image(image: AssetImage("assets/images/Focal Logo_Full.png")),
+          Image(image: AssetImage('assets/img/Focal Logo_Full.png')),
           Padding(
             padding: const EdgeInsets.only(top: 100),
             child: RctButton(
               onTap: () async {
-                await AuthProvider().googleSignIn();
+                FirebaseUser user = await AuthProvider().googleSignIn();
+                FirestoreProvider.createUserDocument(user);
               },
               buttonWidth: 300,
               buttonColor: Colors.white,
