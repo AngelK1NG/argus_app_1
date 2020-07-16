@@ -33,6 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _isLoading,
+      color: Theme.of(context).accentColor,
       child: WrapperWidget(
         nav: false,
         child: Column(

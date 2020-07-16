@@ -53,6 +53,7 @@ class _WrapperWidgetState extends State<WrapperWidget> {
                   setState(() {
                     _navActive = false;
                   });
+                  FocusScope.of(context).requestFocus(new FocusNode());
                 },
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 200),
@@ -71,7 +72,10 @@ class _WrapperWidgetState extends State<WrapperWidget> {
               SafeArea(
                 child: Offstage(
                   offstage: !widget.nav,
-                  child: NavBurger(onTap: toggleNav, active: _navActive),
+                  child: NavBurger(onTap: () {
+                    toggleNav();
+                    FocusScope.of(context).requestFocus(new FocusNode());
+                  }, active: _navActive),
                 ),
               )
             ],

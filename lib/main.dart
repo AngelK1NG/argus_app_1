@@ -5,6 +5,10 @@ import 'screens/tasks.dart';
 import 'screens/statistics.dart';
 import 'screens/settings.dart';
 import 'screens/login.dart';
+import 'package:provider/provider.dart';
+import 'utils/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'constants.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,36 +26,35 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      navigatorKey: navigatorKey,
-      theme: ThemeData(
-        buttonTheme: ButtonThemeData(
-          height: 60,
-          minWidth: 60,
+        navigatorKey: navigatorKey,
+        theme: ThemeData(
+          buttonTheme: ButtonThemeData(
+            height: 60,
+            minWidth: 60,
+          ),
+          primaryColor: const Color(0xff3c25d7),
+          accentColor: const Color(0xff3c25d7),
+          hintColor: const Color(0xffb0b0b0),
+          dividerColor: const Color(0xffe2e2e2),
+          splashColor: Colors.transparent,
         ),
-        primaryColor: const Color(0xff3c25d7),
-        accentColor: const Color(0xff3c25d7),
-        hintColor: const Color(0xffb0b0b0),
-        dividerColor: const Color(0xffe2e2e2),
-        splashColor: Colors.transparent,
-      ),
-      initialRoute: '/login',
-      routes: {
-        '/home': (context) {
-          return HomePage();
-        },
-        '/tasks': (context) {
-          return TasksPage();
-        },
-        '/statistics': (context) {
-          return StatisticsPage();
-        },
-        '/settings': (context) {
-          return SettingsPage();
-        },
-        '/login': (context) {
-          return LoginPage();
-        }
-      },
-    );
+        initialRoute: '/login',
+        routes: {
+          '/home': (context) {
+            return HomePage();
+          },
+          '/tasks': (context) {
+            return TasksPage();
+          },
+          '/statistics': (context) {
+            return StatisticsPage();
+          },
+          '/settings': (context) {
+            return SettingsPage();
+          },
+          '/login': (context) {
+            return LoginPage();
+          }
+        });
   }
 }
