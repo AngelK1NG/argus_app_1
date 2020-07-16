@@ -3,8 +3,17 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class TaskItem extends StatelessWidget {
   final String name;
+  final String id;
+  final bool completed;
+  final int order;
 
-  const TaskItem({@required this.name, Key key}) : super(key: key);
+  const TaskItem(
+      {@required this.name,
+      @required this.id,
+      @required this.completed,
+      @required this.order,
+      Key key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

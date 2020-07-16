@@ -1,9 +1,11 @@
+import 'package:Focal/constants.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../components/wrapper.dart';
 import '../utils/firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:Focal/components/task_list.dart';
 
 class TasksPage extends StatefulWidget {
   TasksPage({Key key}) : super(key: key);
@@ -75,9 +77,7 @@ class _TasksPageState extends State<TasksPage> {
           top: 100,
           child: SizedBox(
             height: MediaQuery.of(context).size.height - 100,
-            child: FirestoreProvider.getTasks(
-              _date,
-            ),
+            child: TaskList(date: _date, userId: userId),
           ),
         ),
       ]),
