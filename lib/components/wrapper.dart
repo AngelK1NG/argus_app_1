@@ -63,7 +63,11 @@ class _WrapperWidgetState extends State<WrapperWidget> {
                     duration: Duration(milliseconds: 200),
                     opacity: _navActive ? 0.5 : 1,
                     child: SafeArea(
-                      child: _navActive ? IgnorePointer(child: widget.child) : Container(child: widget.child),
+                      child: AbsorbPointer(
+                        absorbing: _navActive,
+                        child: Container(
+                          child: widget.child)
+                        ),
                     ),
                   ),
                 ),

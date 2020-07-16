@@ -20,6 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    imageCache.clear();
     auth.onAuthStateChanged.listen((user) {
       if (user == null) {
         Navigator.popUntil(context, (route) => route.isFirst);
@@ -33,7 +34,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _isLoading,
-      color: Theme.of(context).accentColor,
       child: WrapperWidget(
         nav: false,
         child: Column(

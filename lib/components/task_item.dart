@@ -1,28 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:Focal/utils/firestore.dart';
 
 class TaskItem extends StatelessWidget {
   final String name;
   final String id;
   final bool completed;
   final int order;
+  final VoidCallback onDismissed;
 
   const TaskItem(
       {@required this.name,
-      @required this.id,
+      this.id,
       @required this.completed,
-      @required this.order,
+      this.order,
+      @required this.onDismissed,
       Key key})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var now = DateTime.now();
+    String day = now.day.toString();
+    String month = now.month.toString();
+    String year = now.year.toString();
+    if (month.length == 1) {
+      month = '0' + month;
+    }
+    if (day.length == 1) {
+      day = '0' + day;
+    }
+    String date = month + day + year;
+
     return Container(
         child: Dismissible(
             background: Container(color: Colors.red),
             key: UniqueKey(),
             direction: DismissDirection.horizontal,
-            onDismissed: (direction) => {},
+            onDismissed: (direction) {
+              FirestoreProvider.deleteTask(date, id);
+              onDismissed();
+            },
             child: Container(
               child: Row(
                 children: <Widget>[
@@ -43,7 +61,9 @@ class TaskItem extends StatelessWidget {
                       ),
                       initialValue: name,
                       autofocus: false,
-                      onSaved: (value) {},
+                      onFieldSubmitted: (value) {
+                        FirestoreProvider.updateTaskName(value, date, id);
+                      },
                     ),
                   ),
                 ],

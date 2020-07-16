@@ -1,9 +1,7 @@
 import 'package:Focal/constants.dart';
-import 'package:Focal/utils/firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../components/wrapper.dart';
-import '../utils/firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Focal/components/task_list.dart';
 
@@ -77,7 +75,8 @@ class _TasksPageState extends State<TasksPage> {
           top: 100,
           child: SizedBox(
             height: MediaQuery.of(context).size.height - 100,
-            child: TaskList(date: _date, userId: userId),
+            child:
+                TaskList(date: _date, userId: 'K39LOmjUxQYrtt8x5gjziw4wKZz2'),
           ),
         ),
       ]),

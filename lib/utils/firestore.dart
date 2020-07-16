@@ -1,9 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Focal/constants.dart';
-import 'package:flutter/material.dart';
-import 'package:Focal/Components/task_item.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:Focal/components/task_item.dart';
 
 class FirestoreProvider {
   // create user document in firestore when signed in with google
@@ -21,7 +18,7 @@ class FirestoreProvider {
   }
 
   // add task to firestore method
-  static void addTask(String date, int order) async {
+  static void addTask(TaskItem task, String date) async {
     FirebaseUser user = await auth.currentUser();
     String userId = user.uid;
     db
@@ -31,8 +28,8 @@ class FirestoreProvider {
         .document(date)
         .collection('tasks')
         .add({
-      'name': '',
-      'order': order,
+      'name': task.name,
+      'order': task.order,
       'completed': false,
     });
   }
@@ -53,19 +50,21 @@ class FirestoreProvider {
     });
   }
 
-  static void updateTaskOrder(String name, String date, String taskId) async {
+  static void updateTaskOrder(List<TaskItem> tasks, String date) async {
     FirebaseUser user = await auth.currentUser();
     String userId = user.uid;
-    db
-        .collection('users')
-        .document(userId)
-        .collection('tasks')
-        .document(date)
-        .collection('tasks')
-        .document(taskId)
-        .updateData({
-      'name': name,
-    });
+    for (TaskItem task in tasks) {
+      db
+          .collection('users')
+          .document(userId)
+          .collection('tasks')
+          .document(date)
+          .collection('tasks')
+          .document(task.id)
+          .updateData({
+        'order': tasks.indexOf(task) + 1,
+      });
+    }
   }
 
   // delete task

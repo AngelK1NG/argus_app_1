@@ -6,8 +6,8 @@ import 'package:Focal/utils/firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class TaskList extends StatefulWidget {
-  final String date;
   final String userId;
+  final String date;
   const TaskList({Key key, this.date, this.userId}) : super(key: key);
 
   @override
@@ -16,6 +16,13 @@ class TaskList extends StatefulWidget {
 
 class _TaskListState extends State<TaskList> {
   List<TaskItem> _tasks = [];
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -29,11 +36,9 @@ class _TaskListState extends State<TaskList> {
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return Center(
-                child: CircularProgressIndicator(
-              backgroundColor: Theme.of(context).accentColor,
-            ));
+            return Center(child: CircularProgressIndicator());
           }
+          _tasks = [];
           final data = snapshot.data.documents;
           for (var task in data) {
             String name = task.data['name'];
@@ -43,6 +48,8 @@ class _TaskListState extends State<TaskList> {
               completed: task.data['completed'],
               order: task.data['order'],
               key: UniqueKey(),
+              onDismissed: () =>
+                  FirestoreProvider.updateTaskOrder(_tasks, widget.date),
             );
             _tasks.add(actionItem);
           }
@@ -51,20 +58,7 @@ class _TaskListState extends State<TaskList> {
               onTap: () {},
               child: Container(
                 child: GestureDetector(
-                  onTap: () {
-                    var now = DateTime.now();
-                    String day = now.day.toString();
-                    String month = now.month.toString();
-                    String year = now.year.toString();
-                    if (day.length == 1) {
-                      day = '0' + day;
-                    }
-                    if (month.length == 1) {
-                      month = '0' + month;
-                    }
-                    String date = month + day + year;
-                    FirestoreProvider.addTask(date, 1);
-                  },
+                  onTap: () {},
                   child: Row(
                     children: <Widget>[
                       Padding(
@@ -78,18 +72,32 @@ class _TaskListState extends State<TaskList> {
                       SizedBox(
                         height: 50,
                         width: MediaQuery.of(context).size.width - 100,
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Add task",
-                          ),
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: Theme.of(context).hintColor,
-                          ),
-                          autofocus: false,
-                          onSaved: (value) {},
+                        child: Form(
+                          child: TextFormField(
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Add task",
+                              ),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: Theme.of(context).hintColor,
+                              ),
+                              autofocus: false,
+                              onFieldSubmitted: (value) {
+                                TaskItem newTask = TaskItem(
+                                  name: value,
+                                  completed: false,
+                                  key: UniqueKey(),
+                                  order: _tasks.length + 1,
+                                  onDismissed: () =>
+                                      FirestoreProvider.updateTaskOrder(
+                                          _tasks, widget.date),
+                                );
+                                _tasks.add(newTask);
+
+                                FirestoreProvider.addTask(newTask, widget.date);
+                              }),
                         ),
                       ),
                     ],
@@ -107,13 +115,16 @@ class _TaskListState extends State<TaskList> {
               ),
             ),
             onReorder: ((oldIndex, newIndex) {
+              List<TaskItem> tasks = _tasks;
               if (oldIndex < newIndex) {
                 newIndex -= 1;
               }
-              setState(() {
-                final task = _tasks.removeAt(oldIndex);
-                _tasks.insert(newIndex, task);
-              });
+              final task = tasks.removeAt(oldIndex);
+              print(task);
+              tasks.insert(newIndex, task);
+              print(tasks);
+              print(_tasks);
+              FirestoreProvider.updateTaskOrder(tasks, widget.date);
             }),
             children: _tasks,
           );
