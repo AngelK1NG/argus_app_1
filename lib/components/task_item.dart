@@ -10,6 +10,7 @@ class TaskItem extends StatelessWidget {
   final bool completed;
   final int order;
   final VoidCallback onDismissed;
+  final String date;
 
   const TaskItem(
       {@required this.name,
@@ -17,22 +18,12 @@ class TaskItem extends StatelessWidget {
       @required this.completed,
       this.order,
       @required this.onDismissed,
+      @required this.date,
       Key key})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var now = DateTime.now();
-    String day = now.day.toString();
-    String month = now.month.toString();
-    String year = now.year.toString();
-    if (month.length == 1) {
-      month = '0' + month;
-    }
-    if (day.length == 1) {
-      day = '0' + day;
-    }
-    String date = month + day + year;
     FirestoreProvider firestoreProvider =
         FirestoreProvider(Provider.of<User>(context, listen: false).user);
 

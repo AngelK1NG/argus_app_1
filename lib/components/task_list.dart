@@ -58,6 +58,7 @@ class _TaskListState extends State<TaskList> {
                     _tasks.firstWhere((tasku) => tasku.id == task.documentID));
                 firestoreProvider.updateTaskOrder(_tasks, widget.date);
               },
+              date: widget.date,
             );
             _tasks.add(actionItem);
           }
@@ -96,6 +97,7 @@ class _TaskListState extends State<TaskList> {
                               order: _tasks.length + 1,
                               onDismissed: () => firestoreProvider
                                   .updateTaskOrder(_tasks, widget.date),
+                              date: widget.date,
                             );
                             _tasks.add(newTask);
                             _formKey.currentState.reset();

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../components/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Focal/components/task_list.dart';
+import 'package:Focal/utils/date.dart';
 
 class TasksPage extends StatefulWidget {
   TasksPage({Key key}) : super(key: key);
@@ -21,17 +22,7 @@ class _TasksPageState extends State<TasksPage> {
   void initState() {
     super.initState();
     setState(() {
-      var now = DateTime.now();
-      String day = now.day.toString();
-      String month = now.month.toString();
-      String year = now.year.toString();
-      if (day.length == 1) {
-        day = '0' + day;
-      }
-      if (month.length == 1) {
-        month = '0' + month;
-      }
-      _date = month + day + year;
+      _date = getDateString(DateTime.now());
     });
   }
 
@@ -46,13 +37,17 @@ class _TasksPageState extends State<TasksPage> {
           top: 0,
           child: Padding(
             padding: const EdgeInsets.only(
-              right: 38,
+              right: 18,
               top: 30,
             ),
             child: Row(
               children: <Widget>[
                 Text(
-                  "Today",
+                  (DateTime.parse(_date).year == DateTime.now().year &&  DateTime.parse(_date).month == DateTime.now().month &&  DateTime.parse(_date).day == DateTime.now().day)
+                    ? "Today"
+                    : (DateTime.parse(_date).year == DateTime.now().year &&  DateTime.parse(_date).month == DateTime.now().month &&  DateTime.parse(_date).day == DateTime.now().day + 1)
+                      ? "Tomorrow"
+                      : DateTime.parse(_date).month.toString() + "/" + DateTime.parse(_date).day.toString(),
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.w500,
@@ -62,9 +57,21 @@ class _TasksPageState extends State<TasksPage> {
                   padding: const EdgeInsets.only(
                     left: 10,
                   ),
-                  width: 35,
                   child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showDatePicker(
+                          context: context,
+                          initialDate: DateTime.parse(_date),
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2120),
+                        ).then((date) {
+                          if (date != null) {
+                            setState(() {
+                              _date = getDateString(date);
+                            });
+                          }
+                        });
+                      },
                       icon: FaIcon(FontAwesomeIcons.calendar)),
                 ),
               ],
