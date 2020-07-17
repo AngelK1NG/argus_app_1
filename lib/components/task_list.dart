@@ -54,65 +54,59 @@ class _TaskListState extends State<TaskList> {
             _tasks.add(actionItem);
           }
           return ReorderableListView(
-            header: GestureDetector(
-              onTap: () {},
-              child: Container(
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 31, right: 11),
-                        child: FaIcon(
-                          FontAwesomeIcons.plus,
-                          size: 15,
-                          color: Theme.of(context).hintColor,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: MediaQuery.of(context).size.width - 100,
-                        child: Form(
-                          child: TextFormField(
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Add task",
-                              ),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: Theme.of(context).hintColor,
-                              ),
-                              autofocus: false,
-                              onFieldSubmitted: (value) {
-                                TaskItem newTask = TaskItem(
-                                  name: value,
-                                  completed: false,
-                                  key: UniqueKey(),
-                                  order: _tasks.length + 1,
-                                  onDismissed: () =>
-                                      FirestoreProvider.updateTaskOrder(
-                                          _tasks, widget.date),
-                                );
-                                _tasks.add(newTask);
-
-                                FirestoreProvider.addTask(newTask, widget.date);
-                              }),
-                        ),
-                      ),
-                    ],
+            header: Container(
+              child: Row(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 31, right: 11),
+                    child: FaIcon(
+                      FontAwesomeIcons.plus,
+                      size: 15,
+                      color: Theme.of(context).hintColor,
+                    ),
                   ),
-                ),
-                height: 50,
-                width: MediaQuery.of(context).size.width,
-                alignment: Alignment.centerLeft,
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                  width: 1,
-                  color: Theme.of(context).dividerColor,
-                ))),
+                  SizedBox(
+                    height: 50,
+                    width: MediaQuery.of(context).size.width - 100,
+                    child: Form(
+                      key: _formKey,
+                      child: TextFormField(
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Add task",
+                          ),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          autofocus: false,
+                          onFieldSubmitted: (value) {
+                            TaskItem newTask = TaskItem(
+                              name: value,
+                              completed: false,
+                              key: UniqueKey(),
+                              order: _tasks.length + 1,
+                              onDismissed: () =>
+                                  FirestoreProvider.updateTaskOrder(
+                                      _tasks, widget.date),
+                            );
+                            _tasks.add(newTask);
+                            _formKey.currentState.reset();
+                            FirestoreProvider.addTask(newTask, widget.date);
+                          }),
+                    ),
+                  ),
+                ],
               ),
+              height: 50,
+              width: MediaQuery.of(context).size.width,
+              alignment: Alignment.centerLeft,
+              decoration: BoxDecoration(
+                  border: Border(
+                      bottom: BorderSide(
+                width: 1,
+                color: Theme.of(context).dividerColor,
+              ))),
             ),
             onReorder: ((oldIndex, newIndex) {
               List<TaskItem> tasks = _tasks;
