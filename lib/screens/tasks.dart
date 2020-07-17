@@ -1,5 +1,7 @@
+import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import '../components/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Focal/components/task_list.dart';
@@ -35,6 +37,7 @@ class _TasksPageState extends State<TasksPage> {
 
   @override
   Widget build(BuildContext context) {
+    user = Provider.of<User>(context).user;
     return WrapperWidget(
       nav: true,
       child: Stack(children: <Widget>[
@@ -74,8 +77,7 @@ class _TasksPageState extends State<TasksPage> {
           top: 100,
           child: SizedBox(
             height: MediaQuery.of(context).size.height - 100,
-            child:
-                TaskList(date: _date, userId: 'K39LOmjUxQYrtt8x5gjziw4wKZz2'),
+            child: TaskList(date: _date, userId: user.uid),
           ),
         ),
       ]),

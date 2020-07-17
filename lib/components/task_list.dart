@@ -1,6 +1,8 @@
+import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Focal/constants.dart';
+import 'package:provider/provider.dart';
 import 'task_item.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -25,6 +27,8 @@ class _TaskListState extends State<TaskList> {
 
   @override
   Widget build(BuildContext context) {
+    FirestoreProvider firestoreProvider =
+        FirestoreProvider(Provider.of<User>(context, listen: false).user);
     return StreamBuilder<QuerySnapshot>(
         stream: db
             .collection('users')
@@ -48,8 +52,11 @@ class _TaskListState extends State<TaskList> {
               completed: task.data['completed'],
               order: task.data['order'],
               key: UniqueKey(),
-              onDismissed: () =>
-                  FirestoreProvider.updateTaskOrder(_tasks, widget.date),
+              onDismissed: () {
+                _tasks.remove(
+                    _tasks.firstWhere((tasku) => tasku.id == task.documentID));
+                firestoreProvider.updateTaskOrder(_tasks, widget.date);
+              },
             );
             _tasks.add(actionItem);
           }
@@ -86,13 +93,12 @@ class _TaskListState extends State<TaskList> {
                               completed: false,
                               key: UniqueKey(),
                               order: _tasks.length + 1,
-                              onDismissed: () =>
-                                  FirestoreProvider.updateTaskOrder(
-                                      _tasks, widget.date),
+                              onDismissed: () => firestoreProvider
+                                  .updateTaskOrder(_tasks, widget.date),
                             );
                             _tasks.add(newTask);
                             _formKey.currentState.reset();
-                            FirestoreProvider.addTask(newTask, widget.date);
+                            firestoreProvider.addTask(newTask, widget.date);
                           }),
                     ),
                   ),
@@ -118,7 +124,7 @@ class _TaskListState extends State<TaskList> {
               tasks.insert(newIndex, task);
               print(tasks);
               print(_tasks);
-              FirestoreProvider.updateTaskOrder(tasks, widget.date);
+              firestoreProvider.updateTaskOrder(tasks, widget.date);
             }),
             children: _tasks,
           );

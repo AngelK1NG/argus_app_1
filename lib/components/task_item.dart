@@ -1,6 +1,9 @@
+import 'package:Focal/utils/user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:Focal/utils/firestore.dart';
+import 'package:provider/provider.dart';
 
 class TaskItem extends StatelessWidget {
   final String name;
@@ -31,6 +34,8 @@ class TaskItem extends StatelessWidget {
       day = '0' + day;
     }
     String date = month + day + year;
+    FirestoreProvider firestoreProvider =
+        FirestoreProvider(Provider.of<User>(context, listen: false).user);
 
     return Container(
         child: Dismissible(
@@ -38,7 +43,7 @@ class TaskItem extends StatelessWidget {
             key: UniqueKey(),
             direction: DismissDirection.horizontal,
             onDismissed: (direction) {
-              FirestoreProvider.deleteTask(date, id);
+              firestoreProvider.deleteTask(date, id);
               onDismissed();
             },
             child: Container(
@@ -62,7 +67,7 @@ class TaskItem extends StatelessWidget {
                       initialValue: name,
                       autofocus: false,
                       onFieldSubmitted: (value) {
-                        FirestoreProvider.updateTaskName(value, date, id);
+                        firestoreProvider.updateTaskName(value, date, id);
                       },
                     ),
                   ),

@@ -1,6 +1,8 @@
 import 'package:Focal/utils/auth.dart';
+import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import '../components/wrapper.dart';
 import '../components/rct_button.dart';
 import 'package:Focal/constants.dart';
@@ -20,8 +22,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    imageCache.clear();
     auth.onAuthStateChanged.listen((user) {
+      Provider.of<User>(context, listen: false).user = user;
       if (user == null) {
         Navigator.popUntil(context, (route) => route.isFirst);
       } else {
@@ -48,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
                     _isLoading = true;
                   });
                   FirebaseUser user = await AuthProvider().googleSignIn();
-                  FirestoreProvider.createUserDocument(user);
+                  FirestoreProvider(user).createUserDocument();
                   setState(() {
                     _isLoading = false;
                   });

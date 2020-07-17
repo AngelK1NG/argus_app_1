@@ -3,8 +3,12 @@ import 'package:Focal/constants.dart';
 import 'package:Focal/components/task_item.dart';
 
 class FirestoreProvider {
+  FirebaseUser user;
+
+  FirestoreProvider(this.user);
+
   // create user document in firestore when signed in with google
-  static void createUserDocument(FirebaseUser user) async {
+  void createUserDocument() async {
     await db.collection('users').document(user.uid).get().then((doc) {
       if (!doc.exists) {
         db.collection('users').document(user.uid).setData({
@@ -18,8 +22,7 @@ class FirestoreProvider {
   }
 
   // add task to firestore method
-  static void addTask(TaskItem task, String date) async {
-    FirebaseUser user = await auth.currentUser();
+  void addTask(TaskItem task, String date) {
     String userId = user.uid;
     db
         .collection('users')
@@ -35,8 +38,7 @@ class FirestoreProvider {
   }
 
   // update method
-  static void updateTaskName(String name, String date, String taskId) async {
-    FirebaseUser user = await auth.currentUser();
+  void updateTaskName(String name, String date, String taskId) {
     String userId = user.uid;
     db
         .collection('users')
@@ -50,8 +52,7 @@ class FirestoreProvider {
     });
   }
 
-  static void updateTaskOrder(List<TaskItem> tasks, String date) async {
-    FirebaseUser user = await auth.currentUser();
+  void updateTaskOrder(List<TaskItem> tasks, String date) {
     String userId = user.uid;
     for (TaskItem task in tasks) {
       db
@@ -68,8 +69,7 @@ class FirestoreProvider {
   }
 
   // delete task
-  static void deleteTask(String date, String taskId) async {
-    FirebaseUser user = await auth.currentUser();
+  void deleteTask(String date, String taskId) {
     String userId = user.uid;
     db
         .collection('users')
