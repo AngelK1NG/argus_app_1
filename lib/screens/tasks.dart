@@ -37,7 +37,7 @@ class _TasksPageState extends State<TasksPage> {
 
   @override
   Widget build(BuildContext context) {
-    user = Provider.of<User>(context).user;
+    user = Provider.of<User>(context, listen: false).user;
     return WrapperWidget(
       nav: true,
       child: Stack(children: <Widget>[
@@ -77,7 +77,7 @@ class _TasksPageState extends State<TasksPage> {
           top: 100,
           child: SizedBox(
             height: MediaQuery.of(context).size.height - 100,
-            child: TaskList(date: _date, userId: user.uid),
+            child: TaskList(date: _date),
           ),
         ),
       ]),

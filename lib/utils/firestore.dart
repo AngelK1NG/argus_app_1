@@ -15,8 +15,6 @@ class FirestoreProvider {
           'name': user.displayName,
           'email': user.email,
         });
-      } else {
-        print('user exists');
       }
     });
   }

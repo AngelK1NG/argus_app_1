@@ -6,11 +6,11 @@ import 'package:provider/provider.dart';
 import 'task_item.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class TaskList extends StatefulWidget {
-  final String userId;
   final String date;
-  const TaskList({Key key, this.date, this.userId}) : super(key: key);
+  const TaskList({Key key, this.date}) : super(key: key);
 
   @override
   _TaskListState createState() => _TaskListState();
@@ -27,12 +27,13 @@ class _TaskListState extends State<TaskList> {
 
   @override
   Widget build(BuildContext context) {
+    FirebaseUser user = Provider.of<User>(context, listen: false).user;
     FirestoreProvider firestoreProvider =
         FirestoreProvider(Provider.of<User>(context, listen: false).user);
     return StreamBuilder<QuerySnapshot>(
         stream: db
             .collection('users')
-            .document(widget.userId)
+            .document(user.uid)
             .collection('tasks')
             .document(widget.date)
             .collection('tasks')
@@ -120,10 +121,7 @@ class _TaskListState extends State<TaskList> {
                 newIndex -= 1;
               }
               final task = tasks.removeAt(oldIndex);
-              print(task);
               tasks.insert(newIndex, task);
-              print(tasks);
-              print(_tasks);
               firestoreProvider.updateTaskOrder(tasks, widget.date);
             }),
             children: _tasks,

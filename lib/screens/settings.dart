@@ -14,7 +14,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    String _email = Provider.of<User>(context).user.email;
+    String _email = Provider.of<User>(context, listen: false).user.email;
     return WrapperWidget(
       nav: true,
       child: Stack(children: <Widget>[
