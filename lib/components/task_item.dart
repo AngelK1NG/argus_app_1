@@ -35,7 +35,9 @@ class _TaskItemState extends State<TaskItem> {
     super.initState();
     _focus.addListener(() {
       if (!_focus.hasFocus) {
-        setState(() {_active = false;});
+        setState(() {
+          _active = false;
+        });
       }
     });
   }
@@ -66,39 +68,53 @@ class _TaskItemState extends State<TaskItem> {
                 child: Row(
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.only(left: 33, right: 15),
-                      child: widget.completed ? Image(image: AssetImage('images/Task Icon_Filled.png'), width: 10, height: 10,) : Image(image: AssetImage('images/Task Icon_Unfilled.png'), width: 10, height: 10,)
-                    ),
+                        padding: const EdgeInsets.only(left: 33, right: 15),
+                        child: widget.completed
+                            ? Image(
+                                image:
+                                    AssetImage('images/Task Icon_Filled.png'),
+                                width: 10,
+                                height: 10,
+                              )
+                            : Image(
+                                image:
+                                    AssetImage('images/Task Icon_Unfilled.png'),
+                                width: 10,
+                                height: 10,
+                              )),
                     SizedBox(
-                      height: 50,
-                      width: MediaQuery.of(context).size.width - 58,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: _active 
-                          ? TextFormField(
-                            focusNode: _focus,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                            ),
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            initialValue: widget.name,
-                            autofocus: false,
-                            onFieldSubmitted: (value) {
-                              firestoreProvider.updateTaskName(value, widget.date, widget.id);
-                            },
-                          )
-                          : Text(
-                            widget.name,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                      )
-                    ),
+                        height: 50,
+                        width: MediaQuery.of(context).size.width - 58,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: _active
+                              ? TextFormField(
+                                  focusNode: _focus,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                  ),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  initialValue: widget.name,
+                                  autofocus: false,
+                                  onFieldSubmitted: (value) {
+                                    firestoreProvider.updateTaskName(
+                                        value, widget.date, widget.id);
+                                  },
+                                )
+                              : Text(
+                                  widget.name,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: widget.completed
+                                        ? Colors.grey
+                                        : Colors.black,
+                                  ),
+                                ),
+                        )),
                   ],
                 ),
                 height: 50,

@@ -1,9 +1,18 @@
+import 'package:Focal/components/task_item.dart';
+import 'package:Focal/utils/date.dart';
+import 'package:Focal/utils/firestore.dart';
+import 'package:Focal/utils/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import '../components/wrapper.dart';
 import '../components/rct_button.dart';
 import '../components/sqr_button.dart';
+import '../constants.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -16,21 +25,32 @@ class _HomePageState extends State<HomePage> {
   Timer timer;
   DateTime _startTime;
   String _swatchDisplay = "00:00";
-  String _taskDisplay = "AP Bio Reading U7 p37-39";
   double _taskPercent = 0.69;
   bool _doingTask = false;
+  String _date;
+  FirebaseUser _user;
+  FirestoreProvider _firestoreProvider;
+  List<TaskItem> _tasks = [];
 
   void startTask() {
     timer = new Timer.periodic(
-      const Duration(seconds: 1), (Timer timer) => setState(() {
-        if (_doingTask) {
-          final currentTime = DateTime.now();
-          _swatchDisplay = currentTime.difference(_startTime).inMinutes.toString().padLeft(2, "0") + ":" + (currentTime.difference(_startTime).inSeconds % 60).toString().padLeft(2, "0");
-        } else {
-          timer.cancel();
-        }
-      })
-    );
+        const Duration(seconds: 1),
+        (Timer timer) => setState(() {
+              if (_doingTask) {
+                final currentTime = DateTime.now();
+                _swatchDisplay = currentTime
+                        .difference(_startTime)
+                        .inMinutes
+                        .toString()
+                        .padLeft(2, "0") +
+                    ":" +
+                    (currentTime.difference(_startTime).inSeconds % 60)
+                        .toString()
+                        .padLeft(2, "0");
+              } else {
+                timer.cancel();
+              }
+            }));
     setState(() {
       _doingTask = true;
       _startTime = DateTime.now();
@@ -49,11 +69,41 @@ class _HomePageState extends State<HomePage> {
       _doingTask = false;
       _swatchDisplay = "00:00";
     });
-}
+    _firestoreProvider.deleteTask(_date, _tasks[0].id);
+  }
+
+  void completeTask(FirebaseUser user) {
+    FirestoreProvider firestoreProvider = FirestoreProvider(user);
+    TaskItem currentTask = _tasks[0];
+    TaskItem finishedTask = TaskItem(
+      completed: true,
+      name: currentTask.name,
+      date: _date,
+      order: _tasks.length,
+      id: currentTask.id,
+      onDismissed: currentTask.onDismissed,
+    );
+    _tasks.add(finishedTask);
+    print('curren task id: ${currentTask.id}');
+    firestoreProvider.deleteTask(_date, currentTask.id);
+    _tasks.remove(currentTask);
+    firestoreProvider.addTask(finishedTask, _date);
+    for (var task in _tasks) {
+      print(_tasks.indexOf(task) + 1);
+      print(task.name);
+      print(task.id);
+    }
+    firestoreProvider.updateTaskOrder(_tasks, _date);
+  }
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
+    setState(() {
+      _date = getDateString(DateTime.now());
+      _user = Provider.of<User>(context, listen: false).user;
+      _firestoreProvider = FirestoreProvider(_user);
+    });
   }
 
   @override
@@ -67,31 +117,123 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.05),
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.05),
               child: Container(
                 width: 315,
                 padding: const EdgeInsets.only(bottom: 70),
-                child: Text(_swatchDisplay, textAlign: TextAlign.center, style: TextStyle(
-                  fontSize: 80,
-                  fontWeight: FontWeight.w500,
-                  color: _doingTask ? Colors.white : Colors.black,
-                ),),
+                child: Text(
+                  _swatchDisplay,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 80,
+                    fontWeight: FontWeight.w500,
+                    color: _doingTask ? Colors.white : Colors.black,
+                  ),
+                ),
               ),
             ),
-            Text(_taskDisplay, textAlign: TextAlign.center, style: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.w300,
-              color: _doingTask ? Colors.white : Colors.black,
-            ),),
+            StreamBuilder<QuerySnapshot>(
+                stream: db
+                    .collection('users')
+                    .document(_user.uid)
+                    .collection('tasks')
+                    .document(_date)
+                    .collection('tasks')
+                    .orderBy('order')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Text('No tasks yet!');
+                  }
+                  _tasks = [];
+                  final data = snapshot.data.documents;
+                  for (var task in data) {
+                    String name = task.data['name'];
+                    TaskItem actionItem = TaskItem(
+                      name: name,
+                      id: task.documentID,
+                      completed: task.data['completed'],
+                      order: task.data['order'],
+                      key: UniqueKey(),
+                      onDismissed: () {
+                        _tasks.remove(_tasks.firstWhere(
+                            (tasku) => tasku.id == task.documentID));
+                        _firestoreProvider.updateTaskOrder(_tasks, _date);
+                      },
+                      date: _date,
+                    );
+                    _tasks.add(actionItem);
+                  }
+                  if (_tasks.isEmpty) {
+                    return Text('No tasks yet!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.w300,
+                          color: _doingTask ? Colors.white : Colors.black,
+                        ));
+                  }
+                  return Text(
+                    _tasks[0].name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.w300,
+                      color: _doingTask ? Colors.white : Colors.black,
+                    ),
+                  );
+                }),
             Padding(
               padding: const EdgeInsets.only(top: 90),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  _doingTask ? RctButton(onTap: stopTask, buttonWidth: 240, buttonText: "Complete", buttonColor: Colors.white, textColor: Colors.black, textSize: 32,) : RctButton(onTap: startTask, buttonWidth: 240, buttonText: "Start", buttonColor: Colors.black, textColor: Colors.white, textSize: 32,),
+                  _doingTask
+                      ? RctButton(
+                          onTap: () {
+                            setState(() {
+                              _doingTask = false;
+                            });
+                            stopTask();
+                            completeTask(_user);
+                          },
+                          buttonWidth: 240,
+                          buttonText: "Complete",
+                          buttonColor: Colors.white,
+                          textColor: Colors.black,
+                          textSize: 32,
+                        )
+                      : RctButton(
+                          onTap: () {
+                            setState(() {
+                              _doingTask = true;
+                            });
+                            startTask();
+                          },
+                          buttonWidth: 240,
+                          buttonText: "Start",
+                          buttonColor: Colors.black,
+                          textColor: Colors.white,
+                          textSize: 32,
+                        ),
                   Padding(
                     padding: const EdgeInsets.only(left: 15),
-                    child: SqrButton(onTap: abandonTask, buttonColor: Theme.of(context).primaryColor, icon: FaIcon(FontAwesomeIcons.running, size: 32, color: Colors.white,)),
+                    child: SqrButton(
+                        onTap: () {
+                          Fluttertoast.showToast(
+                            msg: 'Abandoned task: ${_tasks[0].name}',
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                          );
+                          abandonTask();
+                        },
+                        buttonColor: Theme.of(context).primaryColor,
+                        icon: FaIcon(
+                          FontAwesomeIcons.running,
+                          size: 32,
+                          color: Colors.white,
+                        )),
                   ),
                 ],
               ),
@@ -105,7 +247,8 @@ class _HomePageState extends State<HomePage> {
                   visible: !_doingTask,
                   child: LinearProgressIndicator(
                     value: _taskPercent,
-                    backgroundColor: Colors.black,),
+                    backgroundColor: Colors.black,
+                  ),
                 ),
               ),
             ),
@@ -117,10 +260,10 @@ class _HomePageState extends State<HomePage> {
                 height: 24,
                 child: Visibility(
                   visible: !_doingTask,
-                  child: Text(
-                    (_taskPercent*100).toInt().toString() + "%",
-                    style: TextStyle(fontSize: 24,)
-                  ),
+                  child: Text((_taskPercent * 100).toInt().toString() + "%",
+                      style: TextStyle(
+                        fontSize: 24,
+                      )),
                 ),
               ),
             ),

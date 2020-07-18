@@ -28,10 +28,11 @@ class FirestoreProvider {
         .collection('tasks')
         .document(date)
         .collection('tasks')
-        .add({
+        .document(task.id)
+        .setData({
       'name': task.name,
       'order': task.order,
-      'completed': false,
+      'completed': task.completed,
     });
   }
 
