@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
       _doingTask = false;
       _swatchDisplay = "00:00";
     });
-    _firestoreProvider.deleteTask(_date, _tasks[0].id);
+    _firestoreProvider.deleteTask(_date, _tasks[0].id, _tasks[0].completed);
   }
 
   bool areTasksCompleted() {
@@ -93,16 +93,10 @@ class _HomePageState extends State<HomePage> {
       id: currentTask.id,
       onDismissed: currentTask.onDismissed,
     );
+    firestoreProvider.deleteTask(_date, currentTask.id, false);
     _tasks.add(finishedTask);
-    print('Curren task id: ${currentTask.id}');
-    firestoreProvider.deleteTask(_date, currentTask.id);
     _tasks.remove(currentTask);
     firestoreProvider.addTask(finishedTask, _date);
-    for (var task in _tasks) {
-      print(_tasks.indexOf(task) + 1);
-      print(task.name);
-      print(task.id);
-    }
     firestoreProvider.updateTaskOrder(_tasks, _date);
   }
 
@@ -133,7 +127,9 @@ class _HomePageState extends State<HomePage> {
               .orderBy('order')
               .snapshots(),
           builder: (context, snapshot) {
-            if (!snapshot.hasData || snapshot.data.documents == null || snapshot.data.documents.isEmpty) {
+            if (!snapshot.hasData ||
+                snapshot.data.documents == null ||
+                snapshot.data.documents.isEmpty) {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -144,33 +140,30 @@ class _HomePageState extends State<HomePage> {
                       width: 315,
                       padding: const EdgeInsets.only(bottom: 70),
                       child: Text(
-                          _swatchDisplay,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 80,
-                            fontWeight: FontWeight.w500,
-                            color: _doingTask ? Colors.white : Colors.black,
-                          ),
+                        _swatchDisplay,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 80,
+                          fontWeight: FontWeight.w500,
+                          color: _doingTask ? Colors.white : Colors.black,
                         ),
+                      ),
                     ),
                   ),
                   Container(
-                    width: 315,
-                    child: 
-                      Text('Add a task and start your day!',
+                      width: 315,
+                      child: Text('Add a task and start your day!',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 36,
                             fontWeight: FontWeight.w300,
-                          )
-                        )
-                  ),
+                          ))),
                   Padding(
                     padding: const EdgeInsets.only(top: 90),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        RctButton (
+                        RctButton(
                           onTap: () {
                             Navigator.pushNamed(context, '/tasks');
                           },
@@ -205,10 +198,11 @@ class _HomePageState extends State<HomePage> {
                       height: 24,
                       child: Visibility(
                         visible: !_doingTask,
-                        child: Text((_taskPercent * 100).toInt().toString() + "%",
-                            style: TextStyle(
-                              fontSize: 24,
-                            )),
+                        child:
+                            Text((_taskPercent * 100).toInt().toString() + "%",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                )),
                       ),
                     ),
                   ),
@@ -226,8 +220,8 @@ class _HomePageState extends State<HomePage> {
                   order: task.data['order'],
                   key: UniqueKey(),
                   onDismissed: () {
-                    _tasks.remove(_tasks.firstWhere(
-                        (tasku) => tasku.id == task.documentID));
+                    _tasks.remove(_tasks
+                        .firstWhere((tasku) => tasku.id == task.documentID));
                     _firestoreProvider.updateTaskOrder(_tasks, _date);
                   },
                   date: _date,
@@ -244,46 +238,44 @@ class _HomePageState extends State<HomePage> {
                       width: 315,
                       padding: const EdgeInsets.only(bottom: 70),
                       child: areTasksCompleted()
-                        ? Text(
-                          'Done',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 80,
-                            fontWeight: FontWeight.w500,
-                            color: _doingTask ? Colors.white : Colors.black,
-                          ),
-                        )
-                        : Text(
-                          _swatchDisplay,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 80,
-                            fontWeight: FontWeight.w500,
-                            color: _doingTask ? Colors.white : Colors.black,
-                          ),
-                        ),
+                          ? Text(
+                              'Done',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 80,
+                                fontWeight: FontWeight.w500,
+                                color: _doingTask ? Colors.white : Colors.black,
+                              ),
+                            )
+                          : Text(
+                              _swatchDisplay,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 80,
+                                fontWeight: FontWeight.w500,
+                                color: _doingTask ? Colors.white : Colors.black,
+                              ),
+                            ),
                     ),
                   ),
                   Container(
                     width: 315,
-                    child: 
-                    areTasksCompleted()
-                      ? Text('Congrats! You are done for the day',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w300,
-                          )
-                        )
-                      : Text(
-                          _tasks[0].name,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w300,
-                            color: _doingTask ? Colors.white : Colors.black,
+                    child: areTasksCompleted()
+                        ? Text('Congrats! You are done for the day',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.w300,
+                            ))
+                        : Text(
+                            _tasks[0].name,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.w300,
+                              color: _doingTask ? Colors.white : Colors.black,
+                            ),
                           ),
-                        ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 90),
@@ -298,6 +290,8 @@ class _HomePageState extends State<HomePage> {
                                   });
                                   stopTask();
                                   completeTask(_user);
+                                  _firestoreProvider
+                                      .addCompletedTaskNumber(_date);
                                 },
                                 buttonWidth: 240,
                                 buttonText: "Complete",
@@ -306,49 +300,51 @@ class _HomePageState extends State<HomePage> {
                                 textSize: 32,
                               )
                             : areTasksCompleted()
-                              ? RctButton (
-                                  onTap: () {
-                                    Navigator.pushNamed(context, '/statistics');
-                                  },
-                                  buttonWidth: 315,
-                                  buttonText: "Statistics",
-                                  buttonColor: Colors.black,
-                                  textColor: Colors.white,
-                                  textSize: 32,
-                                )
-                              : RctButton(
-                                  onTap: () {
-                                    setState(() {
-                                      _doingTask = true;
-                                    });
-                                    startTask();
-                                  },
-                                  buttonWidth: 240,
-                                  buttonText: "Start",
-                                  buttonColor: Colors.black,
-                                  textColor: Colors.white,
-                                  textSize: 32,
-                                ),
-                        areTasksCompleted()
-                          ? Container()
-                          : Padding(
-                            padding: const EdgeInsets.only(left: 15),
-                            child: SqrButton(
-                                onTap: () {
-                                  Fluttertoast.showToast(
-                                    msg: 'Abandoned task: ${_tasks[0].name}',
-                                    backgroundColor: Colors.black,
+                                ? RctButton(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                          context, '/statistics');
+                                    },
+                                    buttonWidth: 315,
+                                    buttonText: "Statistics",
+                                    buttonColor: Colors.black,
                                     textColor: Colors.white,
-                                  );
-                                  abandonTask();
-                                },
-                                buttonColor: Theme.of(context).primaryColor,
-                                icon: FaIcon(
-                                  FontAwesomeIcons.running,
-                                  size: 32,
-                                  color: Colors.white,
-                                )),
-                          ),
+                                    textSize: 32,
+                                  )
+                                : RctButton(
+                                    onTap: () {
+                                      setState(() {
+                                        _doingTask = true;
+                                      });
+                                      startTask();
+                                    },
+                                    buttonWidth: 240,
+                                    buttonText: "Start",
+                                    buttonColor: Colors.black,
+                                    textColor: Colors.white,
+                                    textSize: 32,
+                                  ),
+                        areTasksCompleted()
+                            ? Container()
+                            : Padding(
+                                padding: const EdgeInsets.only(left: 15),
+                                child: SqrButton(
+                                    onTap: () {
+                                      Fluttertoast.showToast(
+                                        msg:
+                                            'Abandoned task: ${_tasks[0].name}',
+                                        backgroundColor: Colors.black,
+                                        textColor: Colors.white,
+                                      );
+                                      abandonTask();
+                                    },
+                                    buttonColor: Theme.of(context).primaryColor,
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.running,
+                                      size: 32,
+                                      color: Colors.white,
+                                    )),
+                              ),
                       ],
                     ),
                   ),
@@ -374,10 +370,11 @@ class _HomePageState extends State<HomePage> {
                       height: 24,
                       child: Visibility(
                         visible: !_doingTask,
-                        child: Text((_taskPercent * 100).toInt().toString() + "%",
-                            style: TextStyle(
-                              fontSize: 24,
-                            )),
+                        child:
+                            Text((_taskPercent * 100).toInt().toString() + "%",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                )),
                       ),
                     ),
                   ),

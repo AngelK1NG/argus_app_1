@@ -19,10 +19,23 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> {
   List<TaskItem> _tasks = [];
   final _formKey = GlobalKey<FormState>();
-
+  int _completedTasks;
   @override
   void initState() {
     super.initState();
+    db
+        .collection('users')
+        .document('r293ijm8s8Wd4EItw8MYiAh6P682')
+        .collection('tasks')
+        .document(widget.date)
+        .collection('completed_tasks')
+        .document('completed')
+        .snapshots()
+        .listen((DocumentSnapshot snapshot) {
+      setState(() {
+        _completedTasks = snapshot.data['number'];
+      });
+    });
   }
 
   @override
@@ -95,20 +108,25 @@ class _TaskListState extends State<TaskList> {
                                 name: value,
                                 completed: false,
                                 key: UniqueKey(),
-                                order: _tasks.length + 1,
+                                order: _tasks.length - _completedTasks,
                                 onDismissed: () => firestoreProvider
                                     .updateTaskOrder(_tasks, widget.date),
                                 date: widget.date,
                               );
-                              _tasks.add(newTask);
                               _formKey.currentState.reset();
+                              print('Completed Tasks: $_completedTasks');
+                              print('tasks.length: ${_tasks.length}');
+                              print(newTask.order);
+                              _tasks.insert(
+                                  _tasks.length - _completedTasks, newTask);
                               firestoreProvider.addTask(newTask, widget.date);
                             }
                           },
                           validator: (value) {
-                            return value.isEmpty ? 'You cannot add an empty task' : null;
-                          }
-                        ),
+                            return value.isEmpty
+                                ? 'You cannot add an empty task'
+                                : null;
+                          }),
                     ),
                   ),
                 ],
@@ -124,13 +142,22 @@ class _TaskListState extends State<TaskList> {
               ))),
             ),
             onReorder: ((oldIndex, newIndex) {
-              List<TaskItem> tasks = _tasks;
-              if (oldIndex < newIndex) {
-                newIndex -= 1;
+              if (!_tasks[oldIndex].completed) {
+                List<TaskItem> tasks = _tasks;
+                if (oldIndex < newIndex) {
+                  newIndex -= 1;
+                }
+                final task = tasks.removeAt(oldIndex);
+                if (newIndex >= tasks.length - _completedTasks) {
+                  int distanceFromEnd = tasks.length - newIndex;
+                  tasks.insert(
+                      newIndex - (_completedTasks - distanceFromEnd), task);
+                  firestoreProvider.updateTaskOrder(tasks, widget.date);
+                } else {
+                  tasks.insert(newIndex, task);
+                  firestoreProvider.updateTaskOrder(tasks, widget.date);
+                }
               }
-              final task = tasks.removeAt(oldIndex);
-              tasks.insert(newIndex, task);
-              firestoreProvider.updateTaskOrder(tasks, widget.date);
             }),
             children: _tasks,
           );

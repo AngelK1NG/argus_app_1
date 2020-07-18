@@ -1,6 +1,5 @@
 import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:provider/provider.dart';
 
@@ -53,7 +52,8 @@ class _TaskItemState extends State<TaskItem> {
             key: UniqueKey(),
             direction: DismissDirection.horizontal,
             onDismissed: (direction) {
-              firestoreProvider.deleteTask(widget.date, widget.id);
+              firestoreProvider.deleteTask(
+                  widget.date, widget.id, widget.completed);
               widget.onDismissed();
             },
             child: GestureDetector(

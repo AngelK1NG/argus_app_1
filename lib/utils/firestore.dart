@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/components/task_item.dart';
@@ -22,6 +23,12 @@ class FirestoreProvider {
   // add task to firestore method
   void addTask(TaskItem task, String date) {
     String userId = user.uid;
+    CollectionReference completedTasks = db
+        .collection('users')
+        .document(userId)
+        .collection('tasks')
+        .document(date)
+        .collection('completed_tasks');
     db
         .collection('users')
         .document(userId)
@@ -33,6 +40,15 @@ class FirestoreProvider {
       'name': task.name,
       'order': task.order,
       'completed': task.completed,
+    });
+
+    completedTasks.getDocuments().then((snapshots) {
+      if (snapshots.documents.length == 0) {
+        print('collection does not exist');
+        completedTasks.document('completed').setData({
+          'number': 0,
+        });
+      }
     });
   }
 
@@ -68,15 +84,43 @@ class FirestoreProvider {
   }
 
   // delete task
-  void deleteTask(String date, String taskId) {
+  void deleteTask(String date, String taskId, bool isCompleted) {
+    String userId = user.uid;
+    DocumentReference taskDocumentReference = db
+        .collection('users')
+        .document(userId)
+        .collection('tasks')
+        .document(date)
+        .collection('tasks')
+        .document(taskId);
+
+    taskDocumentReference.delete();
+    if (isCompleted) {
+      db
+          .collection('users')
+          .document(userId)
+          .collection('tasks')
+          .document(date)
+          .collection('completed_tasks')
+          .document('completed')
+          .updateData({
+        'number': FieldValue.increment(-1),
+      });
+    }
+  }
+
+  // add to completed number of tasks
+  void addCompletedTaskNumber(String date) {
     String userId = user.uid;
     db
         .collection('users')
         .document(userId)
         .collection('tasks')
         .document(date)
-        .collection('tasks')
-        .document(taskId)
-        .delete();
+        .collection('completed_tasks')
+        .document('completed')
+        .updateData({
+      'number': FieldValue.increment(1),
+    });
   }
 }
