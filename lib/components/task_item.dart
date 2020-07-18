@@ -110,7 +110,7 @@ class _TaskItemState extends State<TaskItem> {
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
                                     color: widget.completed
-                                        ? Colors.grey
+                                        ? Theme.of(context).hintColor
                                         : Colors.black,
                                   ),
                                 ),

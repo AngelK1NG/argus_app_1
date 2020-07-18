@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
                     _isLoading = false;
                   });
                 },
-                buttonWidth: 300,
+                buttonWidth: 315,
                 buttonColor: Colors.white,
                 textColor: Colors.black,
                 buttonText: "Sign in with Google",
@@ -70,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.only(top: 15),
               child: RctButton(
                 onTap: () {},
-                buttonWidth: 300,
+                buttonWidth: 315,
                 buttonColor: Colors.black,
                 textColor: Colors.black,
                 buttonText: "Sign in with Apple",
