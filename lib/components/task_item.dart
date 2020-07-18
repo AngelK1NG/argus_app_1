@@ -66,12 +66,12 @@ class _TaskItemState extends State<TaskItem> {
                 child: Row(
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.only(left: 35, right: 15),
-                      child: FaIcon(FontAwesomeIcons.ellipsisV, size: 15),
+                      padding: const EdgeInsets.only(left: 33, right: 15),
+                      child: widget.completed ? Image(image: AssetImage('images/Task Icon_Filled.png'), width: 10, height: 10,) : Image(image: AssetImage('images/Task Icon_Unfilled.png'), width: 10, height: 10,)
                     ),
                     SizedBox(
                       height: 50,
-                      width: MediaQuery.of(context).size.width - 56,
+                      width: MediaQuery.of(context).size.width - 58,
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: _active 

@@ -90,19 +90,25 @@ class _TaskListState extends State<TaskList> {
                           ),
                           autofocus: false,
                           onFieldSubmitted: (value) {
-                            TaskItem newTask = TaskItem(
-                              name: value,
-                              completed: false,
-                              key: UniqueKey(),
-                              order: _tasks.length + 1,
-                              onDismissed: () => firestoreProvider
-                                  .updateTaskOrder(_tasks, widget.date),
-                              date: widget.date,
-                            );
-                            _tasks.add(newTask);
-                            _formKey.currentState.reset();
-                            firestoreProvider.addTask(newTask, widget.date);
-                          }),
+                            if (_formKey.currentState.validate()) {
+                              TaskItem newTask = TaskItem(
+                                name: value,
+                                completed: false,
+                                key: UniqueKey(),
+                                order: _tasks.length + 1,
+                                onDismissed: () => firestoreProvider
+                                    .updateTaskOrder(_tasks, widget.date),
+                                date: widget.date,
+                              );
+                              _tasks.add(newTask);
+                              _formKey.currentState.reset();
+                              firestoreProvider.addTask(newTask, widget.date);
+                            }
+                          },
+                          validator: (value) {
+                            return value.isEmpty ? 'You cannot add an empty task' : null;
+                          }
+                        ),
                     ),
                   ),
                 ],
