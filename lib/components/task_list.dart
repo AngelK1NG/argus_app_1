@@ -19,7 +19,7 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> {
   List<TaskItem> _tasks = [];
   final _formKey = GlobalKey<FormState>();
-  DocumentSnapshot _completedTasks;
+  int _completedTasks;
   bool _loading = false;
 
   void toggleLoading() {
@@ -28,21 +28,31 @@ class _TaskListState extends State<TaskList> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
+  void updateCompletedTasks() {
     FirebaseUser user = context.read<User>().user;
-    db
+    DocumentReference dateDoc = db
         .collection('users')
         .document(user.uid)
         .collection('tasks')
-        .document(widget.date)
-        .snapshots()
-        .listen((DocumentSnapshot snapshot) {
-      setState(() {
-        _completedTasks = snapshot;
-      });
+        .document(widget.date);
+    dateDoc.get().then((snapshot) {
+      if (snapshot.data == null) {
+        _completedTasks = 0;
+        dateDoc.setData({
+          'completedTasks': 0,
+        });
+      } else {
+        setState(() {
+          _completedTasks = snapshot.data['completedTasks'];
+        });
+      }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    updateCompletedTasks();
   }
 
   @override
@@ -112,25 +122,18 @@ class _TaskListState extends State<TaskList> {
                           onFieldSubmitted: (value) async {
                             if (_formKey.currentState.validate()) {
                               toggleLoading();
+                              updateCompletedTasks();
                               TaskItem newTask = TaskItem(
                                 name: value,
                                 completed: false,
                                 key: UniqueKey(),
                                 order: _tasks.length -
-                                    (_completedTasks.data == null
-                                        ? 0
-                                        : _completedTasks
-                                            .data['completedTasks']),
+                                    _completedTasks,
                                 onDismissed: () => firestoreProvider
                                     .updateTaskOrder(_tasks, widget.date),
                                 date: widget.date,
                               );
                               String userId = user.uid;
-                              DocumentReference dateDoc = db
-                                  .collection('users')
-                                  .document(userId)
-                                  .collection('tasks')
-                                  .document(widget.date);
                               db
                                   .collection('users')
                                   .document(userId)
@@ -143,23 +146,11 @@ class _TaskListState extends State<TaskList> {
                                 'completed': newTask.completed,
                               }).then((doc) {
                                 newTask.id = doc.documentID;
-                                print(newTask.id);
                                 _tasks.insert(
-                                    _tasks.length -
-                                        (_completedTasks.data == null
-                                            ? 0
-                                            : _completedTasks
-                                                .data['completedTasks']),
+                                    _tasks.length - _completedTasks,
                                     newTask);
                                 firestoreProvider.updateTaskOrder(
                                     _tasks, widget.date);
-                                dateDoc.get().then((snapshot) {
-                                  if (snapshot.data == null) {
-                                    dateDoc.setData({
-                                      'completedTasks': 0,
-                                    });
-                                  }
-                                });
                                 toggleLoading();
                               });
                               _formKey.currentState.reset();
@@ -191,19 +182,9 @@ class _TaskListState extends State<TaskList> {
                   newIndex -= 1;
                 }
                 final task = tasks.removeAt(oldIndex);
-                if (newIndex >=
-                    tasks.length -
-                        (_completedTasks.data == null
-                            ? 0
-                            : _completedTasks.data['completedTasks'])) {
+                if (newIndex >= tasks.length - _completedTasks) {
                   int distanceFromEnd = tasks.length - newIndex;
-                  tasks.insert(
-                      newIndex -
-                          ((_completedTasks.data == null
-                                  ? 0
-                                  : _completedTasks.data['completedTasks']) -
-                              distanceFromEnd),
-                      task);
+                  tasks.insert(newIndex - (_completedTasks - distanceFromEnd), task);
                   firestoreProvider.updateTaskOrder(tasks, widget.date);
                 } else {
                   tasks.insert(newIndex, task);
