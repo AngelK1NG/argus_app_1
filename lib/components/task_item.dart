@@ -57,7 +57,7 @@ class _TaskItemState extends State<TaskItem> {
               widget.onDismissed();
             },
             child: GestureDetector(
-              onDoubleTap: () {
+              onTap: () {
                 setState(() {
                   _active = true;
                 });
