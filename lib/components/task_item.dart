@@ -28,18 +28,16 @@ class TaskItem extends StatefulWidget {
 
 class _TaskItemState extends State<TaskItem> {
   bool _active = false;
-  FocusNode _focus = new FocusNode();
+
+  void toggleActive() {
+    setState(() {
+      _active = !_active;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    _focus.addListener(() {
-      if (!_focus.hasFocus) {
-        setState(() {
-          _active = false;
-        });
-      }
-    });
   }
 
   @override
@@ -90,22 +88,31 @@ class _TaskItemState extends State<TaskItem> {
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: _active
-                              ? TextFormField(
-                                  focusNode: _focus,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
+                              ? Focus(
+                                onFocusChange: (focus) {
+                                  if (!focus) {
+                                    toggleActive();
+                                  }
+                                },
+                                child: TextFormField(
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    initialValue: widget.name,
+                                    autofocus: true,
+                                    onFieldSubmitted: (value) {
+                                      firestoreProvider.updateTaskName(
+                                          value, widget.date, widget.id);
+                                      setState(() {
+                                        _active = false;
+                                      });
+                                    },
                                   ),
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                  initialValue: widget.name,
-                                  autofocus: true,
-                                  onFieldSubmitted: (value) {
-                                    firestoreProvider.updateTaskName(
-                                        value, widget.date, widget.id);
-                                  },
-                                )
+                              )
                               : Text(
                                   widget.name,
                                   style: TextStyle(
