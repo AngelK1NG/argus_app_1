@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class TaskItem extends StatefulWidget {
   final String name;
   String id;
@@ -59,9 +60,10 @@ class _TaskItemState extends State<TaskItem> {
             child: GestureDetector(
               onTap: () {
                 setState(() {
-                  _active = true;
+                  if (!widget.completed) {
+                    _active = true;
+                  }
                 });
-                _focus.requestFocus();
               },
               behavior: HitTestBehavior.deferToChild,
               child: Container(
@@ -98,7 +100,7 @@ class _TaskItemState extends State<TaskItem> {
                                     fontWeight: FontWeight.w400,
                                   ),
                                   initialValue: widget.name,
-                                  autofocus: false,
+                                  autofocus: true,
                                   onFieldSubmitted: (value) {
                                     firestoreProvider.updateTaskName(
                                         value, widget.date, widget.id);

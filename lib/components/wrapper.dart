@@ -38,11 +38,13 @@ class _WrapperWidgetState extends State<WrapperWidget> {
               setState(() {
                 _navActive = true;
               });
+              FocusScope.of(context).unfocus();
             }
             if (details.delta.dx < -10 && widget.nav) {
               setState(() {
                 _navActive = false;
               });
+              FocusScope.of(context).unfocus();
             }
           },
           child: Stack(
@@ -53,7 +55,7 @@ class _WrapperWidgetState extends State<WrapperWidget> {
                   setState(() {
                     _navActive = false;
                   });
-                  FocusScope.of(context).requestFocus(new FocusNode());
+                  FocusScope.of(context).unfocus();
                 },
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 200),
@@ -78,7 +80,7 @@ class _WrapperWidgetState extends State<WrapperWidget> {
                   offstage: !widget.nav,
                   child: NavBurger(onTap: () {
                     toggleNav();
-                    FocusScope.of(context).requestFocus(new FocusNode());
+                    FocusScope.of(context).unfocus();
                   }, active: _navActive),
                 ),
               )
