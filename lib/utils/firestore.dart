@@ -23,12 +23,6 @@ class FirestoreProvider {
   // add task to firestore method
   void addTask(TaskItem task, String date) {
     String userId = user.uid;
-    CollectionReference completedTasks = db
-        .collection('users')
-        .document(userId)
-        .collection('tasks')
-        .document(date)
-        .collection('completed_tasks');
     db
         .collection('users')
         .document(userId)
@@ -40,15 +34,6 @@ class FirestoreProvider {
       'name': task.name,
       'order': task.order,
       'completed': task.completed,
-    });
-
-    completedTasks.getDocuments().then((snapshots) {
-      if (snapshots.documents.length == 0) {
-        print('collection does not exist');
-        completedTasks.document('completed').setData({
-          'number': 0,
-        });
-      }
     });
   }
 
@@ -101,10 +86,8 @@ class FirestoreProvider {
           .document(userId)
           .collection('tasks')
           .document(date)
-          .collection('completed_tasks')
-          .document('completed')
           .updateData({
-        'number': FieldValue.increment(-1),
+        'completedTasks': FieldValue.increment(-1),
       });
     }
   }
@@ -117,10 +100,8 @@ class FirestoreProvider {
         .document(userId)
         .collection('tasks')
         .document(date)
-        .collection('completed_tasks')
-        .document('completed')
         .updateData({
-      'number': FieldValue.increment(1),
+      'completedTasks': FieldValue.increment(1),
     });
   }
 }

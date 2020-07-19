@@ -5,13 +5,13 @@ import 'package:provider/provider.dart';
 
 class TaskItem extends StatefulWidget {
   final String name;
-  final String id;
+  String id;
   final bool completed;
   final int order;
   final VoidCallback onDismissed;
   final String date;
 
-  const TaskItem(
+  TaskItem(
       {@required this.name,
       this.id,
       @required this.completed,

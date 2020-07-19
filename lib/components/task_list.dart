@@ -19,21 +19,28 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> {
   List<TaskItem> _tasks = [];
   final _formKey = GlobalKey<FormState>();
-  int _completedTasks;
+  DocumentSnapshot _completedTasks;
+  bool _loading = false;
+
+  void toggleLoading() {
+    setState(() {
+      _loading = !_loading;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    FirebaseUser user = context.read<User>().user;
     db
         .collection('users')
-        .document('r293ijm8s8Wd4EItw8MYiAh6P682')
+        .document(user.uid)
         .collection('tasks')
         .document(widget.date)
-        .collection('completed_tasks')
-        .document('completed')
         .snapshots()
         .listen((DocumentSnapshot snapshot) {
       setState(() {
-        _completedTasks = snapshot.data['number'];
+        _completedTasks = snapshot;
       });
     });
   }
@@ -53,7 +60,7 @@ class _TaskListState extends State<TaskList> {
             .orderBy('order')
             .snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (!snapshot.hasData || _loading) {
             return Center(child: CircularProgressIndicator());
           }
           _tasks = [];
@@ -102,24 +109,60 @@ class _TaskListState extends State<TaskList> {
                             fontWeight: FontWeight.w400,
                           ),
                           autofocus: false,
-                          onFieldSubmitted: (value) {
+                          onFieldSubmitted: (value) async {
                             if (_formKey.currentState.validate()) {
+                              toggleLoading();
                               TaskItem newTask = TaskItem(
                                 name: value,
                                 completed: false,
                                 key: UniqueKey(),
-                                order: _tasks.length - _completedTasks,
+                                order: _tasks.length -
+                                    (_completedTasks.data == null
+                                        ? 0
+                                        : _completedTasks
+                                            .data['completedTasks']),
                                 onDismissed: () => firestoreProvider
                                     .updateTaskOrder(_tasks, widget.date),
                                 date: widget.date,
                               );
+                              String userId = user.uid;
+                              DocumentReference dateDoc = db
+                                  .collection('users')
+                                  .document(userId)
+                                  .collection('tasks')
+                                  .document(widget.date);
+                              db
+                                  .collection('users')
+                                  .document(userId)
+                                  .collection('tasks')
+                                  .document(widget.date)
+                                  .collection('tasks')
+                                  .add({
+                                'name': newTask.name,
+                                'order': newTask.order,
+                                'completed': newTask.completed,
+                              }).then((doc) {
+                                newTask.id = doc.documentID;
+                                print(newTask.id);
+                                _tasks.insert(
+                                    _tasks.length -
+                                        (_completedTasks.data == null
+                                            ? 0
+                                            : _completedTasks
+                                                .data['completedTasks']),
+                                    newTask);
+                                firestoreProvider.updateTaskOrder(
+                                    _tasks, widget.date);
+                                dateDoc.get().then((snapshot) {
+                                  if (snapshot.data == null) {
+                                    dateDoc.setData({
+                                      'completedTasks': 0,
+                                    });
+                                  }
+                                });
+                                toggleLoading();
+                              });
                               _formKey.currentState.reset();
-                              print('Completed Tasks: $_completedTasks');
-                              print('tasks.length: ${_tasks.length}');
-                              print(newTask.order);
-                              _tasks.insert(
-                                  _tasks.length - _completedTasks, newTask);
-                              firestoreProvider.addTask(newTask, widget.date);
                             }
                           },
                           validator: (value) {
@@ -148,10 +191,19 @@ class _TaskListState extends State<TaskList> {
                   newIndex -= 1;
                 }
                 final task = tasks.removeAt(oldIndex);
-                if (newIndex >= tasks.length - _completedTasks) {
+                if (newIndex >=
+                    tasks.length -
+                        (_completedTasks.data == null
+                            ? 0
+                            : _completedTasks.data['completedTasks'])) {
                   int distanceFromEnd = tasks.length - newIndex;
                   tasks.insert(
-                      newIndex - (_completedTasks - distanceFromEnd), task);
+                      newIndex -
+                          ((_completedTasks.data == null
+                                  ? 0
+                                  : _completedTasks.data['completedTasks']) -
+                              distanceFromEnd),
+                      task);
                   firestoreProvider.updateTaskOrder(tasks, widget.date);
                 } else {
                   tasks.insert(newIndex, task);

@@ -74,7 +74,6 @@ class _HomePageState extends State<HomePage> {
 
   bool areTasksCompleted() {
     for (var task in _tasks) {
-      print(task.completed);
       if (!task.completed) {
         return false;
       }
@@ -94,10 +93,11 @@ class _HomePageState extends State<HomePage> {
       onDismissed: currentTask.onDismissed,
     );
     firestoreProvider.deleteTask(_date, currentTask.id, false);
-    _tasks.add(finishedTask);
     _tasks.remove(currentTask);
     firestoreProvider.addTask(finishedTask, _date);
+    _tasks.add(finishedTask);
     firestoreProvider.updateTaskOrder(_tasks, _date);
+    firestoreProvider.addCompletedTaskNumber(_date);
   }
 
   @override
@@ -140,10 +140,10 @@ class _HomePageState extends State<HomePage> {
                       width: 315,
                       padding: const EdgeInsets.only(bottom: 70),
                       child: Text(
-                        _swatchDisplay,
+                        'Welcome!',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 80,
+                          fontSize: 60,
                           fontWeight: FontWeight.w500,
                           color: _doingTask ? Colors.white : Colors.black,
                         ),
@@ -182,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                       width: 315,
                       height: 5,
                       child: Visibility(
-                        visible: !_doingTask,
+                        visible: false,
                         child: LinearProgressIndicator(
                           value: _taskPercent,
                           backgroundColor: Colors.black,
@@ -197,7 +197,7 @@ class _HomePageState extends State<HomePage> {
                       width: 315,
                       height: 24,
                       child: Visibility(
-                        visible: !_doingTask,
+                        visible: false,
                         child:
                             Text((_taskPercent * 100).toInt().toString() + "%",
                                 style: TextStyle(
@@ -290,8 +290,6 @@ class _HomePageState extends State<HomePage> {
                                   });
                                   stopTask();
                                   completeTask(_user);
-                                  _firestoreProvider
-                                      .addCompletedTaskNumber(_date);
                                 },
                                 buttonWidth: 240,
                                 buttonText: "Complete",
@@ -305,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                                       Navigator.pushNamed(
                                           context, '/statistics');
                                     },
-                                    buttonWidth: 315,
+                                    buttonWidth: 240,
                                     buttonText: "Statistics",
                                     buttonColor: Colors.black,
                                     textColor: Colors.white,
@@ -324,11 +322,10 @@ class _HomePageState extends State<HomePage> {
                                     textColor: Colors.white,
                                     textSize: 32,
                                   ),
-                        areTasksCompleted()
-                            ? Container()
-                            : Padding(
-                                padding: const EdgeInsets.only(left: 15),
-                                child: SqrButton(
+                        Padding(
+                            padding: const EdgeInsets.only(left: 15),
+                            child: !areTasksCompleted()
+                                ? SqrButton(
                                     onTap: () {
                                       Fluttertoast.showToast(
                                         msg:
@@ -343,8 +340,17 @@ class _HomePageState extends State<HomePage> {
                                       FontAwesomeIcons.running,
                                       size: 32,
                                       color: Colors.white,
-                                    )),
-                              ),
+                                    ))
+                                : SqrButton(
+                                    onTap: () {
+                                      Navigator.pushNamed(context, '/tasks');
+                                    },
+                                    buttonColor: Theme.of(context).primaryColor,
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.plus,
+                                      size: 32,
+                                      color: Colors.white,
+                                    ))),
                       ],
                     ),
                   ),
