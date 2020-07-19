@@ -28,6 +28,7 @@ class TaskItem extends StatefulWidget {
 
 class _TaskItemState extends State<TaskItem> {
   bool _active = false;
+  FocusNode _focus = new FocusNode();
 
   void toggleActive() {
     setState(() {
@@ -60,6 +61,7 @@ class _TaskItemState extends State<TaskItem> {
                 setState(() {
                   if (!widget.completed) {
                     _active = true;
+                    _focus.requestFocus();
                   }
                 });
               },
@@ -95,6 +97,7 @@ class _TaskItemState extends State<TaskItem> {
                                   }
                                 },
                                 child: TextFormField(
+                                  focusNode: _focus,
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                     ),

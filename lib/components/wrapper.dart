@@ -50,7 +50,7 @@ class _WrapperWidgetState extends State<WrapperWidget> {
           child: Stack(
             children: <Widget>[
               GestureDetector(
-                behavior: HitTestBehavior.translucent,
+                behavior: HitTestBehavior.deferToChild,
                 onTap: () {
                   setState(() {
                     _navActive = false;
