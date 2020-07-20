@@ -5,11 +5,13 @@ class AuthProvider {
   FirebaseAuth _auth = FirebaseAuth.instance;
   GoogleSignIn _googleSignIn = GoogleSignIn();
 
+  Future<FirebaseUser> getUser() async => _auth.currentUser();
+
   Future<FirebaseUser> googleSignIn() async {
     try {
       GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
       GoogleSignInAuthentication googleAuth =
-        await googleSignInAccount.authentication;
+          await googleSignInAccount.authentication;
 
       final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken,
@@ -20,7 +22,7 @@ class AuthProvider {
       FirebaseUser user = result.user;
       print("Login successful, uid: " + user.uid);
       return user;
-    } catch(error) {
+    } catch (error) {
       print(error);
       return null;
     }

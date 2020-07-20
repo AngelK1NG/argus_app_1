@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter/services.dart';
 
 class RctButton extends StatelessWidget {
   final VoidCallback onTap;
@@ -23,7 +24,10 @@ class RctButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
-      onPressed: onTap,
+      onPressed: () {
+        HapticFeedback.heavyImpact();
+        onTap();
+      },
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       padding: const EdgeInsets.all(0.0),
       child: Container(

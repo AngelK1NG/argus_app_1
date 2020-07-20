@@ -38,21 +38,24 @@ class _WrapperWidgetState extends State<WrapperWidget> {
               setState(() {
                 _navActive = true;
               });
+              FocusScope.of(context).unfocus();
             }
             if (details.delta.dx < -10 && widget.nav) {
               setState(() {
                 _navActive = false;
               });
+              FocusScope.of(context).unfocus();
             }
           },
           child: Stack(
             children: <Widget>[
               GestureDetector(
-                behavior: HitTestBehavior.translucent,
+                behavior: HitTestBehavior.deferToChild,
                 onTap: () {
                   setState(() {
                     _navActive = false;
                   });
+                  FocusScope.of(context).unfocus();
                 },
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 200),
@@ -62,7 +65,11 @@ class _WrapperWidgetState extends State<WrapperWidget> {
                     duration: Duration(milliseconds: 200),
                     opacity: _navActive ? 0.5 : 1,
                     child: SafeArea(
-                      child: _navActive ? IgnorePointer(child: widget.child) : Container(child: widget.child),
+                      child: AbsorbPointer(
+                        absorbing: _navActive,
+                        child: Container(
+                          child: widget.child)
+                        ),
                     ),
                   ),
                 ),
@@ -71,7 +78,10 @@ class _WrapperWidgetState extends State<WrapperWidget> {
               SafeArea(
                 child: Offstage(
                   offstage: !widget.nav,
-                  child: NavBurger(onTap: toggleNav, active: _navActive),
+                  child: NavBurger(onTap: () {
+                    toggleNav();
+                    FocusScope.of(context).unfocus();
+                  }, active: _navActive),
                 ),
               )
             ],
