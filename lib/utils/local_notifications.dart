@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:Focal/constants.dart';
 
 class LocalNotificationHelper {
-  static bool userLoggedIn = false;
+  static bool userLoggedIn = true;
   void initialize() async {
     var initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
@@ -35,7 +36,7 @@ class LocalNotificationHelper {
     IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
     NotificationDetails notificationDetails =
         NotificationDetails(androidNotificationDetails, iosNotificationDetails);
-    await notificationsPlugin.show(0, 'You\' abandoning your task!',
+    await notificationsPlugin.show(0, 'You\'re abandoning your task!',
         'Click here to go back to being productive', notificationDetails);
   }
 
