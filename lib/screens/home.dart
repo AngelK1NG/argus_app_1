@@ -205,11 +205,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void onData(ScreenStateEvent event) {
     print(event);
-    if (event == ScreenStateEvent.SCREEN_OFF ||
-        event == ScreenStateEvent.SCREEN_UNLOCKED) {
+    if (event == ScreenStateEvent.SCREEN_OFF) {
       LocalNotificationHelper.screenOff = true;
     }
-    if (event == ScreenStateEvent.SCREEN_ON) {
+    if (event == ScreenStateEvent.SCREEN_UNLOCKED) {
       LocalNotificationHelper.screenOff = false;
     }
   }

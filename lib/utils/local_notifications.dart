@@ -23,7 +23,7 @@ class LocalNotificationHelper {
     if (userLoggedIn && !iosReopen && !screenOff) {
       HapticFeedback.heavyImpact();
       await notification();
-      print('notification sent');
+      print('Notification sent');
     }
   }
 
