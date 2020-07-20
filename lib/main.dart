@@ -2,6 +2,8 @@ import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'screens/home.dart';
 import 'screens/tasks.dart';
 import 'screens/statistics.dart';
@@ -39,6 +41,9 @@ class MyApp extends StatelessWidget {
             dividerColor: const Color(0xffe2e2e2),
             splashColor: Colors.transparent,
           ),
+          navigatorObservers: [
+            FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
+          ],
           initialRoute: '/login',
           routes: {
             '/home': (context) {

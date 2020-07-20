@@ -66,22 +66,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 15),
-              child: RctButton(
-                onTap: () {},
-                buttonWidth: 315,
-                buttonColor: Colors.black,
-                textColor: Colors.black,
-                buttonText: "Sign in with Apple",
-                textSize: 24,
-                icon: FaIcon(
-                  FontAwesomeIcons.apple,
-                  size: 38,
-                  color: Colors.white,
-                ),
-              ),
-            ),
           ],
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:provider/provider.dart';
+import 'dart:io' show Platform;
 
 // ignore: must_be_immutable
 class TaskItem extends StatefulWidget {
@@ -53,7 +54,7 @@ class _TaskItemState extends State<TaskItem> {
             child: GestureDetector(
               onTap: () {
                 setState(() {
-                  if (!widget.completed) {
+                  if (!widget.completed && !Platform.isIOS) {
                     _active = true;
                     _focus.requestFocus();
                   }
