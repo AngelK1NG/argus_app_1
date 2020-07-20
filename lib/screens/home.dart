@@ -16,6 +16,7 @@ import '../constants.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:io' show Platform;
 import 'package:flutter_dnd/flutter_dnd.dart';
+import 'package:screen_state/screen_state.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -36,6 +37,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   FirestoreProvider _firestoreProvider;
   List<TaskItem> _tasks = [];
   LocalNotificationHelper notificationHelper;
+  Screen _screen;
+  StreamSubscription<ScreenStateEvent> _subscription;
 
   void startTask() {
     timer = new Timer.periodic(
@@ -128,6 +131,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     notificationHelper = LocalNotificationHelper();
     notificationHelper.initialize();
     WidgetsBinding.instance.addObserver(this);
+    initPlatformState();
     setState(() {
       _date = getDateString(DateTime.now());
       _user = Provider.of<User>(context, listen: false).user;
@@ -159,10 +163,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     super.dispose();
-    // if (_doingTask) {
-    notificationHelper.showNotifications();
     WidgetsBinding.instance.removeObserver(this);
-    // }
+    _subscription.cancel();
   }
 
   @override
@@ -170,14 +172,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.inactive:
-        if (_doingTask) {
-          FlutterDnd.setInterruptionFilter(FlutterDnd.INTERRUPTION_FILTER_ALL);
-          notificationHelper.showNotifications();
-          Future.delayed(const Duration(milliseconds: 500), () {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (_doingTask) {
             FlutterDnd.setInterruptionFilter(
-                FlutterDnd.INTERRUPTION_FILTER_NONE);
-          });
-        }
+                FlutterDnd.INTERRUPTION_FILTER_ALL);
+            notificationHelper.showNotifications();
+            LocalNotificationHelper.iosReopen = true;
+            Future.delayed(const Duration(milliseconds: 500), () {
+              FlutterDnd.setInterruptionFilter(
+                  FlutterDnd.INTERRUPTION_FILTER_NONE);
+            });
+            Future.delayed(const Duration(milliseconds: 3000), () {
+              LocalNotificationHelper.iosReopen = false;
+            });
+          }
+        });
+
         break;
       case AppLifecycleState.resumed:
         break;
@@ -185,6 +195,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.detached:
         break;
+    }
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    startListening();
+  }
+
+  void onData(ScreenStateEvent event) {
+    print(event);
+    if (event == ScreenStateEvent.SCREEN_OFF) {
+      LocalNotificationHelper.screenOff = true;
+    }
+    if (event == ScreenStateEvent.SCREEN_ON) {
+      LocalNotificationHelper.screenOff = false;
+    }
+  }
+
+  void startListening() {
+    _screen = new Screen();
+    try {
+      _subscription = _screen.screenStateStream.listen(onData);
+    } on ScreenStateException catch (exception) {
+      print(exception);
     }
   }
 
