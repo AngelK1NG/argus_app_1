@@ -171,13 +171,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.inactive:
         if (_doingTask) {
-          if (_user.uid != null) {
-            FlutterDnd.setInterruptionFilter(
-                FlutterDnd.INTERRUPTION_FILTER_NONE);
-            notificationHelper.showNotifications();
-            FlutterDnd.setInterruptionFilter(
-                FlutterDnd.INTERRUPTION_FILTER_ALL);
-          }
+          FlutterDnd.isNotificationPolicyAccessGranted.then((bool settingsOn) {
+            if (settingsOn) {
+              FlutterDnd.setInterruptionFilter(
+                  FlutterDnd.INTERRUPTION_FILTER_NONE);
+              notificationHelper.showNotifications();
+              FlutterDnd.setInterruptionFilter(
+                  FlutterDnd.INTERRUPTION_FILTER_ALL);
+            }
+          });
         }
         break;
       case AppLifecycleState.resumed:
