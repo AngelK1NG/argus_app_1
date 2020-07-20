@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:Focal/constants.dart';
+import 'package:flutter/services.dart';
 
 class LocalNotificationHelper {
   static bool userLoggedIn = true;
@@ -18,6 +19,7 @@ class LocalNotificationHelper {
 
   void showNotifications() async {
     if (userLoggedIn) {
+      HapticFeedback.heavyImpact();
       await notification();
     }
   }
@@ -26,8 +28,8 @@ class LocalNotificationHelper {
     AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
       'Channel ID',
-      'Channel Title',
-      'channel body',
+      'Focus Notification',
+      'Channel Body',
       priority: Priority.High,
       importance: Importance.Max,
       ticker: 'test',
@@ -40,6 +42,7 @@ class LocalNotificationHelper {
         'Click here to go back to being productive', notificationDetails);
   }
 
+  // ignore: missing_return
   Future onSelectionNotification(String payLoad) {
     if (payLoad != null) {
       print(payLoad);
@@ -54,9 +57,7 @@ class LocalNotificationHelper {
       actions: <Widget>[
         CupertinoDialogAction(
           isDefaultAction: true,
-          onPressed: () {
-            print('');
-          },
+          onPressed: () {},
           child: Text('OK'),
         ),
       ],

@@ -7,6 +7,7 @@ import 'task_item.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 
 class TaskList extends StatefulWidget {
   final String date;
@@ -122,6 +123,7 @@ class _TaskListState extends State<TaskList> {
                           autofocus: false,
                           onFieldSubmitted: (value) async {
                             if (_formKey.currentState.validate()) {
+                              HapticFeedback.heavyImpact();
                               toggleLoading();
                               updateCompletedTasks();
                               TaskItem newTask = TaskItem(

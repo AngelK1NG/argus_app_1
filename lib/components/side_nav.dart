@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SideNav extends StatelessWidget {
   final VoidCallback onTap;
@@ -20,8 +21,17 @@ class SideNav extends StatelessWidget {
     if (!isNewRouteSameAsCurrent) {
       Navigator.pushNamed(context, newRoute);
     }
-    
+
     onTap();
+  }
+
+  openFeedbackForm() async {
+    const feedbackURL = 'https://forms.gle/YKVpEAimFx3T6kn39';
+    if (await canLaunch(feedbackURL)) {
+      await launch(feedbackURL);
+    } else {
+      print('Couldn\'t find url');
+    }
   }
 
   @override
@@ -100,17 +110,24 @@ class SideNav extends StatelessWidget {
               bottom: 0,
               left: 0,
               child: FlatButton(
-                onPressed: () {},
+                onPressed: openFeedbackForm,
                 child: Row(
                   children: <Widget>[
-                    Text("Feedback", style: TextStyle(
-                      color: Theme.of(context).hintColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w400,
-                    ),),
+                    Text(
+                      "Feedback",
+                      style: TextStyle(
+                        color: Theme.of(context).hintColor,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(left: 10),
-                      child: FaIcon(FontAwesomeIcons.fileAlt, color: Theme.of(context).hintColor, size: 24,),
+                      child: FaIcon(
+                        FontAwesomeIcons.fileAlt,
+                        color: Theme.of(context).hintColor,
+                        size: 24,
+                      ),
                     ),
                   ],
                 ),
