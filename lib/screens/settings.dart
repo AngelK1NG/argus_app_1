@@ -1,3 +1,4 @@
+import 'package:Focal/utils/local_notifications.dart';
 import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:Focal/constants.dart';
@@ -67,6 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: <Widget>[
                     FlatButton(
                       onPressed: () {
+                        LocalNotificationHelper.userLoggedIn = false;
                         auth.signOut();
                       },
                       child: Text("Sign out",

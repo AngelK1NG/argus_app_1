@@ -1,6 +1,7 @@
 import 'package:Focal/components/task_item.dart';
 import 'package:Focal/utils/date.dart';
 import 'package:Focal/utils/firestore.dart';
+import 'package:Focal/utils/local_notifications.dart';
 import 'package:Focal/utils/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,6 +14,8 @@ import '../components/rct_button.dart';
 import '../components/sqr_button.dart';
 import '../constants.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'dart:io' show Platform;
+import 'package:flutter_dnd/flutter_dnd.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -21,7 +24,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Timer timer;
   DateTime _startTime;
   String _swatchDisplay = "00:00";
@@ -32,6 +35,7 @@ class _HomePageState extends State<HomePage> {
   FirebaseUser _user;
   FirestoreProvider _firestoreProvider;
   List<TaskItem> _tasks = [];
+  LocalNotificationHelper notificationHelper;
 
   void startTask() {
     timer = new Timer.periodic(
@@ -121,6 +125,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    notificationHelper = LocalNotificationHelper();
+    notificationHelper.initialize();
+    WidgetsBinding.instance.addObserver(this);
     setState(() {
       _date = getDateString(DateTime.now());
       _user = Provider.of<User>(context, listen: false).user;
@@ -147,6 +154,39 @@ class _HomePageState extends State<HomePage> {
         });
       });
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // if (_doingTask) {
+    notificationHelper.showNotifications();
+    WidgetsBinding.instance.removeObserver(this);
+    // }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.inactive:
+        if (_doingTask) {
+          if (_user.uid != null) {
+            FlutterDnd.setInterruptionFilter(
+                FlutterDnd.INTERRUPTION_FILTER_NONE);
+            notificationHelper.showNotifications();
+            FlutterDnd.setInterruptionFilter(
+                FlutterDnd.INTERRUPTION_FILTER_ALL);
+          }
+        }
+        break;
+      case AppLifecycleState.resumed:
+        break;
+      case AppLifecycleState.paused:
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
   }
 
   @override
@@ -293,12 +333,22 @@ class _HomePageState extends State<HomePage> {
                       children: <Widget>[
                         _doingTask
                             ? RctButton(
-                                onTap: () {
+                                onTap: () async {
                                   setState(() {
                                     _doingTask = false;
                                   });
                                   stopTask();
                                   completeTask(_user);
+                                  if (Platform.isAndroid) {
+                                    if (await FlutterDnd
+                                        .isNotificationPolicyAccessGranted) {
+                                      await FlutterDnd.setInterruptionFilter(
+                                          FlutterDnd
+                                              .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
+                                    } else {
+                                      FlutterDnd.gotoPolicySettings();
+                                    }
+                                  }
                                 },
                                 buttonWidth: 240,
                                 buttonText: "Complete",
@@ -319,11 +369,21 @@ class _HomePageState extends State<HomePage> {
                                     textSize: 32,
                                   )
                                 : RctButton(
-                                    onTap: () {
+                                    onTap: () async {
                                       setState(() {
                                         _doingTask = true;
                                       });
                                       startTask();
+                                      if (Platform.isAndroid) {
+                                        if (await FlutterDnd
+                                            .isNotificationPolicyAccessGranted) {
+                                          await FlutterDnd
+                                              .setInterruptionFilter(FlutterDnd
+                                                  .INTERRUPTION_FILTER_NONE); // Turn on DND - All notifications are suppressed.
+                                        } else {
+                                          FlutterDnd.gotoPolicySettings();
+                                        }
+                                      }
                                     },
                                     buttonWidth: 240,
                                     buttonText: "Start",

@@ -1,4 +1,5 @@
 import 'package:Focal/utils/auth.dart';
+import 'package:Focal/utils/local_notifications.dart';
 import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -54,14 +55,16 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     _isLoading = false;
                   });
+                  LocalNotificationHelper.userLoggedIn = true;
                 },
                 buttonWidth: 315,
-                buttonColor: Colors.white,
-                textColor: Colors.black,
+                buttonColor: Colors.black,
+                textColor: Colors.white,
                 buttonText: "Sign in with Google",
                 textSize: 24,
                 icon: FaIcon(
                   FontAwesomeIcons.google,
+                  color: Colors.white,
                   size: 30,
                 ),
               ),
