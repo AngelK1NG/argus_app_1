@@ -39,7 +39,7 @@ class LocalNotificationHelper {
     NotificationDetails notificationDetails =
         NotificationDetails(androidNotificationDetails, iosNotificationDetails);
     await notificationsPlugin.show(0, 'You\'re abandoning your task!',
-        'Click here to go back to being productive', notificationDetails);
+        'Come back, don\'t give up', notificationDetails);
   }
 
   // ignore: missing_return
