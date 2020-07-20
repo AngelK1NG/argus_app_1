@@ -17,6 +17,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:io' show Platform;
 import 'package:flutter_dnd/flutter_dnd.dart';
 import 'package:screen_state/screen_state.dart';
+import 'package:flutter/services.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -224,6 +225,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    if (_doingTask) {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle.light
+      );
+    } else {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle.dark
+      );
+    }
     return new WillPopScope(
       onWillPop: () async => false,
       child: WrapperWidget(
