@@ -35,6 +35,14 @@ class FirestoreProvider {
       'order': task.order,
       'completed': task.completed,
     });
+    DocumentReference dateDoc = db
+        .collection('users')
+        .document(user.uid)
+        .collection('tasks')
+        .document(date);
+    dateDoc.updateData({
+      'totalTasks': FieldValue.increment(1),
+    });
   }
 
   // update method
@@ -80,14 +88,21 @@ class FirestoreProvider {
         .document(taskId);
 
     taskDocumentReference.delete();
+    DocumentReference dateDoc = db
+        .collection('users')
+        .document(userId)
+        .collection('tasks')
+        .document(date);
     if (isCompleted) {
-      db
-          .collection('users')
-          .document(userId)
-          .collection('tasks')
-          .document(date)
-          .updateData({
+      dateDoc
+        .updateData({
         'completedTasks': FieldValue.increment(-1),
+        'totalTasks': FieldValue.increment(-1),
+      });
+    } else {
+      dateDoc
+        .updateData({
+        'totalTasks': FieldValue.increment(-1),
       });
     }
   }

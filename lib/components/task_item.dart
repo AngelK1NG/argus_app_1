@@ -30,12 +30,6 @@ class _TaskItemState extends State<TaskItem> {
   bool _active = false;
   FocusNode _focus = new FocusNode();
 
-  void toggleActive() {
-    setState(() {
-      _active = !_active;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -91,13 +85,15 @@ class _TaskItemState extends State<TaskItem> {
                           alignment: Alignment.centerLeft,
                           child: _active
                               ? Focus(
-                                onFocusChange: (focus) {
-                                  if (!focus) {
-                                    toggleActive();
-                                  }
-                                },
-                                child: TextFormField(
-                                  focusNode: _focus,
+                                  onFocusChange: (focus) {
+                                    if (!focus) {
+                                      setState(() {
+                                        _active = false;
+                                      });
+                                    }
+                                  },
+                                  child: TextFormField(
+                                    focusNode: _focus,
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                     ),
@@ -106,7 +102,7 @@ class _TaskItemState extends State<TaskItem> {
                                       fontWeight: FontWeight.w400,
                                     ),
                                     initialValue: widget.name,
-                                    autofocus: true,
+                                    autofocus: false,
                                     onFieldSubmitted: (value) {
                                       firestoreProvider.updateTaskName(
                                           value, widget.date, widget.id);
@@ -115,7 +111,7 @@ class _TaskItemState extends State<TaskItem> {
                                       });
                                     },
                                   ),
-                              )
+                                )
                               : Text(
                                   widget.name,
                                   style: TextStyle(

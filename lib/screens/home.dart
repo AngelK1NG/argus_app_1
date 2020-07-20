@@ -25,7 +25,8 @@ class _HomePageState extends State<HomePage> {
   Timer timer;
   DateTime _startTime;
   String _swatchDisplay = "00:00";
-  double _taskPercent = 0.69;
+  int _completedTasks;
+  int _totalTasks;
   bool _doingTask = false;
   String _date;
   FirebaseUser _user;
@@ -72,6 +73,30 @@ class _HomePageState extends State<HomePage> {
     _firestoreProvider.deleteTask(_date, _tasks[0].id, _tasks[0].completed);
   }
 
+  void updateTasks() {
+    FirebaseUser user = Provider.of<User>(context, listen: false).user;
+    DocumentReference dateDoc = db
+        .collection('users')
+        .document(user.uid)
+        .collection('tasks')
+        .document(_date);
+    dateDoc.get().then((snapshot) {
+      if (snapshot.data == null) {
+        _completedTasks = 0;
+        _totalTasks = 0;
+        dateDoc.setData({
+          'completedTasks': 0,
+          'totalTasks': 0,
+        });
+      } else {
+        setState(() {
+          _completedTasks = snapshot.data['completedTasks'];
+          _totalTasks = snapshot.data['totalTasks'];
+        });
+      }
+    });
+  }
+
   bool areTasksCompleted() {
     for (var task in _tasks) {
       if (!task.completed) {
@@ -82,6 +107,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void completeTask(FirebaseUser user) {
+    final currentTime = DateTime.now();
     FirestoreProvider firestoreProvider = FirestoreProvider(user);
     TaskItem currentTask = _tasks[0];
     TaskItem finishedTask = TaskItem(
@@ -98,6 +124,22 @@ class _HomePageState extends State<HomePage> {
     _tasks.add(finishedTask);
     firestoreProvider.updateTaskOrder(_tasks, _date);
     firestoreProvider.addCompletedTaskNumber(_date);
+    DocumentReference dateDoc = db
+        .collection('users')
+        .document(user.uid)
+        .collection('tasks')
+        .document(_date);
+    dateDoc.get().then((snapshot) {
+      if (snapshot.data == null) {
+        dateDoc.setData({
+          'secondsSpent': 0,
+        });
+      }
+      dateDoc.updateData({
+        'secondsSpent':
+            FieldValue.increment(currentTime.difference(_startTime).inSeconds),
+      });
+    });
   }
 
   @override
@@ -127,6 +169,7 @@ class _HomePageState extends State<HomePage> {
               .orderBy('order')
               .snapshots(),
           builder: (context, snapshot) {
+            updateTasks();
             if (!snapshot.hasData ||
                 snapshot.data.documents == null ||
                 snapshot.data.documents.isEmpty) {
@@ -174,36 +217,6 @@ class _HomePageState extends State<HomePage> {
                           textSize: 32,
                         )
                       ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 30),
-                    child: SizedBox(
-                      width: 315,
-                      height: 5,
-                      child: Visibility(
-                        visible: false,
-                        child: LinearProgressIndicator(
-                          value: _taskPercent,
-                          backgroundColor: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 5),
-                    child: Container(
-                      alignment: Alignment.centerRight,
-                      width: 315,
-                      height: 24,
-                      child: Visibility(
-                        visible: false,
-                        child:
-                            Text((_taskPercent * 100).toInt().toString() + "%",
-                                style: TextStyle(
-                                  fontSize: 24,
-                                )),
-                      ),
                     ),
                   ),
                 ],
@@ -362,7 +375,7 @@ class _HomePageState extends State<HomePage> {
                       child: Visibility(
                         visible: !_doingTask,
                         child: LinearProgressIndicator(
-                          value: _taskPercent,
+                          value: (_totalTasks == null || _totalTasks == 0) ? 0 : (_completedTasks / _totalTasks),
                           backgroundColor: Colors.black,
                         ),
                       ),
@@ -377,7 +390,7 @@ class _HomePageState extends State<HomePage> {
                       child: Visibility(
                         visible: !_doingTask,
                         child:
-                            Text((_taskPercent * 100).toInt().toString() + "%",
+                            Text(((_totalTasks == null || _totalTasks == 0) ? 0 : (_completedTasks / _totalTasks) * 100).toInt().toString() + "%",
                                 style: TextStyle(
                                   fontSize: 24,
                                 )),

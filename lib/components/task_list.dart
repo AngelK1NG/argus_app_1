@@ -40,6 +40,7 @@ class _TaskListState extends State<TaskList> {
         _completedTasks = 0;
         dateDoc.setData({
           'completedTasks': 0,
+          'totalTasks': 0,
         });
       } else {
         setState(() {
@@ -127,8 +128,7 @@ class _TaskListState extends State<TaskList> {
                                 name: value,
                                 completed: false,
                                 key: UniqueKey(),
-                                order: _tasks.length -
-                                    _completedTasks,
+                                order: _tasks.length - _completedTasks,
                                 onDismissed: () => firestoreProvider
                                     .updateTaskOrder(_tasks, widget.date),
                                 date: widget.date,
@@ -147,10 +147,17 @@ class _TaskListState extends State<TaskList> {
                               }).then((doc) {
                                 newTask.id = doc.documentID;
                                 _tasks.insert(
-                                    _tasks.length - _completedTasks,
-                                    newTask);
+                                    _tasks.length - _completedTasks, newTask);
                                 firestoreProvider.updateTaskOrder(
                                     _tasks, widget.date);
+                                DocumentReference dateDoc = db
+                                    .collection('users')
+                                    .document(user.uid)
+                                    .collection('tasks')
+                                    .document(widget.date);
+                                dateDoc.updateData({
+                                  'totalTasks': FieldValue.increment(1),
+                                });
                                 toggleLoading();
                               });
                               _formKey.currentState.reset();
@@ -184,7 +191,8 @@ class _TaskListState extends State<TaskList> {
                 final task = tasks.removeAt(oldIndex);
                 if (newIndex >= tasks.length - _completedTasks) {
                   int distanceFromEnd = tasks.length - newIndex;
-                  tasks.insert(newIndex - (_completedTasks - distanceFromEnd), task);
+                  tasks.insert(
+                      newIndex - (_completedTasks - distanceFromEnd), task);
                   firestoreProvider.updateTaskOrder(tasks, widget.date);
                 } else {
                   tasks.insert(newIndex, task);
