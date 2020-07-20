@@ -73,30 +73,6 @@ class _HomePageState extends State<HomePage> {
     _firestoreProvider.deleteTask(_date, _tasks[0].id, _tasks[0].completed);
   }
 
-  void updateTasks() {
-    FirebaseUser user = Provider.of<User>(context, listen: false).user;
-    DocumentReference dateDoc = db
-        .collection('users')
-        .document(user.uid)
-        .collection('tasks')
-        .document(_date);
-    dateDoc.get().then((snapshot) {
-      if (snapshot.data == null) {
-        _completedTasks = 0;
-        _totalTasks = 0;
-        dateDoc.setData({
-          'completedTasks': 0,
-          'totalTasks': 0,
-        });
-      } else {
-        setState(() {
-          _completedTasks = snapshot.data['completedTasks'];
-          _totalTasks = snapshot.data['totalTasks'];
-        });
-      }
-    });
-  }
-
   bool areTasksCompleted() {
     for (var task in _tasks) {
       if (!task.completed) {
@@ -149,6 +125,27 @@ class _HomePageState extends State<HomePage> {
       _date = getDateString(DateTime.now());
       _user = Provider.of<User>(context, listen: false).user;
       _firestoreProvider = FirestoreProvider(_user);
+      DocumentReference dateDoc = db
+          .collection('users')
+          .document(_user.uid)
+          .collection('tasks')
+          .document(_date);
+      dateDoc.get().then((snapshot) {
+        if (snapshot.data == null) {
+          _completedTasks = 0;
+          _totalTasks = 0;
+          dateDoc.setData({
+            'completedTasks': 0,
+            'totalTasks': 0,
+          });
+        }
+      });
+      dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
+        setState(() {
+          _totalTasks = snapshot.data['totalTasks'];
+          _completedTasks = snapshot.data['completedTasks'];
+        });
+      });
     });
   }
 
@@ -169,7 +166,6 @@ class _HomePageState extends State<HomePage> {
               .orderBy('order')
               .snapshots(),
           builder: (context, snapshot) {
-            updateTasks();
             if (!snapshot.hasData ||
                 snapshot.data.documents == null ||
                 snapshot.data.documents.isEmpty) {
@@ -375,7 +371,9 @@ class _HomePageState extends State<HomePage> {
                       child: Visibility(
                         visible: !_doingTask,
                         child: LinearProgressIndicator(
-                          value: (_totalTasks == null || _totalTasks == 0) ? 0 : (_completedTasks / _totalTasks),
+                          value: (_totalTasks == null || _totalTasks == 0)
+                              ? 0
+                              : (_completedTasks / _totalTasks),
                           backgroundColor: Colors.black,
                         ),
                       ),
@@ -389,11 +387,16 @@ class _HomePageState extends State<HomePage> {
                       height: 24,
                       child: Visibility(
                         visible: !_doingTask,
-                        child:
-                            Text(((_totalTasks == null || _totalTasks == 0) ? 0 : (_completedTasks / _totalTasks) * 100).toInt().toString() + "%",
-                                style: TextStyle(
-                                  fontSize: 24,
-                                )),
+                        child: Text(
+                            ((_totalTasks == null || _totalTasks == 0)
+                                        ? 0
+                                        : (_completedTasks / _totalTasks) * 100)
+                                    .toInt()
+                                    .toString() +
+                                "%",
+                            style: TextStyle(
+                              fontSize: 24,
+                            )),
                       ),
                     ),
                   ),
