@@ -62,7 +62,7 @@ class _OnboardingState extends State<Onboarding> {
                 ),
                 OnboardingPage(
                   title: 'Focus',
-                  text: 'Once you finish, tap Complete. If you failed to complete the task, tap Abandon to start your next task.',
+                  text: 'Once you finish, tap Complete. If you fail to complete the task, tap Abandon to start your next task.',
                   button: false,
                 ),
                 OnboardingPage(
@@ -72,20 +72,19 @@ class _OnboardingState extends State<Onboarding> {
                 ),
                 OnboardingPage(
                   title: 'Calendar',
-                  text: 'Use the calendar to schedule future tasks as well as access task history.',
+                  text: 'Use the calendar to schedule future tasks and access historic tasks.',
                   button: false,
                 ),
                 OnboardingPage(
                   title: 'Statistics',
-                  text: 'At any point of the day, you can always check your stats to see the total time you were being productive, how many tasks you have completed, and the percentage of tasks you have completed ',
+                  text: 'At any point of the day, you can check your stats to see the total time you have been productive, how many tasks you have completed, and the percentage of tasks you have completed.',
                   button: false,
                 ),
                 OnboardingPage(
                   title: 'Feedback',
-                  text: 'When you are ready, please fill out a feedback form that could be found at the bottom of the navigation bar. We will also be contacting you for more details.',
+                  text: 'When you are ready, please fill out the feedback form that can be found at the bottom of the navigation bar. We will also be contacting you for more details.',
                   button: true,
                 ),
-                
               ],
             ),
             Positioned(
