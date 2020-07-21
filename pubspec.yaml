@@ -28,6 +28,7 @@ dependencies:
   flutter_dnd: ^0.1.2
   flutter_local_notifications: ^1.4.4+2
   url_launcher: ^5.5.0
+  screen_state: ^1.0.0
 
 
 dev_dependencies:
