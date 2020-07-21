@@ -157,14 +157,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           dateDoc.setData({
             'completedTasks': 0,
             'totalTasks': 0,
+          }).then((_) {
+            dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
+              setState(() {
+                _totalTasks = snapshot.data['totalTasks'];
+                _completedTasks = snapshot.data['completedTasks'];
+              });
+            });
+          });
+        } else {
+          dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
+            setState(() {
+              _totalTasks = snapshot.data['totalTasks'];
+              _completedTasks = snapshot.data['completedTasks'];
+            });
           });
         }
-      });
-      dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
-        setState(() {
-          _totalTasks = snapshot.data['totalTasks'];
-          _completedTasks = snapshot.data['completedTasks'];
-        });
       });
     });
   }
@@ -343,7 +351,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     } else {
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     }
-    return new WillPopScope(
+    return WillPopScope(
       onWillPop: () async => false,
       child: WrapperWidget(
         nav: !_doingTask,
