@@ -41,6 +41,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   LocalNotificationHelper notificationHelper;
   Screen _screen;
   StreamSubscription<ScreenStateEvent> _subscription;
+  bool _notifConfirmation = false;
 
   void startTask() {
     timer = new Timer.periodic(
@@ -80,6 +81,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _swatchDisplay = "00:00";
     });
     _firestoreProvider.deleteTask(_date, _tasks[0].id, _tasks[0].completed);
+    Fluttertoast.showToast(
+      msg:
+          'Abandoned task: ${_tasks[0].name}',
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+    );
   }
 
   bool areTasksCompleted() {
@@ -237,16 +244,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
           actions: <Widget>[
             FlatButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
               child: Text('Yes'),
               onPressed: () {
                 Navigator.of(context).pop();
                 abandonTask();
-              },
-            ),
-            FlatButton(
-              child: Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
               },
             ),
           ],
@@ -269,16 +276,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
           actions: <Widget>[
             FlatButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
               child: Text('Yes'),
               onPressed: () {
                 Navigator.of(context).pop();
                 abandonTask();
-              },
-            ),
-            FlatButton(
-              child: Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
               },
             ),
           ],
@@ -298,22 +305,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('This will keep you in focus'),
+                Text('This will keep you in focus while you are doing your task. Clicking OK will redirect you to Settings.'),
               ],
             ),
           ),
-          actions: <Widget>[
+          actions: <Widget>[  
             FlatButton(
-              child: Text('Yes'),
+              child: Text('OK'),
               onPressed: () {
+                
                 Navigator.of(context).pop();
                 FlutterDnd.gotoPolicySettings();
-              },
-            ),
-            FlatButton(
-              child: Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
               },
             ),
           ],
@@ -325,7 +327,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void checkIfNotificationsOn() async {
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted == false) {
-        showNotificationConfirmation();
+        if (_notifConfirmation == false) {
+          _notifConfirmation = true;
+          showNotificationConfirmation();
+        }
       }
     }
   }
@@ -547,12 +552,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                       } else {
                                         showAbandonConfirmationIOS();
                                       }
-                                      Fluttertoast.showToast(
-                                        msg:
-                                            'Abandoned task: ${_tasks[0].name}',
-                                        backgroundColor: Colors.black,
-                                        textColor: Colors.white,
-                                      );
                                     },
                                     buttonColor: Theme.of(context).primaryColor,
                                     icon: FaIcon(
