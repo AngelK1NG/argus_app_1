@@ -9,6 +9,18 @@ class FirestoreProvider {
   FirestoreProvider(this.user);
 
   // create user document in firestore when signed in with google
+  Future<bool> userDocumentExists() async {
+    bool docExists = false;
+    await db.collection('users').document(user.uid).get().then((doc) {
+      if (!doc.exists) {
+        
+      } else {
+        docExists = true;
+      }
+    });
+    return docExists;
+  }
+
   void createUserDocument() async {
     await db.collection('users').document(user.uid).get().then((doc) {
       if (!doc.exists) {
