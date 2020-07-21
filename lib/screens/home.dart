@@ -172,27 +172,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     switch (state) {
-      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
         Future.delayed(const Duration(milliseconds: 500), () {
           if (_doingTask) {
-            FlutterDnd.setInterruptionFilter(
-                FlutterDnd.INTERRUPTION_FILTER_ALL);
-            notificationHelper.showNotifications();
-            LocalNotificationHelper.iosReopen = true;
-            Future.delayed(const Duration(milliseconds: 500), () {
+            if (Platform.isAndroid) {
               FlutterDnd.setInterruptionFilter(
-                  FlutterDnd.INTERRUPTION_FILTER_NONE);
-            });
-            Future.delayed(const Duration(milliseconds: 6000), () {
-              LocalNotificationHelper.iosReopen = false;
-            });
+                  FlutterDnd.INTERRUPTION_FILTER_ALL);
+              notificationHelper.showNotifications();
+              Future.delayed(const Duration(milliseconds: 500), () {
+                FlutterDnd.setInterruptionFilter(
+                    FlutterDnd.INTERRUPTION_FILTER_NONE);
+              });
+            } else {
+              notificationHelper.showNotifications();
+            }
           }
         });
-
         break;
       case AppLifecycleState.resumed:
         break;
-      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
         break;
       case AppLifecycleState.detached:
         break;
