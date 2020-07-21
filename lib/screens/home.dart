@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               FlutterDnd.setInterruptionFilter(
                   FlutterDnd.INTERRUPTION_FILTER_NONE);
             });
-            Future.delayed(const Duration(milliseconds: 3000), () {
+            Future.delayed(const Duration(milliseconds: 6000), () {
               LocalNotificationHelper.iosReopen = false;
             });
           }
@@ -226,13 +226,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     if (_doingTask) {
-      SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle.light
-      );
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     } else {
-      SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle.dark
-      );
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     }
     return new WillPopScope(
       onWillPop: () async => false,
