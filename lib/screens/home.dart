@@ -82,8 +82,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
     _firestoreProvider.deleteTask(_date, _tasks[0].id, _tasks[0].completed);
     Fluttertoast.showToast(
-      msg:
-          'Abandoned task: ${_tasks[0].name}',
+      msg: 'Abandoned task: ${_tasks[0].name}',
       backgroundColor: Colors.black,
       textColor: Colors.white,
     );
@@ -189,9 +188,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.paused:
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (_doingTask) {
-            if (Platform.isAndroid) {
+        if (_doingTask) {
+          if (Platform.isAndroid) {
+            Future.delayed(const Duration(milliseconds: 500), () {
               FlutterDnd.setInterruptionFilter(
                   FlutterDnd.INTERRUPTION_FILTER_ALL);
               notificationHelper.showNotifications();
@@ -199,11 +198,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 FlutterDnd.setInterruptionFilter(
                     FlutterDnd.INTERRUPTION_FILTER_NONE);
               });
-            } else {
-              notificationHelper.showNotifications();
-            }
+            });
+          } else {
+            notificationHelper.showNotifications();
           }
-        });
+        }
         break;
       case AppLifecycleState.resumed:
         break;
@@ -313,15 +312,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('This will keep you in focus while you are doing your task. Clicking OK will redirect you to Settings.'),
+                Text(
+                    'This will keep you in focus while you are doing your task. Clicking OK will redirect you to Settings.'),
               ],
             ),
           ),
-          actions: <Widget>[  
+          actions: <Widget>[
             FlatButton(
               child: Text('OK'),
               onPressed: () {
-                
                 Navigator.of(context).pop();
                 FlutterDnd.gotoPolicySettings();
               },
@@ -533,14 +532,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                       });
                                       startTask();
                                       if (Platform.isAndroid) {
-                                        showNotificationConfirmation();
                                         if (await FlutterDnd
                                             .isNotificationPolicyAccessGranted) {
                                           await FlutterDnd
                                               .setInterruptionFilter(FlutterDnd
                                                   .INTERRUPTION_FILTER_NONE); // Turn on DND - All notifications are suppressed.
-                                        } else {
-                                          showNotificationConfirmation();
                                         }
                                       }
                                     },
