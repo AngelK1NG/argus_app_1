@@ -9,6 +9,7 @@ import 'screens/tasks.dart';
 import 'screens/statistics.dart';
 import 'screens/settings.dart';
 import 'screens/login.dart';
+import 'screens/onboarding.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,6 +64,9 @@ class MyApp extends StatelessWidget {
             },
             '/login': (context) {
               return LoginPage();
+            },
+            '/onboarding': (context) {
+              return Onboarding();
             }
           }),
     );

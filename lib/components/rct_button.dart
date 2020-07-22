@@ -60,9 +60,7 @@ class RctButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: textSize,
                   fontWeight: FontWeight.w500,
-                  color: this.buttonColor == Colors.black
-                      ? Colors.white
-                      : Colors.black,
+                  color: this.textColor,
                 ),
               ),
             ],

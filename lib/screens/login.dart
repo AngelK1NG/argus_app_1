@@ -28,7 +28,13 @@ class _LoginPageState extends State<LoginPage> {
       if (user == null) {
         Navigator.popUntil(context, (route) => route.isFirst);
       } else {
-        Navigator.pushNamed(context, '/home');
+        FirestoreProvider(user).userDocumentExists().then((exists) {
+          if (exists) {
+            Navigator.pushNamed(context, '/home');
+          } else {
+            Navigator.pushNamed(context, '/onboarding');
+          }
+        });
       }
     });
   }
@@ -50,8 +56,7 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     _isLoading = true;
                   });
-                  FirebaseUser user = await AuthProvider().googleSignIn();
-                  FirestoreProvider(user).createUserDocument();
+                  AuthProvider().googleSignIn();
                   setState(() {
                     _isLoading = false;
                   });
