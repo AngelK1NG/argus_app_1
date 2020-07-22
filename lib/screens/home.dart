@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   StreamSubscription<ScreenStateEvent> _subscription;
   bool _notifConfirmation = false;
 
-  void startTask() {
+  void startTask() async {
     timer = new Timer.periodic(
         const Duration(seconds: 1),
         (Timer timer) => setState(() {
@@ -66,16 +66,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _doingTask = true;
       _startTime = DateTime.now();
     });
+    if (Platform.isAndroid) {
+      if (await FlutterDnd.isNotificationPolicyAccessGranted) {
+        await FlutterDnd.setInterruptionFilter(
+          FlutterDnd.INTERRUPTION_FILTER_NONE)
+        ; // Turn on DND - All notifications are suppressed.
+      }
+    }
   }
 
-  void stopTask() {
+  void stopTask() async {
     setState(() {
       _doingTask = false;
       _swatchDisplay = "00:00";
     });
+    if (Platform.isAndroid) {
+      if (await FlutterDnd.isNotificationPolicyAccessGranted) {
+        await FlutterDnd.setInterruptionFilter(
+          FlutterDnd.INTERRUPTION_FILTER_ALL
+        ); // Turn on DND - All notifications are suppressed.
+      }
+    }
   }
 
-  void abandonTask() {
+  void abandonTask() async {
     setState(() {
       _doingTask = false;
       _swatchDisplay = "00:00";
@@ -86,6 +100,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       backgroundColor: Colors.black,
       textColor: Colors.white,
     );
+    if (Platform.isAndroid) {
+      if (await FlutterDnd.isNotificationPolicyAccessGranted) {
+        await FlutterDnd.setInterruptionFilter(
+          FlutterDnd.INTERRUPTION_FILTER_ALL
+        ); // Turn on DND - All notifications are suppressed.
+      }
+    }
   }
 
   bool areTasksCompleted() {
@@ -498,14 +519,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                   });
                                   stopTask();
                                   completeTask(_user);
-                                  if (Platform.isAndroid) {
-                                    if (await FlutterDnd
-                                        .isNotificationPolicyAccessGranted) {
-                                      await FlutterDnd.setInterruptionFilter(
-                                          FlutterDnd
-                                              .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
-                                    } else {}
-                                  }
                                 },
                                 buttonWidth: 240,
                                 buttonText: "Complete",
@@ -531,14 +544,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                         _doingTask = true;
                                       });
                                       startTask();
-                                      if (Platform.isAndroid) {
-                                        if (await FlutterDnd
-                                            .isNotificationPolicyAccessGranted) {
-                                          await FlutterDnd
-                                              .setInterruptionFilter(FlutterDnd
-                                                  .INTERRUPTION_FILTER_NONE); // Turn on DND - All notifications are suppressed.
-                                        }
-                                      }
                                     },
                                     buttonWidth: 240,
                                     buttonText: "Start",
