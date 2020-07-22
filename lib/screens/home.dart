@@ -150,7 +150,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           .collection('tasks')
           .document(_date);
       dateDoc.get().then((snapshot) {
-        if (snapshot.data == null) {
+        if (snapshot.data == null || snapshot.data['totalTasks'] == null || snapshot.data['completedTasks'] == null) {
           _completedTasks = 0;
           _totalTasks = 0;
           dateDoc.setData({

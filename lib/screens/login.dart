@@ -31,23 +31,23 @@ class _LoginPageState extends State<LoginPage> {
           _isLogin = true;
           _isLoading = false;
         });
-        Future.delayed(Duration(milliseconds: 1000), () {
-          Navigator.popUntil(context, (route) => route.isFirst);
-        });
+        Navigator.popUntil(context, (route) => route.isFirst);
       } else {
         FirestoreProvider(user).userDocumentExists().then((exists) {
-          setState(() {
-            _isLoading = false;
+          Future.delayed(Duration(milliseconds: 500), () {
+            setState(() {
+              _isLoading = false;
+            });
+            if (exists) {
+              Future.delayed(Duration(milliseconds: 500), () {
+                Navigator.pushNamed(context, '/home');
+              });
+            } else {
+              Future.delayed(Duration(milliseconds: 500), () {
+                Navigator.pushNamed(context, '/onboarding');
+              });
+            }
           });
-          if (exists) {
-            Future.delayed(Duration(milliseconds: 1000), () {
-              Navigator.pushNamed(context, '/home');
-            });
-          } else {
-            Future.delayed(Duration(milliseconds: 1000), () {
-              Navigator.pushNamed(context, '/onboarding');
-            });
-          }
         });
       }
     });
