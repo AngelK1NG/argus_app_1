@@ -14,20 +14,22 @@ dependencies:
 
   cupertino_icons: ^0.1.3
 
-  font_awesome_flutter: ^8.8.1
-
   firebase_core: ^0.4.5
   firebase_analytics: ^5.0.16
   cloud_firestore: ^0.13.7
   firebase_auth: ^0.16.1
   google_sign_in: ^4.5.1
+
   provider: ^4.3.1
+  font_awesome_flutter: ^8.8.1
   modal_progress_hud: ^0.1.3
   intl: ^0.16.1
   fluttertoast: ^7.0.1
   flutter_dnd: ^0.1.2
   flutter_local_notifications: ^1.4.4+2
   url_launcher: ^5.5.0
+  screen_state: ^1.0.0
+  dots_indicator: ^1.2.0
 
 
 dev_dependencies:
@@ -38,3 +40,4 @@ flutter:
   uses-material-design: true
   assets:
     - images/
+    - images/onboarding/

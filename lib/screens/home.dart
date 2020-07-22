@@ -5,6 +5,7 @@ import 'package:Focal/utils/local_notifications.dart';
 import 'package:Focal/utils/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -16,6 +17,8 @@ import '../constants.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:io' show Platform;
 import 'package:flutter_dnd/flutter_dnd.dart';
+import 'package:screen_state/screen_state.dart';
+import 'package:flutter/services.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -36,6 +39,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   FirestoreProvider _firestoreProvider;
   List<TaskItem> _tasks = [];
   LocalNotificationHelper notificationHelper;
+  Screen _screen;
+  StreamSubscription<ScreenStateEvent> _subscription;
+  bool _notifConfirmation = false;
 
   void startTask() {
     timer = new Timer.periodic(
@@ -75,6 +81,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _swatchDisplay = "00:00";
     });
     _firestoreProvider.deleteTask(_date, _tasks[0].id, _tasks[0].completed);
+    Fluttertoast.showToast(
+      msg:
+          'Abandoned task: ${_tasks[0].name}',
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+    );
   }
 
   bool areTasksCompleted() {
@@ -128,6 +140,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     notificationHelper = LocalNotificationHelper();
     notificationHelper.initialize();
     WidgetsBinding.instance.addObserver(this);
+    initPlatformState();
     setState(() {
       _date = getDateString(DateTime.now());
       _user = Provider.of<User>(context, listen: false).user;
@@ -144,14 +157,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           dateDoc.setData({
             'completedTasks': 0,
             'totalTasks': 0,
+          }).then((_) {
+            dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
+              setState(() {
+                _totalTasks = snapshot.data['totalTasks'];
+                _completedTasks = snapshot.data['completedTasks'];
+              });
+            });
+          });
+        } else {
+          dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
+            setState(() {
+              _totalTasks = snapshot.data['totalTasks'];
+              _completedTasks = snapshot.data['completedTasks'];
+            });
           });
         }
-      });
-      dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
-        setState(() {
-          _totalTasks = snapshot.data['totalTasks'];
-          _completedTasks = snapshot.data['completedTasks'];
-        });
       });
     });
   }
@@ -159,38 +180,178 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     super.dispose();
-    // if (_doingTask) {
-    notificationHelper.showNotifications();
     WidgetsBinding.instance.removeObserver(this);
-    // }
+    _subscription.cancel();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     switch (state) {
-      case AppLifecycleState.inactive:
-        if (_doingTask) {
-          FlutterDnd.setInterruptionFilter(FlutterDnd.INTERRUPTION_FILTER_ALL);
-          notificationHelper.showNotifications();
-          Future.delayed(const Duration(milliseconds: 500), () {
-            FlutterDnd.setInterruptionFilter(
-                FlutterDnd.INTERRUPTION_FILTER_NONE);
-          });
-        }
+      case AppLifecycleState.paused:
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (_doingTask) {
+            if (Platform.isAndroid) {
+              FlutterDnd.setInterruptionFilter(
+                  FlutterDnd.INTERRUPTION_FILTER_ALL);
+              notificationHelper.showNotifications();
+              Future.delayed(const Duration(milliseconds: 2500), () {
+                FlutterDnd.setInterruptionFilter(
+                    FlutterDnd.INTERRUPTION_FILTER_NONE);
+              });
+            } else {
+              notificationHelper.showNotifications();
+            }
+          }
+        });
         break;
       case AppLifecycleState.resumed:
         break;
-      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
         break;
       case AppLifecycleState.detached:
         break;
     }
   }
 
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    startListening();
+  }
+
+  void onData(ScreenStateEvent event) {
+    print(event);
+    if (event == ScreenStateEvent.SCREEN_OFF) {
+      LocalNotificationHelper.screenOff = true;
+    }
+    if (event == ScreenStateEvent.SCREEN_UNLOCKED) {
+      LocalNotificationHelper.screenOff = false;
+    }
+  }
+
+  void startListening() {
+    _screen = new Screen();
+    try {
+      _subscription = _screen.screenStateStream.listen(onData);
+    } on ScreenStateException catch (exception) {
+      print(exception);
+    }
+  }
+
+  Future<void> showAbandonConfirmationAndroid() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure you want to abandon task?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                abandonTask();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> showAbandonConfirmationIOS() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('Are you sure you want to abandon task?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                abandonTask();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+// android confirm for notification settings
+  Future<void> showNotificationConfirmation() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Allow do not disturb access'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('This will keep you in focus while you are doing your task. Clicking OK will redirect you to Settings.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[  
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                
+                Navigator.of(context).pop();
+                FlutterDnd.gotoPolicySettings();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void checkIfNotificationsOn() async {
+    if (Platform.isAndroid) {
+      if (await FlutterDnd.isNotificationPolicyAccessGranted == false) {
+        if (_notifConfirmation == false) {
+          _notifConfirmation = true;
+          showNotificationConfirmation();
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new WillPopScope(
+    checkIfNotificationsOn();
+    if (_doingTask) {
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+    } else {
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+    }
+    return WillPopScope(
       onWillPop: () async => false,
       child: WrapperWidget(
         nav: !_doingTask,
@@ -344,9 +505,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                       await FlutterDnd.setInterruptionFilter(
                                           FlutterDnd
                                               .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
-                                    } else {
-                                      FlutterDnd.gotoPolicySettings();
-                                    }
+                                    } else {}
                                   }
                                 },
                                 buttonWidth: 240,
@@ -374,13 +533,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                       });
                                       startTask();
                                       if (Platform.isAndroid) {
+                                        showNotificationConfirmation();
                                         if (await FlutterDnd
                                             .isNotificationPolicyAccessGranted) {
                                           await FlutterDnd
                                               .setInterruptionFilter(FlutterDnd
                                                   .INTERRUPTION_FILTER_NONE); // Turn on DND - All notifications are suppressed.
                                         } else {
-                                          FlutterDnd.gotoPolicySettings();
+                                          showNotificationConfirmation();
                                         }
                                       }
                                     },
@@ -395,13 +555,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             child: !areTasksCompleted()
                                 ? SqrButton(
                                     onTap: () {
-                                      Fluttertoast.showToast(
-                                        msg:
-                                            'Abandoned task: ${_tasks[0].name}',
-                                        backgroundColor: Colors.black,
-                                        textColor: Colors.white,
-                                      );
-                                      abandonTask();
+                                      if (Platform.isAndroid) {
+                                        showAbandonConfirmationAndroid();
+                                      } else {
+                                        showAbandonConfirmationIOS();
+                                      }
                                     },
                                     buttonColor: Theme.of(context).primaryColor,
                                     icon: FaIcon(
