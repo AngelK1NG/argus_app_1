@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Image(image: AssetImage('images/Focal Logo_Full.png')),
+                  Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
                   Padding(
                     padding: const EdgeInsets.only(top: 100),
                     child: RctButton(
@@ -108,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Container(
               alignment: Alignment.center,
               color: Colors.white,
-              child: Image(image: AssetImage('images/Focal Logo_Full.png')),
+              child: Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
             ),
           ),
         ),

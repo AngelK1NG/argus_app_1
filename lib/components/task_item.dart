@@ -69,13 +69,13 @@ class _TaskItemState extends State<TaskItem> {
                         child: widget.completed
                             ? Image(
                                 image:
-                                    AssetImage('images/Task Icon_Filled.png'),
+                                    AssetImage('images/icons/Task Icon_Filled.png'),
                                 width: 10,
                                 height: 10,
                               )
                             : Image(
                                 image:
-                                    AssetImage('images/Task Icon_Unfilled.png'),
+                                    AssetImage('images/icons/Task Icon_Unfilled.png'),
                                 width: 10,
                                 height: 10,
                               )),
