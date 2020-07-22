@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
           visible: !_isLogin,
           child: AnimatedOpacity(
             opacity: _isLoading ? 1.0 : 0.0,
-            duration: Duration(milliseconds: 1000),
+            duration: Duration(milliseconds: 500),
             child: Container(
               alignment: Alignment.center,
               color: Colors.white,
