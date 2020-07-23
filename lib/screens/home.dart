@@ -20,12 +20,7 @@ import 'package:flutter_dnd/flutter_dnd.dart';
 import 'package:screen_state/screen_state.dart';
 import 'package:flutter/services.dart';
 
-
-
 class HomePage extends StatefulWidget {
-  
-
-
   HomePage({Key key}) : super(key: key);
 
   @override
@@ -49,9 +44,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Screen _screen;
   StreamSubscription<ScreenStateEvent> _subscription;
   bool _notifConfirmation = false;
+  String _iosScreen;
 
   void startTask() async {
-     PrintBoi();
+    PrintBoi();
     timer = new Timer.periodic(
         const Duration(seconds: 1),
         (Timer timer) => setState(() {
@@ -76,9 +72,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(
-          FlutterDnd.INTERRUPTION_FILTER_NONE)
-        ; // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(FlutterDnd
+            .INTERRUPTION_FILTER_NONE); // Turn on DND - All notifications are suppressed.
       }
     }
   }
@@ -90,9 +85,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(
-          FlutterDnd.INTERRUPTION_FILTER_ALL
-        ); // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(FlutterDnd
+            .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
       }
     }
   }
@@ -110,9 +104,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(
-          FlutterDnd.INTERRUPTION_FILTER_ALL
-        ); // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(FlutterDnd
+            .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
       }
     }
   }
@@ -179,7 +172,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           .collection('tasks')
           .document(_date);
       dateDoc.get().then((snapshot) {
-        if (snapshot.data == null || snapshot.data['totalTasks'] == null || snapshot.data['completedTasks'] == null) {
+        if (snapshot.data == null ||
+            snapshot.data['totalTasks'] == null ||
+            snapshot.data['completedTasks'] == null) {
           _completedTasks = 0;
           _totalTasks = 0;
           dateDoc.setData({
@@ -229,7 +224,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               });
             });
           } else {
-            notificationHelper.showNotifications();
+            PrintBoi().then((value) {
+              if (_iosScreen.isNotEmpty) {
+                notificationHelper.showNotifications();
+              }
+            });
           }
         }
         break;
@@ -371,11 +370,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> PrintBoi() async {
+    try {
+      platform.invokeMethod("PrintBoi").then((value) {
+        print(value);
+        _iosScreen = value;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     checkIfNotificationsOn();
     if (_doingTask) {
-     
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     } else {
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
@@ -635,15 +644,4 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
     );
   }
-    void PrintBoi() async {
-    String value;
-    try {
-      value = await platform.invokeMethod("PrintBoi");
-    }catch(e) {
-      print(e);
-    }
-    print(value);
-
-    }
- }
-
+}
