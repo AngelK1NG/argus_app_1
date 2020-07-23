@@ -13,10 +13,24 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: 1), () {
+      setState(() {
+        _loading = false;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     String _email = Provider.of<User>(context, listen: false).user.email;
     return WrapperWidget(
+      loading: _loading,
+      transition: true,
       nav: true,
       child: Stack(children: <Widget>[
         Positioned(

@@ -19,35 +19,53 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _loginLoading = false;
-  bool _isLoading = true;
+  bool _loading = true;
   bool _isLogin = false;
+
   @override
   void initState() {
     super.initState();
     auth.onAuthStateChanged.listen((user) {
-      Provider.of<User>(context, listen: false).user = user;
+      if (context != null) {
+        Provider.of<User>(context, listen: false).user = user;
+      } else {
+        user = null;
+      }
       if (user == null) {
-        setState(() {
-          _isLogin = true;
-          _isLoading = false;
-        });
-        Navigator.popUntil(context, (route) => route.isFirst);
+        if (mounted) {
+          setState(() {
+            _isLogin = true;
+            _loading = false;
+          });
+          Navigator.popUntil(context, (route) => route.isFirst);
+        }
       } else {
         FirestoreProvider(user).userDocumentExists().then((exists) {
-          Future.delayed(Duration(milliseconds: 500), () {
-            setState(() {
-              _isLoading = false;
-            });
-            if (exists) {
-              Future.delayed(Duration(milliseconds: 500), () {
-                Navigator.pushNamed(context, '/home');
+          if (mounted) {
+            if (_isLogin) {
+              setState(() {
+                _loginLoading = false;
               });
+              if (exists) {
+                Navigator.pushNamed(context, '/home');
+              } else {
+                Navigator.pushNamed(context, '/onboarding');
+              }
             } else {
               Future.delayed(Duration(milliseconds: 500), () {
-                Navigator.pushNamed(context, '/onboarding');
+                setState(() {
+                  _loading = false;
+                });
+                Future.delayed(Duration(milliseconds: 500), () {
+                  if (exists) {
+                    Navigator.pushNamed(context, '/home');
+                  } else {
+                    Navigator.pushNamed(context, '/onboarding');
+                  }
+                });
               });
             }
-          });
+          }
         });
       }
     });
@@ -65,6 +83,8 @@ class _LoginPageState extends State<LoginPage> {
           child: ModalProgressHUD(
             inAsyncCall: _loginLoading,
             child: WrapperWidget(
+              loading: false,
+              transition: false,
               nav: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -78,9 +98,6 @@ class _LoginPageState extends State<LoginPage> {
                           _loginLoading = true;
                         });
                         AuthProvider().googleSignIn();
-                        setState(() {
-                          _loginLoading = false;
-                        });
                         LocalNotificationHelper.userLoggedIn = true;
                       },
                       buttonWidth: 315,
@@ -103,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
         Visibility(
           visible: !_isLogin,
           child: AnimatedOpacity(
-            opacity: _isLoading ? 1.0 : 0.0,
+            opacity: _loading ? 1.0 : 0.0,
             duration: Duration(milliseconds: 500),
             child: Container(
               alignment: Alignment.center,

@@ -6,8 +6,10 @@ class WrapperWidget extends StatefulWidget {
   final Widget child;
   final Color backgroundColor;
   final bool nav;
+  final bool loading;
+  final bool transition;
 
-  const WrapperWidget({@required this.child, this.backgroundColor, this.nav});
+  const WrapperWidget({@required this.child, this.backgroundColor, this.nav, @required this.loading, @required this.transition});
 
   @override
   _WrapperWidgetState createState() => _WrapperWidgetState();
@@ -15,10 +17,19 @@ class WrapperWidget extends StatefulWidget {
 
 class _WrapperWidgetState extends State<WrapperWidget> {
   bool _navActive = false;
+  bool _offstage = false;
 
   void toggleNav() {
     setState(() {
       _navActive = !_navActive;
+    });
+  }
+  
+  void toggleOffstage() {
+    Future.delayed(Duration(milliseconds: 200), () {
+      if (this.mounted) {
+        setState(() => _offstage = true);
+      }
     });
   }
 
@@ -29,6 +40,9 @@ class _WrapperWidgetState extends State<WrapperWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.loading) {
+      toggleOffstage();
+    }
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       child: Scaffold(
@@ -70,9 +84,20 @@ class _WrapperWidgetState extends State<WrapperWidget> {
                         child: AbsorbPointer(
                           absorbing: _navActive,
                           child: Container(
-                            child: widget.child)
+                            child: widget.child
                           ),
+                        ),
                       ),
+                    ),
+                  ),
+                ),
+                Offstage(
+                  offstage: _offstage || !widget.transition,
+                  child: AnimatedOpacity(
+                    opacity: widget.loading ? 1 : 0,
+                    duration: Duration(milliseconds: 200),
+                    child: Container(
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -85,7 +110,7 @@ class _WrapperWidgetState extends State<WrapperWidget> {
                       FocusScope.of(context).unfocus();
                     }, active: _navActive),
                   ),
-                )
+                ),
               ],
             ),
           ),

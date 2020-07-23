@@ -31,7 +31,6 @@ dependencies:
   screen_state: ^1.0.0
   dots_indicator: ^1.2.0
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
