@@ -29,62 +29,65 @@ class _WrapperWidgetState extends State<WrapperWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SizedBox.expand(
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onHorizontalDragUpdate: (details) {
-            if (details.delta.dx > 10 && widget.nav) {
-              setState(() {
-                _navActive = true;
-              });
-              FocusScope.of(context).unfocus();
-            }
-            if (details.delta.dx < -10 && widget.nav) {
-              setState(() {
-                _navActive = false;
-              });
-              FocusScope.of(context).unfocus();
-            }
-          },
-          child: Stack(
-            children: <Widget>[
-              GestureDetector(
-                behavior: HitTestBehavior.deferToChild,
-                onTap: () {
-                  setState(() {
-                    _navActive = false;
-                  });
-                  FocusScope.of(context).unfocus();
-                },
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: 200),
-                  curve: Curves.ease,
-                  color: widget.backgroundColor,
-                  child: AnimatedOpacity(
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: Scaffold(
+        body: SizedBox.expand(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onHorizontalDragUpdate: (details) {
+              if (details.delta.dx > 10 && widget.nav) {
+                setState(() {
+                  _navActive = true;
+                });
+                FocusScope.of(context).unfocus();
+              }
+              if (details.delta.dx < -10 && widget.nav) {
+                setState(() {
+                  _navActive = false;
+                });
+                FocusScope.of(context).unfocus();
+              }
+            },
+            child: Stack(
+              children: <Widget>[
+                GestureDetector(
+                  behavior: HitTestBehavior.deferToChild,
+                  onTap: () {
+                    setState(() {
+                      _navActive = false;
+                    });
+                    FocusScope.of(context).unfocus();
+                  },
+                  child: AnimatedContainer(
                     duration: Duration(milliseconds: 200),
-                    opacity: _navActive ? 0.5 : 1,
-                    child: SafeArea(
-                      child: AbsorbPointer(
-                        absorbing: _navActive,
-                        child: Container(
-                          child: widget.child)
-                        ),
+                    curve: Curves.ease,
+                    color: widget.backgroundColor,
+                    child: AnimatedOpacity(
+                      duration: Duration(milliseconds: 200),
+                      opacity: _navActive ? 0.5 : 1,
+                      child: SafeArea(
+                        child: AbsorbPointer(
+                          absorbing: _navActive,
+                          child: Container(
+                            child: widget.child)
+                          ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SideNav(onTap: toggleNav, active: _navActive,),
-              SafeArea(
-                child: Offstage(
-                  offstage: !widget.nav,
-                  child: NavBurger(onTap: () {
-                    toggleNav();
-                    FocusScope.of(context).unfocus();
-                  }, active: _navActive),
-                ),
-              )
-            ],
+                SideNav(onTap: toggleNav, active: _navActive,),
+                SafeArea(
+                  child: Offstage(
+                    offstage: !widget.nav,
+                    child: NavBurger(onTap: () {
+                      toggleNav();
+                      FocusScope.of(context).unfocus();
+                    }, active: _navActive),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
