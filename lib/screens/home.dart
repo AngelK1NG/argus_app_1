@@ -20,7 +20,12 @@ import 'package:flutter_dnd/flutter_dnd.dart';
 import 'package:screen_state/screen_state.dart';
 import 'package:flutter/services.dart';
 
+
+
 class HomePage extends StatefulWidget {
+  
+
+
   HomePage({Key key}) : super(key: key);
 
   @override
@@ -28,6 +33,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+  static const platform = const MethodChannel("com.flutter.lockscreen");
+
   Timer timer;
   DateTime _startTime;
   String _swatchDisplay = "00:00";
@@ -44,6 +51,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _notifConfirmation = false;
 
   void startTask() async {
+     PrintBoi();
     timer = new Timer.periodic(
         const Duration(seconds: 1),
         (Timer timer) => setState(() {
@@ -367,6 +375,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     checkIfNotificationsOn();
     if (_doingTask) {
+     
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     } else {
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
@@ -626,4 +635,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
     );
   }
-}
+    void PrintBoi() async {
+    String value;
+    try {
+      value = await platform.invokeMethod("PrintBoi");
+    }catch(e) {
+      print(e);
+    }
+    print(value);
+
+    }
+ }
+
