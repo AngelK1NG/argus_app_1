@@ -23,7 +23,10 @@ import Flutter
             [unowned self] (methodCall, result) in
             if (methodCall.method == "PrintBoi")
             {
-                result(screenStat)
+                if UIScreen.main.brightness == 0.0 {
+                           screenStat = "screen is locked"
+                     result(screenStat)
+                }
             }
         }
         

@@ -47,7 +47,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   String _iosScreen;
 
   void startTask() async {
-    PrintBoi();
     timer = new Timer.periodic(
         const Duration(seconds: 1),
         (Timer timer) => setState(() {
@@ -225,7 +224,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             });
           } else {
             PrintBoi().then((value) {
-              if (_iosScreen.isNotEmpty) {
+              if (_iosScreen == 'nil') {
                 notificationHelper.showNotifications();
               }
             });
