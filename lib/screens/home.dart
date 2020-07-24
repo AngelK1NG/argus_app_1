@@ -28,6 +28,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+  static const platform = const MethodChannel("com.flutter.lockscreen");
+
   Timer timer;
   DateTime _startTime;
   String _swatchDisplay = "00:00";
@@ -42,6 +44,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Screen _screen;
   StreamSubscription<ScreenStateEvent> _subscription;
   bool _notifConfirmation = false;
+  bool _iosScreen = true;
   bool _loading = true;
 
   void startTask() async {
@@ -69,9 +72,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(
-          FlutterDnd.INTERRUPTION_FILTER_NONE)
-        ; // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(FlutterDnd
+            .INTERRUPTION_FILTER_NONE); // Turn on DND - All notifications are suppressed.
       }
     }
   }
@@ -83,9 +85,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(
-          FlutterDnd.INTERRUPTION_FILTER_ALL
-        ); // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(FlutterDnd
+            .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
       }
     }
   }
@@ -103,9 +104,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(
-          FlutterDnd.INTERRUPTION_FILTER_ALL
-        ); // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(FlutterDnd
+            .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
       }
     }
   }
@@ -172,7 +172,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           .collection('tasks')
           .document(_date);
       dateDoc.get().then((snapshot) {
-        if (snapshot.data == null || snapshot.data['totalTasks'] == null || snapshot.data['completedTasks'] == null) {
+        if (snapshot.data == null ||
+            snapshot.data['totalTasks'] == null ||
+            snapshot.data['completedTasks'] == null) {
           _completedTasks = 0;
           _totalTasks = 0;
           dateDoc.setData({
@@ -222,7 +224,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               });
             });
           } else {
-            notificationHelper.showNotifications();
+            printBoi().then((_) {
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (_iosScreen) {
+                  notificationHelper.showNotifications();
+                }
+              });
+            });
           }
         }
         break;
@@ -361,6 +369,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           showNotificationConfirmation();
         }
       }
+    }
+  }
+
+  Future<void> printBoi() async {
+    try {
+      platform.invokeMethod("printBoi").then((value) {
+        setState(() {
+          _iosScreen = value;
+        });
+      });
+    } catch(e) {
+      print(e);
     }
   }
 
