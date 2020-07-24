@@ -9,9 +9,9 @@ import Flutter
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         
-        var screenStat = "nil"
+        var screenStat = true
         if UIScreen.main.brightness == 0.0 {
-                             screenStat = "screen is locked"
+                             screenStat = false
                   }
         
         let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
@@ -21,12 +21,15 @@ import Flutter
           
             
             [unowned self] (methodCall, result) in
-            if (methodCall.method == "PrintBoi")
+            if (methodCall.method == "printBoi")
             {
                 if UIScreen.main.brightness == 0.0 {
-                           screenStat = "screen is locked"
-                     result(screenStat)
+                           screenStat = false
                 }
+                else {
+                    screenStat = true
+                }
+                result(screenStat)
             }
         }
         
