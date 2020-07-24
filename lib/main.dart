@@ -49,26 +49,32 @@ class MyApp extends StatelessWidget {
             FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
           ],
           initialRoute: '/login',
-          routes: {
-            '/home': (context) {
-              return HomePage();
-            },
-            '/tasks': (context) {
-              return TasksPage();
-            },
-            '/statistics': (context) {
-              return StatisticsPage();
-            },
-            '/settings': (context) {
-              return SettingsPage();
-            },
-            '/login': (context) {
-              return LoginPage();
-            },
-            '/onboarding': (context) {
-              return Onboarding();
+          onGenerateRoute: (routeSettings) {
+            switch (routeSettings.name) {
+              case '/home':
+                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => HomePage());
+                break;
+              case '/tasks':
+                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => TasksPage());
+                break;
+              case '/statistics':
+                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => StatisticsPage());
+                break;
+              case '/settings':
+                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => SettingsPage());
+                break;
+              case '/login':
+                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => LoginPage());
+                break;
+              case '/onboarding':
+                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => Onboarding());
+                break;
+              default:
+                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => LoginPage());
+                break;
             }
-          }),
+          }
+      ),
     );
   }
 }

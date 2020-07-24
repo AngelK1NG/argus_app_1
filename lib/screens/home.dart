@@ -45,6 +45,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   StreamSubscription<ScreenStateEvent> _subscription;
   bool _notifConfirmation = false;
   bool _iosScreen = true;
+  bool _loading = true;
 
   void startTask() async {
     timer = new Timer.periodic(
@@ -394,6 +395,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return WillPopScope(
       onWillPop: () async => false,
       child: WrapperWidget(
+        loading: _loading,
+        transition: true,
         nav: !_doingTask,
         backgroundColor: _doingTask ? Colors.black : Colors.white,
         child: StreamBuilder<QuerySnapshot>(
@@ -406,6 +409,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               .orderBy('order')
               .snapshots(),
           builder: (context, snapshot) {
+            _loading = false;
             if (!snapshot.hasData ||
                 snapshot.data.documents == null ||
                 snapshot.data.documents.isEmpty) {
