@@ -1,46 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:apple_sign_in/apple_sign_in.dart';
-// import 'package:apple_sign_in_firebase_flutter/apple_sign_in_available.dart';
-// import 'package:apple_sign_in_firebase_flutter/auth_service.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
-class SignInPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final appleSignInAvailable =
-        Provider.of<AppleSignInAvailable>(context, listen: false);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Sign In'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(6.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [            
-            if (appleSignInAvailable.isAvailable)
-              AppleSignInButton(
-                style: ButtonStyle.black, // style as needed
-                type: ButtonType.signIn, // style as needed
-                onPressed: () {},
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class AppleSignInAvailable {
-  AppleSignInAvailable(this.isAvailable);
-  final bool isAvailable;
-
-  static Future<AppleSignInAvailable> check() async {
-    return AppleSignInAvailable(await AppleSignIn.isAvailable());
-  }
-}
 
 class AuthProvider {
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -70,5 +32,46 @@ class AuthProvider {
       print(error);
       return null;
     }
+  }
+
+  final _firebaseAuth = FirebaseAuth.instance;
+
+  Future<FirebaseUser> signInWithApple({List<Scope> scopes = const []}) async {
+    // 1. perform the sign-in request
+    final result = await AppleSignIn.performRequests(
+        [AppleIdRequest(requestedScopes: scopes)]);
+    // 2. check the result
+    switch (result.status) {
+      case AuthorizationStatus.authorized:
+        final appleIdCredential = result.credential;
+        final oAuthProvider = OAuthProvider(providerId: 'apple.com');
+        final credential = oAuthProvider.getCredential(
+          idToken: String.fromCharCodes(appleIdCredential.identityToken),
+          accessToken:
+              String.fromCharCodes(appleIdCredential.authorizationCode),
+        );
+        final authResult = await _firebaseAuth.signInWithCredential(credential);
+        final firebaseUser = authResult.user;
+        if (scopes.contains(Scope.fullName)) {
+          final updateUser = UserUpdateInfo();
+          updateUser.displayName =
+              '${appleIdCredential.fullName.givenName} ${appleIdCredential.fullName.familyName}';
+          await firebaseUser.updateProfile(updateUser);
+        }
+        return firebaseUser;
+      case AuthorizationStatus.error:
+        print(result.error.toString());
+        throw PlatformException(
+          code: 'ERROR_AUTHORIZATION_DENIED',
+          message: result.error.toString(),
+        );
+
+      case AuthorizationStatus.cancelled:
+        throw PlatformException(
+          code: 'ERROR_ABORTED_BY_USER',
+          message: 'Sign in aborted by user',
+        );
+    }
+    return null;
   }
 }
