@@ -20,9 +20,11 @@ class SideNav extends StatelessWidget {
 
     if (!isNewRouteSameAsCurrent) {
       if (newRoute == '/home') {
-        Navigator.pushNamedAndRemoveUntil(context, newRoute, ModalRoute.withName('/login'));
+        Navigator.pushNamedAndRemoveUntil(
+            context, newRoute, ModalRoute.withName('/login'));
       } else {
-        Navigator.pushNamedAndRemoveUntil(context, newRoute, ModalRoute.withName('/home'));
+        Navigator.pushNamedAndRemoveUntil(
+            context, newRoute, ModalRoute.withName('/home'));
       }
     }
 

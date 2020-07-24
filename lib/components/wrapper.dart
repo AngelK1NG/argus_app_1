@@ -8,8 +8,12 @@ class WrapperWidget extends StatefulWidget {
   final bool nav;
   final bool loading;
   final bool transition;
-
-  const WrapperWidget({@required this.child, this.backgroundColor, this.nav, @required this.loading, @required this.transition});
+  const WrapperWidget(
+      {@required this.child,
+      this.backgroundColor,
+      this.nav,
+      @required this.loading,
+      @required this.transition});
 
   @override
   _WrapperWidgetState createState() => _WrapperWidgetState();
@@ -24,7 +28,7 @@ class _WrapperWidgetState extends State<WrapperWidget> {
       _navActive = !_navActive;
     });
   }
-  
+
   void toggleOffstage() {
     Future.delayed(Duration(milliseconds: 200), () {
       if (this.mounted) {
@@ -34,7 +38,7 @@ class _WrapperWidgetState extends State<WrapperWidget> {
   }
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
   }
 
@@ -83,9 +87,7 @@ class _WrapperWidgetState extends State<WrapperWidget> {
                       child: SafeArea(
                         child: AbsorbPointer(
                           absorbing: _navActive,
-                          child: Container(
-                            child: widget.child
-                          ),
+                          child: Container(child: widget.child),
                         ),
                       ),
                     ),
@@ -101,14 +103,19 @@ class _WrapperWidgetState extends State<WrapperWidget> {
                     ),
                   ),
                 ),
-                SideNav(onTap: toggleNav, active: _navActive,),
+                SideNav(
+                  onTap: toggleNav,
+                  active: _navActive,
+                ),
                 SafeArea(
                   child: Offstage(
                     offstage: !widget.nav,
-                    child: NavBurger(onTap: () {
-                      toggleNav();
-                      FocusScope.of(context).unfocus();
-                    }, active: _navActive),
+                    child: NavBurger(
+                        onTap: () {
+                          toggleNav();
+                          FocusScope.of(context).unfocus();
+                        },
+                        active: _navActive),
                   ),
                 ),
               ],
