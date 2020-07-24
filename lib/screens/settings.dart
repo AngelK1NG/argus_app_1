@@ -57,10 +57,10 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Container(),
         ),
         Positioned(
-          right: 0,
-          left: 0,
+          right: 30,
+          left: 30,
           bottom: 120,
-          child: Text("You are signed in with Google as " + _email,
+          child: Text("You are signed in as " + _email,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18,

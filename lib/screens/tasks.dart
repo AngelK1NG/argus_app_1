@@ -47,11 +47,19 @@ class _TasksPageState extends State<TasksPage> {
             child: Row(
               children: <Widget>[
                 Text(
-                  (DateTime.parse(_date).year == DateTime.now().year &&  DateTime.parse(_date).month == DateTime.now().month &&  DateTime.parse(_date).day == DateTime.now().day)
-                    ? "Today"
-                    : (DateTime.parse(_date).year == DateTime.now().year &&  DateTime.parse(_date).month == DateTime.now().month &&  DateTime.parse(_date).day == DateTime.now().day + 1)
-                      ? "Tomorrow"
-                      : DateTime.parse(_date).month.toString() + "/" + DateTime.parse(_date).day.toString(),
+                  (DateTime.parse(_date).year == DateTime.now().year &&
+                          DateTime.parse(_date).month == DateTime.now().month &&
+                          DateTime.parse(_date).day == DateTime.now().day)
+                      ? "Today"
+                      : (DateTime.parse(_date).year == DateTime.now().year &&
+                              DateTime.parse(_date).month ==
+                                  DateTime.now().month &&
+                              DateTime.parse(_date).day ==
+                                  DateTime.now().day + 1)
+                          ? "Tomorrow"
+                          : DateTime.parse(_date).month.toString() +
+                              "/" +
+                              DateTime.parse(_date).day.toString(),
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.w500,
@@ -89,7 +97,8 @@ class _TasksPageState extends State<TasksPage> {
           top: 100,
           child: SizedBox(
             height: MediaQuery.of(context).size.height - 100,
-            child: TaskList(callback: () => setState(() => _loading = false), key: _key),
+            child: TaskList(
+                callback: () => setState(() => _loading = false), key: _key),
           ),
         ),
       ]),

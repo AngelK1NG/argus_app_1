@@ -9,6 +9,7 @@ import '../components/rct_button.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'dart:io' show Platform;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -91,25 +92,53 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
                   Padding(
-                    padding: const EdgeInsets.only(top: 100),
-                    child: RctButton(
-                      onTap: () async {
-                        setState(() {
-                          _loginLoading = true;
-                        });
-                        AuthProvider().googleSignIn();
-                        LocalNotificationHelper.userLoggedIn = true;
-                      },
-                      buttonWidth: 315,
-                      buttonColor: Colors.black,
-                      textColor: Colors.white,
-                      buttonText: "Sign in with Google",
-                      textSize: 24,
-                      icon: FaIcon(
-                        FontAwesomeIcons.google,
-                        color: Colors.white,
-                        size: 30,
-                      ),
+                    padding: const EdgeInsets.only(top: 180),
+                    child: Column(
+                      children: <Widget>[
+                        RctButton(
+                          onTap: () async {
+                            setState(() {
+                              _loginLoading = true;
+                            });
+                            AuthProvider().googleSignIn();
+                            LocalNotificationHelper.userLoggedIn = true;
+                          },
+                          buttonWidth: 315,
+                          buttonColor: Colors.black,
+                          textColor: Colors.white,
+                          buttonText: "Sign in with Google",
+                          textSize: 24,
+                          icon: FaIcon(
+                            FontAwesomeIcons.google,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                        Platform.isIOS
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 15),
+                                child: RctButton(
+                                  onTap: () async {
+                                    setState(() {
+                                      _loginLoading = true;
+                                    });
+                                    AuthProvider().appleSignIn();
+                                    LocalNotificationHelper.userLoggedIn = true;
+                                  },
+                                  buttonWidth: 315,
+                                  buttonColor: Colors.white,
+                                  textColor: Colors.black,
+                                  buttonText: "Sign in with Apple",
+                                  textSize: 24,
+                                  icon: FaIcon(
+                                    FontAwesomeIcons.apple,
+                                    color: Colors.black,
+                                    size: 36,
+                                  ),
+                                ),
+                              )
+                            : Container()
+                      ],
                     ),
                   ),
                 ],
@@ -125,7 +154,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Container(
               alignment: Alignment.center,
               color: Colors.white,
-              child: Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
+              child:
+                  Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
             ),
           ),
         ),

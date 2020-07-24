@@ -1,4 +1,5 @@
 import 'package:Focal/components/task_item.dart';
+import 'package:Focal/utils/analytics.dart';
 import 'package:Focal/utils/date.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:Focal/utils/local_notifications.dart';
@@ -47,8 +48,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _iosScreen = true;
   bool _loading = true;
   bool _paused = false;
-  int minutes;
-  int seconds;
+  int _seconds = 0;
+  AnalyticsProvider analyticsProvider = AnalyticsProvider();
 
   void startTask() async {
     timer = new Timer.periodic(
@@ -56,11 +57,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         (Timer timer) => setState(() {
               if (_doingTask && !_paused) {
                 final currentTime = DateTime.now();
-                minutes = (currentTime.difference(_startTime).inMinutes);
-                seconds = (currentTime.difference(_startTime).inSeconds % 60);
-                _swatchDisplay = minutes.toString().padLeft(2, "0") +
+                _seconds = (currentTime.difference(_startTime).inSeconds);
+                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
                     ":" +
-                    seconds.toString().padLeft(2, "0");
+                    (_seconds % 60).toString().padLeft(2, "0");
               } else {
                 timer.cancel();
               }
@@ -76,6 +76,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             .INTERRUPTION_FILTER_NONE); // Turn on DND - All notifications are suppressed.
       }
     }
+    analyticsProvider.logStartTask(_tasks[0], DateTime.now());
   }
 
   void stopTask() async {
@@ -94,21 +95,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void pauseTask() {
     if (_paused) {
-      int pausedDifference = (minutes * 60) + seconds;
+      int pausedDifference = _seconds;
       print('Paused difference: $pausedDifference');
       timer = new Timer.periodic(
           const Duration(seconds: 1),
           (Timer timer) => setState(() {
                 if (_doingTask && !_paused) {
                   final currentTime = DateTime.now();
-                  minutes = (currentTime.difference(_startTime).inMinutes +
-                      (pausedDifference ~/ 60));
-                  seconds = (currentTime.difference(_startTime).inSeconds % 60 +
-                      pausedDifference % 60);
-
-                  _swatchDisplay = minutes.toString().padLeft(2, "0") +
+                  _seconds = currentTime.difference(_startTime).inSeconds +
+                      pausedDifference;
+                  _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
                       ":" +
-                      seconds.toString().padLeft(2, "0");
+                      (_seconds % 60).toString().padLeft(2, "0");
                 } else {
                   timer.cancel();
                 }
@@ -144,6 +142,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
       }
     }
+    analyticsProvider.logAbandonTask(_tasks[0], DateTime.now(), _swatchDisplay);
   }
 
   bool areTasksCompleted() {
@@ -156,7 +155,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void completeTask(FirebaseUser user) {
-    final currentTime = DateTime.now();
     FirestoreProvider firestoreProvider = FirestoreProvider(user);
     TaskItem currentTask = _tasks[0];
     TaskItem finishedTask = TaskItem(
@@ -185,10 +183,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         });
       }
       dateDoc.updateData({
-        'secondsSpent':
-            FieldValue.increment(currentTime.difference(_startTime).inSeconds),
+        'secondsSpent': FieldValue.increment(_seconds),
       });
     });
+    analyticsProvider.logCompleteTask(
+        finishedTask, DateTime.now(), _swatchDisplay);
   }
 
   @override
@@ -313,7 +312,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         return AlertDialog(
           title: Text('Abandon task?'),
           content: Padding(
-            padding: const EdgeInsets.only(top: 15, bottom: 5,),
+            padding: const EdgeInsets.only(
+              top: 15,
+              bottom: 5,
+            ),
             child: Text('Are you sure you want to abandon task?'),
           ),
           actions: <Widget>[
@@ -324,7 +326,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               },
             ),
             FlatButton(
-              child: Text('Abandon', style: TextStyle(color: Colors.red,)),
+              child: Text('Abandon',
+                  style: TextStyle(
+                    color: Colors.red,
+                  )),
               onPressed: () {
                 Navigator.of(context).pop();
                 abandonTask();
@@ -344,7 +349,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         return CupertinoAlertDialog(
           title: Text('Abandon task?'),
           content: Padding(
-            padding: const EdgeInsets.only(top: 15, bottom: 5,),
+            padding: const EdgeInsets.only(
+              top: 15,
+              bottom: 5,
+            ),
             child: Text('Are you sure you want to abandon task?'),
           ),
           actions: <Widget>[
@@ -355,7 +363,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               },
             ),
             CupertinoDialogAction(
-              child: Text('Abandon', style: TextStyle(color: Colors.red,)),
+              child: Text('Abandon',
+                  style: TextStyle(
+                    color: Colors.red,
+                  )),
               onPressed: () {
                 Navigator.of(context).pop();
                 abandonTask();
@@ -529,9 +540,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             : Icon(Icons.pause),
                         color: Colors.white,
                         iconSize: 50.0,
-                        onPressed: () {
-                          pauseTask();
-                        },
+                        onPressed: pauseTask,
                       ),
                     ),
                   ),
