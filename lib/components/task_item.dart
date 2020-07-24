@@ -10,7 +10,7 @@ class TaskItem extends StatefulWidget {
   String id;
   final bool completed;
   final int order;
-  final VoidCallback onDismissed;
+  VoidCallback onDismissed;
   final String date;
 
   TaskItem(
@@ -18,7 +18,7 @@ class TaskItem extends StatefulWidget {
       this.id,
       @required this.completed,
       this.order,
-      @required this.onDismissed,
+      this.onDismissed,
       @required this.date,
       Key key})
       : super(key: key);
@@ -69,13 +69,13 @@ class _TaskItemState extends State<TaskItem> {
                         child: widget.completed
                             ? Image(
                                 image:
-                                    AssetImage('images/Task Icon_Filled.png'),
+                                    AssetImage('images/icons/Task Icon_Filled.png'),
                                 width: 10,
                                 height: 10,
                               )
                             : Image(
                                 image:
-                                    AssetImage('images/Task Icon_Unfilled.png'),
+                                    AssetImage('images/icons/Task Icon_Unfilled.png'),
                                 width: 10,
                                 height: 10,
                               )),

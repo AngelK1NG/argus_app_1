@@ -18,6 +18,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
   Duration _timeSpent = new Duration();
   int _completedTasks;
   int _totalTasks;
+  bool _loading = true;
 
   @override
   void initState() {
@@ -38,6 +39,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
         } else {
           _timeSpent = Duration(seconds: snapshot.data['secondsSpent']);
         }
+        _loading = false;
       });
     });
   }
@@ -45,6 +47,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   Widget build(BuildContext context) {
     return WrapperWidget(
+      loading: _loading,
+      transition: true,
       nav: true,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

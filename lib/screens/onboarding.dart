@@ -39,6 +39,8 @@ class _OnboardingState extends State<Onboarding> {
     return WillPopScope(
       onWillPop: () async => false,
       child: WrapperWidget(
+        loading: false,
+        transition: false,
         nav: false,
         child: Stack(
           children: <Widget>[
@@ -51,28 +53,13 @@ class _OnboardingState extends State<Onboarding> {
                   button: false,
                 ),
                 OnboardingPage(
-                  title: 'Navigate',
-                  text: 'Use the navigation bar to access all of Focal’s features!',
-                  button: false,
-                ),
-                OnboardingPage(
-                  title: 'Home',
-                  text: 'This is where you will complete all of your tasks! Click start to begin your task at hand and the stopwatch will start.',
-                  button: false,
-                ),
-                OnboardingPage(
                   title: 'Focus',
-                  text: 'Once you finish, tap Complete. If you fail to complete the task, tap Abandon to start your next task.',
+                  text: 'This is where you will complete all of your tasks! Click start to begin your task at hand and the stopwatch will start. Once you finish, tap Complete. If you fail to complete the task, tap Abandon to start your next task.',
                   button: false,
                 ),
                 OnboardingPage(
                   title: 'Prioritize',
                   text: 'Start the day by ordering your tasks based on what you need to get done first. Hold anywhere on the screen to drag and reorder your list. The task at the top will be shown first in Focus. You can also swipe to remove any tasks.',
-                  button: false,
-                ),
-                OnboardingPage(
-                  title: 'Calendar',
-                  text: 'Use the calendar to schedule future tasks and access historic tasks.',
                   button: false,
                 ),
                 OnboardingPage(
@@ -92,7 +79,7 @@ class _OnboardingState extends State<Onboarding> {
               right: 0,
               bottom: 20,
               child: DotsIndicator(
-                dotsCount: 8,
+                dotsCount: 5,
                 position: _index,
                 decorator: DotsDecorator(
                   color: Colors.transparent,

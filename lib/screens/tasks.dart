@@ -2,7 +2,7 @@ import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import '../components/wrapper.dart';
+import 'package:Focal/components/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Focal/components/task_list.dart';
 import 'package:Focal/utils/date.dart';
@@ -15,8 +15,10 @@ class TasksPage extends StatefulWidget {
 }
 
 class _TasksPageState extends State<TasksPage> {
+  final GlobalKey<TaskListState> _key = GlobalKey();
   String _date;
   FirebaseUser user;
+  bool _loading = true;
 
   @override
   void initState() {
@@ -30,6 +32,8 @@ class _TasksPageState extends State<TasksPage> {
   Widget build(BuildContext context) {
     user = Provider.of<User>(context, listen: false).user;
     return WrapperWidget(
+      loading: _loading,
+      transition: true,
       nav: true,
       child: Stack(children: <Widget>[
         Positioned(
@@ -43,11 +47,19 @@ class _TasksPageState extends State<TasksPage> {
             child: Row(
               children: <Widget>[
                 Text(
-                  (DateTime.parse(_date).year == DateTime.now().year &&  DateTime.parse(_date).month == DateTime.now().month &&  DateTime.parse(_date).day == DateTime.now().day)
-                    ? "Today"
-                    : (DateTime.parse(_date).year == DateTime.now().year &&  DateTime.parse(_date).month == DateTime.now().month &&  DateTime.parse(_date).day == DateTime.now().day + 1)
-                      ? "Tomorrow"
-                      : DateTime.parse(_date).month.toString() + "/" + DateTime.parse(_date).day.toString(),
+                  (DateTime.parse(_date).year == DateTime.now().year &&
+                          DateTime.parse(_date).month == DateTime.now().month &&
+                          DateTime.parse(_date).day == DateTime.now().day)
+                      ? "Today"
+                      : (DateTime.parse(_date).year == DateTime.now().year &&
+                              DateTime.parse(_date).month ==
+                                  DateTime.now().month &&
+                              DateTime.parse(_date).day ==
+                                  DateTime.now().day + 1)
+                          ? "Tomorrow"
+                          : DateTime.parse(_date).month.toString() +
+                              "/" +
+                              DateTime.parse(_date).day.toString(),
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.w500,
@@ -68,6 +80,7 @@ class _TasksPageState extends State<TasksPage> {
                           if (date != null) {
                             setState(() {
                               _date = getDateString(date);
+                              _key.currentState.setDate(_date);
                             });
                           }
                         });
@@ -84,7 +97,8 @@ class _TasksPageState extends State<TasksPage> {
           top: 100,
           child: SizedBox(
             height: MediaQuery.of(context).size.height - 100,
-            child: TaskList(date: _date),
+            child: TaskList(
+                callback: () => setState(() => _loading = false), key: _key),
           ),
         ),
       ]),

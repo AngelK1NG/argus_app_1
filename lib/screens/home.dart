@@ -1,4 +1,5 @@
 import 'package:Focal/components/task_item.dart';
+import 'package:Focal/utils/analytics.dart';
 import 'package:Focal/utils/date.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:Focal/utils/local_notifications.dart';
@@ -28,6 +29,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+  static const platform = const MethodChannel("com.flutter.lockscreen");
+
   Timer timer;
   DateTime _startTime;
   String _swatchDisplay = "00:00";
@@ -42,22 +45,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Screen _screen;
   StreamSubscription<ScreenStateEvent> _subscription;
   bool _notifConfirmation = false;
+  bool _iosScreen = true;
+  bool _loading = true;
+  bool _paused = false;
+  int _seconds = 0;
+  AnalyticsProvider analyticsProvider = AnalyticsProvider();
 
   void startTask() async {
     timer = new Timer.periodic(
         const Duration(seconds: 1),
         (Timer timer) => setState(() {
-              if (_doingTask) {
+              if (_doingTask && !_paused) {
                 final currentTime = DateTime.now();
-                _swatchDisplay = currentTime
-                        .difference(_startTime)
-                        .inMinutes
-                        .toString()
-                        .padLeft(2, "0") +
+                _seconds = (currentTime.difference(_startTime).inSeconds);
+                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
                     ":" +
-                    (currentTime.difference(_startTime).inSeconds % 60)
-                        .toString()
-                        .padLeft(2, "0");
+                    (_seconds % 60).toString().padLeft(2, "0");
               } else {
                 timer.cancel();
               }
@@ -65,27 +68,60 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     setState(() {
       _doingTask = true;
       _startTime = DateTime.now();
+      _paused = false;
     });
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(
-          FlutterDnd.INTERRUPTION_FILTER_NONE)
-        ; // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(FlutterDnd
+            .INTERRUPTION_FILTER_NONE); // Turn on DND - All notifications are suppressed.
       }
     }
+    analyticsProvider.logStartTask(_tasks[0], DateTime.now());
   }
 
   void stopTask() async {
     setState(() {
       _doingTask = false;
       _swatchDisplay = "00:00";
+      _paused = false;
     });
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(
-          FlutterDnd.INTERRUPTION_FILTER_ALL
-        ); // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(FlutterDnd
+            .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
       }
+    }
+  }
+
+  void pauseTask() {
+    if (_paused) {
+      int pausedDifference = _seconds;
+      print('Paused difference: $pausedDifference');
+      timer = new Timer.periodic(
+          const Duration(seconds: 1),
+          (Timer timer) => setState(() {
+                if (_doingTask && !_paused) {
+                  final currentTime = DateTime.now();
+                  _seconds = currentTime.difference(_startTime).inSeconds +
+                      pausedDifference;
+                  _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                      ":" +
+                      (_seconds % 60).toString().padLeft(2, "0");
+                } else {
+                  timer.cancel();
+                }
+              }));
+      setState(() {
+        _doingTask = true;
+        _startTime = DateTime.now();
+        _paused = !_paused;
+      });
+      LocalNotificationHelper.paused = false;
+    } else {
+      setState(() {
+        _paused = !_paused;
+        LocalNotificationHelper.paused = true;
+      });
     }
   }
 
@@ -102,11 +138,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(
-          FlutterDnd.INTERRUPTION_FILTER_ALL
-        ); // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(FlutterDnd
+            .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
       }
     }
+    analyticsProvider.logAbandonTask(_tasks[0], DateTime.now(), _swatchDisplay);
   }
 
   bool areTasksCompleted() {
@@ -119,7 +155,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void completeTask(FirebaseUser user) {
-    final currentTime = DateTime.now();
     FirestoreProvider firestoreProvider = FirestoreProvider(user);
     TaskItem currentTask = _tasks[0];
     TaskItem finishedTask = TaskItem(
@@ -148,10 +183,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         });
       }
       dateDoc.updateData({
-        'secondsSpent':
-            FieldValue.increment(currentTime.difference(_startTime).inSeconds),
+        'secondsSpent': FieldValue.increment(_seconds),
       });
     });
+    analyticsProvider.logCompleteTask(
+        finishedTask, DateTime.now(), _swatchDisplay);
   }
 
   @override
@@ -171,7 +207,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           .collection('tasks')
           .document(_date);
       dateDoc.get().then((snapshot) {
-        if (snapshot.data == null || snapshot.data['totalTasks'] == null || snapshot.data['completedTasks'] == null) {
+        if (snapshot.data == null ||
+            snapshot.data['totalTasks'] == null ||
+            snapshot.data['completedTasks'] == null) {
           _completedTasks = 0;
           _totalTasks = 0;
           dateDoc.setData({
@@ -179,19 +217,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             'totalTasks': 0,
           }).then((_) {
             dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
-              setState(() {
-                _totalTasks = snapshot.data['totalTasks'];
-                _completedTasks = snapshot.data['completedTasks'];
-              });
+              if (mounted) {
+                setState(() {
+                  _totalTasks = snapshot.data['totalTasks'];
+                  _completedTasks = snapshot.data['completedTasks'];
+                });
+              }
             });
           });
         } else {
-          dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
+          if (mounted) {
             setState(() {
               _totalTasks = snapshot.data['totalTasks'];
               _completedTasks = snapshot.data['completedTasks'];
             });
-          });
+          }
         }
       });
     });
@@ -221,7 +261,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               });
             });
           } else {
-            notificationHelper.showNotifications();
+            printBoi().then((_) {
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (_iosScreen) {
+                  notificationHelper.showNotifications();
+                }
+              });
+            });
           }
         }
         break;
@@ -264,11 +310,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Are you sure you want to abandon task?'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[],
+          title: Text('Abandon task?'),
+          content: Padding(
+            padding: const EdgeInsets.only(
+              top: 15,
+              bottom: 5,
             ),
+            child: Text('Are you sure you want to abandon task?'),
           ),
           actions: <Widget>[
             FlatButton(
@@ -278,7 +326,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               },
             ),
             FlatButton(
-              child: Text('Yes'),
+              child: Text('Abandon',
+                  style: TextStyle(
+                    color: Colors.red,
+                  )),
               onPressed: () {
                 Navigator.of(context).pop();
                 abandonTask();
@@ -296,21 +347,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: Text('Are you sure you want to abandon task?'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[],
+          title: Text('Abandon task?'),
+          content: Padding(
+            padding: const EdgeInsets.only(
+              top: 15,
+              bottom: 5,
             ),
+            child: Text('Are you sure you want to abandon task?'),
           ),
           actions: <Widget>[
-            FlatButton(
+            CupertinoDialogAction(
               child: Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
-            FlatButton(
-              child: Text('Yes'),
+            CupertinoDialogAction(
+              child: Text('Abandon',
+                  style: TextStyle(
+                    color: Colors.red,
+                  )),
               onPressed: () {
                 Navigator.of(context).pop();
                 abandonTask();
@@ -363,6 +419,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> printBoi() async {
+    try {
+      platform.invokeMethod("printBoi").then((value) {
+        setState(() {
+          _iosScreen = value;
+        });
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     checkIfNotificationsOn();
@@ -374,6 +442,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return WillPopScope(
       onWillPop: () async => false,
       child: WrapperWidget(
+        loading: _loading,
+        transition: true,
         nav: !_doingTask,
         backgroundColor: _doingTask ? Colors.black : Colors.white,
         child: StreamBuilder<QuerySnapshot>(
@@ -386,6 +456,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               .orderBy('order')
               .snapshots(),
           builder: (context, snapshot) {
+            _loading = false;
             if (!snapshot.hasData ||
                 snapshot.data.documents == null ||
                 snapshot.data.documents.isEmpty) {
@@ -457,166 +528,193 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 );
                 _tasks.add(actionItem);
               }
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              return Stack(
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).size.height * 0.05),
-                    child: Container(
-                      width: 315,
-                      padding: const EdgeInsets.only(bottom: 70),
-                      child: areTasksCompleted()
-                          ? Text(
-                              'Done',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 80,
-                                fontWeight: FontWeight.w500,
-                                color: _doingTask ? Colors.white : Colors.black,
-                              ),
-                            )
-                          : Text(
-                              _swatchDisplay,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 80,
-                                fontWeight: FontWeight.w500,
-                                color: _doingTask ? Colors.white : Colors.black,
-                              ),
-                            ),
+                  Positioned(
+                    right: 0,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 10.0, right: 10.0),
+                      child: IconButton(
+                        icon: _paused
+                            ? Icon(Icons.play_arrow)
+                            : Icon(Icons.pause),
+                        color: Colors.white,
+                        iconSize: 50.0,
+                        onPressed: pauseTask,
+                      ),
                     ),
                   ),
-                  Container(
-                    width: 315,
-                    child: areTasksCompleted()
-                        ? Text('Congrats! You are done for the day',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.w300,
-                            ))
-                        : Text(
-                            _tasks[0].name,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.w300,
-                              color: _doingTask ? Colors.white : Colors.black,
-                            ),
-                          ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 90),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        _doingTask
-                            ? RctButton(
-                                onTap: () async {
-                                  setState(() {
-                                    _doingTask = false;
-                                  });
-                                  stopTask();
-                                  completeTask(_user);
-                                },
-                                buttonWidth: 240,
-                                buttonText: "Complete",
-                                buttonColor: Colors.white,
-                                textColor: Colors.black,
-                                textSize: 32,
-                              )
-                            : areTasksCompleted()
-                                ? RctButton(
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                          context, '/statistics');
-                                    },
-                                    buttonWidth: 240,
-                                    buttonText: "Statistics",
-                                    buttonColor: Colors.black,
-                                    textColor: Colors.white,
-                                    textSize: 32,
-                                  )
-                                : RctButton(
-                                    onTap: () async {
-                                      setState(() {
-                                        _doingTask = true;
-                                      });
-                                      startTask();
-                                    },
-                                    buttonWidth: 240,
-                                    buttonText: "Start",
-                                    buttonColor: Colors.black,
-                                    textColor: Colors.white,
-                                    textSize: 32,
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height * 0.05),
+                        child: Container(
+                          width: 315,
+                          padding: const EdgeInsets.only(bottom: 70),
+                          child: areTasksCompleted()
+                              ? Text(
+                                  'Done',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 80,
+                                    fontWeight: FontWeight.w500,
+                                    color: _doingTask
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
-                        Padding(
-                            padding: const EdgeInsets.only(left: 15),
-                            child: !areTasksCompleted()
-                                ? SqrButton(
-                                    onTap: () {
-                                      if (Platform.isAndroid) {
-                                        showAbandonConfirmationAndroid();
-                                      } else {
-                                        showAbandonConfirmationIOS();
-                                      }
-                                    },
-                                    buttonColor: Theme.of(context).primaryColor,
-                                    icon: FaIcon(
-                                      FontAwesomeIcons.running,
-                                      size: 32,
-                                      color: Colors.white,
-                                    ))
-                                : SqrButton(
-                                    onTap: () {
-                                      Navigator.pushNamed(context, '/tasks');
-                                    },
-                                    buttonColor: Theme.of(context).primaryColor,
-                                    icon: FaIcon(
-                                      FontAwesomeIcons.plus,
-                                      size: 32,
-                                      color: Colors.white,
-                                    ))),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 30),
-                    child: SizedBox(
-                      width: 315,
-                      height: 5,
-                      child: Visibility(
-                        visible: !_doingTask,
-                        child: LinearProgressIndicator(
-                          value: (_totalTasks == null || _totalTasks == 0)
-                              ? 0
-                              : (_completedTasks / _totalTasks),
-                          backgroundColor: Colors.black,
+                                )
+                              : Text(
+                                  _swatchDisplay,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 80,
+                                    fontWeight: FontWeight.w500,
+                                    color: _doingTask
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
                         ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 5),
-                    child: Container(
-                      alignment: Alignment.centerRight,
-                      width: 315,
-                      height: 24,
-                      child: Visibility(
-                        visible: !_doingTask,
-                        child: Text(
-                            ((_totalTasks == null || _totalTasks == 0)
-                                        ? 0
-                                        : (_completedTasks / _totalTasks) * 100)
-                                    .toInt()
-                                    .toString() +
-                                "%",
-                            style: TextStyle(
-                              fontSize: 24,
-                            )),
+                      Container(
+                        width: 315,
+                        child: areTasksCompleted()
+                            ? Text('Congrats! You are done for the day',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.w300,
+                                ))
+                            : Text(
+                                _tasks[0].name,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.w300,
+                                  color:
+                                      _doingTask ? Colors.white : Colors.black,
+                                ),
+                              ),
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 90),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            _doingTask
+                                ? RctButton(
+                                    onTap: () async {
+                                      setState(() {
+                                        _doingTask = false;
+                                      });
+                                      stopTask();
+                                      completeTask(_user);
+                                    },
+                                    buttonWidth: 240,
+                                    buttonText: "Complete",
+                                    buttonColor: Colors.white,
+                                    textColor: Colors.black,
+                                    textSize: 32,
+                                  )
+                                : areTasksCompleted()
+                                    ? RctButton(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                              context, '/statistics');
+                                        },
+                                        buttonWidth: 240,
+                                        buttonText: "Statistics",
+                                        buttonColor: Colors.black,
+                                        textColor: Colors.white,
+                                        textSize: 32,
+                                      )
+                                    : RctButton(
+                                        onTap: () async {
+                                          setState(() {
+                                            _doingTask = true;
+                                          });
+                                          startTask();
+                                        },
+                                        buttonWidth: 240,
+                                        buttonText: "Start",
+                                        buttonColor: Colors.black,
+                                        textColor: Colors.white,
+                                        textSize: 32,
+                                      ),
+                            Padding(
+                                padding: const EdgeInsets.only(left: 15),
+                                child: !areTasksCompleted()
+                                    ? SqrButton(
+                                        onTap: () {
+                                          if (Platform.isAndroid) {
+                                            showAbandonConfirmationAndroid();
+                                          } else {
+                                            showAbandonConfirmationIOS();
+                                          }
+                                        },
+                                        buttonColor:
+                                            Theme.of(context).primaryColor,
+                                        icon: FaIcon(
+                                          FontAwesomeIcons.running,
+                                          size: 32,
+                                          color: Colors.white,
+                                        ))
+                                    : SqrButton(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                              context, '/tasks');
+                                        },
+                                        buttonColor:
+                                            Theme.of(context).primaryColor,
+                                        icon: FaIcon(
+                                          FontAwesomeIcons.plus,
+                                          size: 32,
+                                          color: Colors.white,
+                                        ))),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 30),
+                        child: SizedBox(
+                          width: 315,
+                          height: 5,
+                          child: Visibility(
+                            visible: !_doingTask,
+                            child: LinearProgressIndicator(
+                              value: (_totalTasks == null || _totalTasks == 0)
+                                  ? 0
+                                  : (_completedTasks / _totalTasks),
+                              backgroundColor: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 5),
+                        child: Container(
+                          alignment: Alignment.centerRight,
+                          width: 315,
+                          height: 24,
+                          child: Visibility(
+                            visible: !_doingTask,
+                            child: Text(
+                                ((_totalTasks == null || _totalTasks == 0)
+                                            ? 0
+                                            : (_completedTasks / _totalTasks) *
+                                                100)
+                                        .toInt()
+                                        .toString() +
+                                    "%",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                )),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               );
