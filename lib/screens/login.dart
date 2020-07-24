@@ -114,30 +114,6 @@ class _LoginPageState extends State<LoginPage> {
                             size: 30,
                           ),
                         ),
-                        Platform.isIOS
-                            ? Padding(
-                                padding: const EdgeInsets.only(top: 15),
-                                child: RctButton(
-                                  onTap: () async {
-                                    setState(() {
-                                      _loginLoading = true;
-                                    });
-                                    AuthProvider().appleSignIn();
-                                    LocalNotificationHelper.userLoggedIn = true;
-                                  },
-                                  buttonWidth: 315,
-                                  buttonColor: Colors.white,
-                                  textColor: Colors.black,
-                                  buttonText: "Sign in with Apple",
-                                  textSize: 24,
-                                  icon: FaIcon(
-                                    FontAwesomeIcons.apple,
-                                    color: Colors.black,
-                                    size: 36,
-                                  ),
-                                ),
-                              )
-                            : Container()
                       ],
                     ),
                   ),
