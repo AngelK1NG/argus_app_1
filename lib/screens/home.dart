@@ -182,19 +182,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             'totalTasks': 0,
           }).then((_) {
             dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
-              setState(() {
-                _totalTasks = snapshot.data['totalTasks'];
-                _completedTasks = snapshot.data['completedTasks'];
-              });
+              if (mounted) {
+                setState(() {
+                  _totalTasks = snapshot.data['totalTasks'];
+                  _completedTasks = snapshot.data['completedTasks'];
+                });
+              }
             });
           });
         } else {
-          dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
+          if (mounted) {
             setState(() {
               _totalTasks = snapshot.data['totalTasks'];
               _completedTasks = snapshot.data['completedTasks'];
             });
-          });
+          }
         }
       });
     });
@@ -273,11 +275,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Are you sure you want to abandon task?'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[],
-            ),
+          title: Text('Abandon task?'),
+          content: Padding(
+            padding: const EdgeInsets.only(top: 15, bottom: 5,),
+            child: Text('Are you sure you want to abandon task?'),
           ),
           actions: <Widget>[
             FlatButton(
@@ -287,7 +288,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               },
             ),
             FlatButton(
-              child: Text('Yes'),
+              child: Text('Abandon', style: TextStyle(color: Colors.red,)),
               onPressed: () {
                 Navigator.of(context).pop();
                 abandonTask();
@@ -305,21 +306,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: Text('Are you sure you want to abandon task?'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[],
-            ),
+          title: Text('Abandon task?'),
+          content: Padding(
+            padding: const EdgeInsets.only(top: 15, bottom: 5,),
+            child: Text('Are you sure you want to abandon task?'),
           ),
           actions: <Widget>[
-            FlatButton(
+            CupertinoDialogAction(
               child: Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
-            FlatButton(
-              child: Text('Yes'),
+            CupertinoDialogAction(
+              child: Text('Abandon', style: TextStyle(color: Colors.red,)),
               onPressed: () {
                 Navigator.of(context).pop();
                 abandonTask();
