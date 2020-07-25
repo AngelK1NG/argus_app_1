@@ -13,6 +13,7 @@ class FirestoreProvider {
     bool docExists = false;
     await db.collection('users').document(user.uid).get().then((doc) {
       if (!doc.exists) {
+        docExists = false;
       } else {
         docExists = true;
       }

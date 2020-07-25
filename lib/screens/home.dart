@@ -45,7 +45,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Screen _screen;
   StreamSubscription<ScreenStateEvent> _subscription;
   bool _notifConfirmation = false;
-  bool _iosScreen = true;
   bool _loading = true;
   bool _paused = false;
   int _seconds = 0;
@@ -261,12 +260,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               });
             });
           } else {
-            printBoi().then((_) {
-              Future.delayed(const Duration(milliseconds: 500), () {
-                if (_iosScreen) {
-                  notificationHelper.showNotifications();
-                }
-              });
+            printBoi().then((value) {
+              if (value) {
+                notificationHelper.showNotifications();
+              }
             });
           }
         }
@@ -419,16 +416,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> printBoi() async {
-    try {
-      platform.invokeMethod("printBoi").then((value) {
-        setState(() {
-          _iosScreen = value;
-        });
-      });
-    } catch (e) {
-      print(e);
-    }
+  Future<bool> printBoi() async {
+    var value = await platform.invokeMethod("printBoi");
+    return value;
   }
 
   @override
