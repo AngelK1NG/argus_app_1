@@ -13,10 +13,24 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: 1), () {
+      setState(() {
+        _loading = false;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     String _email = Provider.of<User>(context, listen: false).user.email;
     return WrapperWidget(
+      loading: _loading,
+      transition: true,
       nav: true,
       child: Stack(children: <Widget>[
         Positioned(
@@ -43,10 +57,10 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Container(),
         ),
         Positioned(
-          right: 0,
-          left: 0,
+          right: 30,
+          left: 30,
           bottom: 120,
-          child: Text("You are signed in with Google as " + _email,
+          child: Text("You are signed in as " + _email,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18,

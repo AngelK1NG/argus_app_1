@@ -8,12 +8,12 @@ class FirestoreProvider {
 
   FirestoreProvider(this.user);
 
-  // create user document in firestore when signed in with google
+  // check if user document exists in firestore
   Future<bool> userDocumentExists() async {
     bool docExists = false;
     await db.collection('users').document(user.uid).get().then((doc) {
       if (!doc.exists) {
-        
+        docExists = false;
       } else {
         docExists = true;
       }
@@ -21,6 +21,7 @@ class FirestoreProvider {
     return docExists;
   }
 
+  // create user document in firestore when signed in with google
   void createUserDocument() async {
     await db.collection('users').document(user.uid).get().then((doc) {
       if (!doc.exists) {
@@ -32,7 +33,7 @@ class FirestoreProvider {
     });
   }
 
-  // add task to firestore method
+  // add task
   void addTask(TaskItem task, String date) {
     String userId = user.uid;
     db
@@ -57,7 +58,7 @@ class FirestoreProvider {
     });
   }
 
-  // update method
+  // update task name
   void updateTaskName(String name, String date, String taskId) {
     String userId = user.uid;
     db
@@ -72,6 +73,7 @@ class FirestoreProvider {
     });
   }
 
+  // update task order
   void updateTaskOrder(List<TaskItem> tasks, String date) {
     String userId = user.uid;
     for (TaskItem task in tasks) {
@@ -98,7 +100,6 @@ class FirestoreProvider {
         .document(date)
         .collection('tasks')
         .document(taskId);
-
     taskDocumentReference.delete();
     DocumentReference dateDoc = db
         .collection('users')
@@ -106,14 +107,12 @@ class FirestoreProvider {
         .collection('tasks')
         .document(date);
     if (isCompleted) {
-      dateDoc
-        .updateData({
+      dateDoc.updateData({
         'completedTasks': FieldValue.increment(-1),
         'totalTasks': FieldValue.increment(-1),
       });
     } else {
-      dateDoc
-        .updateData({
+      dateDoc.updateData({
         'totalTasks': FieldValue.increment(-1),
       });
     }
