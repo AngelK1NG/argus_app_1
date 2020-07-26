@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "644707158790-0coqhhta7020up9m2ipeu1vign8ratff.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "technology.focal.focal",
+            "certificate_hash": "a13a089f33572812a5ea656b7e73f3092b7d6429"
+          }
+        },
+        {
           "client_id": "644707158790-0rr7de0s0177b5ji3dm0emh5ntqqka4a.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
