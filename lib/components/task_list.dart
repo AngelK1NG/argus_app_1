@@ -70,6 +70,7 @@ class TaskListState extends State<TaskList> {
           date: _date,
         );
         newTask.onDismissed = () => removeTask(newTask);
+        newTask.onUpdate = (value) => newTask.name = value;
         setState(() {
           _tasks.add(newTask);
         });
@@ -149,6 +150,7 @@ class TaskListState extends State<TaskList> {
                           date: _date,
                         );
                         newTask.onDismissed = () => removeTask(newTask);
+                        newTask.onUpdate = (value) => newTask.name = value;
                         setState(() {
                           _tasks.insert(
                               _tasks.length - _completedTasks, newTask);

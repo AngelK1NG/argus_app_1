@@ -32,6 +32,7 @@ dependencies:
   screen_state: ^1.0.0
   dots_indicator: ^1.2.0
   percent_indicator: ^2.1.5
+  auto_size_text: ^2.1.0
 
 dev_dependencies:
   flutter_test:

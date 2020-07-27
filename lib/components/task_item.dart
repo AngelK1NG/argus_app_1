@@ -6,11 +6,12 @@ import 'dart:io' show Platform;
 
 // ignore: must_be_immutable
 class TaskItem extends StatefulWidget {
-  final String name;
+  String name;
   String id;
   final bool completed;
   final int order;
   VoidCallback onDismissed;
+  Function onUpdate;
   final String date;
 
   TaskItem(
@@ -19,6 +20,7 @@ class TaskItem extends StatefulWidget {
       @required this.completed,
       this.order,
       this.onDismissed,
+      this.onUpdate,
       @required this.date,
       Key key})
       : super(key: key);
@@ -30,6 +32,7 @@ class TaskItem extends StatefulWidget {
 class _TaskItemState extends State<TaskItem> {
   bool _active = false;
   FocusNode _focus = new FocusNode();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -87,30 +90,45 @@ class _TaskItemState extends State<TaskItem> {
                           child: _active
                               ? Focus(
                                   onFocusChange: (focus) {
-                                    if (!focus) {
+                                    if (!focus && _formKey.currentState.validate()) {
                                       setState(() {
                                         _active = false;
                                       });
                                     }
-                                  },
-                                  child: TextFormField(
-                                    focusNode: _focus,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    initialValue: widget.name,
-                                    autofocus: false,
-                                    onFieldSubmitted: (value) {
-                                      firestoreProvider.updateTaskName(
-                                          value, widget.date, widget.id);
-                                      setState(() {
-                                        _active = false;
+                                    if (!_formKey.currentState.validate()) {
+                                      Future.delayed(Duration(milliseconds: 1), () {
+                                        _focus.requestFocus();
                                       });
-                                    },
+                                    }
+                                  },
+                                  child: Form(
+                                    key: _formKey,
+                                    child: TextFormField(
+                                      focusNode: _focus,
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      initialValue: widget.name,
+                                      autofocus: false,
+                                      onChanged: (value) {
+                                        Future.delayed(Duration(milliseconds: 1), () {
+                                          if (_formKey.currentState.validate()) {
+                                            widget.onUpdate(value);
+                                            firestoreProvider.updateTaskName(
+                                              value, widget.date, widget.id);
+                                          }
+                                        });
+                                      },
+                                      validator: (value) {
+                                        return value.isEmpty
+                                            ? 'You cannot add an empty task'
+                                            : null;
+                                      },
+                                    ),
                                   ),
                                 )
                               : Text(

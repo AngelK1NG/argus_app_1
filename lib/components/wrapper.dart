@@ -77,6 +77,10 @@ class _WrapperWidgetState extends State<WrapperWidget> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50),),
                       color: Colors.white,
+                      boxShadow: [BoxShadow(
+                        spreadRadius: -5,
+                        blurRadius: 15,
+                      )],
                     ),
                     height: widget.cardHeight,
                   ),

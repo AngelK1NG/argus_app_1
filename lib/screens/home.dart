@@ -20,6 +20,7 @@ import 'package:flutter_dnd/flutter_dnd.dart';
 import 'package:screen_state/screen_state.dart';
 import 'package:flutter/services.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -432,7 +433,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       fontWeight: FontWeight.w600,
     );
     final TextStyle taskTextStyle = TextStyle(
-      fontSize: 34,
+      fontSize: 36,
       color: primaryTextColor,
       fontWeight: FontWeight.w400,
     );
@@ -482,7 +483,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     right: 50,
                     bottom: MediaQuery.of(context).size.height / 2 + 180,
                     child: Text(
-                      'Good Morning!',
+                      'Good Morning! ☕',
                       textAlign: TextAlign.center,
                       style: topTextStyle,
                     ),
@@ -546,7 +547,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       right: 50,
                       bottom: _startAnimate ? MediaQuery.of(context).size.height / 2 + 180 : MediaQuery.of(context).size.height / 2 + 150,
                       child: Text(
-                        'Congrats!',
+                        'Congrats! 🎉',
                         textAlign: TextAlign.center,
                         style: topTextStyle,
                       ),
@@ -572,7 +573,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: cardSlideCurve,
                       left: 50,
                       right: 50,
-                      top: _startAnimate ? MediaQuery.of(context).size.height / 2 - 50 : MediaQuery.of(context).size.height / 2 + 50,
+                      top: _startAnimate ? MediaQuery.of(context).size.height / 2 - 75 : MediaQuery.of(context).size.height / 2 + 25,
                       child: Text(
                         'You\'re done!',
                         textAlign: TextAlign.center,
@@ -592,7 +593,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           },
                           buttonWidth: 220,
                           colored: true,
-                          buttonText: 'Stats',
+                          buttonText: 'Statsistics',
                           textSize: 32,
                         ),
                       ),
@@ -649,12 +650,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               } else {
                 return Stack(
                   children: <Widget>[
-                    AnimatedPositioned(
-                      duration: cardSlideDuration,
-                      curve: cardSlideCurve,
+                    Positioned(
                       left: 50, 
                       right: 50,
-                      bottom: _doingTask ? MediaQuery.of(context).size.height / 2 + 150 : MediaQuery.of(context).size.height / 2 + 180,
+                      bottom: MediaQuery.of(context).size.height / 2 + 150,
                       child: _doingTask
                         ? Text(
                           _swatchDisplay,
@@ -662,7 +661,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           style: swatchTextStyle,
                         )
                         : Text(
-                          'Keep up the good work!',
+                          'Keep up the good work! 🙌',
                           textAlign: TextAlign.center,
                           style: topTextStyle,
                         )
@@ -688,11 +687,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: cardSlideCurve,
                       left: 30,
                       right: 30,
-                      top: _doingTask ? MediaQuery.of(context).size.height / 2 + 50 : MediaQuery.of(context).size.height / 2 - 50,
-                      child: Text(
+                      top: _doingTask ? MediaQuery.of(context).size.height / 2 + 25 : MediaQuery.of(context).size.height / 2 - 75,
+                      child: AutoSizeText(
                         _tasks[0].name,
                         textAlign: TextAlign.center,
                         style: taskTextStyle,
+                        maxLines: 2,
                       ),
                     ),
                     AnimatedPositioned(

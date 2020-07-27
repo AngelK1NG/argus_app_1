@@ -34,6 +34,8 @@ class _TasksPageState extends State<TasksPage> {
     return WrapperWidget(
       loading: _loading,
       nav: true,
+      cardHeight: 600,
+      backgroundColor: Theme.of(context).primaryColor,
       child: Stack(children: <Widget>[
         Positioned(
           right: 0,
