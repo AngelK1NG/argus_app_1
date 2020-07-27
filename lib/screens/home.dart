@@ -38,7 +38,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _completedTasks;
   int _totalTasks;
   bool _doingTask = false;
-  bool _startAnimate = false;
   String _date;
   FirebaseUser _user;
   FirestoreProvider _firestoreProvider;
@@ -187,7 +186,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         return false;
       }
     }
-    _startAnimate = true;
     return true;
   }
 
@@ -449,11 +447,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
 
     checkIfNotificationsOn();
-    if (_doingTask) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
-    } else {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-    }
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -461,7 +454,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         loading: _loading,
         nav: !_doingTask,
         backgroundColor: _doingTask ? Colors.black : Theme.of(context).primaryColor,
-        cardHeight: _doingTask ? MediaQuery.of(context).size.height / 2 : MediaQuery.of(context).size.height / 2 + 100,
+        cardPosition: _doingTask ? MediaQuery.of(context).size.height / 2 : MediaQuery.of(context).size.height / 2 - 100,
         child: StreamBuilder<QuerySnapshot>(
           stream: db
               .collection('users')
@@ -545,7 +538,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: cardSlideCurve,
                       left: 50, 
                       right: 50,
-                      bottom: _startAnimate ? MediaQuery.of(context).size.height / 2 + 180 : MediaQuery.of(context).size.height / 2 + 150,
+                      bottom: !_doingTask ? MediaQuery.of(context).size.height / 2 + 180 : MediaQuery.of(context).size.height / 2 + 150,
                       child: Text(
                         'Congrats! 🎉',
                         textAlign: TextAlign.center,
@@ -559,7 +552,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       child: AnimatedOpacity(
                         duration: cardSlideDuration,
                         curve: cardSlideCurve,
-                        opacity: _startAnimate ? 0 : 1,
+                        opacity: !_doingTask ? 0 : 1,
                         child: Center(
                           child: SqrButton(
                             onTap: pauseTask,
@@ -573,7 +566,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: cardSlideCurve,
                       left: 50,
                       right: 50,
-                      top: _startAnimate ? MediaQuery.of(context).size.height / 2 - 80 : MediaQuery.of(context).size.height / 2 + 20,
+                      top: !_doingTask ? MediaQuery.of(context).size.height / 2 - 80 : MediaQuery.of(context).size.height / 2 + 20,
                       child: Container(
                         alignment: Alignment.center,
                         height: 117,
@@ -589,7 +582,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: cardSlideCurve,
                       left: 0,
                       right: 0,
-                      bottom: _startAnimate ? 190 : 90,
+                      bottom: !_doingTask ? 190 : 90,
                       child: Center(
                         child: RctButton(
                           onTap: () {
@@ -607,7 +600,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: cardSlideCurve,
                       left: 0,
                       right: 0,
-                      bottom: _startAnimate ? 130 : 30,
+                      bottom: !_doingTask ? 130 : 30,
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () {

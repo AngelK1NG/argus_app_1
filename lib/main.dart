@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle.dark
+      SystemUiOverlayStyle.light
     );
     return ChangeNotifierProvider<User>(
       create: (_) => User(),

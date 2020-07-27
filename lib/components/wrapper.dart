@@ -8,14 +8,14 @@ class WrapperWidget extends StatefulWidget {
   final Color backgroundColor;
   final bool nav;
   final bool loading;
-  final double cardHeight;
+  final double cardPosition;
 
   const WrapperWidget(
       {@required this.child,
       this.backgroundColor,
       this.nav,
       @required this.loading,
-      @required this.cardHeight,
+      @required this.cardPosition,
     }
   );
 
@@ -23,7 +23,7 @@ class WrapperWidget extends StatefulWidget {
   _WrapperWidgetState createState() => _WrapperWidgetState();
 }
 
-class _WrapperWidgetState extends State<WrapperWidget> {
+class _WrapperWidgetState extends State<WrapperWidget> with TickerProviderStateMixin {
   bool _navActive = false;
 
   void toggleNav() {
@@ -67,13 +67,13 @@ class _WrapperWidgetState extends State<WrapperWidget> {
                   color: widget.backgroundColor,
                   child: Container(),
                 ),
-                Positioned(
+                AnimatedPositioned(
+                  duration: cardSlideDuration,
+                  curve: cardSlideCurve,
                   left: 0,
                   right: 0,
-                  bottom: 0,
-                  child: AnimatedContainer(
-                    duration: cardSlideDuration,
-                    curve: cardSlideCurve,
+                  bottom: - widget.cardPosition,
+                  child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50),),
                       color: Colors.white,
@@ -82,7 +82,7 @@ class _WrapperWidgetState extends State<WrapperWidget> {
                         blurRadius: 15,
                       )],
                     ),
-                    height: widget.cardHeight,
+                    height: MediaQuery.of(context).size.height,
                   ),
                 ),
                 GestureDetector(
