@@ -52,9 +52,8 @@ class OnboardingPage extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/home');
             },
             buttonWidth: 315,
-            buttonColor: Colors.black,
+            colored: true,
             buttonText: 'Get started!',
-            textColor: Colors.white,
             textSize: 32,
           ),
         ),

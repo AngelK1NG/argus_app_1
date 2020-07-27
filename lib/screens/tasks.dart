@@ -33,7 +33,6 @@ class _TasksPageState extends State<TasksPage> {
     user = Provider.of<User>(context, listen: false).user;
     return WrapperWidget(
       loading: _loading,
-      transition: true,
       nav: true,
       child: Stack(children: <Widget>[
         Positioned(

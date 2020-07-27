@@ -30,7 +30,6 @@ class _SettingsPageState extends State<SettingsPage> {
     String _email = Provider.of<User>(context, listen: false).user.email;
     return WrapperWidget(
       loading: _loading,
-      transition: true,
       nav: true,
       child: Stack(children: <Widget>[
         Positioned(

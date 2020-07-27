@@ -32,8 +32,16 @@ class _StatisticsPageState extends State<StatisticsPage> {
         .document(date);
     dateDoc.get().then((snapshot) {
       setState(() {
-        _completedTasks = snapshot.data['completedTasks'];
-        _totalTasks = snapshot.data['totalTasks'];
+        if (snapshot.data['completedTasks'] == null) {
+          _completedTasks = 0;
+        } else {
+          _completedTasks = snapshot.data['completedTasks'];
+        }
+        if (snapshot.data['totalTasks'] == null) {
+          _totalTasks = 0;
+        } else {
+          _totalTasks = snapshot.data['totalTasks'];
+        }
         if (snapshot.data['secondsSpent'] == null) {
           _timeSpent = Duration(seconds: 0);
         } else {
@@ -48,7 +56,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
   Widget build(BuildContext context) {
     return WrapperWidget(
       loading: _loading,
-      transition: true,
       nav: true,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

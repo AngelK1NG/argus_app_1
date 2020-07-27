@@ -23,16 +23,9 @@ class TaskListState extends State<TaskList> {
   List<TaskItem> _tasks = [];
   final _formKey = GlobalKey<FormState>();
   int _completedTasks;
-  bool _loading = false;
   String _date = getDateString(DateTime.now());
 
-  void toggleLoading() {
-    setState(() {
-      _loading = !_loading;
-    });
-  }
-
-  void updateCompletedTasks() {
+  void getCompletedTasks() {
     FirebaseUser user = context.read<User>().user;
     DocumentReference dateDoc = db
         .collection('users')
@@ -90,8 +83,11 @@ class TaskListState extends State<TaskList> {
         FirestoreProvider(Provider.of<User>(context, listen: false).user);
     setState(() {
       _tasks.remove(_tasks.firstWhere((tasku) => tasku.id == task.id));
-      firestoreProvider.updateTaskOrder(_tasks, _date);
+      if (task.completed) {
+        _completedTasks --;
+      }
     });
+    firestoreProvider.updateTaskOrder(_tasks, _date);
   }
 
   void setDate(String date) {
@@ -104,7 +100,7 @@ class TaskListState extends State<TaskList> {
   @override
   void initState() {
     super.initState();
-    updateCompletedTasks();
+    getCompletedTasks();
     getTasks();
   }
 
@@ -144,8 +140,6 @@ class TaskListState extends State<TaskList> {
                     onFieldSubmitted: (value) async {
                       if (_formKey.currentState.validate()) {
                         HapticFeedback.heavyImpact();
-                        toggleLoading();
-                        updateCompletedTasks();
                         TaskItem newTask = TaskItem(
                           id: '',
                           name: value,
@@ -155,6 +149,10 @@ class TaskListState extends State<TaskList> {
                           date: _date,
                         );
                         newTask.onDismissed = () => removeTask(newTask);
+                        setState(() {
+                          _tasks.insert(
+                              _tasks.length - _completedTasks, newTask);
+                        });
                         String userId = user.uid;
                         db
                             .collection('users')
@@ -167,9 +165,7 @@ class TaskListState extends State<TaskList> {
                           'order': newTask.order,
                           'completed': newTask.completed,
                         }).then((doc) {
-                          newTask.id = doc.documentID;
-                          _tasks.insert(
-                              _tasks.length - _completedTasks, newTask);
+                          _tasks[_tasks.length - _completedTasks - 1].id = doc.documentID;
                           firestoreProvider.updateTaskOrder(_tasks, _date);
                           DocumentReference dateDoc = db
                               .collection('users')
@@ -179,7 +175,6 @@ class TaskListState extends State<TaskList> {
                           dateDoc.updateData({
                             'totalTasks': FieldValue.increment(1),
                           });
-                          toggleLoading();
                         });
                         _formKey.currentState.reset();
                         AnalyticsProvider().logAddTask(newTask, DateTime.now());

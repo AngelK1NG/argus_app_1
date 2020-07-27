@@ -10,11 +10,11 @@ class NavBurger extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 102,
-      height: 102,
+      width: 90,
+      height: 90,
       child: IconButton(
         onPressed: onTap,
-        icon: active ? FaIcon(FontAwesomeIcons.times, size: 32,) : FaIcon(FontAwesomeIcons.bars, size: 32,),
+        icon: active ? FaIcon(FontAwesomeIcons.times, size: 32, color: Colors.black,) : FaIcon(FontAwesomeIcons.bars, size: 32, color: Colors.white,),
       ),
     );
   }

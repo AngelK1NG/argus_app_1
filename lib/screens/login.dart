@@ -84,7 +84,6 @@ class _LoginPageState extends State<LoginPage> {
             inAsyncCall: _loginLoading,
             child: WrapperWidget(
               loading: false,
-              transition: false,
               nav: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -103,8 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                             LocalNotificationHelper.userLoggedIn = true;
                           },
                           buttonWidth: 315,
-                          buttonColor: Colors.black,
-                          textColor: Colors.white,
+                          colored: true,
                           buttonText: "Sign in with Google",
                           textSize: 24,
                           icon: FaIcon(

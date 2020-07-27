@@ -40,10 +40,11 @@ class MyApp extends StatelessWidget {
             ),
             primarySwatch: focalPurple,
             primaryColor: const Color(0xff3c25d7),
-            accentColor: const Color(0xff3c25d7),
+            accentColor: const Color(0xff7c4efd),
             hintColor: const Color(0xffb0b0b0),
             dividerColor: const Color(0xffe2e2e2),
             splashColor: Colors.transparent,
+            fontFamily: 'Roboto',
           ),
           navigatorObservers: [
             FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
