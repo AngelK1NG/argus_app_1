@@ -483,7 +483,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     right: 50,
                     bottom: MediaQuery.of(context).size.height / 2 + 180,
                     child: Text(
-                      'Good Morning! ☕',
+                      'Good Morning!',
                       textAlign: TextAlign.center,
                       style: topTextStyle,
                     ),
@@ -573,11 +573,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: cardSlideCurve,
                       left: 50,
                       right: 50,
-                      top: _startAnimate ? MediaQuery.of(context).size.height / 2 - 75 : MediaQuery.of(context).size.height / 2 + 25,
-                      child: Text(
-                        'You\'re done!',
-                        textAlign: TextAlign.center,
-                        style: taskTextStyle,
+                      top: _startAnimate ? MediaQuery.of(context).size.height / 2 - 80 : MediaQuery.of(context).size.height / 2 + 20,
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: 117,
+                        child: Text(
+                          'You\'re done!',
+                          textAlign: TextAlign.center,
+                          style: taskTextStyle,
+                        ),
                       ),
                     ),
                     AnimatedPositioned(
@@ -585,7 +589,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: cardSlideCurve,
                       left: 0,
                       right: 0,
-                      bottom: _startAnimate ? 220 : 120,
+                      bottom: _startAnimate ? 190 : 90,
                       child: Center(
                         child: RctButton(
                           onTap: () {
@@ -603,7 +607,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: cardSlideCurve,
                       left: 0,
                       right: 0,
-                      bottom: _startAnimate ? 160 : 60,
+                      bottom: _startAnimate ? 130 : 30,
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () {
@@ -687,12 +691,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: cardSlideCurve,
                       left: 30,
                       right: 30,
-                      top: _doingTask ? MediaQuery.of(context).size.height / 2 + 25 : MediaQuery.of(context).size.height / 2 - 75,
-                      child: AutoSizeText(
-                        _tasks[0].name,
-                        textAlign: TextAlign.center,
-                        style: taskTextStyle,
-                        maxLines: 2,
+                      top: _doingTask ? MediaQuery.of(context).size.height / 2 + 20 : MediaQuery.of(context).size.height / 2 - 80,
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: 117,
+                        child: AutoSizeText(
+                          _tasks[0].name,
+                          textAlign: TextAlign.center,
+                          style: taskTextStyle,
+                          maxLines: 3,
+                        ),
                       ),
                     ),
                     AnimatedPositioned(
@@ -700,7 +708,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: cardSlideCurve,
                       left: 0,
                       right: 0,
-                      bottom: _doingTask ? 120 : 220,
+                      bottom: _doingTask ? 90 : 190,
                       child: Center(
                         child: _doingTask
                           ? RctButton(
@@ -735,7 +743,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: cardSlideCurve,
                       left: 0,
                       right: 0,
-                      bottom: _doingTask ? 60 : 160,
+                      bottom: _doingTask ? 30 : 130,
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () {

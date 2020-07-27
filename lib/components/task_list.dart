@@ -131,7 +131,7 @@ class TaskListState extends State<TaskList> {
                 child: TextFormField(
                     decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: "Add task",
+                      hintText: "Add task...",
                     ),
                     style: TextStyle(
                       fontSize: 16,
@@ -191,15 +191,9 @@ class TaskListState extends State<TaskList> {
             ),
           ],
         ),
-        height: 50,
+        height: 55,
         width: MediaQuery.of(context).size.width,
         alignment: Alignment.centerLeft,
-        decoration: BoxDecoration(
-            border: Border(
-                bottom: BorderSide(
-          width: 1,
-          color: Theme.of(context).dividerColor,
-        ))),
       ),
       onReorder: ((oldIndex, newIndex) {
         if (!_tasks[oldIndex].completed) {

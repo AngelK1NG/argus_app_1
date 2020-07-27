@@ -83,8 +83,8 @@ class _TaskItemState extends State<TaskItem> {
                                 height: 10,
                               )),
                     SizedBox(
-                        height: 50,
-                        width: MediaQuery.of(context).size.width - 58,
+                        height: 55,
+                        width: MediaQuery.of(context).size.width - 116,
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: _active
@@ -147,12 +147,6 @@ class _TaskItemState extends State<TaskItem> {
                 height: 50,
                 width: MediaQuery.of(context).size.width,
                 alignment: Alignment.centerLeft,
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                  width: 1,
-                  color: Theme.of(context).dividerColor,
-                ))),
               ),
             )));
   }

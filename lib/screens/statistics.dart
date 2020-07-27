@@ -57,94 +57,108 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return WrapperWidget(
       loading: _loading,
       nav: true,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      cardHeight: MediaQuery.of(context).size.height / 2 + 240,
+      backgroundColor: Theme.of(context).primaryColor,
+      child: Stack(
         children: <Widget>[
-          Padding(
-            padding:
-                EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.05),
-            child: Container(
-              width: 315,
-              padding: const EdgeInsets.only(bottom: 70),
-              child: RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                    text: _timeSpent.inHours.toString().padLeft(2, "0") +
-                        ":" +
-                        (_timeSpent.inMinutes % 60).toString().padLeft(2, "0") +
-                        ":" +
-                        (_timeSpent.inSeconds % 60).toString().padLeft(2, "0"),
-                    style: TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                    children: <TextSpan>[
-                      TextSpan(
-                          text: ' Spent',
-                          style: TextStyle(fontWeight: FontWeight.w300)),
-                    ]),
-              ),
+          Positioned(
+            right: 30,
+            top: 30,
+            child: Text(
+              'Statistics',
+              style: headerTextStyle,
             ),
           ),
-          Stack(
-            alignment: Alignment.center,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              SizedBox(
-                width: 220,
-                height: 220,
-                child: CircularProgressIndicator(
-                  strokeWidth: 5,
-                  value: (_totalTasks == null || _totalTasks == 0)
-                      ? 0
-                      : (_completedTasks / _totalTasks),
-                  backgroundColor: Colors.black,
+              Padding(
+                padding:
+                    EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.05),
+                child: Container(
+                  width: 315,
+                  padding: const EdgeInsets.only(bottom: 70),
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                        text: _timeSpent.inHours.toString().padLeft(2, "0") +
+                            ":" +
+                            (_timeSpent.inMinutes % 60).toString().padLeft(2, "0") +
+                            ":" +
+                            (_timeSpent.inSeconds % 60).toString().padLeft(2, "0"),
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                        children: <TextSpan>[
+                          TextSpan(
+                              text: ' Spent',
+                              style: TextStyle(fontWeight: FontWeight.w300)),
+                        ]),
+                  ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Stack(
+                alignment: Alignment.center,
                 children: <Widget>[
-                  Text(
-                      ((_totalTasks == null || _totalTasks == 0)
-                              ? 0
-                              : (_completedTasks / _totalTasks) * 100)
-                          .toInt()
-                          .toString(),
-                      style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.w500,
-                      )),
-                  Text("%",
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w300,
-                      )),
+                  SizedBox(
+                    width: 220,
+                    height: 220,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                      value: (_totalTasks == null || _totalTasks == 0)
+                          ? 0
+                          : (_completedTasks / _totalTasks),
+                      backgroundColor: Colors.black,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                          ((_totalTasks == null || _totalTasks == 0)
+                                  ? 0
+                                  : (_completedTasks / _totalTasks) * 100)
+                              .toInt()
+                              .toString(),
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.w500,
+                          )),
+                      Text("%",
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w300,
+                          )),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
-          Padding(
-            padding:
-                EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.05),
-            child: Container(
-              width: 315,
-              padding: const EdgeInsets.only(top: 70),
-              child: RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                    text: _completedTasks.toString(),
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                    children: <TextSpan>[
-                      TextSpan(
-                          text: ' Tasks Completed',
-                          style: TextStyle(fontWeight: FontWeight.w300)),
-                    ]),
+              Padding(
+                padding:
+                    EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.05),
+                child: Container(
+                  width: 315,
+                  padding: const EdgeInsets.only(top: 70),
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                        text: _completedTasks.toString(),
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                        children: <TextSpan>[
+                          TextSpan(
+                              text: ' Tasks Completed',
+                              style: TextStyle(fontWeight: FontWeight.w300)),
+                        ]),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),

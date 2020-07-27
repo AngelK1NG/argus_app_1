@@ -12,9 +12,16 @@ final FirebaseAnalytics analytics = FirebaseAnalytics();
 // local notifications
 final FlutterLocalNotificationsPlugin notificationsPlugin = FlutterLocalNotificationsPlugin();
 
-//styles
+//colors
 final Color primaryTextColor = Color(0xff2b2b2b);
 final Color indicatorBackgroundColor = Color(0xffe5e5e5);
+
+//styles
+final TextStyle headerTextStyle = TextStyle(
+  fontSize: 30,
+  fontWeight: FontWeight.w500,
+  color: Colors.white,
+);
 
 //animation transitions
 final Duration navDuration = Duration(milliseconds: 200);
