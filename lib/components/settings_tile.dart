@@ -1,36 +1,32 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class SettingsTile extends StatefulWidget {
+class SettingsTile extends StatelessWidget {
   final String title;
   final bool toggle;
   final Function onChanged;
   SettingsTile({this.title, this.toggle, this.onChanged});
 
   @override
-  _SettingsTileState createState() => _SettingsTileState();
-}
-
-class _SettingsTileState extends State<SettingsTile> {
-  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 30.0,
+      height: 50,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Text(
-            widget.title,
-            style: TextStyle(fontSize: 17),
+            title,
+            style: TextStyle(fontSize: 16),
           ),
-          Container(
-            width: 100.0,
-            child: CupertinoSwitch(
-              activeColor: Colors.purple,
-              trackColor: Colors.grey,
-              value: widget.toggle,
-              onChanged: widget.onChanged,
-            ),
+          CupertinoSwitch(
+            activeColor: Theme.of(context).accentColor,
+            trackColor: Colors.grey,
+            value: toggle,
+            onChanged: (value) {
+              HapticFeedback.heavyImpact();
+              onChanged(value);
+            },
           ),
         ],
       ),

@@ -35,6 +35,7 @@ class _SettingsPageState extends State<SettingsPage> {
         _soundOn = prefs.getBool('sound on') == null
             ? true
             : prefs.getBool('sound on');
+        _loading = false;
       });
     });
   }
@@ -49,11 +50,6 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     getSettings();
-    Future.delayed(Duration(milliseconds: 1), () {
-      setState(() {
-        _loading = false;
-      });
-    });
   }
 
   @override
@@ -82,23 +78,20 @@ class _SettingsPageState extends State<SettingsPage> {
         Positioned(
           right: 30,
           left: 30,
-          top: 100,
+          top: MediaQuery.of(context).size.height / 2 - 220,
           child: Container(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  'Notifications',
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: 25,
+                Padding(
+                  padding: EdgeInsets.only(bottom: 25),
+                  child: Text(
+                    'Notifications',
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 SettingsTile(
-                  title: 'Send notifications',
+                  title: 'Notifiy upon exiting app',
                   toggle: _notificationsOn,
                   onChanged: (value) {
                     setState(() {
@@ -107,9 +100,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     LocalNotificationHelper.notificationsOn = value;
                     setValue('notifications on', value);
                   },
-                ),
-                SizedBox(
-                  height: 20,
                 ),
                 SettingsTile(
                   title: 'Do not disturb',
@@ -121,15 +111,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     setValue('do not disturb on', value);
                   },
                 ),
-                SizedBox(
-                  height: 50,
-                ),
-                Text(
-                  'Sounds',
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: 25,
+                Padding(
+                  padding: EdgeInsets.only(top: 50, bottom: 25),
+                  child: Text(
+                    'Sounds',
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 SettingsTile(
                   title: 'Notification Sounds',
