@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:Focal/constants.dart';
 import 'package:flutter/services.dart';
+import 'package:screen/screen.dart';
 
 class LocalNotificationHelper {
   static bool userLoggedIn = true;
   static bool screenOff = false;
   static bool paused = false;
+  static bool notificationsOn = true;
+
   void initialize() async {
     var initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
@@ -20,11 +23,14 @@ class LocalNotificationHelper {
   }
 
   void showNotifications() async {
-    if (userLoggedIn && !screenOff && !paused) {
-      HapticFeedback.heavyImpact();
-      await notification();
-      print('Notification sent');
-    }
+    Screen.brightness.then((double brightness) async {
+      if (userLoggedIn && !paused && notificationsOn && brightness != 0) {
+        print('brightness : $brightness');
+        HapticFeedback.heavyImpact();
+        await notification();
+        print('Notification sent');
+      }
+    });
   }
 
   Future<void> notification() async {

@@ -48,10 +48,8 @@ class _TasksPageState extends State<TasksPage> {
                       DateTime.parse(_date).day == DateTime.now().day)
                   ? "Today"
                   : (DateTime.parse(_date).year == DateTime.now().year &&
-                          DateTime.parse(_date).month ==
-                              DateTime.now().month &&
-                          DateTime.parse(_date).day ==
-                              DateTime.now().day + 1)
+                          DateTime.parse(_date).month == DateTime.now().month &&
+                          DateTime.parse(_date).day == DateTime.now().day + 1)
                       ? "Tomorrow"
                       : DateTime.parse(_date).month.toString() +
                           "/" +
@@ -73,7 +71,11 @@ class _TasksPageState extends State<TasksPage> {
             right: 30,
             bottom: 30,
             child: SqrButton(
-              icon: Icon(Icons.calendar_today, color: Colors.white, size: 28,),
+              icon: Icon(
+                Icons.calendar_today,
+                color: Colors.white,
+                size: 28,
+              ),
               onTap: () {
                 showDatePicker(
                   context: context,

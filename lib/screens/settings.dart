@@ -1,8 +1,10 @@
+import 'package:Focal/components/settings_tile.dart';
 import 'package:Focal/utils/local_notifications.dart';
 import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:Focal/constants.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../components/wrapper.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -14,10 +16,39 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _loading = true;
+  bool _notificationsOn = true;
+  bool _dndOn = true;
+  bool _soundOn = true;
+
+  void getSettings() {
+    SharedPreferences.getInstance().then((SharedPreferences prefs) {
+      setState(() {
+        _notificationsOn = prefs.getBool('notifications on') == null
+            ? true
+            : prefs.getBool('notifications on');
+        _dndOn = prefs.getBool('do not disturb on') == null
+            ? true
+            : prefs.getBool('do not disturb on');
+        _notificationsOn = prefs.getBool('notifications on') == null
+            ? true
+            : prefs.getBool('notifications on');
+        _soundOn = prefs.getBool('sound on') == null
+            ? true
+            : prefs.getBool('sound on');
+      });
+    });
+  }
+
+  void setValue(String key, bool val) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool(key, val);
+    print('$key is set to ${prefs.get}');
+  }
 
   @override
   void initState() {
     super.initState();
+    getSettings();
     Future.delayed(Duration(milliseconds: 1), () {
       setState(() {
         _loading = false;
@@ -39,7 +70,7 @@ class _SettingsPageState extends State<SettingsPage> {
           top: 0,
           child: Padding(
             padding: const EdgeInsets.only(
-              right: 38,
+              right: 30,
               top: 30,
             ),
             child: Text(
@@ -49,10 +80,70 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         Positioned(
-          right: 0,
-          left: 0,
+          right: 30,
+          left: 30,
           top: 100,
-          child: Container(),
+          child: Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Notifications',
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                SettingsTile(
+                  title: 'Send notifications',
+                  toggle: _notificationsOn,
+                  onChanged: (value) {
+                    setState(() {
+                      _notificationsOn = value;
+                    });
+                    LocalNotificationHelper.notificationsOn = value;
+                    setValue('notifications on', value);
+                  },
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                SettingsTile(
+                  title: 'Do not disturb',
+                  toggle: _dndOn,
+                  onChanged: (value) {
+                    setState(() {
+                      _dndOn = value;
+                    });
+                    setValue('do not disturb on', value);
+                  },
+                ),
+                SizedBox(
+                  height: 50,
+                ),
+                Text(
+                  'Sounds',
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                SettingsTile(
+                  title: 'Notification Sounds',
+                  toggle: _soundOn,
+                  onChanged: (value) {
+                    setState(() {
+                      _soundOn = value;
+                    });
+                    setValue('sound on', value);
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
         Positioned(
           right: 30,
