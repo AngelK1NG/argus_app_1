@@ -1,4 +1,5 @@
 import 'dart:io' show Platform;
+import 'dart:async';
 import 'package:Focal/components/task_item.dart';
 import 'package:Focal/utils/analytics.dart';
 import 'package:Focal/utils/date.dart';
@@ -9,7 +10,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:provider/provider.dart';
 import '../components/wrapper.dart';
 import '../components/rct_button.dart';
@@ -20,6 +20,7 @@ import 'package:flutter_dnd/flutter_dnd.dart';
 import 'package:flutter/services.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:confetti/confetti.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -48,6 +49,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _paused = false;
   int _seconds = 0;
   AnalyticsProvider analyticsProvider = AnalyticsProvider();
+  ConfettiController _confettiController = ConfettiController(duration: Duration(seconds: 1));
 
   void startTask() async {
     timer = new Timer.periodic(
@@ -178,6 +180,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
     analyticsProvider.logCompleteTask(
         finishedTask, DateTime.now(), _swatchDisplay);
+    if (areTasksCompleted()) {
+      Future.delayed(cardSlideDuration, () {
+        _confettiController.play();
+      });
+    }
   }
 
   bool areTasksCompleted() {
@@ -586,7 +593,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           progressColor: Theme.of(context).accentColor,
                           backgroundColor: Theme.of(context).dividerColor,
                         ),
-                      )
+                      ),
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: ConfettiWidget(
+                          confettiController: _confettiController,
+                          emissionFrequency: 0.01,
+                          blastDirectionality: BlastDirectionality.explosive,
+                          numberOfParticles: 200,
+                          particleDrag: 0.03,
+                          shouldLoop: false,
+                        ),
+                      ),
                     ],
                   );
                 } else {
