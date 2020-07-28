@@ -41,7 +41,7 @@ class RctButton extends StatelessWidget {
               end: Alignment.centerRight,
             )
             : LinearGradient(
-              colors: [primaryTextColor],
+              colors: [jetBlack],
             )
           ,
           borderRadius: BorderRadius.all(Radius.circular(40)),

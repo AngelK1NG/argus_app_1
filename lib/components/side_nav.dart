@@ -76,6 +76,7 @@ class SideNav extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w400,
+                        color: jetBlack,
                       )),
                 ),
                 FlatButton(
@@ -87,6 +88,7 @@ class SideNav extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w400,
+                        color: jetBlack,
                       )),
                 ),
                 FlatButton(
@@ -98,6 +100,7 @@ class SideNav extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w400,
+                        color: jetBlack,
                       )),
                 ),
                 FlatButton(
@@ -109,6 +112,7 @@ class SideNav extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w400,
+                        color: jetBlack,
                       )),
                 ),
               ],
