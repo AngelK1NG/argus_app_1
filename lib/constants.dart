@@ -13,8 +13,7 @@ final FirebaseAnalytics analytics = FirebaseAnalytics();
 final FlutterLocalNotificationsPlugin notificationsPlugin = FlutterLocalNotificationsPlugin();
 
 //colors
-final Color primaryTextColor = Color(0xff2b2b2b);
-final Color indicatorBackgroundColor = Color(0xffe5e5e5);
+final Color jetBlack = Color(0xff2b2b2b);
 
 //styles
 final TextStyle headerTextStyle = TextStyle(

@@ -2,6 +2,7 @@ import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:provider/provider.dart';
+import 'package:Focal/constants.dart';
 import 'dart:io' show Platform;
 
 // ignore: must_be_immutable
@@ -138,7 +139,7 @@ class _TaskItemState extends State<TaskItem> {
                                     fontWeight: FontWeight.w400,
                                     color: widget.completed
                                         ? Theme.of(context).hintColor
-                                        : Colors.black,
+                                        : jetBlack,
                                   ),
                                 ),
                         )),

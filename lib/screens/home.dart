@@ -130,7 +130,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _firestoreProvider.deleteTask(_date, _tasks[0].id, _tasks[0].completed);
     Fluttertoast.showToast(
       msg: 'Abandoned task: ${_tasks[0].name}',
-      backgroundColor: Colors.black,
+      backgroundColor: jetBlack,
       textColor: Colors.white,
     );
     if (Platform.isAndroid) {
@@ -250,7 +250,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       case AppLifecycleState.paused:
         if (_doingTask) {
           if (Platform.isAndroid) {
-            Future.delayed(const Duration(milliseconds: 500), () {
+            Future.delayed(const Duration(milliseconds: 2000), () {
               FlutterDnd.setInterruptionFilter(
                   FlutterDnd.INTERRUPTION_FILTER_ALL);
               notificationHelper.showNotifications();
@@ -430,7 +430,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
     final TextStyle taskTextStyle = TextStyle(
       fontSize: 36,
-      color: primaryTextColor,
       fontWeight: FontWeight.w400,
     );
     final TextStyle secondaryButtonTextStyle = TextStyle(
@@ -440,7 +439,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
     final TextStyle percentTextStyle = TextStyle(
       fontSize: 24,
-      color: primaryTextColor,
       fontWeight: FontWeight.w400,
     );
 
@@ -452,7 +450,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         loading: _loading,
         nav: !_doingTask,
         backgroundColor:
-            _doingTask ? Colors.black : Theme.of(context).primaryColor,
+            _doingTask ? jetBlack : Theme.of(context).primaryColor,
         cardPosition: _doingTask
             ? MediaQuery.of(context).size.height / 2
             : MediaQuery.of(context).size.height / 2 - 100,
@@ -657,7 +655,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               : (_completedTasks / _totalTasks),
                           lineHeight: 20,
                           progressColor: Theme.of(context).accentColor,
-                          backgroundColor: indicatorBackgroundColor,
+                          backgroundColor: Theme.of(context).dividerColor,
                         ),
                       )
                     ],
@@ -806,7 +804,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                 : (_completedTasks / _totalTasks),
                             lineHeight: 20,
                             progressColor: Theme.of(context).accentColor,
-                            backgroundColor: indicatorBackgroundColor,
+                            backgroundColor: Theme.of(context).dividerColor,
                           ),
                         ),
                       )
