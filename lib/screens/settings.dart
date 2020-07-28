@@ -87,11 +87,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   padding: EdgeInsets.only(bottom: 25),
                   child: Text(
                     'Notifications',
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
                   ),
                 ),
                 SettingsTile(
-                  title: 'Notifiy upon exiting app',
+                  title: 'Notify upon exiting app when Focused',
                   toggle: _notificationsOn,
                   onChanged: (value) {
                     setState(() {
@@ -102,7 +102,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
                 SettingsTile(
-                  title: 'Do not disturb',
+                  title: 'Turn on Do Not Disturb when Focused',
                   toggle: _dndOn,
                   onChanged: (value) {
                     setState(() {
@@ -115,11 +115,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   padding: EdgeInsets.only(top: 50, bottom: 25),
                   child: Text(
                     'Sounds',
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
                   ),
                 ),
                 SettingsTile(
-                  title: 'Notification Sounds',
+                  title: 'Notification sounds',
                   toggle: _soundOn,
                   onChanged: (value) {
                     setState(() {

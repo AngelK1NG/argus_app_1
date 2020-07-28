@@ -11,13 +11,16 @@ class SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 50,
+      height: 60,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(fontSize: 16),
+          SizedBox(
+            width: 200,
+            child: Text(
+              title,
+              style: TextStyle(fontSize: 16),
+            ),
           ),
           CupertinoSwitch(
             activeColor: Theme.of(context).accentColor,
