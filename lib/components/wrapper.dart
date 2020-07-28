@@ -15,7 +15,7 @@ class WrapperWidget extends StatefulWidget {
       this.backgroundColor,
       this.nav,
       @required this.loading,
-      @required this.cardPosition,
+      this.cardPosition,
     }
   );
 
@@ -72,7 +72,7 @@ class _WrapperWidgetState extends State<WrapperWidget> with TickerProviderStateM
                   curve: cardSlideCurve,
                   left: 0,
                   right: 0,
-                  bottom: - widget.cardPosition,
+                  bottom: widget.cardPosition == null ? - MediaQuery.of(context).size.height : - widget.cardPosition,
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50),),
