@@ -70,8 +70,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(FlutterDnd
-            .INTERRUPTION_FILTER_NONE); // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(
+            FlutterDnd.INTERRUPTION_FILTER_NONE);
       }
     }
     analyticsProvider.logStartTask(_tasks[0], DateTime.now());
@@ -85,8 +85,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(FlutterDnd
-            .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(
+            FlutterDnd.INTERRUPTION_FILTER_ALL);
       }
     }
   }
@@ -122,24 +122,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  void abandonTask() async {
+  void saveTask() async {
     setState(() {
       _doingTask = false;
       _swatchDisplay = "00:00";
     });
-    _firestoreProvider.deleteTask(_date, _tasks[0].id, _tasks[0].completed);
+    final task = _tasks.removeAt(0);
+    _tasks.insert(_tasks.length - _completedTasks, task);
+    _firestoreProvider.updateTaskOrder(_tasks, _date);
     Fluttertoast.showToast(
-      msg: 'Abandoned task: ${_tasks[0].name}',
+      msg: '${task.name} has been saved for later',
       backgroundColor: jetBlack,
       textColor: Colors.white,
     );
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(FlutterDnd
-            .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(
+            FlutterDnd.INTERRUPTION_FILTER_ALL);
       }
     }
-    analyticsProvider.logAbandonTask(_tasks[0], DateTime.now(), _swatchDisplay);
+    analyticsProvider.logSaveTask(_tasks[0], DateTime.now(), _swatchDisplay);
   }
 
   void completeTask(FirebaseUser user) {
@@ -250,15 +252,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       case AppLifecycleState.paused:
         if (_doingTask) {
           if (Platform.isAndroid) {
-            Future.delayed(const Duration(milliseconds: 2000), () {
-              FlutterDnd.setInterruptionFilter(
-                  FlutterDnd.INTERRUPTION_FILTER_ALL);
-              notificationHelper.showNotifications();
-              Future.delayed(const Duration(milliseconds: 2500), () {
+            if (LocalNotificationHelper.notificationsOn) {
+              Future.delayed(const Duration(milliseconds: 500), () {
                 FlutterDnd.setInterruptionFilter(
-                    FlutterDnd.INTERRUPTION_FILTER_NONE);
+                    FlutterDnd.INTERRUPTION_FILTER_ALL);
+                notificationHelper.showNotifications();
+                Future.delayed(const Duration(milliseconds: 3000), () {
+                  FlutterDnd.setInterruptionFilter(
+                      FlutterDnd.INTERRUPTION_FILTER_NONE);
+                });
               });
-            });
+            }
           } else {
             printBoi().then((value) {
               if (value) {
@@ -295,80 +299,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   //     print(exception);
   //   }
   // }
-
-  Future<void> showAbandonConfirmationAndroid() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Abandon task?'),
-          content: Padding(
-            padding: const EdgeInsets.only(
-              top: 15,
-              bottom: 5,
-            ),
-            child: Text('Are you sure you want to abandon task?'),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            FlatButton(
-              child: Text('Abandon',
-                  style: TextStyle(
-                    color: Colors.red,
-                  )),
-              onPressed: () {
-                Navigator.of(context).pop();
-                abandonTask();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> showAbandonConfirmationIOS() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text('Abandon task?'),
-          content: Padding(
-            padding: const EdgeInsets.only(
-              top: 15,
-              bottom: 5,
-            ),
-            child: Text('Are you sure you want to abandon task?'),
-          ),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            CupertinoDialogAction(
-              child: Text('Abandon',
-                  style: TextStyle(
-                    color: Colors.red,
-                  )),
-              onPressed: () {
-                Navigator.of(context).pop();
-                abandonTask();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
 // android confirm for notification settings
   Future<void> showNotificationConfirmation() async {
@@ -449,8 +379,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       child: WrapperWidget(
         loading: _loading,
         nav: !_doingTask,
-        backgroundColor:
-            _doingTask ? jetBlack : Theme.of(context).primaryColor,
+        backgroundColor: _doingTask ? jetBlack : Theme.of(context).primaryColor,
         cardPosition: _doingTask
             ? MediaQuery.of(context).size.height / 2
             : MediaQuery.of(context).size.height / 2 - 100,
@@ -767,6 +696,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           behavior: HitTestBehavior.translucent,
                           onTap: () {
                             HapticFeedback.heavyImpact();
+                            saveTask();
                           },
                           child: Padding(
                             padding: EdgeInsets.all(10),
