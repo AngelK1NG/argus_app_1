@@ -541,7 +541,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             },
                             buttonWidth: 220,
                             colored: true,
-                            buttonText: 'Statsistics',
+                            buttonText: 'Statistics',
                             textSize: 32,
                           ),
                         ),
