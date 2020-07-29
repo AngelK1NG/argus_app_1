@@ -9,7 +9,8 @@ class LocalNotificationHelper {
   static bool userLoggedIn = true;
   static bool screenOff = false;
   static bool paused = false;
-  static bool notificationsOn = true;
+  static bool notificationsOn;
+  static bool dndOn;
 
   void initialize() async {
     var initializationSettingsAndroid =
@@ -23,14 +24,11 @@ class LocalNotificationHelper {
   }
 
   void showNotifications() async {
-    Screen.brightness.then((double brightness) async {
-      if (userLoggedIn && !paused && notificationsOn && brightness != 0) {
-        print('brightness : $brightness');
-        HapticFeedback.heavyImpact();
-        await notification();
-        print('Notification sent');
-      }
-    });
+    if (userLoggedIn && !paused && notificationsOn) {
+      HapticFeedback.heavyImpact();
+      await notification();
+      print('Notification sent');
+    }
   }
 
   Future<void> notification() async {

@@ -21,6 +21,7 @@ import 'package:flutter/services.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:confetti/confetti.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -49,8 +50,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _paused = false;
   int _seconds = 0;
   AnalyticsProvider analyticsProvider = AnalyticsProvider();
-  ConfettiController _confettiController = ConfettiController(duration: Duration(seconds: 1));
-
+  ConfettiController _confettiController =
+      ConfettiController(duration: Duration(seconds: 1));
   void startTask() async {
     timer = new Timer.periodic(
         const Duration(seconds: 1),
@@ -71,9 +72,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _paused = false;
     });
     if (Platform.isAndroid) {
-      if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(
-            FlutterDnd.INTERRUPTION_FILTER_NONE);
+      if (LocalNotificationHelper.dndOn) {
+        if (await FlutterDnd.isNotificationPolicyAccessGranted) {
+          await FlutterDnd.setInterruptionFilter(
+              FlutterDnd.INTERRUPTION_FILTER_NONE);
+        }
       }
     }
     analyticsProvider.logStartTask(_tasks[0], DateTime.now());
@@ -86,9 +89,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _paused = false;
     });
     if (Platform.isAndroid) {
-      if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(
-            FlutterDnd.INTERRUPTION_FILTER_ALL);
+      if (LocalNotificationHelper.dndOn) {
+        if (await FlutterDnd.isNotificationPolicyAccessGranted) {
+          await FlutterDnd.setInterruptionFilter(
+              FlutterDnd.INTERRUPTION_FILTER_ALL);
+        }
       }
     }
   }
@@ -196,9 +201,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return true;
   }
 
+  void getSettings() {
+    SharedPreferences.getInstance().then((SharedPreferences prefs) {
+      LocalNotificationHelper.dndOn = prefs.getBool('do not disturb on') == null
+          ? true
+          : prefs.getBool('do not disturb on');
+      LocalNotificationHelper.notificationsOn =
+          prefs.getBool('notifications on') == null
+              ? true
+              : prefs.getBool('notifications on');
+      print('Notifications ON: ${LocalNotificationHelper.notificationsOn}');
+      print('DND ON: ${LocalNotificationHelper.dndOn}');
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    getSettings();
     notificationHelper = LocalNotificationHelper();
     notificationHelper.initialize();
     WidgetsBinding.instance.addObserver(this);
@@ -260,17 +280,25 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         if (_doingTask) {
           if (Platform.isAndroid) {
             if (LocalNotificationHelper.notificationsOn) {
-              Future.delayed(const Duration(milliseconds: 500), () {
-                FlutterDnd.setInterruptionFilter(
-                    FlutterDnd.INTERRUPTION_FILTER_ALL);
-                notificationHelper.showNotifications();
-                Future.delayed(const Duration(milliseconds: 3000), () {
+              if (LocalNotificationHelper.dndOn) {
+                Future.delayed(const Duration(milliseconds: 500), () {
                   FlutterDnd.setInterruptionFilter(
-                      FlutterDnd.INTERRUPTION_FILTER_NONE);
+                      FlutterDnd.INTERRUPTION_FILTER_ALL);
+                  notificationHelper.showNotifications();
+                  Future.delayed(const Duration(milliseconds: 3000), () {
+                    FlutterDnd.setInterruptionFilter(
+                        FlutterDnd.INTERRUPTION_FILTER_NONE);
+                  });
                 });
-              });
+              } else {
+                print('dnd is off');
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  notificationHelper.showNotifications();
+                });
+              }
             }
           } else {
+            print('printboi triggered');
             printBoi().then((value) {
               if (value) {
                 notificationHelper.showNotifications();

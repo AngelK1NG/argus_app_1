@@ -108,6 +108,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {
                       _dndOn = value;
                     });
+                    LocalNotificationHelper.dndOn = value;
                     setValue('do not disturb on', value);
                   },
                 ),
