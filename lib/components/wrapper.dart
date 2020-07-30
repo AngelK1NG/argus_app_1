@@ -10,20 +10,20 @@ class WrapperWidget extends StatefulWidget {
   final bool loading;
   final double cardPosition;
 
-  const WrapperWidget(
-      {@required this.child,
-      this.backgroundColor,
-      this.nav,
-      @required this.loading,
-      this.cardPosition,
-    }
-  );
+  const WrapperWidget({
+    @required this.child,
+    this.backgroundColor,
+    this.nav,
+    @required this.loading,
+    this.cardPosition,
+  });
 
   @override
   _WrapperWidgetState createState() => _WrapperWidgetState();
 }
 
-class _WrapperWidgetState extends State<WrapperWidget> with TickerProviderStateMixin {
+class _WrapperWidgetState extends State<WrapperWidget>
+    with TickerProviderStateMixin {
   bool _navActive = false;
 
   void toggleNav() {
@@ -72,15 +72,22 @@ class _WrapperWidgetState extends State<WrapperWidget> with TickerProviderStateM
                   curve: cardSlideCurve,
                   left: 0,
                   right: 0,
-                  bottom: widget.cardPosition == null ? - MediaQuery.of(context).size.height : - widget.cardPosition,
+                  top: widget.cardPosition == null
+                      ? MediaQuery.of(context).size.height
+                      : widget.cardPosition,
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50),),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(50),
+                        topRight: Radius.circular(50),
+                      ),
                       color: Colors.white,
-                      boxShadow: [BoxShadow(
-                        spreadRadius: -5,
-                        blurRadius: 15,
-                      )],
+                      boxShadow: [
+                        BoxShadow(
+                          spreadRadius: -5,
+                          blurRadius: 15,
+                        )
+                      ],
                     ),
                     height: MediaQuery.of(context).size.height,
                   ),
