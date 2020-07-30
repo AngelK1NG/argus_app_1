@@ -1,4 +1,7 @@
+import 'dart:io' show Platform;
+import 'dart:async';
 import 'package:Focal/components/task_item.dart';
+import 'package:Focal/utils/analytics.dart';
 import 'package:Focal/utils/date.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:Focal/utils/local_notifications.dart';
@@ -7,18 +10,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import '../components/wrapper.dart';
 import '../components/rct_button.dart';
 import '../components/sqr_button.dart';
 import '../constants.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'dart:io' show Platform;
 import 'package:flutter_dnd/flutter_dnd.dart';
-import 'package:screen_state/screen_state.dart';
 import 'package:flutter/services.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:confetti/confetti.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -31,7 +34,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static const platform = const MethodChannel("com.flutter.lockscreen");
 
   Timer timer;
-  DateTime _startTime;
+  DateTime _startFocused;
+  DateTime _startPaused;
+  DateTime _startDistracted;
   String _swatchDisplay = "00:00";
   int _completedTasks;
   int _totalTasks;
@@ -41,86 +46,136 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   FirestoreProvider _firestoreProvider;
   List<TaskItem> _tasks = [];
   LocalNotificationHelper notificationHelper;
-  Screen _screen;
-  StreamSubscription<ScreenStateEvent> _subscription;
+  // StreamSubscription<ScreenStateEvent> _subscription;
   bool _notifConfirmation = false;
-  bool _iosScreen = true;
   bool _loading = true;
-
+  bool _paused = false;
+  int _seconds = 0;
+  int _secondsPaused = 0;
+  int _secondsDistracted = 0;
+  AnalyticsProvider analyticsProvider = AnalyticsProvider();
+  ConfettiController _confettiController =
+      ConfettiController(duration: Duration(seconds: 1));
   void startTask() async {
+    _secondsPaused = 0;
+    _secondsDistracted = 0;
     timer = new Timer.periodic(
         const Duration(seconds: 1),
         (Timer timer) => setState(() {
-              if (_doingTask) {
+              if (_doingTask && !_paused) {
                 final currentTime = DateTime.now();
-                _swatchDisplay = currentTime
-                        .difference(_startTime)
-                        .inMinutes
-                        .toString()
-                        .padLeft(2, "0") +
+                _seconds = (currentTime.difference(_startFocused).inSeconds);
+                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
                     ":" +
-                    (currentTime.difference(_startTime).inSeconds % 60)
-                        .toString()
-                        .padLeft(2, "0");
+                    (_seconds % 60).toString().padLeft(2, "0");
               } else {
                 timer.cancel();
               }
             }));
     setState(() {
       _doingTask = true;
-      _startTime = DateTime.now();
+      _startFocused = DateTime.now();
+      _paused = false;
     });
     if (Platform.isAndroid) {
-      if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(FlutterDnd
-            .INTERRUPTION_FILTER_NONE); // Turn on DND - All notifications are suppressed.
+      if (LocalNotificationHelper.dndOn) {
+        if (await FlutterDnd.isNotificationPolicyAccessGranted) {
+          await FlutterDnd.setInterruptionFilter(
+              FlutterDnd.INTERRUPTION_FILTER_NONE);
+        }
       }
     }
+    analyticsProvider.logStartTask(_tasks[0], DateTime.now());
   }
 
   void stopTask() async {
     setState(() {
       _doingTask = false;
       _swatchDisplay = "00:00";
+      _paused = false;
     });
     if (Platform.isAndroid) {
-      if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(FlutterDnd
-            .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
+      if (LocalNotificationHelper.dndOn) {
+        if (await FlutterDnd.isNotificationPolicyAccessGranted) {
+          await FlutterDnd.setInterruptionFilter(
+              FlutterDnd.INTERRUPTION_FILTER_ALL);
+        }
       }
     }
   }
 
-  void abandonTask() async {
+  void pauseTask() {
+    if (_paused) {
+      int pausedDifference = _seconds;
+      _secondsPaused += DateTime.now().difference(_startPaused).inSeconds;
+      timer = new Timer.periodic(
+          const Duration(seconds: 1),
+          (Timer timer) => setState(() {
+                if (_doingTask && !_paused) {
+                  final currentTime = DateTime.now();
+                  _seconds = currentTime.difference(_startFocused).inSeconds +
+                      pausedDifference;
+                  _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                      ":" +
+                      (_seconds % 60).toString().padLeft(2, "0");
+                } else {
+                  timer.cancel();
+                }
+              }));
+      setState(() {
+        _doingTask = true;
+        _startFocused = DateTime.now();
+        _paused = !_paused;
+      });
+      LocalNotificationHelper.paused = false;
+    } else {
+      setState(() {
+        _startPaused = DateTime.now();
+        _paused = !_paused;
+        LocalNotificationHelper.paused = true;
+      });
+    }
+    print(_secondsPaused);
+  }
+
+  void saveTask(FirebaseUser user) async {
     setState(() {
       _doingTask = false;
       _swatchDisplay = "00:00";
     });
-    _firestoreProvider.deleteTask(_date, _tasks[0].id, _tasks[0].completed);
+    final task = _tasks.removeAt(0);
+    _tasks.insert(_tasks.length - _completedTasks, task);
+    _firestoreProvider.updateTaskOrder(_tasks, _date);
     Fluttertoast.showToast(
-      msg: 'Abandoned task: ${_tasks[0].name}',
-      backgroundColor: Colors.black,
+      msg: '${task.name} has been saved for later',
+      backgroundColor: jetBlack,
       textColor: Colors.white,
     );
     if (Platform.isAndroid) {
       if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(FlutterDnd
-            .INTERRUPTION_FILTER_ALL); // Turn on DND - All notifications are suppressed.
+        await FlutterDnd.setInterruptionFilter(
+            FlutterDnd.INTERRUPTION_FILTER_ALL);
       }
     }
-  }
-
-  bool areTasksCompleted() {
-    for (var task in _tasks) {
-      if (!task.completed) {
-        return false;
+    DocumentReference dateDoc = db
+        .collection('users')
+        .document(user.uid)
+        .collection('tasks')
+        .document(_date);
+    dateDoc.get().then((snapshot) {
+      if (snapshot.data == null) {
+        dateDoc.setData({
+          'secondsFocused': 0,
+        });
       }
-    }
-    return true;
+      dateDoc.updateData({
+        'secondsFocused': FieldValue.increment(_seconds),
+      });
+    });
+    analyticsProvider.logSaveTask(_tasks[0], DateTime.now(), _swatchDisplay);
   }
 
   void completeTask(FirebaseUser user) {
-    final currentTime = DateTime.now();
     FirestoreProvider firestoreProvider = FirestoreProvider(user);
     TaskItem currentTask = _tasks[0];
     TaskItem finishedTask = TaskItem(
@@ -145,23 +200,53 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     dateDoc.get().then((snapshot) {
       if (snapshot.data == null) {
         dateDoc.setData({
-          'secondsSpent': 0,
+          'secondsFocused': 0,
         });
       }
       dateDoc.updateData({
-        'secondsSpent':
-            FieldValue.increment(currentTime.difference(_startTime).inSeconds),
+        'secondsFocused': FieldValue.increment(_seconds),
       });
+    });
+    analyticsProvider.logCompleteTask(
+        finishedTask, DateTime.now(), _swatchDisplay);
+    if (areTasksCompleted()) {
+      Future.delayed(cardSlideDuration, () {
+        _confettiController.play();
+      });
+    }
+  }
+
+  bool areTasksCompleted() {
+    for (var task in _tasks) {
+      if (!task.completed) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void getSettings() {
+    SharedPreferences.getInstance().then((SharedPreferences prefs) {
+      LocalNotificationHelper.dndOn = prefs.getBool('do not disturb on') == null
+          ? true
+          : prefs.getBool('do not disturb on');
+      LocalNotificationHelper.notificationsOn =
+          prefs.getBool('notifications on') == null
+              ? true
+              : prefs.getBool('notifications on');
+      print('Notifications ON: ${LocalNotificationHelper.notificationsOn}');
+      print('DND ON: ${LocalNotificationHelper.dndOn}');
     });
   }
 
   @override
   void initState() {
     super.initState();
+    getSettings();
     notificationHelper = LocalNotificationHelper();
     notificationHelper.initialize();
     WidgetsBinding.instance.addObserver(this);
-    initPlatformState();
+    // startListening();
     setState(() {
       _date = getDateString(DateTime.now());
       _user = Provider.of<User>(context, listen: false).user;
@@ -182,18 +267,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             'totalTasks': 0,
           }).then((_) {
             dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
-              setState(() {
-                _totalTasks = snapshot.data['totalTasks'];
-                _completedTasks = snapshot.data['completedTasks'];
-              });
+              if (mounted) {
+                setState(() {
+                  _totalTasks = snapshot.data['totalTasks'];
+                  _completedTasks = snapshot.data['completedTasks'];
+                });
+              }
             });
           });
         } else {
           dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
-            setState(() {
-              _totalTasks = snapshot.data['totalTasks'];
-              _completedTasks = snapshot.data['completedTasks'];
-            });
+            if (mounted) {
+              setState(() {
+                _totalTasks = snapshot.data['totalTasks'];
+                _completedTasks = snapshot.data['completedTasks'];
+              });
+            }
           });
         }
       });
@@ -202,9 +291,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    super.dispose();
     WidgetsBinding.instance.removeObserver(this);
-    _subscription.cancel();
+    // _subscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -213,28 +302,43 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.paused:
         if (_doingTask) {
+          setState(() {
+            _startDistracted = DateTime.now();
+            print('Start distracted: $_startDistracted');
+          });
           if (Platform.isAndroid) {
-            Future.delayed(const Duration(milliseconds: 500), () {
-              FlutterDnd.setInterruptionFilter(
-                  FlutterDnd.INTERRUPTION_FILTER_ALL);
-              notificationHelper.showNotifications();
-              Future.delayed(const Duration(milliseconds: 2500), () {
-                FlutterDnd.setInterruptionFilter(
-                    FlutterDnd.INTERRUPTION_FILTER_NONE);
-              });
-            });
-          } else {
-            printBoi().then((_) {
-              Future.delayed(const Duration(milliseconds: 500), () {
-                if (_iosScreen) {
+            if (LocalNotificationHelper.notificationsOn) {
+              if (LocalNotificationHelper.dndOn) {
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  FlutterDnd.setInterruptionFilter(
+                      FlutterDnd.INTERRUPTION_FILTER_ALL);
                   notificationHelper.showNotifications();
-                }
-              });
+                  Future.delayed(const Duration(milliseconds: 3000), () {
+                    FlutterDnd.setInterruptionFilter(
+                        FlutterDnd.INTERRUPTION_FILTER_NONE);
+                  });
+                });
+              } else {
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  notificationHelper.showNotifications();
+                });
+              }
+            }
+          } else {
+            printBoi().then((value) {
+              if (value) {
+                notificationHelper.showNotifications();
+              }
             });
           }
         }
         break;
       case AppLifecycleState.resumed:
+        Future.delayed(Duration(milliseconds: 2000), () {
+          _secondsDistracted +=
+              DateTime.now().difference(_startDistracted).inSeconds;
+          print(_secondsDistracted);
+        });
         break;
       case AppLifecycleState.inactive:
         break;
@@ -243,93 +347,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    startListening();
-  }
+  // void onData(ScreenStateEvent event) {
+  //   print(event);
+  //   if (event == ScreenStateEvent.SCREEN_OFF) {
+  //     LocalNotificationHelper.screenOff = true;
+  //   }
+  //   if (event == ScreenStateEvent.SCREEN_UNLOCKED) {
+  //     LocalNotificationHelper.screenOff = false;
+  //   }
+  // }
 
-  void onData(ScreenStateEvent event) {
-    print(event);
-    if (event == ScreenStateEvent.SCREEN_OFF) {
-      LocalNotificationHelper.screenOff = true;
-    }
-    if (event == ScreenStateEvent.SCREEN_UNLOCKED) {
-      LocalNotificationHelper.screenOff = false;
-    }
-  }
-
-  void startListening() {
-    _screen = new Screen();
-    try {
-      _subscription = _screen.screenStateStream.listen(onData);
-    } on ScreenStateException catch (exception) {
-      print(exception);
-    }
-  }
-
-  Future<void> showAbandonConfirmationAndroid() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Are you sure you want to abandon task?'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            FlatButton(
-              child: Text('Yes'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                abandonTask();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> showAbandonConfirmationIOS() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text('Are you sure you want to abandon task?'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            FlatButton(
-              child: Text('Yes'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                abandonTask();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // void startListening() {
+  //   _screen = new Screen();
+  //   try {
+  //     _subscription = _screen.screenStateStream.listen(onData);
+  //   } on ScreenStateException catch (exception) {
+  //     print(exception);
+  //   }
+  // }
 
 // android confirm for notification settings
   Future<void> showNotificationConfirmation() async {
@@ -372,194 +407,347 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> printBoi() async {
-    try {
-      platform.invokeMethod("printBoi").then((value) {
-        setState(() {
-          _iosScreen = value;
-        });
-      });
-    } catch(e) {
-      print(e);
-    }
+  Future<bool> printBoi() async {
+    var value = await platform.invokeMethod("printBoi");
+    return value;
   }
 
   @override
   Widget build(BuildContext context) {
+    final TextStyle topTextStyle = TextStyle(
+      fontSize: 40,
+      color: Colors.white,
+      fontWeight: FontWeight.w600,
+    );
+    final TextStyle swatchTextStyle = TextStyle(
+      fontSize: 80,
+      color: Colors.white,
+      fontWeight: FontWeight.w600,
+    );
+    final TextStyle taskTextStyle = TextStyle(
+      fontSize: 36,
+      fontWeight: FontWeight.w400,
+    );
+    final TextStyle secondaryButtonTextStyle = TextStyle(
+      fontSize: 22,
+      color: Theme.of(context).hintColor,
+      fontWeight: FontWeight.w500,
+    );
+    final TextStyle percentTextStyle = TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.w400,
+    );
+
     checkIfNotificationsOn();
-    if (_doingTask) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
-    } else {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-    }
+
     return WillPopScope(
       onWillPop: () async => false,
       child: WrapperWidget(
         loading: _loading,
-        transition: true,
         nav: !_doingTask,
-        backgroundColor: _doingTask ? Colors.black : Colors.white,
+        backgroundColor: _doingTask ? jetBlack : Theme.of(context).primaryColor,
+        cardPosition: _doingTask
+            ? MediaQuery.of(context).size.height / 2
+            : MediaQuery.of(context).size.height / 2 - 100,
         child: StreamBuilder<QuerySnapshot>(
-          stream: db
-              .collection('users')
-              .document(_user.uid)
-              .collection('tasks')
-              .document(_date)
-              .collection('tasks')
-              .orderBy('order')
-              .snapshots(),
-          builder: (context, snapshot) {
-            _loading = false;
-            if (!snapshot.hasData ||
-                snapshot.data.documents == null ||
-                snapshot.data.documents.isEmpty) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).size.height * 0.05),
-                    child: Container(
-                      width: 315,
-                      padding: const EdgeInsets.only(bottom: 70),
+            stream: db
+                .collection('users')
+                .document(_user.uid)
+                .collection('tasks')
+                .document(_date)
+                .collection('tasks')
+                .orderBy('order')
+                .snapshots(),
+            builder: (context, snapshot) {
+              _loading = false;
+              if (!snapshot.hasData ||
+                  snapshot.data.documents == null ||
+                  snapshot.data.documents.isEmpty) {
+                return Stack(
+                  children: <Widget>[
+                    Positioned(
+                      left: 50,
+                      right: 50,
+                      bottom: MediaQuery.of(context).size.height / 2 + 180,
                       child: Text(
-                        'Welcome!',
+                        'Good Morning!',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 60,
-                          fontWeight: FontWeight.w500,
-                          color: _doingTask ? Colors.white : Colors.black,
-                        ),
+                        style: topTextStyle,
                       ),
                     ),
-                  ),
-                  Container(
-                      width: 315,
-                      child: Text('Add a task and start your day!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w300,
-                          ))),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 90),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        RctButton(
+                    Positioned(
+                      left: 50,
+                      right: 50,
+                      top: MediaQuery.of(context).size.height / 2,
+                      child: Text(
+                        'Add a task and start your day!',
+                        textAlign: TextAlign.center,
+                        style: taskTextStyle,
+                      ),
+                    ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 120,
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: RctButton(
                           onTap: () {
-                            Navigator.pushNamed(context, '/tasks');
+                            Navigator.pushNamedAndRemoveUntil(context, '/tasks',
+                                ModalRoute.withName('/home'));
                           },
-                          buttonWidth: 315,
-                          buttonText: "Add task",
-                          buttonColor: Colors.black,
-                          textColor: Colors.white,
+                          buttonWidth: 220,
+                          colored: true,
+                          buttonText: 'Add',
                           textSize: 32,
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            } else {
-              _tasks = [];
-              final data = snapshot.data.documents;
-              for (var task in data) {
-                String name = task.data['name'];
-                TaskItem actionItem = TaskItem(
-                  name: name,
-                  id: task.documentID,
-                  completed: task.data['completed'],
-                  order: task.data['order'],
-                  key: UniqueKey(),
-                  onDismissed: () {
-                    _tasks.remove(_tasks
-                        .firstWhere((tasku) => tasku.id == task.documentID));
-                    _firestoreProvider.updateTaskOrder(_tasks, _date);
-                  },
-                  date: _date,
+                        ),
+                      ),
+                    )
+                  ],
                 );
-                _tasks.add(actionItem);
-              }
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).size.height * 0.05),
-                    child: Container(
-                      width: 315,
-                      padding: const EdgeInsets.only(bottom: 70),
-                      child: areTasksCompleted()
-                          ? Text(
-                              'Done',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 80,
-                                fontWeight: FontWeight.w500,
-                                color: _doingTask ? Colors.white : Colors.black,
-                              ),
-                            )
-                          : Text(
-                              _swatchDisplay,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 80,
-                                fontWeight: FontWeight.w500,
-                                color: _doingTask ? Colors.white : Colors.black,
-                              ),
-                            ),
-                    ),
-                  ),
-                  Container(
-                    width: 315,
-                    child: areTasksCompleted()
-                        ? Text('Congrats! You are done for the day',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.w300,
-                            ))
-                        : Text(
-                            _tasks[0].name,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.w300,
-                              color: _doingTask ? Colors.white : Colors.black,
+              } else {
+                _tasks = [];
+                final data = snapshot.data.documents;
+                for (var task in data) {
+                  String name = task.data['name'];
+                  TaskItem actionItem = TaskItem(
+                    name: name,
+                    id: task.documentID,
+                    completed: task.data['completed'],
+                    order: task.data['order'],
+                    key: UniqueKey(),
+                    onDismissed: () {
+                      _tasks.remove(_tasks
+                          .firstWhere((tasku) => tasku.id == task.documentID));
+                      _firestoreProvider.updateTaskOrder(_tasks, _date);
+                    },
+                    date: _date,
+                  );
+                  _tasks.add(actionItem);
+                }
+                if (areTasksCompleted()) {
+                  return Stack(
+                    children: <Widget>[
+                      AnimatedPositioned(
+                        duration: cardSlideDuration,
+                        curve: cardSlideCurve,
+                        left: 50,
+                        right: 50,
+                        bottom: !_doingTask
+                            ? MediaQuery.of(context).size.height / 2 + 180
+                            : MediaQuery.of(context).size.height / 2 + 150,
+                        child: Text(
+                          'Congrats! 🎉',
+                          textAlign: TextAlign.center,
+                          style: topTextStyle,
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: Platform.isIOS ? MediaQuery.of(context).size.height / 2 - 66 : MediaQuery.of(context).size.height / 2 - 33,
+                        child: AnimatedOpacity(
+                          duration: cardSlideDuration,
+                          curve: cardSlideCurve,
+                          opacity: !_doingTask ? 0 : 1,
+                          child: Center(
+                            child: SqrButton(
+                              onTap: pauseTask,
+                              icon: _paused
+                                  ? Icon(
+                                      Icons.play_arrow,
+                                      color: Colors.white,
+                                      size: 32,
+                                    )
+                                  : Icon(
+                                      Icons.pause,
+                                      color: Colors.white,
+                                      size: 32,
+                                    ),
                             ),
                           ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 90),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        _doingTask
-                            ? RctButton(
-                                onTap: () async {
-                                  setState(() {
-                                    _doingTask = false;
-                                  });
-                                  stopTask();
-                                  completeTask(_user);
-                                },
-                                buttonWidth: 240,
-                                buttonText: "Complete",
-                                buttonColor: Colors.white,
-                                textColor: Colors.black,
-                                textSize: 32,
-                              )
-                            : areTasksCompleted()
+                        ),
+                      ),
+                      AnimatedPositioned(
+                        duration: cardSlideDuration,
+                        curve: cardSlideCurve,
+                        left: 50,
+                        right: 50,
+                        top: !_doingTask
+                            ? MediaQuery.of(context).size.height / 2 - 80
+                            : MediaQuery.of(context).size.height / 2 + 20,
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: 117,
+                          child: Text(
+                            'You\'re done!',
+                            textAlign: TextAlign.center,
+                            style: taskTextStyle,
+                          ),
+                        ),
+                      ),
+                      AnimatedPositioned(
+                        duration: cardSlideDuration,
+                        curve: cardSlideCurve,
+                        left: 0,
+                        right: 0,
+                        bottom: !_doingTask ? 190 : 90,
+                        child: Center(
+                          child: RctButton(
+                            onTap: () {
+                              Navigator.pushNamedAndRemoveUntil(context,
+                                  '/statistics', ModalRoute.withName('/home'));
+                            },
+                            buttonWidth: 220,
+                            colored: true,
+                            buttonText: 'Statistics',
+                            textSize: 32,
+                          ),
+                        ),
+                      ),
+                      AnimatedPositioned(
+                        duration: cardSlideDuration,
+                        curve: cardSlideCurve,
+                        left: 0,
+                        right: 0,
+                        bottom: !_doingTask ? 130 : 30,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: () {
+                            HapticFeedback.heavyImpact();
+                            Navigator.pushNamedAndRemoveUntil(context, '/tasks',
+                                ModalRoute.withName('/home'));
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Text(
+                              'Add another task',
+                              textAlign: TextAlign.center,
+                              style: secondaryButtonTextStyle,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                          right: 30,
+                          bottom: 90,
+                          child: Text(
+                            ((_totalTasks == null || _totalTasks == 0)
+                                        ? 0
+                                        : (_completedTasks / _totalTasks) * 100)
+                                    .toInt()
+                                    .toString() +
+                                "%",
+                            style: percentTextStyle,
+                          )),
+                      Positioned(
+                        left: 30,
+                        right: 30,
+                        bottom: 60,
+                        child: LinearPercentIndicator(
+                          percent: (_totalTasks == null || _totalTasks == 0)
+                              ? 0
+                              : (_completedTasks / _totalTasks),
+                          lineHeight: 20,
+                          progressColor: Theme.of(context).accentColor,
+                          backgroundColor: Theme.of(context).dividerColor,
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: ConfettiWidget(
+                          confettiController: _confettiController,
+                          emissionFrequency: 0.01,
+                          blastDirectionality: BlastDirectionality.explosive,
+                          numberOfParticles: 200,
+                          particleDrag: 0.03,
+                          shouldLoop: false,
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Stack(
+                    children: <Widget>[
+                      Positioned(
+                          left: 50,
+                          right: 50,
+                          bottom: MediaQuery.of(context).size.height / 2 + 150,
+                          child: _doingTask
+                              ? Text(
+                                  _swatchDisplay,
+                                  textAlign: TextAlign.center,
+                                  style: swatchTextStyle,
+                                )
+                              : Text(
+                                  'Keep up the good work! 🙌',
+                                  textAlign: TextAlign.center,
+                                  style: topTextStyle,
+                                )),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: Platform.isIOS ? MediaQuery.of(context).size.height / 2 - 66 : MediaQuery.of(context).size.height / 2 - 33,
+                        child: AnimatedOpacity(
+                          duration: cardSlideDuration,
+                          curve: cardSlideCurve,
+                          opacity: _doingTask ? 1 : 0,
+                          child: Center(
+                            child: SqrButton(
+                              onTap: pauseTask,
+                              icon: _paused
+                                  ? Icon(
+                                      Icons.play_arrow,
+                                      color: Colors.white,
+                                      size: 32,
+                                    )
+                                  : Icon(
+                                      Icons.pause,
+                                      color: Colors.white,
+                                      size: 32,
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      AnimatedPositioned(
+                        duration: cardSlideDuration,
+                        curve: cardSlideCurve,
+                        left: 30,
+                        right: 30,
+                        top: _doingTask
+                            ? MediaQuery.of(context).size.height / 2 + 20
+                            : MediaQuery.of(context).size.height / 2 - 80,
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: 117,
+                          child: AutoSizeText(
+                            _tasks[0].name,
+                            textAlign: TextAlign.center,
+                            style: taskTextStyle,
+                            maxLines: 3,
+                          ),
+                        ),
+                      ),
+                      AnimatedPositioned(
+                        duration: cardSlideDuration,
+                        curve: cardSlideCurve,
+                        left: 0,
+                        right: 0,
+                        bottom: _doingTask ? 90 : 190,
+                        child: Center(
+                            child: _doingTask
                                 ? RctButton(
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                          context, '/statistics');
+                                    onTap: () async {
+                                      setState(() {
+                                        _doingTask = false;
+                                      });
+                                      stopTask();
+                                      completeTask(_user);
                                     },
-                                    buttonWidth: 240,
-                                    buttonText: "Statistics",
-                                    buttonColor: Colors.black,
-                                    textColor: Colors.white,
+                                    buttonWidth: 220,
+                                    colored: true,
+                                    buttonText: 'Done',
                                     textSize: 32,
                                   )
                                 : RctButton(
@@ -569,84 +757,69 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                       });
                                       startTask();
                                     },
-                                    buttonWidth: 240,
-                                    buttonText: "Start",
-                                    buttonColor: Colors.black,
-                                    textColor: Colors.white,
+                                    buttonWidth: 220,
+                                    colored: true,
+                                    buttonText: 'Start',
                                     textSize: 32,
-                                  ),
-                        Padding(
-                            padding: const EdgeInsets.only(left: 15),
-                            child: !areTasksCompleted()
-                                ? SqrButton(
-                                    onTap: () {
-                                      if (Platform.isAndroid) {
-                                        showAbandonConfirmationAndroid();
-                                      } else {
-                                        showAbandonConfirmationIOS();
-                                      }
-                                    },
-                                    buttonColor: Theme.of(context).primaryColor,
-                                    icon: FaIcon(
-                                      FontAwesomeIcons.running,
-                                      size: 32,
-                                      color: Colors.white,
-                                    ))
-                                : SqrButton(
-                                    onTap: () {
-                                      Navigator.pushNamed(context, '/tasks');
-                                    },
-                                    buttonColor: Theme.of(context).primaryColor,
-                                    icon: FaIcon(
-                                      FontAwesomeIcons.plus,
-                                      size: 32,
-                                      color: Colors.white,
-                                    ))),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 30),
-                    child: SizedBox(
-                      width: 315,
-                      height: 5,
-                      child: Visibility(
-                        visible: !_doingTask,
-                        child: LinearProgressIndicator(
-                          value: (_totalTasks == null || _totalTasks == 0)
-                              ? 0
-                              : (_completedTasks / _totalTasks),
-                          backgroundColor: Colors.black,
+                                  )),
+                      ),
+                      AnimatedPositioned(
+                        duration: cardSlideDuration,
+                        curve: cardSlideCurve,
+                        left: 0,
+                        right: 0,
+                        bottom: _doingTask ? 30 : 130,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: () {
+                            HapticFeedback.heavyImpact();
+                            saveTask(_user);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Text('Save for later',
+                                textAlign: TextAlign.center,
+                                style: secondaryButtonTextStyle),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 5),
-                    child: Container(
-                      alignment: Alignment.centerRight,
-                      width: 315,
-                      height: 24,
-                      child: Visibility(
-                        visible: !_doingTask,
-                        child: Text(
-                            ((_totalTasks == null || _totalTasks == 0)
-                                        ? 0
-                                        : (_completedTasks / _totalTasks) * 100)
-                                    .toInt()
-                                    .toString() +
-                                "%",
-                            style: TextStyle(
-                              fontSize: 24,
-                            )),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            }
-          },
-        ),
+                      Positioned(
+                          right: 30,
+                          bottom: 90,
+                          child: Visibility(
+                            visible: !_doingTask,
+                            child: Text(
+                              ((_totalTasks == null || _totalTasks == 0)
+                                          ? 0
+                                          : (_completedTasks / _totalTasks) *
+                                              100)
+                                      .toInt()
+                                      .toString() +
+                                  "%",
+                              style: percentTextStyle,
+                            ),
+                          )),
+                      Positioned(
+                        left: 30,
+                        right: 30,
+                        bottom: 60,
+                        child: Visibility(
+                          visible: !_doingTask,
+                          child: LinearPercentIndicator(
+                            percent: (_totalTasks == null || _totalTasks == 0)
+                                ? 0
+                                : (_completedTasks / _totalTasks),
+                            lineHeight: 20,
+                            progressColor: Theme.of(context).accentColor,
+                            backgroundColor: Theme.of(context).dividerColor,
+                          ),
+                        ),
+                      )
+                    ],
+                  );
+                }
+              }
+            }),
       ),
     );
   }

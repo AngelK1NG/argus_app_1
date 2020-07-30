@@ -40,7 +40,6 @@ class _OnboardingState extends State<Onboarding> {
       onWillPop: () async => false,
       child: WrapperWidget(
         loading: false,
-        transition: false,
         nav: false,
         child: Stack(
           children: <Widget>[

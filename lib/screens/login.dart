@@ -84,32 +84,34 @@ class _LoginPageState extends State<LoginPage> {
             inAsyncCall: _loginLoading,
             child: WrapperWidget(
               loading: false,
-              transition: false,
               nav: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
                   Padding(
-                    padding: const EdgeInsets.only(top: 100),
-                    child: RctButton(
-                      onTap: () async {
-                        setState(() {
-                          _loginLoading = true;
-                        });
-                        AuthProvider().googleSignIn();
-                        LocalNotificationHelper.userLoggedIn = true;
-                      },
-                      buttonWidth: 315,
-                      buttonColor: Colors.black,
-                      textColor: Colors.white,
-                      buttonText: "Sign in with Google",
-                      textSize: 24,
-                      icon: FaIcon(
-                        FontAwesomeIcons.google,
-                        color: Colors.white,
-                        size: 30,
-                      ),
+                    padding: const EdgeInsets.only(top: 180),
+                    child: Column(
+                      children: <Widget>[
+                        RctButton(
+                          onTap: () async {
+                            setState(() {
+                              _loginLoading = true;
+                            });
+                            AuthProvider().googleSignIn();
+                            LocalNotificationHelper.userLoggedIn = true;
+                          },
+                          buttonWidth: 315,
+                          colored: true,
+                          buttonText: "Sign in with Google",
+                          textSize: 24,
+                          icon: FaIcon(
+                            FontAwesomeIcons.google,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -125,7 +127,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Container(
               alignment: Alignment.center,
               color: Colors.white,
-              child: Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
+              child:
+                  Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
             ),
           ),
         ),

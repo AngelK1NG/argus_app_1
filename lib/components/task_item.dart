@@ -2,16 +2,21 @@ import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:provider/provider.dart';
+import 'package:Focal/constants.dart';
 import 'dart:io' show Platform;
 
 // ignore: must_be_immutable
 class TaskItem extends StatefulWidget {
-  final String name;
+  String name;
   String id;
   final bool completed;
   final int order;
   VoidCallback onDismissed;
+  Function onUpdate;
   final String date;
+  int focused;
+  int paused;
+  int distracted;
 
   TaskItem(
       {@required this.name,
@@ -19,7 +24,11 @@ class TaskItem extends StatefulWidget {
       @required this.completed,
       this.order,
       this.onDismissed,
+      this.onUpdate,
       @required this.date,
+      this.focused,
+      this.paused,
+      this.distracted,
       Key key})
       : super(key: key);
 
@@ -30,6 +39,7 @@ class TaskItem extends StatefulWidget {
 class _TaskItemState extends State<TaskItem> {
   bool _active = false;
   FocusNode _focus = new FocusNode();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -68,49 +78,68 @@ class _TaskItemState extends State<TaskItem> {
                         padding: const EdgeInsets.only(left: 33, right: 15),
                         child: widget.completed
                             ? Image(
-                                image:
-                                    AssetImage('images/icons/Task Icon_Filled.png'),
+                                image: AssetImage(
+                                    'images/icons/Task Icon_Filled.png'),
                                 width: 10,
                                 height: 10,
                               )
                             : Image(
-                                image:
-                                    AssetImage('images/icons/Task Icon_Unfilled.png'),
+                                image: AssetImage(
+                                    'images/icons/Task Icon_Unfilled.png'),
                                 width: 10,
                                 height: 10,
                               )),
                     SizedBox(
-                        height: 50,
-                        width: MediaQuery.of(context).size.width - 58,
+                        height: 55,
+                        width: MediaQuery.of(context).size.width - 116,
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: _active
                               ? Focus(
                                   onFocusChange: (focus) {
-                                    if (!focus) {
+                                    if (!focus &&
+                                        _formKey.currentState.validate()) {
                                       setState(() {
                                         _active = false;
                                       });
                                     }
-                                  },
-                                  child: TextFormField(
-                                    focusNode: _focus,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    initialValue: widget.name,
-                                    autofocus: false,
-                                    onFieldSubmitted: (value) {
-                                      firestoreProvider.updateTaskName(
-                                          value, widget.date, widget.id);
-                                      setState(() {
-                                        _active = false;
+                                    if (!_formKey.currentState.validate()) {
+                                      Future.delayed(Duration(milliseconds: 1),
+                                          () {
+                                        _focus.requestFocus();
                                       });
-                                    },
+                                    }
+                                  },
+                                  child: Form(
+                                    key: _formKey,
+                                    child: TextFormField(
+                                      focusNode: _focus,
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      initialValue: widget.name,
+                                      autofocus: false,
+                                      onChanged: (value) {
+                                        Future.delayed(
+                                            Duration(milliseconds: 1), () {
+                                          if (_formKey.currentState
+                                              .validate()) {
+                                            widget.onUpdate(value);
+                                            firestoreProvider.updateTaskName(
+                                                value, widget.date, widget.id);
+                                          }
+                                        });
+                                      },
+                                      validator: (value) {
+                                        return value.isEmpty
+                                            ? 'You cannot add an empty task'
+                                            : null;
+                                      },
+                                    ),
                                   ),
                                 )
                               : Text(
@@ -120,7 +149,7 @@ class _TaskItemState extends State<TaskItem> {
                                     fontWeight: FontWeight.w400,
                                     color: widget.completed
                                         ? Theme.of(context).hintColor
-                                        : Colors.black,
+                                        : jetBlack,
                                   ),
                                 ),
                         )),
@@ -129,12 +158,6 @@ class _TaskItemState extends State<TaskItem> {
                 height: 50,
                 width: MediaQuery.of(context).size.width,
                 alignment: Alignment.centerLeft,
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                  width: 1,
-                  color: Theme.of(context).dividerColor,
-                ))),
               ),
             )));
   }

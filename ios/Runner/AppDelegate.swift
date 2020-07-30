@@ -10,9 +10,6 @@ import Flutter
     ) -> Bool {
         
         var screenStat = true
-        if UIScreen.main.brightness == 0.0 {
-                             screenStat = false
-                  }
         
         let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
         let CHANNEL = FlutterMethodChannel(name: "com.flutter.lockscreen", binaryMessenger: controller as! FlutterBinaryMessenger)
@@ -25,9 +22,16 @@ import Flutter
             {
                 if UIScreen.main.brightness == 0.0 {
                            screenStat = false
+                    
                 }
                 else {
                     screenStat = true
+                    if #available(iOS 10.0, *) {
+                                       UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+                                   } else {
+                                       // Fallback on earlier versions
+                                   }
+                    
                 }
                 result(screenStat)
             }

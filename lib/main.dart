@@ -10,6 +10,7 @@ import 'screens/statistics.dart';
 import 'screens/settings.dart';
 import 'screens/login.dart';
 import 'screens/onboarding.dart';
+import 'constants.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle.dark
+      SystemUiOverlayStyle.light
     );
     return ChangeNotifierProvider<User>(
       create: (_) => User(),
@@ -40,10 +41,12 @@ class MyApp extends StatelessWidget {
             ),
             primarySwatch: focalPurple,
             primaryColor: const Color(0xff3c25d7),
-            accentColor: const Color(0xff3c25d7),
+            accentColor: const Color(0xff7c4efd),
             hintColor: const Color(0xffb0b0b0),
-            dividerColor: const Color(0xffe2e2e2),
+            dividerColor: const Color(0xffe5e5e5),
             splashColor: Colors.transparent,
+            fontFamily: 'Roboto',
+            textTheme: Theme.of(context).textTheme.apply(bodyColor: jetBlack, displayColor: jetBlack),
           ),
           navigatorObservers: [
             FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),

@@ -13,7 +13,7 @@ class FirestoreProvider {
     bool docExists = false;
     await db.collection('users').document(user.uid).get().then((doc) {
       if (!doc.exists) {
-        
+        docExists = false;
       } else {
         docExists = true;
       }
@@ -100,7 +100,6 @@ class FirestoreProvider {
         .document(date)
         .collection('tasks')
         .document(taskId);
-
     taskDocumentReference.delete();
     DocumentReference dateDoc = db
         .collection('users')
@@ -108,14 +107,12 @@ class FirestoreProvider {
         .collection('tasks')
         .document(date);
     if (isCompleted) {
-      dateDoc
-        .updateData({
+      dateDoc.updateData({
         'completedTasks': FieldValue.increment(-1),
         'totalTasks': FieldValue.increment(-1),
       });
     } else {
-      dateDoc
-        .updateData({
+      dateDoc.updateData({
         'totalTasks': FieldValue.increment(-1),
       });
     }

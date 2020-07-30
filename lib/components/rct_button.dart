@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
+import 'package:Focal/constants.dart';
 
 class RctButton extends StatelessWidget {
   final VoidCallback onTap;
   final double buttonWidth;
-  final Color buttonColor;
+  final bool colored;
   final String buttonText;
-  final Color textColor;
   final double textSize;
   final FaIcon icon;
 
   const RctButton({
     this.onTap,
     @required this.buttonWidth,
-    @required this.buttonColor,
+    @required this.colored,
     @required this.buttonText,
-    @required this.textColor,
     @required this.textSize,
     this.icon,
   });
@@ -28,15 +27,24 @@ class RctButton extends StatelessWidget {
         HapticFeedback.heavyImpact();
         onTap();
       },
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
       padding: const EdgeInsets.all(0.0),
       child: Container(
         width: buttonWidth,
-        height: 60,
+        height: 80,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: this.buttonColor,
-          borderRadius: BorderRadius.all(Radius.circular(12)),
+          gradient: colored 
+            ? LinearGradient(
+              colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            )
+            : LinearGradient(
+              colors: [jetBlack],
+            )
+          ,
+          borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
         child: Padding(
           padding: const EdgeInsets.only(
@@ -60,7 +68,7 @@ class RctButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: textSize,
                   fontWeight: FontWeight.w500,
-                  color: this.textColor,
+                  color: Colors.white,
                 ),
               ),
             ],

@@ -217,23 +217,14 @@ PODS:
     - AppAuth/ExternalUserAgent (= 1.4.0)
   - AppAuth/Core (1.4.0)
   - AppAuth/ExternalUserAgent (1.4.0)
-<<<<<<< Updated upstream
   - BoringSSL-GRPC (0.0.3):
     - BoringSSL-GRPC/Implementation (= 0.0.3)
     - BoringSSL-GRPC/Interface (= 0.0.3)
   - BoringSSL-GRPC/Implementation (0.0.3):
     - BoringSSL-GRPC/Interface (= 0.0.3)
   - BoringSSL-GRPC/Interface (0.0.3)
-=======
   - apple_sign_in (0.0.1):
     - Flutter
-  - BoringSSL-GRPC (0.0.7):
-    - BoringSSL-GRPC/Implementation (= 0.0.7)
-    - BoringSSL-GRPC/Interface (= 0.0.7)
-  - BoringSSL-GRPC/Implementation (0.0.7):
-    - BoringSSL-GRPC/Interface (= 0.0.7)
-  - BoringSSL-GRPC/Interface (0.0.7)
->>>>>>> Stashed changes
   - cloud_firestore (0.0.1):
     - Firebase/Core
     - Firebase/Firestore (~> 6.0)
@@ -377,14 +368,6 @@ PODS:
     - BoringSSL-GRPC (= 0.0.7)
     - gRPC-Core/Interface (= 1.28.2)
   - gRPC-Core/Interface (1.28.2)
-  - GTMAppAuth (1.0.0):
-    - AppAuth/Core (~> 1.0)
-    - GTMSessionFetcher (~> 1.1)
-  - GTMSessionFetcher (1.4.0):
-    - GTMSessionFetcher/Full (= 1.4.0)
-  - GTMSessionFetcher/Core (1.4.0)
-  - GTMSessionFetcher/Full (1.4.0):
-    - GTMSessionFetcher/Core (= 1.4.0)
   - leveldb-library (1.22)
   - nanopb (1.30905.0):
     - nanopb/decode (= 1.30905.0)
@@ -416,6 +399,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - apple_sign_in (from `.symlinks/plugins/apple_sign_in/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - cloud_firestore_web (from `.symlinks/plugins/cloud_firestore_web/ios`)
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
@@ -424,6 +408,7 @@ DEPENDENCIES:
   - firebase_auth_web (from `.symlinks/plugins/firebase_auth_web/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_core_web (from `.symlinks/plugins/firebase_core_web/ios`)
+  - FirebaseFirestore (from `https://github.com/invertase/firestore-ios-sdk-frameworks.git`, tag `6.26.0`)
   - Flutter (from `Flutter`)
   - flutter_dnd (from `.symlinks/plugins/flutter_dnd/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
@@ -444,29 +429,27 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - abseil
     - AppAuth
-    - BoringSSL-GRPC
     - Firebase
     - FirebaseAnalytics
     - FirebaseAuth
     - FirebaseCore
     - FirebaseCoreDiagnostics
     - FirebaseFirestore
+    - FirebaseCoreDiagnosticsInterop
     - FirebaseInstallations
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleSignIn
     - GoogleUtilities
-    - "gRPC-C++"
-    - gRPC-Core
     - GTMAppAuth
     - GTMSessionFetcher
-    - leveldb-library
     - nanopb
     - PromisesObjC
 
 EXTERNAL SOURCES:
+  apple_sign_in:
+    :path: ".symlinks/plugins/apple_sign_in/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   cloud_firestore_web:
@@ -483,6 +466,9 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_core/ios"
   firebase_core_web:
     :path: ".symlinks/plugins/firebase_core_web/ios"
+  FirebaseFirestore:
+    :git: https://github.com/invertase/firestore-ios-sdk-frameworks.git
+    :tag: 6.26.0
   Flutter:
     :path: Flutter
   flutter_dnd:
@@ -518,18 +504,25 @@ EXTERNAL SOURCES:
   url_launcher_web:
     :path: ".symlinks/plugins/url_launcher_web/ios"
 
+CHECKOUT OPTIONS:
+  FirebaseFirestore:
+    :git: https://github.com/invertase/firestore-ios-sdk-frameworks.git
+    :tag: 6.26.0
+
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
   AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
-<<<<<<< Updated upstream
   BoringSSL-GRPC: db8764df3204ccea016e1c8dd15d9a9ad63ff318
-=======
   apple_sign_in: 7716c7ddfa195aeab7dec0dc374ef4ff45d1adb4
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
->>>>>>> Stashed changes
   cloud_firestore: 2a4f8f802fb0b701cf809b283b6bec7477ebaa6f
   cloud_firestore_web: 9ec3dc7f5f98de5129339802d491c1204462bfec
   Firebase: 57957c8d6eb3d8b80a560b1dc58be24724b89ff2
+  AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
+  apple_sign_in: 7716c7ddfa195aeab7dec0dc374ef4ff45d1adb4
+  cloud_firestore: 2a4f8f802fb0b701cf809b283b6bec7477ebaa6f
+  cloud_firestore_web: 9ec3dc7f5f98de5129339802d491c1204462bfec
+  Firebase: 7cf5f9c67f03cb3b606d1d6535286e1080e57eb6
   firebase_analytics: 9118044ffb98bee71d84733fc594f5134fe4bc1b
   firebase_analytics_web: 7d539061ea4af07563a0e21044af89cab70efec0
   firebase_auth: af8784c4d8d87c36f730a305f97bfbcb24db024b
@@ -573,4 +566,5 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 43ea96a4063af32e6e449d650382dc15805fde41
 
-COCOAPODS: 1.8.4
+
+COCOAPODS: 1.10.0.beta.1
