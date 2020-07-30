@@ -34,7 +34,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static const platform = const MethodChannel("com.flutter.lockscreen");
 
   Timer timer;
-  DateTime _startTime;
+  DateTime _startFocused;
+  DateTime _startPaused;
+  DateTime _startDistracted;
   String _swatchDisplay = "00:00";
   int _completedTasks;
   int _totalTasks;
@@ -49,16 +51,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _loading = true;
   bool _paused = false;
   int _seconds = 0;
+  int _secondsPaused = 0;
+  int _secondsDistracted = 0;
   AnalyticsProvider analyticsProvider = AnalyticsProvider();
   ConfettiController _confettiController =
       ConfettiController(duration: Duration(seconds: 1));
   void startTask() async {
+    _secondsPaused = 0;
+    _secondsDistracted = 0;
     timer = new Timer.periodic(
         const Duration(seconds: 1),
         (Timer timer) => setState(() {
               if (_doingTask && !_paused) {
                 final currentTime = DateTime.now();
-                _seconds = (currentTime.difference(_startTime).inSeconds);
+                _seconds = (currentTime.difference(_startFocused).inSeconds);
                 _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
                     ":" +
                     (_seconds % 60).toString().padLeft(2, "0");
@@ -68,7 +74,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             }));
     setState(() {
       _doingTask = true;
-      _startTime = DateTime.now();
+      _startFocused = DateTime.now();
       _paused = false;
     });
     if (Platform.isAndroid) {
@@ -101,12 +107,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void pauseTask() {
     if (_paused) {
       int pausedDifference = _seconds;
+      _secondsPaused += DateTime.now().difference(_startPaused).inSeconds;
       timer = new Timer.periodic(
           const Duration(seconds: 1),
           (Timer timer) => setState(() {
                 if (_doingTask && !_paused) {
                   final currentTime = DateTime.now();
-                  _seconds = currentTime.difference(_startTime).inSeconds +
+                  _seconds = currentTime.difference(_startFocused).inSeconds +
                       pausedDifference;
                   _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
                       ":" +
@@ -117,19 +124,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               }));
       setState(() {
         _doingTask = true;
-        _startTime = DateTime.now();
+        _startFocused = DateTime.now();
         _paused = !_paused;
       });
       LocalNotificationHelper.paused = false;
     } else {
       setState(() {
+        _startPaused = DateTime.now();
         _paused = !_paused;
         LocalNotificationHelper.paused = true;
       });
     }
+    print(_secondsPaused);
   }
 
-  void saveTask() async {
+  void saveTask(FirebaseUser user) async {
     setState(() {
       _doingTask = false;
       _swatchDisplay = "00:00";
@@ -148,6 +157,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             FlutterDnd.INTERRUPTION_FILTER_ALL);
       }
     }
+    DocumentReference dateDoc = db
+        .collection('users')
+        .document(user.uid)
+        .collection('tasks')
+        .document(_date);
+    dateDoc.get().then((snapshot) {
+      if (snapshot.data == null) {
+        dateDoc.setData({
+          'secondsFocused': 0,
+        });
+      }
+      dateDoc.updateData({
+        'secondsFocused': FieldValue.increment(_seconds),
+      });
+    });
     analyticsProvider.logSaveTask(_tasks[0], DateTime.now(), _swatchDisplay);
   }
 
@@ -176,11 +200,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     dateDoc.get().then((snapshot) {
       if (snapshot.data == null) {
         dateDoc.setData({
-          'secondsSpent': 0,
+          'secondsFocused': 0,
         });
       }
       dateDoc.updateData({
-        'secondsSpent': FieldValue.increment(_seconds),
+        'secondsFocused': FieldValue.increment(_seconds),
       });
     });
     analyticsProvider.logCompleteTask(
@@ -278,6 +302,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.paused:
         if (_doingTask) {
+          setState(() {
+            _startDistracted = DateTime.now();
+            print('Start distracted: $_startDistracted');
+          });
           if (Platform.isAndroid) {
             if (LocalNotificationHelper.notificationsOn) {
               if (LocalNotificationHelper.dndOn) {
@@ -291,14 +319,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   });
                 });
               } else {
-                print('dnd is off');
                 Future.delayed(const Duration(milliseconds: 500), () {
                   notificationHelper.showNotifications();
                 });
               }
             }
           } else {
-            print('printboi triggered');
             printBoi().then((value) {
               if (value) {
                 notificationHelper.showNotifications();
@@ -308,6 +334,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
         break;
       case AppLifecycleState.resumed:
+        Future.delayed(Duration(milliseconds: 2000), () {
+          _secondsDistracted +=
+              DateTime.now().difference(_startDistracted).inSeconds;
+          print(_secondsDistracted);
+        });
         break;
       case AppLifecycleState.inactive:
         break;
@@ -514,7 +545,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       Positioned(
                         left: 0,
                         right: 0,
-                        bottom: MediaQuery.of(context).size.height / 2 - 33,
+                        bottom: Platform.isIOS ? MediaQuery.of(context).size.height / 2 - 66 : MediaQuery.of(context).size.height / 2 - 33,
                         child: AnimatedOpacity(
                           duration: cardSlideDuration,
                           curve: cardSlideCurve,
@@ -656,7 +687,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       Positioned(
                         left: 0,
                         right: 0,
-                        bottom: MediaQuery.of(context).size.height / 2 - 33,
+                        bottom: Platform.isIOS ? MediaQuery.of(context).size.height / 2 - 66 : MediaQuery.of(context).size.height / 2 - 33,
                         child: AnimatedOpacity(
                           duration: cardSlideDuration,
                           curve: cardSlideCurve,
@@ -742,7 +773,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           behavior: HitTestBehavior.translucent,
                           onTap: () {
                             HapticFeedback.heavyImpact();
-                            saveTask();
+                            saveTask(_user);
                           },
                           child: Padding(
                             padding: EdgeInsets.all(10),

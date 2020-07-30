@@ -14,6 +14,9 @@ class TaskItem extends StatefulWidget {
   VoidCallback onDismissed;
   Function onUpdate;
   final String date;
+  int focused;
+  int paused;
+  int distracted;
 
   TaskItem(
       {@required this.name,
@@ -23,6 +26,9 @@ class TaskItem extends StatefulWidget {
       this.onDismissed,
       this.onUpdate,
       @required this.date,
+      this.focused,
+      this.paused,
+      this.distracted,
       Key key})
       : super(key: key);
 
@@ -72,14 +78,14 @@ class _TaskItemState extends State<TaskItem> {
                         padding: const EdgeInsets.only(left: 33, right: 15),
                         child: widget.completed
                             ? Image(
-                                image:
-                                    AssetImage('images/icons/Task Icon_Filled.png'),
+                                image: AssetImage(
+                                    'images/icons/Task Icon_Filled.png'),
                                 width: 10,
                                 height: 10,
                               )
                             : Image(
-                                image:
-                                    AssetImage('images/icons/Task Icon_Unfilled.png'),
+                                image: AssetImage(
+                                    'images/icons/Task Icon_Unfilled.png'),
                                 width: 10,
                                 height: 10,
                               )),
@@ -91,13 +97,15 @@ class _TaskItemState extends State<TaskItem> {
                           child: _active
                               ? Focus(
                                   onFocusChange: (focus) {
-                                    if (!focus && _formKey.currentState.validate()) {
+                                    if (!focus &&
+                                        _formKey.currentState.validate()) {
                                       setState(() {
                                         _active = false;
                                       });
                                     }
                                     if (!_formKey.currentState.validate()) {
-                                      Future.delayed(Duration(milliseconds: 1), () {
+                                      Future.delayed(Duration(milliseconds: 1),
+                                          () {
                                         _focus.requestFocus();
                                       });
                                     }
@@ -116,11 +124,13 @@ class _TaskItemState extends State<TaskItem> {
                                       initialValue: widget.name,
                                       autofocus: false,
                                       onChanged: (value) {
-                                        Future.delayed(Duration(milliseconds: 1), () {
-                                          if (_formKey.currentState.validate()) {
+                                        Future.delayed(
+                                            Duration(milliseconds: 1), () {
+                                          if (_formKey.currentState
+                                              .validate()) {
                                             widget.onUpdate(value);
                                             firestoreProvider.updateTaskName(
-                                              value, widget.date, widget.id);
+                                                value, widget.date, widget.id);
                                           }
                                         });
                                       },
