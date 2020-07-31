@@ -60,7 +60,7 @@ class _SettingsPageState extends State<SettingsPage> {
       nav: true,
       cardPosition: MediaQuery.of(context).size.height / 2 - 240,
       backgroundColor: Theme.of(context).primaryColor,
-      child: Stack(children: <Widget>[
+      staticChild: Stack(children: <Widget>[
         Positioned(
           right: 0,
           top: 0,
@@ -75,6 +75,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
         ),
+      ]),
+      dynamicChild: Stack(children: <Widget>[
         Positioned(
           right: 30,
           left: 30,
@@ -145,41 +147,43 @@ class _SettingsPageState extends State<SettingsPage> {
               )),
         ),
         Positioned(
-            right: 0,
-            left: 0,
-            bottom: 0,
-            child: Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 30,
-                  right: 38,
-                  left: 38,
+          right: 0,
+          left: 0,
+          bottom: 0,
+          child: Padding(
+            padding: const EdgeInsets.only(
+              bottom: 30,
+              right: 38,
+              left: 38,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    LocalNotificationHelper.userLoggedIn = false;
+                    auth.signOut();
+                  },
+                  child: Text("Sign out",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.w400,
+                      )),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    FlatButton(
-                      onPressed: () {
-                        LocalNotificationHelper.userLoggedIn = false;
-                        auth.signOut();
-                      },
-                      child: Text("Sign out",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.w400,
-                          )),
-                    ),
-                    FlatButton(
-                      onPressed: () {},
-                      child: Text("Terms of Service",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Theme.of(context).hintColor,
-                            fontWeight: FontWeight.w400,
-                          )),
-                    ),
-                  ],
-                )))
+                FlatButton(
+                  onPressed: () {},
+                  child: Text("Terms of Service",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Theme.of(context).hintColor,
+                        fontWeight: FontWeight.w400,
+                      )),
+                ),
+              ],
+            ),
+          ),
+        ),
       ]),
     );
   }

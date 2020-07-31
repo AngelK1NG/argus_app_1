@@ -39,9 +39,8 @@ class _OnboardingState extends State<Onboarding> {
     return WillPopScope(
       onWillPop: () async => false,
       child: WrapperWidget(
-        loading: false,
         nav: false,
-        child: Stack(
+        staticChild: Stack(
           children: <Widget>[
             PageView(
               controller: _controller,

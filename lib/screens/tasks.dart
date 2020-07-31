@@ -37,7 +37,7 @@ class _TasksPageState extends State<TasksPage> {
       nav: true,
       cardPosition: MediaQuery.of(context).size.height / 2 - 240,
       backgroundColor: Theme.of(context).primaryColor,
-      child: Stack(
+      staticChild: Stack(
         children: <Widget>[
           Positioned(
             right: 30,
@@ -57,6 +57,10 @@ class _TasksPageState extends State<TasksPage> {
               style: headerTextStyle,
             ),
           ),
+        ]
+      ),
+      dynamicChild: Stack(
+        children: <Widget>[
           Positioned(
             right: 0,
             left: 0,

@@ -441,7 +441,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         cardPosition: _doingTask
             ? MediaQuery.of(context).size.height / 2
             : MediaQuery.of(context).size.height / 2 - 100,
-        child: Stack(
+        dynamicChild: Stack(
           children: <Widget>[
             StreamBuilder<QuerySnapshot>(
                 stream: db

@@ -83,9 +83,8 @@ class _LoginPageState extends State<LoginPage> {
           child: ModalProgressHUD(
             inAsyncCall: _loginLoading,
             child: WrapperWidget(
-              loading: false,
               nav: false,
-              child: Column(
+              staticChild: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Image(image: AssetImage('images/logo/Focal Logo_Full.png')),

@@ -4,17 +4,19 @@ import 'side_nav.dart';
 import 'package:Focal/constants.dart';
 
 class WrapperWidget extends StatefulWidget {
-  final Widget child;
+  final Widget staticChild;
+  final Widget dynamicChild;
   final Color backgroundColor;
   final bool nav;
   final bool loading;
   final double cardPosition;
 
   const WrapperWidget({
-    @required this.child,
+    this.staticChild,
+    this.dynamicChild,
     this.backgroundColor,
     this.nav,
-    @required this.loading,
+    this.loading,
     this.cardPosition,
   });
 
@@ -25,6 +27,7 @@ class WrapperWidget extends StatefulWidget {
 class _WrapperWidgetState extends State<WrapperWidget>
     with TickerProviderStateMixin {
   bool _navActive = false;
+  bool _loading = true;
 
   void toggleNav() {
     setState(() {
@@ -35,6 +38,11 @@ class _WrapperWidgetState extends State<WrapperWidget>
   @override
   void initState() {
     super.initState();
+    Future.delayed(Duration.zero, () {
+      setState(() {
+        _loading = false;
+      });
+    });
   }
 
   @override
@@ -102,11 +110,24 @@ class _WrapperWidgetState extends State<WrapperWidget>
                   },
                   child: AnimatedOpacity(
                     duration: navDuration,
-                    opacity: widget.loading ? 0 : (_navActive ? 0.5 : 1),
+                    opacity: _loading ? 0 : (_navActive ? 0.5 : 1),
                     child: SafeArea(
                       child: AbsorbPointer(
                         absorbing: _navActive,
-                        child: widget.child,
+                        child: Stack(
+                          children: <Widget>[
+                            widget.staticChild == null ? Container() : widget.staticChild,
+                            Opacity(
+                              opacity: widget.loading == true ? 0 : 1,
+                              child: AnimatedOpacity(
+                                duration: navDuration,
+                                curve: navCurve,
+                                opacity: widget.loading == true ? 0 : 1,
+                                child: widget.dynamicChild == null ? Container() : widget.dynamicChild,
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),

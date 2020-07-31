@@ -45,7 +45,7 @@ class SideNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedPositioned(
       duration: navDuration,
-      curve: Curves.ease,
+      curve: navCurve,
       top: 0,
       bottom: 0,
       left: active ? 0 : -300,

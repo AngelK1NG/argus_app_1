@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'task_item.dart';
 
-class TaskStatBar extends StatelessWidget {
+class TaskStatTile extends StatelessWidget {
   final int maxTime;
   final TaskItem task;
-  const TaskStatBar({@required this.maxTime, @required this.task});
+  const TaskStatTile({@required this.maxTime, @required this.task});
 
   @override
   Widget build(BuildContext context) {

@@ -99,9 +99,9 @@ class TaskListState extends State<TaskList> {
         .collection('tasks')
         .document(_date)
         .updateData({
-      'secondsFocused': FieldValue.increment(-task.focused),
-      'secondsPaused': FieldValue.increment(-task.paused),
-      'secondsDistracted': FieldValue.increment(-task.distracted),
+      'secondsFocused': FieldValue.increment(task.focused == null ? 0 : -task.focused),
+      'secondsDistracted': FieldValue.increment(task.distracted == null ? 0 : -task.distracted),
+      'secondsPaused': FieldValue.increment(task.paused == null ? 0 : -task.paused),
     });
   }
 
