@@ -50,104 +50,110 @@ class _WrapperWidgetState extends State<WrapperWidget>
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       child: Scaffold(
-        body: SizedBox.expand(
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onHorizontalDragUpdate: (details) {
-              if (details.delta.dx > 10 && widget.nav) {
-                setState(() {
-                  _navActive = true;
-                });
-                FocusScope.of(context).unfocus();
-              }
-              if (details.delta.dx < -10 && widget.nav) {
-                setState(() {
-                  _navActive = false;
-                });
-                FocusScope.of(context).unfocus();
-              }
-            },
-            child: Stack(
-              children: <Widget>[
-                AnimatedContainer(
-                  duration: cardSlideDuration,
-                  curve: cardSlideCurve,
-                  color: widget.backgroundColor,
-                  child: Container(),
-                ),
-                AnimatedPositioned(
-                  duration: cardSlideDuration,
-                  curve: cardSlideCurve,
-                  left: 0,
-                  right: 0,
-                  top: widget.cardPosition == null
-                      ? MediaQuery.of(context).size.height
-                      : widget.cardPosition,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(50),
-                        topRight: Radius.circular(50),
-                      ),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          spreadRadius: -5,
-                          blurRadius: 15,
-                        )
-                      ],
-                    ),
-                    height: MediaQuery.of(context).size.height,
+        body: NotificationListener<OverscrollIndicatorNotification>(
+          onNotification: (OverscrollIndicatorNotification overscroll) {
+            overscroll.disallowGlow();
+            return null;
+          },
+          child: SizedBox.expand(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onHorizontalDragUpdate: (details) {
+                if (details.delta.dx > 10 && widget.nav) {
+                  setState(() {
+                    _navActive = true;
+                  });
+                  FocusScope.of(context).unfocus();
+                }
+                if (details.delta.dx < -10 && widget.nav) {
+                  setState(() {
+                    _navActive = false;
+                  });
+                  FocusScope.of(context).unfocus();
+                }
+              },
+              child: Stack(
+                children: <Widget>[
+                  AnimatedContainer(
+                    duration: cardSlideDuration,
+                    curve: cardSlideCurve,
+                    color: widget.backgroundColor,
+                    child: Container(),
                   ),
-                ),
-                GestureDetector(
-                  behavior: HitTestBehavior.deferToChild,
-                  onTap: () {
-                    setState(() {
-                      _navActive = false;
-                    });
-                    FocusScope.of(context).unfocus();
-                  },
-                  child: AnimatedOpacity(
-                    duration: navDuration,
-                    opacity: _loading ? 0 : (_navActive ? 0.5 : 1),
-                    child: SafeArea(
-                      child: AbsorbPointer(
-                        absorbing: _navActive,
-                        child: Stack(
-                          children: <Widget>[
-                            widget.staticChild == null ? Container() : widget.staticChild,
-                            Opacity(
-                              opacity: widget.loading == true ? 0 : 1,
-                              child: AnimatedOpacity(
-                                duration: navDuration,
-                                curve: navCurve,
+                  AnimatedPositioned(
+                    duration: cardSlideDuration,
+                    curve: cardSlideCurve,
+                    left: 0,
+                    right: 0,
+                    top: widget.cardPosition == null
+                        ? MediaQuery.of(context).size.height
+                        : widget.cardPosition,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(50),
+                          topRight: Radius.circular(50),
+                        ),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            spreadRadius: -5,
+                            blurRadius: 15,
+                          )
+                        ],
+                      ),
+                      height: MediaQuery.of(context).size.height,
+                    ),
+                  ),
+                  GestureDetector(
+                    behavior: HitTestBehavior.deferToChild,
+                    onTap: () {
+                      setState(() {
+                        _navActive = false;
+                      });
+                      FocusScope.of(context).unfocus();
+                    },
+                    child: AnimatedOpacity(
+                      duration: navDuration,
+                      opacity: _loading ? 0 : (_navActive ? 0.5 : 1),
+                      child: SafeArea(
+                        child: AbsorbPointer(
+                          absorbing: _navActive,
+                          child: Stack(
+                            children: <Widget>[
+                              widget.staticChild == null ? Container() : widget.staticChild,
+                              Opacity(
                                 opacity: widget.loading == true ? 0 : 1,
-                                child: widget.dynamicChild == null ? Container() : widget.dynamicChild,
-                              ),
-                            )
-                          ],
+                                child: AnimatedOpacity(
+                                  duration: navDuration,
+                                  curve: navCurve,
+                                  opacity: widget.loading == true ? 0 : 1,
+                                  child: widget.dynamicChild == null ? Container() : widget.dynamicChild,
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                SideNav(
-                  onTap: toggleNav,
-                  active: _navActive,
-                ),
-                SafeArea(
-                  child: Offstage(
-                    offstage: !widget.nav,
-                    child: NavBurger(
-                        onTap: () {
-                          toggleNav();
-                          FocusScope.of(context).unfocus();
-                        },
-                        active: _navActive),
+                  SideNav(
+                    onTap: toggleNav,
+                    active: _navActive,
                   ),
-                ),
-              ],
+                  SafeArea(
+                    child: Offstage(
+                      offstage: !widget.nav,
+                      child: NavBurger(
+                          onTap: () {
+                            toggleNav();
+                            FocusScope.of(context).unfocus();
+                          },
+                          active: _navActive),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

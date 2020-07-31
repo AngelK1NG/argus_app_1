@@ -53,6 +53,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _seconds = 0;
   int _secondsPaused = 0;
   int _secondsDistracted = 0;
+  int _numPaused = 0;
+  int _numDistracted = 0;
   AnalyticsProvider analyticsProvider = AnalyticsProvider();
   ConfettiController _confettiController =
       ConfettiController(duration: Duration(seconds: 1));
@@ -90,6 +92,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _doingTask = true;
       _startFocused = DateTime.now();
       _paused = false;
+      _numDistracted = 0;
+      _numPaused = 0;
     });
     if (Platform.isAndroid) {
       if (LocalNotificationHelper.dndOn) {
@@ -148,6 +152,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       setState(() {
         _startPaused = DateTime.now();
         _paused = !_paused;
+        _numPaused ++;
         LocalNotificationHelper.paused = true;
       });
     }
@@ -165,6 +170,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       backgroundColor: jetBlack,
       textColor: Colors.white,
     );
+    DocumentReference dateDoc = db
+        .collection('users')
+        .document(user.uid)
+        .collection('tasks')
+        .document(_date);
+    dateDoc.get().then((snapshot) {
+      if (snapshot.data == null) {
+        dateDoc.setData({
+          'numDistracted': 0,
+          'numPaused': 0,
+        });
+      }
+      dateDoc.updateData({
+        'numDistracted': FieldValue.increment(_numDistracted),
+        'numPaused': FieldValue.increment(_numPaused),
+      });
+    });
     analyticsProvider.logSaveTask(_tasks[0], DateTime.now(), _swatchDisplay);
   }
 
@@ -199,12 +221,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           'secondsFocused': 0,
           'secondsDistracted': 0,
           'secondsPaused': 0,
+          'numDistracted': 0,
+          'numPaused': 0,
         });
       }
       dateDoc.updateData({
         'secondsFocused': FieldValue.increment(_seconds - _secondsDistracted),
         'secondsDistracted': FieldValue.increment(_secondsDistracted),
         'secondsPaused': FieldValue.increment(_secondsPaused),
+        'numDistracted': FieldValue.increment(_numDistracted),
+        'numPaused': FieldValue.increment(_numPaused),
       });
     });
     analyticsProvider.logCompleteTask(
@@ -301,6 +327,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       case AppLifecycleState.paused:
         if (_doingTask && !_paused) {
           _startDistracted = DateTime.now();
+          _numDistracted ++;
           if (Platform.isAndroid) {
             if (LocalNotificationHelper.notificationsOn) {
               if (LocalNotificationHelper.dndOn) {

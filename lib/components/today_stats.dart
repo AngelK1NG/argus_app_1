@@ -21,6 +21,8 @@ class _TodayStatsState extends State<TodayStats> {
   Duration _timeDistracted = new Duration();
   int _completedTasks;
   int _totalTasks;
+  int _numDistracted;
+  int _numPaused;
   List<TaskItem> _tasks = [];
   String _date = getDateString(DateTime.now());
 
@@ -111,6 +113,16 @@ class _TodayStatsState extends State<TodayStats> {
         } else {
           _timeDistracted = Duration(seconds: snapshot.data['secondsDistracted']);
         }
+        if (snapshot.data['numDistracted'] == null) {
+          _numDistracted = 0;
+        } else {
+          _numDistracted = snapshot.data['numDistracted'];
+        }
+        if (snapshot.data['numPaused'] == null) {
+          _numPaused = 0;
+        } else {
+          _numPaused = snapshot.data['numPaused'];
+        }
       });
       getTasks();
     });
@@ -119,106 +131,152 @@ class _TodayStatsState extends State<TodayStats> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(left: 10, right: 10,),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Stack(
-                  alignment: Alignment.center,
-                  children: <Widget>[
-                    SizedBox(
-                      width: 80,
-                      height: 80,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        value: (_totalTasks == null || _totalTasks == 0)
-                            ? 0
-                            : (_completedTasks / _totalTasks),
-                        backgroundColor: Colors.black,
-                        valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-                      ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          ((_totalTasks == null || _totalTasks == 0)
-                                  ? 0
-                                  : (_completedTasks / _totalTasks) * 100)
-                              .toInt()
-                              .toString() + '%',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                          )
+    return SizedBox(
+      height: MediaQuery.of(context).size.height / 2 + 180,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(left: 10, right: 10,),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Stack(
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      SizedBox(
+                        width: 80,
+                        height: 80,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          value: (_totalTasks == null || _totalTasks == 0)
+                              ? 0
+                              : (_completedTasks / _totalTasks),
+                          backgroundColor: Colors.black,
+                          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
                         ),
-                        Text(
-                          'Done',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            ((_totalTasks == null || _totalTasks == 0)
+                                    ? 0
+                                    : (_completedTasks / _totalTasks) * 100)
+                                .toInt()
+                                .toString() + '%',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w500,
+                            )
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Text(
-                      _timeFocused.inHours.toString().padLeft(2, "0") +
-                      ":" +
-                      (_timeFocused.inMinutes % 60).toString().padLeft(2, "0") +
-                      ":" +
-                      (_timeFocused.inSeconds % 60).toString().padLeft(2, "0"),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w500,
+                          Text(
+                            'Done',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    Text(
-                      'Focused',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 10),
-                      child: Text(
-                        _timeDistracted.inHours.toString().padLeft(2, "0") +
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Text(
+                        _timeFocused.inHours.toString().padLeft(2, "0") +
                         ":" +
-                        (_timeDistracted.inMinutes % 60).toString().padLeft(2, "0") +
+                        (_timeFocused.inMinutes % 60).toString().padLeft(2, "0") +
                         ":" +
-                        (_timeDistracted.inSeconds % 60).toString().padLeft(2, "0"),
+                        (_timeFocused.inSeconds % 60).toString().padLeft(2, "0"),
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
-                    Text(
-                      'Distracted',
+                      Text(
+                        'Focused',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Text(
+                          _timeDistracted.inHours.toString().padLeft(2, "0") +
+                          ":" +
+                          (_timeDistracted.inMinutes % 60).toString().padLeft(2, "0") +
+                          ":" +
+                          (_timeDistracted.inSeconds % 60).toString().padLeft(2, "0"),
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Distracted',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ]
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 50, bottom: 25,),
+              child: taskColumn(),
+            ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 50,),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  RichText(
+                    text: TextSpan(
+                      text: (_numDistracted == 1 ? 'Distraction: ' : 'Distractions: '),
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 16,
                         color: Colors.red,
                       ),
+                      children: [
+                        TextSpan(
+                          text: _numDistracted.toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
-                  ]
-                ),
-              ],
+                  ),
+                  RichText(
+                    text: TextSpan(
+                      text: (_numPaused == 1 ? 'Pause: ' : 'Pauses: '),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).hintColor,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: _numPaused.toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 50),
-            child: taskColumn(),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

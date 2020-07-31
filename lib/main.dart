@@ -33,50 +33,50 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider<User>(
       create: (_) => User(),
       child: MaterialApp(
-          navigatorKey: navigatorKey,
-          theme: ThemeData(
-            buttonTheme: ButtonThemeData(
-              height: 60,
-              minWidth: 60,
-            ),
-            primarySwatch: focalPurple,
-            primaryColor: const Color(0xff3c25d7),
-            accentColor: const Color(0xff7c4efd),
-            hintColor: const Color(0xffb0b0b0),
-            dividerColor: const Color(0xffe5e5e5),
-            splashColor: Colors.transparent,
-            fontFamily: 'Roboto',
-            textTheme: Theme.of(context).textTheme.apply(bodyColor: jetBlack, displayColor: jetBlack),
+        navigatorKey: navigatorKey,
+        theme: ThemeData(
+          buttonTheme: ButtonThemeData(
+            height: 60,
+            minWidth: 60,
           ),
-          navigatorObservers: [
-            FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
-          ],
-          initialRoute: '/login',
-          onGenerateRoute: (routeSettings) {
-            switch (routeSettings.name) {
-              case '/home':
-                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => HomePage());
-                break;
-              case '/tasks':
-                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => TasksPage());
-                break;
-              case '/statistics':
-                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => StatisticsPage());
-                break;
-              case '/settings':
-                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => SettingsPage());
-                break;
-              case '/login':
-                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => LoginPage());
-                break;
-              case '/onboarding':
-                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => Onboarding());
-                break;
-              default:
-                return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => LoginPage());
-                break;
-            }
+          primarySwatch: focalPurple,
+          primaryColor: const Color(0xff3c25d7),
+          accentColor: const Color(0xff7c4efd),
+          hintColor: const Color(0xffb0b0b0),
+          dividerColor: const Color(0xffe5e5e5),
+          splashColor: Colors.transparent,
+          fontFamily: 'Roboto',
+          textTheme: Theme.of(context).textTheme.apply(bodyColor: jetBlack, displayColor: jetBlack),
+        ),
+        navigatorObservers: [
+          FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
+        ],
+        initialRoute: '/login',
+        onGenerateRoute: (routeSettings) {
+          switch (routeSettings.name) {
+            case '/home':
+              return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => HomePage());
+              break;
+            case '/tasks':
+              return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => TasksPage());
+              break;
+            case '/statistics':
+              return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => StatisticsPage());
+              break;
+            case '/settings':
+              return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => SettingsPage());
+              break;
+            case '/login':
+              return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => LoginPage());
+              break;
+            case '/onboarding':
+              return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => Onboarding());
+              break;
+            default:
+              return PageRouteBuilder(settings: RouteSettings(name: routeSettings.name), pageBuilder: (_, a1, a2) => LoginPage());
+              break;
           }
+        }
       ),
     );
   }
