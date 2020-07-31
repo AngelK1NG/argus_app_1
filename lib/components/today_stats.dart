@@ -61,9 +61,10 @@ class _TodayStatsState extends State<TodayStats> {
     List<Widget> taskTiles = [];
     int maxTime = 0;
     _tasks.forEach((task) {
-      if ((task.focused + task.distracted + task.paused) > maxTime &&
-          task.completed) {
-        maxTime = task.focused + task.distracted + task.paused;
+      if (task.completed) {
+        if ((task.focused + task.distracted + task.paused) > maxTime) {
+          maxTime = task.focused + task.distracted + task.paused;
+        }
       }
     });
     _tasks.forEach((task) {
