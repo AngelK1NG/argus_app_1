@@ -59,16 +59,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ConfettiController _confettiController =
       ConfettiController(duration: Duration(seconds: 1));
   void startTask() async {
-    _secondsPaused = _tasks[0].paused == null ? 0 : _tasks[0].paused;
+    _secondsPaused = _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
     _secondsDistracted =
-        _tasks[0].distracted == null ? 0 : _tasks[0].distracted;
+        _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
     int seconds;
-    if (_tasks[0].focused == null) {
+    if (_tasks[0].secondsFocused == null) {
       seconds = 0;
-    } else if (_tasks[0].distracted == null) {
-      seconds = _tasks[0].focused;
+    } else if (_tasks[0].secondsDistracted == null) {
+      seconds = _tasks[0].secondsFocused;
     } else {
-      seconds = _tasks[0].focused + _tasks[0].distracted;
+      seconds = _tasks[0].secondsFocused + _tasks[0].secondsDistracted;
+    }
+    if (_tasks[0].numDistracted != null) {
+      _numDistracted = _tasks[0].numDistracted;
+    }
+    if (_tasks[0].numPaused != null) {
+      _numPaused = _tasks[0].numPaused;
     }
     timer = new Timer.periodic(
         const Duration(seconds: 1),
@@ -160,9 +166,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void saveTask(FirebaseUser user) async {
     TaskItem task = _tasks.removeAt(0);
-    task.focused = _seconds - _secondsDistracted;
-    task.distracted = _secondsDistracted;
-    task.paused = _secondsPaused;
+    task.secondsFocused = _seconds - _secondsDistracted;
+    task.secondsDistracted = _secondsDistracted;
+    task.secondsPaused = _secondsPaused;
+    task.numDistracted = _numDistracted;
+    task.numPaused = _numPaused;
     _tasks.insert(_tasks.length - _completedTasks, task);
     _firestoreProvider.updateTaskOrder(_tasks, _date);
     Fluttertoast.showToast(
@@ -170,23 +178,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       backgroundColor: jetBlack,
       textColor: Colors.white,
     );
-    DocumentReference dateDoc = db
-        .collection('users')
-        .document(user.uid)
-        .collection('tasks')
-        .document(_date);
-    dateDoc.get().then((snapshot) {
-      if (snapshot.data == null) {
-        dateDoc.setData({
-          'numDistracted': 0,
-          'numPaused': 0,
-        });
-      }
-      dateDoc.updateData({
-        'numDistracted': FieldValue.increment(_numDistracted),
-        'numPaused': FieldValue.increment(_numPaused),
-      });
-    });
     analyticsProvider.logSaveTask(_tasks[0], DateTime.now(), _swatchDisplay);
   }
 
@@ -200,9 +191,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       order: _tasks.length,
       id: currentTask.id,
       onDismissed: currentTask.onDismissed,
-      focused: _seconds - _secondsDistracted,
-      distracted: _secondsDistracted,
-      paused: _secondsPaused,
+      secondsFocused: _seconds - _secondsDistracted,
+      secondsDistracted: _secondsDistracted,
+      secondsPaused: _secondsPaused,
+      numDistracted: _numDistracted,
+      numPaused: _numPaused,
     );
     firestoreProvider.deleteTask(_date, currentTask.id, false);
     _tasks.remove(currentTask);
@@ -536,9 +529,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         id: task.documentID,
                         completed: task.data['completed'],
                         order: task.data['order'],
-                        focused: task.data['focused'],
-                        distracted: task.data['distracted'],
-                        paused: task.data['paused'],
+                        secondsFocused: task.data['secondsFocused'],
+                        secondsDistracted: task.data['secondsDistracted'],
+                        secondsPaused: task.data['secondsPaused'],
+                        numDistracted: task.data['numDistracted'],
+                        numPaused: task.data['numPaused'],
                         key: UniqueKey(),
                         onDismissed: () {
                           _tasks.remove(_tasks.firstWhere(

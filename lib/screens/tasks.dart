@@ -69,9 +69,11 @@ class _TasksPageState extends State<TasksPage> {
           id: task.documentID,
           completed: task.data['completed'],
           order: task.data['order'],
-          focused: task.data['focused'],
-          distracted: task.data['distracted'],
-          paused: task.data['paused'],
+          secondsFocused: task.data['secondsFocused'],
+          secondsDistracted: task.data['secondsDistracted'],
+          secondsPaused: task.data['secondsPaused'],
+          numDistracted: task.data['numDistracted'],
+          numPaused: task.data['numPaused'],
           key: UniqueKey(),
           date: _date,
         );
@@ -104,9 +106,11 @@ class _TasksPageState extends State<TasksPage> {
         .collection('tasks')
         .document(_date);
     dateDoc.updateData({
-      'secondsFocused': FieldValue.increment(task.focused == null ? 0 : -task.focused),
-      'secondsDistracted': FieldValue.increment(task.distracted == null ? 0 : -task.distracted),
-      'secondsPaused': FieldValue.increment(task.paused == null ? 0 : -task.paused),
+      'secondsFocused': FieldValue.increment(task.secondsFocused == null ? 0 : -task.secondsFocused),
+      'secondsDistracted': FieldValue.increment(task.secondsDistracted == null ? 0 : -task.secondsDistracted),
+      'secondsPaused': FieldValue.increment(task.secondsPaused == null ? 0 : -task.secondsPaused),
+      'numDistracted': FieldValue.increment(task.numDistracted == null ? 0 : -task.numDistracted),
+      'numPaused': FieldValue.increment(task.numPaused == null ? 0 : -task.numPaused),
     }).then((_) {
       dateDoc.get().then((snapshot) {
         if (snapshot.data['secondsFocused'] < 0) {

@@ -14,9 +14,11 @@ class TaskItem extends StatefulWidget {
   VoidCallback onDismissed;
   Function onUpdate;
   final String date;
-  int focused;
-  int paused;
-  int distracted;
+  int secondsFocused;
+  int secondsPaused;
+  int secondsDistracted;
+  int numPaused;
+  int numDistracted;
 
   TaskItem(
       {@required this.name,
@@ -26,9 +28,11 @@ class TaskItem extends StatefulWidget {
       this.onDismissed,
       this.onUpdate,
       @required this.date,
-      this.focused,
-      this.paused,
-      this.distracted,
+      this.secondsFocused,
+      this.secondsPaused,
+      this.secondsDistracted,
+      this.numPaused,
+      this.numDistracted,
       Key key})
       : super(key: key);
 

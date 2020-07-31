@@ -29,11 +29,11 @@ class TaskStatTile extends StatelessWidget {
             bottom: 0,
             right: 0,
             child: Text(
-              ((task.focused + task.distracted) ~/ 60)
+              ((task.secondsFocused + task.secondsDistracted) ~/ 60)
                       .toString()
                       .padLeft(2, "0") +
                   ":" +
-                  ((task.focused + task.distracted) % 60)
+                  ((task.secondsFocused + task.secondsDistracted) % 60)
                       .toString()
                       .padLeft(2, "0"),
               style: TextStyle(
@@ -49,9 +49,7 @@ class TaskStatTile extends StatelessWidget {
               children: <Widget>[
                 Container(
                   height: height,
-                  width: (task.paused + task.distracted + task.focused) /
-                      maxTime *
-                      maxLength,
+                  width: maxTime == 0 ? 0 : (task.secondsPaused + task.secondsDistracted + task.secondsFocused) / maxTime * maxLength,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                     color: Theme.of(context).dividerColor,
@@ -59,7 +57,7 @@ class TaskStatTile extends StatelessWidget {
                 ),
                 Container(
                   height: height,
-                  width: (task.distracted + task.focused) / maxTime * maxLength,
+                  width: maxTime == 0 ? 0 : (task.secondsDistracted + task.secondsFocused) / maxTime * maxLength,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                     color: Colors.red,
@@ -67,7 +65,7 @@ class TaskStatTile extends StatelessWidget {
                 ),
                 Container(
                   height: height,
-                  width: task.focused / maxTime * maxLength,
+                  width: maxTime == 0 ? 0 : task.secondsFocused / maxTime * maxLength,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                     color: Theme.of(context).primaryColor,

@@ -45,9 +45,9 @@ class _TodayStatsState extends State<TodayStats> {
           id: task.documentID,
           completed: task.data['completed'],
           order: task.data['order'],
-          focused: task.data['focused'],
-          distracted: task.data['distracted'],
-          paused: task.data['paused'],
+          secondsFocused: task.data['secondsFocused'],
+          secondsDistracted: task.data['secondsDistracted'],
+          secondsPaused: task.data['secondsPaused'],
           key: UniqueKey(),
           date: _date,
         );
@@ -64,8 +64,8 @@ class _TodayStatsState extends State<TodayStats> {
     int maxTime = 0;
     _tasks.forEach((task) {
       if (task.completed) {
-        if ((task.focused + task.distracted + task.paused) > maxTime) {
-          maxTime = task.focused + task.distracted + task.paused;
+        if ((task.secondsFocused + task.secondsDistracted + task.secondsPaused) > maxTime) {
+          maxTime = task.secondsFocused + task.secondsDistracted + task.secondsPaused;
         }
       }
     });
