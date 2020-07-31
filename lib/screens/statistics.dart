@@ -47,10 +47,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 GestureDetector(
                   onTap: () {
                     HapticFeedback.heavyImpact();
-                    setState(() {
-                      _loading = true;
-                      _timeFrame = 'today';
-                    });
+                    if (_timeFrame != 'today') {
+                      setState(() {
+                        _loading = true;
+                        _timeFrame = 'today';
+                      });
+                    }
                   },
                   child: Container(
                     height: 30,
@@ -79,9 +81,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 GestureDetector(
                   onTap: () {
                     HapticFeedback.heavyImpact();
-                    setState(() {
-                      _timeFrame = 'week';
-                    });
+                    if (_timeFrame != 'week') {
+                      setState(() {
+                        _timeFrame = 'week';
+                      });
+                    }
                   },
                   child: Container(
                     height: 30,
