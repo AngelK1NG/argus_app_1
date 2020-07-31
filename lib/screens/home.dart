@@ -34,9 +34,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static const platform = const MethodChannel("com.flutter.lockscreen");
 
   Timer timer;
-  DateTime _startFocused;
-  DateTime _startPaused;
-  DateTime _startDistracted;
+  DateTime _startFocused = DateTime.now();
+  DateTime _startPaused = DateTime.now();
+  DateTime _startDistracted = DateTime.now();
   String _swatchDisplay = "00:00";
   int _completedTasks;
   int _totalTasks;
@@ -57,14 +57,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ConfettiController _confettiController =
       ConfettiController(duration: Duration(seconds: 1));
   void startTask() async {
-    _secondsPaused = 0;
-    _secondsDistracted = 0;
+    _secondsPaused = _tasks[0].paused == null ? 0 : _tasks[0].paused;
+    _secondsDistracted =
+        _tasks[0].distracted == null ? 0 : _tasks[0].distracted;
+    int seconds;
+    if (_tasks[0].focused == null) {
+      seconds = 0;
+    } else if (_tasks[0].distracted == null) {
+      seconds = _tasks[0].focused;
+    } else {
+      seconds = _tasks[0].focused + _tasks[0].distracted;
+    }
     timer = new Timer.periodic(
         const Duration(seconds: 1),
         (Timer timer) => setState(() {
               if (_doingTask && !_paused) {
                 final currentTime = DateTime.now();
-                _seconds = (currentTime.difference(_startFocused).inSeconds);
+                _seconds =
+                    (currentTime.difference(_startFocused).inSeconds) + seconds;
                 _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
                     ":" +
                     (_seconds % 60).toString().padLeft(2, "0");
@@ -73,6 +83,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               }
             }));
     setState(() {
+      _seconds = seconds;
+      _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+          ":" +
+          (_seconds % 60).toString().padLeft(2, "0");
       _doingTask = true;
       _startFocused = DateTime.now();
       _paused = false;
@@ -89,6 +103,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void stopTask() async {
+    if (_paused) {
+      _secondsPaused += DateTime.now().difference(_startPaused).inSeconds;
+    }
     setState(() {
       _doingTask = false;
       _swatchDisplay = "00:00";
@@ -123,7 +140,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 }
               }));
       setState(() {
-        _doingTask = true;
         _startFocused = DateTime.now();
         _paused = !_paused;
       });
@@ -135,15 +151,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         LocalNotificationHelper.paused = true;
       });
     }
-    print(_secondsPaused);
   }
 
   void saveTask(FirebaseUser user) async {
-    setState(() {
-      _doingTask = false;
-      _swatchDisplay = "00:00";
-    });
-    final task = _tasks.removeAt(0);
+    TaskItem task = _tasks.removeAt(0);
+    task.focused = _seconds - _secondsDistracted;
+    task.distracted = _secondsDistracted;
+    task.paused = _secondsPaused;
     _tasks.insert(_tasks.length - _completedTasks, task);
     _firestoreProvider.updateTaskOrder(_tasks, _date);
     Fluttertoast.showToast(
@@ -151,27 +165,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       backgroundColor: jetBlack,
       textColor: Colors.white,
     );
-    if (Platform.isAndroid) {
-      if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-        await FlutterDnd.setInterruptionFilter(
-            FlutterDnd.INTERRUPTION_FILTER_ALL);
-      }
-    }
-    DocumentReference dateDoc = db
-        .collection('users')
-        .document(user.uid)
-        .collection('tasks')
-        .document(_date);
-    dateDoc.get().then((snapshot) {
-      if (snapshot.data == null) {
-        dateDoc.setData({
-          'secondsFocused': 0,
-        });
-      }
-      dateDoc.updateData({
-        'secondsFocused': FieldValue.increment(_seconds),
-      });
-    });
     analyticsProvider.logSaveTask(_tasks[0], DateTime.now(), _swatchDisplay);
   }
 
@@ -185,6 +178,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       order: _tasks.length,
       id: currentTask.id,
       onDismissed: currentTask.onDismissed,
+      focused: _seconds - _secondsDistracted,
+      distracted: _secondsDistracted,
+      paused: _secondsPaused,
     );
     firestoreProvider.deleteTask(_date, currentTask.id, false);
     _tasks.remove(currentTask);
@@ -201,10 +197,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (snapshot.data == null) {
         dateDoc.setData({
           'secondsFocused': 0,
+          'secondsDistracted': 0,
+          'secondsPaused': 0,
         });
       }
       dateDoc.updateData({
-        'secondsFocused': FieldValue.increment(_seconds),
+        'secondsFocused': FieldValue.increment(_seconds - _secondsDistracted),
+        'secondsDistracted': FieldValue.increment(_secondsDistracted),
+        'secondsPaused': FieldValue.increment(_secondsPaused),
       });
     });
     analyticsProvider.logCompleteTask(
@@ -234,8 +234,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           prefs.getBool('notifications on') == null
               ? true
               : prefs.getBool('notifications on');
-      print('Notifications ON: ${LocalNotificationHelper.notificationsOn}');
-      print('DND ON: ${LocalNotificationHelper.dndOn}');
     });
   }
 
@@ -301,11 +299,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.paused:
-        if (_doingTask) {
-          setState(() {
-            _startDistracted = DateTime.now();
-            print('Start distracted: $_startDistracted');
-          });
+        if (_doingTask && !_paused) {
+          _startDistracted = DateTime.now();
           if (Platform.isAndroid) {
             if (LocalNotificationHelper.notificationsOn) {
               if (LocalNotificationHelper.dndOn) {
@@ -334,11 +329,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
         break;
       case AppLifecycleState.resumed:
-        Future.delayed(Duration(milliseconds: 2000), () {
+        if (!_paused) {
           _secondsDistracted +=
               DateTime.now().difference(_startDistracted).inSeconds;
-          print(_secondsDistracted);
-        });
+        }
         break;
       case AppLifecycleState.inactive:
         break;
@@ -348,7 +342,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   // void onData(ScreenStateEvent event) {
-  //   print(event);
   //   if (event == ScreenStateEvent.SCREEN_OFF) {
   //     LocalNotificationHelper.screenOff = true;
   //   }
@@ -362,7 +355,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   //   try {
   //     _subscription = _screen.screenStateStream.listen(onData);
   //   } on ScreenStateException catch (exception) {
-  //     print(exception);
   //   }
   // }
 
@@ -449,377 +441,395 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         cardPosition: _doingTask
             ? MediaQuery.of(context).size.height / 2
             : MediaQuery.of(context).size.height / 2 - 100,
-        child: StreamBuilder<QuerySnapshot>(
-            stream: db
-                .collection('users')
-                .document(_user.uid)
-                .collection('tasks')
-                .document(_date)
-                .collection('tasks')
-                .orderBy('order')
-                .snapshots(),
-            builder: (context, snapshot) {
-              _loading = false;
-              if (!snapshot.hasData ||
-                  snapshot.data.documents == null ||
-                  snapshot.data.documents.isEmpty) {
-                return Stack(
-                  children: <Widget>[
-                    Positioned(
-                      left: 50,
-                      right: 50,
-                      bottom: MediaQuery.of(context).size.height / 2 + 180,
-                      child: Text(
-                        'Good Morning!',
-                        textAlign: TextAlign.center,
-                        style: topTextStyle,
-                      ),
-                    ),
-                    Positioned(
-                      left: 50,
-                      right: 50,
-                      top: MediaQuery.of(context).size.height / 2,
-                      child: Text(
-                        'Add a task and start your day!',
-                        textAlign: TextAlign.center,
-                        style: taskTextStyle,
-                      ),
-                    ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 120,
-                      child: Container(
-                        alignment: Alignment.center,
-                        child: RctButton(
-                          onTap: () {
-                            Navigator.pushNamedAndRemoveUntil(context, '/tasks',
-                                ModalRoute.withName('/home'));
-                          },
-                          buttonWidth: 220,
-                          colored: true,
-                          buttonText: 'Add',
-                          textSize: 32,
-                        ),
-                      ),
-                    )
-                  ],
-                );
-              } else {
-                _tasks = [];
-                final data = snapshot.data.documents;
-                for (var task in data) {
-                  String name = task.data['name'];
-                  TaskItem actionItem = TaskItem(
-                    name: name,
-                    id: task.documentID,
-                    completed: task.data['completed'],
-                    order: task.data['order'],
-                    key: UniqueKey(),
-                    onDismissed: () {
-                      _tasks.remove(_tasks
-                          .firstWhere((tasku) => tasku.id == task.documentID));
-                      _firestoreProvider.updateTaskOrder(_tasks, _date);
-                    },
-                    date: _date,
-                  );
-                  _tasks.add(actionItem);
-                }
-                if (areTasksCompleted()) {
-                  return Stack(
-                    children: <Widget>[
-                      AnimatedPositioned(
-                        duration: cardSlideDuration,
-                        curve: cardSlideCurve,
-                        left: 50,
-                        right: 50,
-                        bottom: !_doingTask
-                            ? MediaQuery.of(context).size.height / 2 + 180
-                            : MediaQuery.of(context).size.height / 2 + 150,
-                        child: Text(
-                          'Congrats! 🎉',
-                          textAlign: TextAlign.center,
-                          style: topTextStyle,
-                        ),
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: Platform.isIOS ? MediaQuery.of(context).size.height / 2 - 66 : MediaQuery.of(context).size.height / 2 - 33,
-                        child: AnimatedOpacity(
-                          duration: cardSlideDuration,
-                          curve: cardSlideCurve,
-                          opacity: !_doingTask ? 0 : 1,
-                          child: Center(
-                            child: SqrButton(
-                              onTap: pauseTask,
-                              icon: _paused
-                                  ? Icon(
-                                      Icons.play_arrow,
-                                      color: Colors.white,
-                                      size: 32,
-                                    )
-                                  : Icon(
-                                      Icons.pause,
-                                      color: Colors.white,
-                                      size: 32,
-                                    ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      AnimatedPositioned(
-                        duration: cardSlideDuration,
-                        curve: cardSlideCurve,
-                        left: 50,
-                        right: 50,
-                        top: !_doingTask
-                            ? MediaQuery.of(context).size.height / 2 - 80
-                            : MediaQuery.of(context).size.height / 2 + 20,
-                        child: Container(
-                          alignment: Alignment.center,
-                          height: 117,
-                          child: Text(
-                            'You\'re done!',
-                            textAlign: TextAlign.center,
-                            style: taskTextStyle,
-                          ),
-                        ),
-                      ),
-                      AnimatedPositioned(
-                        duration: cardSlideDuration,
-                        curve: cardSlideCurve,
-                        left: 0,
-                        right: 0,
-                        bottom: !_doingTask ? 190 : 90,
-                        child: Center(
-                          child: RctButton(
-                            onTap: () {
-                              Navigator.pushNamedAndRemoveUntil(context,
-                                  '/statistics', ModalRoute.withName('/home'));
-                            },
-                            buttonWidth: 220,
-                            colored: true,
-                            buttonText: 'Statistics',
-                            textSize: 32,
-                          ),
-                        ),
-                      ),
-                      AnimatedPositioned(
-                        duration: cardSlideDuration,
-                        curve: cardSlideCurve,
-                        left: 0,
-                        right: 0,
-                        bottom: !_doingTask ? 130 : 30,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () {
-                            HapticFeedback.heavyImpact();
-                            Navigator.pushNamedAndRemoveUntil(context, '/tasks',
-                                ModalRoute.withName('/home'));
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Text(
-                              'Add another task',
-                              textAlign: TextAlign.center,
-                              style: secondaryButtonTextStyle,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                          right: 30,
-                          bottom: 90,
-                          child: Text(
-                            ((_totalTasks == null || _totalTasks == 0)
-                                        ? 0
-                                        : (_completedTasks / _totalTasks) * 100)
-                                    .toInt()
-                                    .toString() +
-                                "%",
-                            style: percentTextStyle,
-                          )),
-                      Positioned(
-                        left: 30,
-                        right: 30,
-                        bottom: 60,
-                        child: LinearPercentIndicator(
-                          percent: (_totalTasks == null || _totalTasks == 0)
-                              ? 0
-                              : (_completedTasks / _totalTasks),
-                          lineHeight: 20,
-                          progressColor: Theme.of(context).accentColor,
-                          backgroundColor: Theme.of(context).dividerColor,
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: ConfettiWidget(
-                          confettiController: _confettiController,
-                          emissionFrequency: 0.01,
-                          blastDirectionality: BlastDirectionality.explosive,
-                          numberOfParticles: 200,
-                          particleDrag: 0.03,
-                          shouldLoop: false,
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  return Stack(
-                    children: <Widget>[
-                      Positioned(
+        child: Stack(
+          children: <Widget>[
+            StreamBuilder<QuerySnapshot>(
+                stream: db
+                    .collection('users')
+                    .document(_user.uid)
+                    .collection('tasks')
+                    .document(_date)
+                    .collection('tasks')
+                    .orderBy('order')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  _loading = false;
+                  if (!snapshot.hasData ||
+                      snapshot.data.documents == null ||
+                      snapshot.data.documents.isEmpty) {
+                    return Stack(
+                      children: <Widget>[
+                        Positioned(
                           left: 50,
                           right: 50,
-                          bottom: MediaQuery.of(context).size.height / 2 + 150,
-                          child: _doingTask
-                              ? Text(
-                                  _swatchDisplay,
-                                  textAlign: TextAlign.center,
-                                  style: swatchTextStyle,
-                                )
-                              : Text(
-                                  'Keep up the good work! 🙌',
-                                  textAlign: TextAlign.center,
-                                  style: topTextStyle,
-                                )),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: Platform.isIOS ? MediaQuery.of(context).size.height / 2 - 66 : MediaQuery.of(context).size.height / 2 - 33,
-                        child: AnimatedOpacity(
-                          duration: cardSlideDuration,
-                          curve: cardSlideCurve,
-                          opacity: _doingTask ? 1 : 0,
-                          child: Center(
-                            child: SqrButton(
-                              onTap: pauseTask,
-                              icon: _paused
-                                  ? Icon(
-                                      Icons.play_arrow,
-                                      color: Colors.white,
-                                      size: 32,
-                                    )
-                                  : Icon(
-                                      Icons.pause,
-                                      color: Colors.white,
-                                      size: 32,
-                                    ),
-                            ),
+                          bottom: MediaQuery.of(context).size.height / 2 + 180,
+                          child: Text(
+                            'Good Morning!',
+                            textAlign: TextAlign.center,
+                            style: topTextStyle,
                           ),
                         ),
-                      ),
-                      AnimatedPositioned(
-                        duration: cardSlideDuration,
-                        curve: cardSlideCurve,
-                        left: 30,
-                        right: 30,
-                        top: _doingTask
-                            ? MediaQuery.of(context).size.height / 2 + 20
-                            : MediaQuery.of(context).size.height / 2 - 80,
-                        child: Container(
-                          alignment: Alignment.center,
-                          height: 117,
-                          child: AutoSizeText(
-                            _tasks[0].name,
+                        Positioned(
+                          left: 50,
+                          right: 50,
+                          top: MediaQuery.of(context).size.height / 2,
+                          child: Text(
+                            'Add a task and start your day!',
                             textAlign: TextAlign.center,
                             style: taskTextStyle,
-                            maxLines: 3,
                           ),
                         ),
-                      ),
-                      AnimatedPositioned(
-                        duration: cardSlideDuration,
-                        curve: cardSlideCurve,
-                        left: 0,
-                        right: 0,
-                        bottom: _doingTask ? 90 : 190,
-                        child: Center(
-                            child: _doingTask
-                                ? RctButton(
-                                    onTap: () async {
-                                      setState(() {
-                                        _doingTask = false;
-                                      });
-                                      stopTask();
-                                      completeTask(_user);
-                                    },
-                                    buttonWidth: 220,
-                                    colored: true,
-                                    buttonText: 'Done',
-                                    textSize: 32,
-                                  )
-                                : RctButton(
-                                    onTap: () async {
-                                      setState(() {
-                                        _doingTask = true;
-                                      });
-                                      startTask();
-                                    },
-                                    buttonWidth: 220,
-                                    colored: true,
-                                    buttonText: 'Start',
-                                    textSize: 32,
-                                  )),
-                      ),
-                      AnimatedPositioned(
-                        duration: cardSlideDuration,
-                        curve: cardSlideCurve,
-                        left: 0,
-                        right: 0,
-                        bottom: _doingTask ? 30 : 130,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () {
-                            HapticFeedback.heavyImpact();
-                            saveTask(_user);
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Text('Save for later',
-                                textAlign: TextAlign.center,
-                                style: secondaryButtonTextStyle),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                          right: 30,
-                          bottom: 90,
-                          child: Visibility(
-                            visible: !_doingTask,
-                            child: Text(
-                              ((_totalTasks == null || _totalTasks == 0)
-                                          ? 0
-                                          : (_completedTasks / _totalTasks) *
-                                              100)
-                                      .toInt()
-                                      .toString() +
-                                  "%",
-                              style: percentTextStyle,
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 120,
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: RctButton(
+                              onTap: () {
+                                Navigator.pushNamedAndRemoveUntil(context,
+                                    '/tasks', ModalRoute.withName('/home'));
+                              },
+                              buttonWidth: 220,
+                              colored: true,
+                              buttonText: 'Add',
+                              textSize: 32,
                             ),
-                          )),
-                      Positioned(
-                        left: 30,
-                        right: 30,
-                        bottom: 60,
-                        child: Visibility(
-                          visible: !_doingTask,
-                          child: LinearPercentIndicator(
-                            percent: (_totalTasks == null || _totalTasks == 0)
-                                ? 0
-                                : (_completedTasks / _totalTasks),
-                            lineHeight: 20,
-                            progressColor: Theme.of(context).accentColor,
-                            backgroundColor: Theme.of(context).dividerColor,
                           ),
-                        ),
-                      )
-                    ],
-                  );
-                }
-              }
-            }),
+                        )
+                      ],
+                    );
+                  } else {
+                    _tasks = [];
+                    final data = snapshot.data.documents;
+                    for (var task in data) {
+                      String name = task.data['name'];
+                      TaskItem actionItem = TaskItem(
+                        name: name,
+                        id: task.documentID,
+                        completed: task.data['completed'],
+                        order: task.data['order'],
+                        focused: task.data['focused'],
+                        distracted: task.data['distracted'],
+                        paused: task.data['paused'],
+                        key: UniqueKey(),
+                        onDismissed: () {
+                          _tasks.remove(_tasks.firstWhere(
+                              (tasku) => tasku.id == task.documentID));
+                          _firestoreProvider.updateTaskOrder(_tasks, _date);
+                        },
+                        date: _date,
+                      );
+                      _tasks.add(actionItem);
+                    }
+                    if (areTasksCompleted()) {
+                      return Stack(
+                        children: <Widget>[
+                          AnimatedPositioned(
+                            duration: cardSlideDuration,
+                            curve: cardSlideCurve,
+                            left: 50,
+                            right: 50,
+                            bottom: !_doingTask
+                                ? MediaQuery.of(context).size.height / 2 + 180
+                                : MediaQuery.of(context).size.height / 2 + 150,
+                            child: Text(
+                              'Congrats! 🎉',
+                              textAlign: TextAlign.center,
+                              style: topTextStyle,
+                            ),
+                          ),
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: Platform.isIOS
+                                ? MediaQuery.of(context).size.height / 2 - 66
+                                : MediaQuery.of(context).size.height / 2 - 33,
+                            child: AnimatedOpacity(
+                              duration: cardSlideDuration,
+                              curve: cardSlideCurve,
+                              opacity: !_doingTask ? 0 : 1,
+                              child: Center(
+                                child: SqrButton(
+                                  onTap: pauseTask,
+                                  icon: _paused
+                                      ? Icon(
+                                          Icons.play_arrow,
+                                          color: Colors.white,
+                                          size: 32,
+                                        )
+                                      : Icon(
+                                          Icons.pause,
+                                          color: Colors.white,
+                                          size: 32,
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          AnimatedPositioned(
+                            duration: cardSlideDuration,
+                            curve: cardSlideCurve,
+                            left: 50,
+                            right: 50,
+                            top: !_doingTask
+                                ? MediaQuery.of(context).size.height / 2 - 80
+                                : MediaQuery.of(context).size.height / 2 + 20,
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: 117,
+                              child: Text(
+                                'You\'re done!',
+                                textAlign: TextAlign.center,
+                                style: taskTextStyle,
+                              ),
+                            ),
+                          ),
+                          AnimatedPositioned(
+                            duration: cardSlideDuration,
+                            curve: cardSlideCurve,
+                            left: 0,
+                            right: 0,
+                            bottom: !_doingTask ? 190 : 90,
+                            child: Center(
+                              child: RctButton(
+                                onTap: () {
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context,
+                                      '/statistics',
+                                      ModalRoute.withName('/home'));
+                                },
+                                buttonWidth: 220,
+                                colored: true,
+                                buttonText: 'Statistics',
+                                textSize: 32,
+                              ),
+                            ),
+                          ),
+                          AnimatedPositioned(
+                            duration: cardSlideDuration,
+                            curve: cardSlideCurve,
+                            left: 0,
+                            right: 0,
+                            bottom: !_doingTask ? 130 : 30,
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                HapticFeedback.heavyImpact();
+                                Navigator.pushNamedAndRemoveUntil(context,
+                                    '/tasks', ModalRoute.withName('/home'));
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  'Add another task',
+                                  textAlign: TextAlign.center,
+                                  style: secondaryButtonTextStyle,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                              right: 30,
+                              bottom: 90,
+                              child: Text(
+                                ((_totalTasks == null || _totalTasks == 0)
+                                            ? 0
+                                            : (_completedTasks / _totalTasks) *
+                                                100)
+                                        .toInt()
+                                        .toString() +
+                                    "%",
+                                style: percentTextStyle,
+                              )),
+                          Positioned(
+                            left: 30,
+                            right: 30,
+                            bottom: 60,
+                            child: LinearPercentIndicator(
+                              percent: (_totalTasks == null || _totalTasks == 0)
+                                  ? 0
+                                  : (_completedTasks / _totalTasks),
+                              lineHeight: 20,
+                              progressColor: Theme.of(context).accentColor,
+                              backgroundColor: Theme.of(context).dividerColor,
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Stack(
+                        children: <Widget>[
+                          Positioned(
+                              left: 50,
+                              right: 50,
+                              bottom:
+                                  MediaQuery.of(context).size.height / 2 + 150,
+                              child: _doingTask
+                                  ? Text(
+                                      _swatchDisplay,
+                                      textAlign: TextAlign.center,
+                                      style: swatchTextStyle,
+                                    )
+                                  : Text(
+                                      'Keep up the good work! 🙌',
+                                      textAlign: TextAlign.center,
+                                      style: topTextStyle,
+                                    )),
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: Platform.isIOS
+                                ? MediaQuery.of(context).size.height / 2 - 66
+                                : MediaQuery.of(context).size.height / 2 - 33,
+                            child: AnimatedOpacity(
+                              duration: cardSlideDuration,
+                              curve: cardSlideCurve,
+                              opacity: _doingTask ? 1 : 0,
+                              child: Center(
+                                child: SqrButton(
+                                  onTap: pauseTask,
+                                  icon: _paused
+                                      ? Icon(
+                                          Icons.play_arrow,
+                                          color: Colors.white,
+                                          size: 32,
+                                        )
+                                      : Icon(
+                                          Icons.pause,
+                                          color: Colors.white,
+                                          size: 32,
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          AnimatedPositioned(
+                            duration: cardSlideDuration,
+                            curve: cardSlideCurve,
+                            left: 30,
+                            right: 30,
+                            top: _doingTask
+                                ? MediaQuery.of(context).size.height / 2 + 20
+                                : MediaQuery.of(context).size.height / 2 - 80,
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: 117,
+                              child: AutoSizeText(
+                                _tasks[0].name,
+                                textAlign: TextAlign.center,
+                                style: taskTextStyle,
+                                maxLines: 3,
+                              ),
+                            ),
+                          ),
+                          AnimatedPositioned(
+                            duration: cardSlideDuration,
+                            curve: cardSlideCurve,
+                            left: 0,
+                            right: 0,
+                            bottom: _doingTask ? 90 : 190,
+                            child: Center(
+                                child: _doingTask
+                                    ? RctButton(
+                                        onTap: () async {
+                                          setState(() {
+                                            _doingTask = false;
+                                          });
+                                          stopTask();
+                                          completeTask(_user);
+                                        },
+                                        buttonWidth: 220,
+                                        colored: true,
+                                        buttonText: 'Done',
+                                        textSize: 32,
+                                      )
+                                    : RctButton(
+                                        onTap: () async {
+                                          setState(() {
+                                            _doingTask = true;
+                                          });
+                                          startTask();
+                                        },
+                                        buttonWidth: 220,
+                                        colored: true,
+                                        buttonText: 'Start',
+                                        textSize: 32,
+                                      )),
+                          ),
+                          AnimatedPositioned(
+                            duration: cardSlideDuration,
+                            curve: cardSlideCurve,
+                            left: 0,
+                            right: 0,
+                            bottom: _doingTask ? 30 : 130,
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                HapticFeedback.heavyImpact();
+                                stopTask();
+                                saveTask(_user);
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('Save for later',
+                                    textAlign: TextAlign.center,
+                                    style: secondaryButtonTextStyle),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                              right: 30,
+                              bottom: 90,
+                              child: Visibility(
+                                visible: !_doingTask,
+                                child: Text(
+                                  ((_totalTasks == null || _totalTasks == 0)
+                                              ? 0
+                                              : (_completedTasks /
+                                                      _totalTasks) *
+                                                  100)
+                                          .toInt()
+                                          .toString() +
+                                      "%",
+                                  style: percentTextStyle,
+                                ),
+                              )),
+                          Positioned(
+                            left: 30,
+                            right: 30,
+                            bottom: 60,
+                            child: Visibility(
+                              visible: !_doingTask,
+                              child: LinearPercentIndicator(
+                                percent:
+                                    (_totalTasks == null || _totalTasks == 0)
+                                        ? 0
+                                        : (_completedTasks / _totalTasks),
+                                lineHeight: 20,
+                                progressColor: Theme.of(context).accentColor,
+                                backgroundColor: Theme.of(context).dividerColor,
+                              ),
+                            ),
+                          )
+                        ],
+                      );
+                    }
+                  }
+                }),
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                emissionFrequency: 0.01,
+                blastDirectionality: BlastDirectionality.explosive,
+                numberOfParticles: 200,
+                particleDrag: 0.03,
+                shouldLoop: false,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

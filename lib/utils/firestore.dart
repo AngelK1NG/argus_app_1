@@ -47,6 +47,9 @@ class FirestoreProvider {
       'name': task.name,
       'order': task.order,
       'completed': task.completed,
+      'focused': task.focused,
+      'distracted': task.distracted,
+      'paused': task.paused,
     });
     DocumentReference dateDoc = db
         .collection('users')
@@ -86,6 +89,9 @@ class FirestoreProvider {
           .document(task.id)
           .updateData({
         'order': tasks.indexOf(task) + 1,
+        'focused': task.focused,
+        'distracted': task.distracted,
+        'paused': task.paused,
       });
     }
   }

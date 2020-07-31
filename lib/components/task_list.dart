@@ -66,6 +66,9 @@ class TaskListState extends State<TaskList> {
           id: task.documentID,
           completed: task.data['completed'],
           order: task.data['order'],
+          focused: task.data['focused'],
+          distracted: task.data['distracted'],
+          paused: task.data['paused'],
           key: UniqueKey(),
           date: _date,
         );
@@ -80,15 +83,26 @@ class TaskListState extends State<TaskList> {
   }
 
   void removeTask(TaskItem task) {
+    FirebaseUser user = context.read<User>().user;
     FirestoreProvider firestoreProvider =
         FirestoreProvider(Provider.of<User>(context, listen: false).user);
     setState(() {
       _tasks.remove(_tasks.firstWhere((tasku) => tasku.id == task.id));
       if (task.completed) {
-        _completedTasks --;
+        _completedTasks--;
       }
     });
     firestoreProvider.updateTaskOrder(_tasks, _date);
+    db
+        .collection('users')
+        .document(user.uid)
+        .collection('tasks')
+        .document(_date)
+        .updateData({
+      'secondsFocused': FieldValue.increment(-task.focused),
+      'secondsPaused': FieldValue.increment(-task.paused),
+      'secondsDistracted': FieldValue.increment(-task.distracted),
+    });
   }
 
   void setDate(String date) {
@@ -167,7 +181,8 @@ class TaskListState extends State<TaskList> {
                           'order': newTask.order,
                           'completed': newTask.completed,
                         }).then((doc) {
-                          _tasks[_tasks.length - _completedTasks - 1].id = doc.documentID;
+                          _tasks[_tasks.length - _completedTasks - 1].id =
+                              doc.documentID;
                           firestoreProvider.updateTaskOrder(_tasks, _date);
                           DocumentReference dateDoc = db
                               .collection('users')
