@@ -98,15 +98,33 @@ class _TasksPageState extends State<TasksPage> {
       }
     });
     firestoreProvider.updateTaskOrder(_tasks, _date);
-    db
+    DocumentReference dateDoc = db
         .collection('users')
         .document(user.uid)
         .collection('tasks')
-        .document(_date)
-        .updateData({
+        .document(_date);
+    dateDoc.updateData({
       'secondsFocused': FieldValue.increment(task.focused == null ? 0 : -task.focused),
       'secondsDistracted': FieldValue.increment(task.distracted == null ? 0 : -task.distracted),
       'secondsPaused': FieldValue.increment(task.paused == null ? 0 : -task.paused),
+    }).then((_) {
+      dateDoc.get().then((snapshot) {
+        if (snapshot.data['secondsFocused'] < 0) {
+          dateDoc.updateData({
+            'secondsFocused': 0,
+          });
+        }
+        if (snapshot.data['secondsDistracted'] < 0) {
+          dateDoc.updateData({
+            'secondsDistracted': 0,
+          });
+        }
+        if (snapshot.data['secondsPaused'] < 0) {
+          dateDoc.updateData({
+            'secondsPaused': 0,
+          });
+        }
+      });
     });
   }
 
