@@ -480,8 +480,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     return Stack(
                       children: <Widget>[
                         Positioned(
-                          left: 50,
-                          right: 50,
+                          left: 40,
+                          right: 40,
                           bottom: MediaQuery.of(context).size.height / 2 + 180,
                           child: Text(
                             'Good Morning!',
@@ -490,8 +490,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ),
                         ),
                         Positioned(
-                          left: 50,
-                          right: 50,
+                          left: 40,
+                          right: 40,
                           top: MediaQuery.of(context).size.height / 2,
                           child: Text(
                             'Add a task and start your day!',
@@ -550,8 +550,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           AnimatedPositioned(
                             duration: cardSlideDuration,
                             curve: cardSlideCurve,
-                            left: 50,
-                            right: 50,
+                            left: 40,
+                            right: 40,
                             bottom: !_doingTask
                                 ? MediaQuery.of(context).size.height / 2 + 180
                                 : MediaQuery.of(context).size.height / 2 + 150,
@@ -592,8 +592,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           AnimatedPositioned(
                             duration: cardSlideDuration,
                             curve: cardSlideCurve,
-                            left: 50,
-                            right: 50,
+                            left: 40,
+                            right: 40,
                             top: !_doingTask
                                 ? MediaQuery.of(context).size.height / 2 - 80
                                 : MediaQuery.of(context).size.height / 2 + 20,
@@ -652,7 +652,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             ),
                           ),
                           Positioned(
-                              right: 30,
+                              right: 40,
                               bottom: 90,
                               child: Text(
                                 ((_totalTasks == null || _totalTasks == 0)
@@ -665,8 +665,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                 style: percentTextStyle,
                               )),
                           Positioned(
-                            left: 30,
-                            right: 30,
+                            left: 40,
+                            right: 40,
                             bottom: 60,
                             child: LinearPercentIndicator(
                               percent: (_totalTasks == null || _totalTasks == 0)
@@ -683,8 +683,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       return Stack(
                         children: <Widget>[
                           Positioned(
-                              left: 50,
-                              right: 50,
+                              left: 40,
+                              right: 40,
                               bottom:
                                   MediaQuery.of(context).size.height / 2 + 150,
                               child: _doingTask
@@ -729,8 +729,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           AnimatedPositioned(
                             duration: cardSlideDuration,
                             curve: cardSlideCurve,
-                            left: 30,
-                            right: 30,
+                            left: 40,
+                            right: 40,
                             top: _doingTask
                                 ? MediaQuery.of(context).size.height / 2 + 20
                                 : MediaQuery.of(context).size.height / 2 - 80,
@@ -801,7 +801,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             ),
                           ),
                           Positioned(
-                              right: 30,
+                              right: 40,
                               bottom: 90,
                               child: Visibility(
                                 visible: !_doingTask,
@@ -818,8 +818,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                 ),
                               )),
                           Positioned(
-                            left: 30,
-                            right: 30,
+                            left: 40,
+                            right: 40,
                             bottom: 60,
                             child: Visibility(
                               visible: !_doingTask,

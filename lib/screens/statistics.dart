@@ -30,8 +30,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
       staticChild: Stack(
         children: <Widget>[
           Positioned(
-            right: 30,
-            top: 30,
+            right: 40,
+            top: 40,
             child: Text(
               'Statistics',
               style: headerTextStyle,
@@ -56,7 +56,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   },
                   child: Container(
                     height: 30,
-                    width: 150,
+                    width: MediaQuery.of(context).size.width / 2 - 40,
                     decoration: BoxDecoration(
                         color: _timeFrame == 'today'
                             ? Theme.of(context).accentColor
@@ -89,7 +89,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   },
                   child: Container(
                     height: 30,
-                    width: 150,
+                    width: MediaQuery.of(context).size.width / 2 - 40,
                     decoration: BoxDecoration(
                         color: _timeFrame == 'week'
                             ? Theme.of(context).accentColor
@@ -119,8 +119,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
       dynamicChild: Stack(
         children: <Widget>[
           Positioned(
-            right: 30,
-            left: 30,
+            right: 40,
+            left: 40,
             top: MediaQuery.of(context).size.height / 2 - 180,
             child: _timeFrame == 'today' ? TodayStats(callback: () => setState(() => _loading = false)) : Container(),
           ),

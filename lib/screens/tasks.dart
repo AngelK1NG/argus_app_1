@@ -154,8 +154,8 @@ class _TasksPageState extends State<TasksPage> {
       staticChild: Stack(
         children: <Widget>[
           Positioned(
-            right: 30,
-            top: 30,
+            right: 40,
+            top: 40,
             child: Text(
               (DateTime.parse(_date).year == DateTime.now().year &&
                       DateTime.parse(_date).month == DateTime.now().month &&

@@ -138,7 +138,7 @@ class _TodayStatsState extends State<TodayStats> {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(left: 10, right: 10,),
+              padding: EdgeInsets.only(left: 1, right: 1),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[

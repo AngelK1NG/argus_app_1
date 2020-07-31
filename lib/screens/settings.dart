@@ -66,8 +66,8 @@ class _SettingsPageState extends State<SettingsPage> {
           top: 0,
           child: Padding(
             padding: const EdgeInsets.only(
-              right: 30,
-              top: 30,
+              right: 40,
+              top: 40,
             ),
             child: Text(
               "Settings",
@@ -78,8 +78,8 @@ class _SettingsPageState extends State<SettingsPage> {
       ]),
       dynamicChild: Stack(children: <Widget>[
         Positioned(
-          right: 30,
-          left: 30,
+          right: 40,
+          left: 40,
           top: MediaQuery.of(context).size.height / 2 - 220,
           child: Container(
             child: Column(
@@ -136,8 +136,8 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         Positioned(
-          right: 30,
-          left: 30,
+          right: 40,
+          left: 40,
           bottom: 120,
           child: Text("You are signed in as " + _email,
               textAlign: TextAlign.center,
