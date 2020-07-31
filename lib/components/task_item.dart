@@ -150,6 +150,7 @@ class _TaskItemState extends State<TaskItem> {
                                     color: widget.completed
                                         ? Theme.of(context).hintColor
                                         : jetBlack,
+                                    decoration: widget.completed ? TextDecoration.lineThrough : null,
                                   ),
                                 ),
                         )),
