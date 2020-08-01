@@ -31,7 +31,6 @@ class _WeekStatsState extends State<WeekStats> {
       days.add(getDateString(now));
       now = now.add(new Duration(days: 1));
     }
-    print(days);
   }
 
   void getNumberOfEvents(String event) {
