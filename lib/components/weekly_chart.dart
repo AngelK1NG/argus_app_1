@@ -23,7 +23,7 @@ class WeeklyChart extends StatelessWidget {
         colorFn: (_, __) => barColor,
       ),
     ];
-    return Container(
+    return SizedBox(
       child: charts.BarChart(
         series,
         animate: false,
@@ -37,7 +37,7 @@ class WeeklyChart extends StatelessWidget {
               color: charts.ColorUtil.fromDartColor(jetBlack)
             ),
             lineStyle: new charts.LineStyleSpec(
-              color: charts.ColorUtil.fromDartColor(Theme.of(context).hintColor)
+              color: charts.ColorUtil.fromDartColor(Theme.of(context).dividerColor)
             ),
           ),
         ),
@@ -48,7 +48,7 @@ class WeeklyChart extends StatelessWidget {
               color: charts.ColorUtil.fromDartColor(jetBlack)
             ),
             lineStyle: new charts.LineStyleSpec(
-              color: charts.ColorUtil.fromDartColor(Theme.of(context).hintColor)
+              color: charts.ColorUtil.fromDartColor(Theme.of(context).dividerColor)
             ),
           ),
         ),
