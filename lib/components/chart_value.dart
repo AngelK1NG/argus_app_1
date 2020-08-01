@@ -1,6 +1,6 @@
-class chartValue {
+class ChartValue {
   String date;
   int val;
 
-  chartValue({this.date, this.val});
+  ChartValue({this.date, this.val});
 }

@@ -1,18 +1,9 @@
-import 'package:Focal/components/chart_value.dart';
-import 'package:Focal/components/task_item.dart';
-import 'package:Focal/components/weekly_chart.dart';
-import 'package:Focal/utils/date.dart';
-import 'package:Focal/utils/firestore.dart';
-import 'package:Focal/utils/user.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:Focal/components/wrapper.dart';
 import 'package:Focal/constants.dart';
 import 'package:flutter/services.dart';
 import 'package:Focal/components/today_stats.dart';
-import 'package:provider/provider.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:Focal/components/week_stats.dart';
 
 class StatisticsPage extends StatefulWidget {
   StatisticsPage({Key key}) : super(key: key);
@@ -24,84 +15,9 @@ class StatisticsPage extends StatefulWidget {
 class _StatisticsPageState extends State<StatisticsPage> {
   bool _loading = true;
   String _timeFrame = 'today';
-  List<String> days = [];
-  List<chartValue> totalDistracted = [];
-  List<chartValue> totalPaused = [];
-  List<chartValue> totalDistractedEx = [
-    chartValue(date: 'S', val: 3),
-    chartValue(date: 'M', val: 4),
-    chartValue(date: 'Tu', val: 7),
-    chartValue(date: 'W', val: 13),
-    chartValue(date: 'Th', val: 2),
-    chartValue(date: 'F', val: 1),
-    chartValue(date: 'Su', val: 10),
-  ];
-  List<TaskItem> tasks = [
-    TaskItem(date: 'M', name: 's', numDistracted: 10, completed: true),
-    TaskItem(date: 'Tu', name: 's', numDistracted: 3, completed: true),
-    TaskItem(date: 'W', name: 's', numDistracted: 6, completed: true),
-    TaskItem(date: 'Th', name: 's', numDistracted: 8, completed: true),
-    TaskItem(date: 'F', name: 's', numDistracted: 12, completed: true),
-    TaskItem(date: 'Sa', name: 's', numDistracted: 16, completed: true),
-    TaskItem(date: 'Su', name: 's', numDistracted: 5, completed: true),
-  ];
-
-  void getThisWeeksDays() {
-    var now = DateTime.now();
-    days.add(getDateString(now));
-    while (now.weekday != 1) {
-      now = now.subtract(new Duration(days: 1));
-      days.add(getDateString(now));
-    }
-    now = now.subtract(new Duration(days: 1));
-    days.add(getDateString(now));
-    days = days.reversed.toList();
-    print(days);
-  }
-
-  void getNumberOfEvents(String event) {
-    FirebaseUser _user = Provider.of<User>(context, listen: false).user;
-    for (int i = 0; i < days.length; i++) {
-      print('$i : ${days[i]}');
-      DocumentReference dateDoc = db
-          .collection('users')
-          .document(_user.uid)
-          .collection('tasks')
-          .document(days[i]);
-      dateDoc.get().then((snapshot) {
-        if (snapshot.data == null || snapshot.data['num$event'] == null) {
-          if (event == 'Distracted') {
-            totalDistracted.add(chartValue(date: days[i], val: 0));
-          } else {
-            totalPaused.add(chartValue(date: days[i], val: 0));
-          }
-        } else {
-          if (event == 'Distracted') {
-            totalDistracted.add(
-                chartValue(date: days[i], val: snapshot.data['num$event']));
-          } else {
-            totalPaused.add(
-                chartValue(date: days[i], val: snapshot.data['num$event']));
-          }
-        }
-        if (event == 'Distracted') {
-          totalDistracted.sort((a, b) => a.date.compareTo(b.date));
-        } else {
-          totalPaused.sort((a, b) => a.date.compareTo(b.date));
-        }
-        print('result');
-        for (int i = 0; i < totalDistracted.length; i++) {
-          print('$i ${totalDistracted[i].date} ${totalDistracted[i].val}');
-        }
-      });
-    }
-  }
 
   @override
   void initState() {
-    getThisWeeksDays();
-    getNumberOfEvents('Distracted');
-    getNumberOfEvents('Paused');
     super.initState();
   }
 
@@ -167,6 +83,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   HapticFeedback.heavyImpact();
                   if (_timeFrame != 'week') {
                     setState(() {
+                      _loading = true;
                       _timeFrame = 'week';
                     });
                   }
@@ -205,40 +122,15 @@ class _StatisticsPageState extends State<StatisticsPage> {
             right: 40,
             left: 40,
             top: MediaQuery.of(context).size.height / 2 - 180,
-            child: _timeFrame == 'today'
-                ? TodayStats(callback: () => setState(() => _loading = false))
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        '# of Distractions by Day',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      Container(
-                        width: 300,
-                        height: 200,
-                        child: weeklyChart(
-                          data: totalDistracted,
-                          barColor: charts.MaterialPalette.red.shadeDefault,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                        '# of Pauses by Day',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      Container(
-                        width: 300,
-                        height: 200,
-                        child: weeklyChart(
-                          data: totalPaused,
-                          barColor: charts.MaterialPalette.gray.shadeDefault,
-                        ),
-                      ),
-                    ],
-                  ),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height / 2 + 180,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: _timeFrame == 'today'
+                  ? TodayStats(callback: () => setState(() => _loading = false))
+                  : WeekStats(callback: () => setState(() => _loading = false)),
+              ),
+            )
           ),
         ],
       ),
