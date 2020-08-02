@@ -528,7 +528,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         nav: !_doingTask,
         backgroundColor: _doingTask ? jetBlack : Theme.of(context).primaryColor,
         cardPosition: _doingTask
-            ? MediaQuery.of(context).size.height / 2
+            ? MediaQuery.of(context).size.height / 2 - MediaQuery.of(context).padding.top
             : 240,
         dynamicChild: Stack(
           children: <Widget>[
@@ -634,9 +634,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           Positioned(
                             left: 0,
                             right: 0,
-                            bottom: Platform.isIOS
-                                ? MediaQuery.of(context).size.height / 2 - 66
-                                : MediaQuery.of(context).size.height / 2 - 33,
+                            top: (MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top) / 2 - 33,
                             child: AnimatedOpacity(
                               duration: cardSlideDuration,
                               curve: cardSlideCurve,
@@ -682,7 +680,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 0,
                             right: 0,
-                            bottom: !_doingTask ? 190 : 90,
+                            bottom: !_doingTask ? 190 : 450 - MediaQuery.of(context).size.height / 290,
                             child: Center(
                               child: RctButton(
                                 onTap: () {
@@ -703,7 +701,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 0,
                             right: 0,
-                            bottom: !_doingTask ? 130 : 30,
+                            bottom: !_doingTask ? 130 : 390 - MediaQuery.of(context).size.height / 2,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
@@ -819,7 +817,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 0,
                             right: 0,
-                            bottom: _doingTask ? 90 : 190,
+                            bottom: _doingTask ? 450 - MediaQuery.of(context).size.height / 2 : 190,
                             child: Center(
                                 child: _doingTask
                                     ? RctButton(
@@ -853,7 +851,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 0,
                             right: 0,
-                            bottom: _doingTask ? 30 : 130,
+                            bottom: _doingTask ? 390 - MediaQuery.of(context).size.height / 2 : 130,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
