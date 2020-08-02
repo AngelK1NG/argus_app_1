@@ -117,7 +117,7 @@ class _WeekStatsState extends State<WeekStats> {
             child: WeeklyChart(
               id: 'totalPaused',
               data: totalPaused,
-              barColor: charts.ColorUtil.fromDartColor(Theme.of(context).hintColor),
+              barColor: charts.ColorUtil.fromDartColor(Theme.of(context).dividerColor),
               key: UniqueKey(),
             ),
           ),

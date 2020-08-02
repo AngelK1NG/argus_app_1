@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'task_item.dart';
+import 'package:Focal/constants.dart';
 
 class TaskStatTile extends StatelessWidget {
   final int maxTime;
   final TaskItem task;
-  const TaskStatTile({@required this.maxTime, @required this.task});
+  final bool completed;
+  const TaskStatTile({@required this.maxTime, @required this.task, @required this.completed});
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +24,7 @@ class TaskStatTile extends StatelessWidget {
               task.name,
               style: TextStyle(
                 fontSize: 16,
+                color: completed ? jetBlack : Theme.of(context).accentColor,
               ),
             ),
           ),
@@ -29,16 +32,17 @@ class TaskStatTile extends StatelessWidget {
             bottom: 0,
             right: 0,
             child: Text(
-              ((task.secondsFocused + task.secondsDistracted) ~/ 60)
+              (task.secondsFocused ~/ 60)
                       .toString()
                       .padLeft(2, "0") +
                   ":" +
-                  ((task.secondsFocused + task.secondsDistracted) % 60)
+                  (task.secondsFocused % 60)
                       .toString()
                       .padLeft(2, "0"),
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
+                color: Theme.of(context).primaryColor,
               ),
             ),
           ),

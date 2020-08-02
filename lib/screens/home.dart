@@ -44,6 +44,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   String _date;
   FirebaseUser _user;
   FirestoreProvider _firestoreProvider;
+  AnalyticsProvider _analyticsProvider = AnalyticsProvider();
   List<TaskItem> _tasks = [];
   LocalNotificationHelper notificationHelper;
   // StreamSubscription<ScreenStateEvent> _subscription;
@@ -55,51 +56,67 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _secondsDistracted = 0;
   int _numPaused = 0;
   int _numDistracted = 0;
-  AnalyticsProvider analyticsProvider = AnalyticsProvider();
+  int _initSecondsFocused = 0;
+  int _initSecondsPaused = 0;
+  int _initSecondsDistracted = 0;
+  int _initNumPaused = 0;
+  int _initNumDistracted = 0;
+  List<List<DateTime>> _focusedTimes = [];
+  List<List<DateTime>> _distractedTimes = [];
+  List<List<DateTime>> _pausedTimes = [];
   ConfettiController _confettiController =
       ConfettiController(duration: Duration(seconds: 1));
+  
   void startTask() async {
     _secondsPaused = _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
-    _secondsDistracted =
-        _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
-    int seconds;
+    _initSecondsPaused = _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
+
+    _secondsDistracted = _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
+    _initSecondsDistracted = _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
+
+    _numPaused = _tasks[0].numPaused == null ? 0 : _tasks[0].numPaused;
+    _initNumPaused = _tasks[0].numPaused == null ? 0 : _tasks[0].numPaused;
+
+    _numDistracted = _tasks[0].numDistracted == null ? 0 : _tasks[0].numDistracted;
+    _initNumDistracted = _tasks[0].numDistracted == null ? 0 : _tasks[0].numDistracted;
+
+    int initSeconds;
     if (_tasks[0].secondsFocused == null) {
-      seconds = 0;
+      initSeconds = 0;
     } else if (_tasks[0].secondsDistracted == null) {
-      seconds = _tasks[0].secondsFocused;
+      initSeconds = _tasks[0].secondsFocused;
+      _initSecondsFocused = _tasks[0].secondsFocused;
     } else {
-      seconds = _tasks[0].secondsFocused + _tasks[0].secondsDistracted;
+      initSeconds = _tasks[0].secondsFocused + _tasks[0].secondsDistracted;
+      _initSecondsFocused = _tasks[0].secondsFocused;
     }
-    if (_tasks[0].numDistracted != null) {
-      _numDistracted = _tasks[0].numDistracted;
-    }
-    if (_tasks[0].numPaused != null) {
-      _numPaused = _tasks[0].numPaused;
-    }
+
     timer = new Timer.periodic(
-        const Duration(seconds: 1),
-        (Timer timer) => setState(() {
-              if (_doingTask && !_paused) {
-                final currentTime = DateTime.now();
-                _seconds =
-                    (currentTime.difference(_startFocused).inSeconds) + seconds;
-                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-                    ":" +
-                    (_seconds % 60).toString().padLeft(2, "0");
-              } else {
-                timer.cancel();
-              }
-            }));
+      const Duration(seconds: 1),
+      (Timer timer) => setState(() {
+        if (_doingTask && !_paused) {
+          final currentTime = DateTime.now();
+          _seconds =
+              (currentTime.difference(_startFocused).inSeconds) + initSeconds;
+          _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+              ":" +
+              (_seconds % 60).toString().padLeft(2, "0");
+        } else {
+          timer.cancel();
+        }
+      })
+    );
     setState(() {
-      _seconds = seconds;
+      _seconds = initSeconds;
       _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
           ":" +
           (_seconds % 60).toString().padLeft(2, "0");
       _doingTask = true;
       _startFocused = DateTime.now();
       _paused = false;
-      _numDistracted = 0;
-      _numPaused = 0;
+      _focusedTimes = [[DateTime.now()]];
+      _distractedTimes = [];
+      _pausedTimes = [];
     });
     if (Platform.isAndroid) {
       if (LocalNotificationHelper.dndOn) {
@@ -109,7 +126,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
       }
     }
-    analyticsProvider.logStartTask(_tasks[0], DateTime.now());
+    _analyticsProvider.logStartTask(_tasks[0], DateTime.now());
   }
 
   void stopTask() async {
@@ -151,15 +168,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               }));
       setState(() {
         _startFocused = DateTime.now();
-        _paused = !_paused;
+        _paused = false;
+        _pausedTimes[_pausedTimes.length - 1].add(DateTime.now());
+        _focusedTimes.add([DateTime.now()]);
       });
       LocalNotificationHelper.paused = false;
     } else {
       setState(() {
         _startPaused = DateTime.now();
-        _paused = !_paused;
+        _paused = true;
         _numPaused ++;
         LocalNotificationHelper.paused = true;
+        _focusedTimes[_focusedTimes.length - 1].add(DateTime.now());
+        _pausedTimes.add([DateTime.now()]);
       });
     }
   }
@@ -178,31 +199,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       backgroundColor: jetBlack,
       textColor: Colors.white,
     );
-    analyticsProvider.logSaveTask(_tasks[0], DateTime.now(), _swatchDisplay);
-  }
-
-  void completeTask(FirebaseUser user) {
-    FirestoreProvider firestoreProvider = FirestoreProvider(user);
-    TaskItem currentTask = _tasks[0];
-    TaskItem finishedTask = TaskItem(
-      completed: true,
-      name: currentTask.name,
-      date: _date,
-      order: _tasks.length,
-      id: currentTask.id,
-      onDismissed: currentTask.onDismissed,
-      secondsFocused: _seconds - _secondsDistracted,
-      secondsDistracted: _secondsDistracted,
-      secondsPaused: _secondsPaused,
-      numDistracted: _numDistracted,
-      numPaused: _numPaused,
-    );
-    firestoreProvider.deleteTask(_date, currentTask.id, false);
-    _tasks.remove(currentTask);
-    firestoreProvider.addTask(finishedTask, _date);
-    _tasks.add(finishedTask);
-    firestoreProvider.updateTaskOrder(_tasks, _date);
-    firestoreProvider.addCompletedTaskNumber(_date);
     DocumentReference dateDoc = db
         .collection('users')
         .document(user.uid)
@@ -219,14 +215,83 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         });
       }
       dateDoc.updateData({
-        'secondsFocused': FieldValue.increment(_seconds - _secondsDistracted),
-        'secondsDistracted': FieldValue.increment(_secondsDistracted),
-        'secondsPaused': FieldValue.increment(_secondsPaused),
-        'numDistracted': FieldValue.increment(_numDistracted),
-        'numPaused': FieldValue.increment(_numPaused),
+        'secondsFocused': FieldValue.increment(_seconds - _secondsDistracted - _initSecondsFocused),
+        'secondsDistracted': FieldValue.increment(_secondsDistracted - _initSecondsDistracted),
+        'secondsPaused': FieldValue.increment(_secondsPaused - _initSecondsPaused),
+        'numDistracted': FieldValue.increment(_numDistracted - _initNumDistracted),
+        'numPaused': FieldValue.increment(_numPaused - _initNumPaused),
+      }).then((_) {
+        _seconds = 0;
+        _secondsPaused = 0;
+        _secondsDistracted = 0;
+        _numPaused = 0;
+        _numDistracted = 0;
+        _initSecondsFocused = 0;
+        _initSecondsPaused = 0;
+        _initSecondsDistracted = 0;
+        _initNumPaused = 0;
+        _initNumDistracted = 0;
       });
     });
-    analyticsProvider.logCompleteTask(
+    _analyticsProvider.logSaveTask(_tasks[0], DateTime.now(), _swatchDisplay);
+  }
+
+  void completeTask(FirebaseUser user) {
+    TaskItem currentTask = _tasks[0];
+    TaskItem finishedTask = TaskItem(
+      completed: true,
+      name: currentTask.name,
+      date: _date,
+      order: _tasks.length,
+      id: currentTask.id,
+      onDismissed: currentTask.onDismissed,
+      secondsFocused: _seconds - _secondsDistracted,
+      secondsDistracted: _secondsDistracted,
+      secondsPaused: _secondsPaused,
+      numDistracted: _numDistracted,
+      numPaused: _numPaused,
+    );
+    _firestoreProvider.deleteTask(_date, currentTask.id, false);
+    _tasks.remove(currentTask);
+    _firestoreProvider.addTask(finishedTask, _date);
+    _tasks.add(finishedTask);
+    _firestoreProvider.updateTaskOrder(_tasks, _date);
+    _firestoreProvider.addCompletedTaskNumber(_date);
+    DocumentReference dateDoc = db
+        .collection('users')
+        .document(user.uid)
+        .collection('tasks')
+        .document(_date);
+    dateDoc.get().then((snapshot) {
+      if (snapshot.data == null) {
+        dateDoc.setData({
+          'secondsFocused': 0,
+          'secondsDistracted': 0,
+          'secondsPaused': 0,
+          'numDistracted': 0,
+          'numPaused': 0,
+        });
+      }
+      dateDoc.updateData({
+        'secondsFocused': FieldValue.increment(_seconds - _secondsDistracted - _initSecondsFocused),
+        'secondsDistracted': FieldValue.increment(_secondsDistracted - _initSecondsDistracted),
+        'secondsPaused': FieldValue.increment(_secondsPaused - _initSecondsPaused),
+        'numDistracted': FieldValue.increment(_numDistracted - _initNumDistracted),
+        'numPaused': FieldValue.increment(_numPaused - _initNumPaused),
+      }).then((_) {
+        _seconds = 0;
+        _secondsPaused = 0;
+        _secondsDistracted = 0;
+        _numPaused = 0;
+        _numDistracted = 0;
+        _initSecondsFocused = 0;
+        _initSecondsPaused = 0;
+        _initSecondsDistracted = 0;
+        _initNumPaused = 0;
+        _initNumDistracted = 0;
+      });
+    });
+    _analyticsProvider.logCompleteTask(
         finishedTask, DateTime.now(), _swatchDisplay);
     if (areTasksCompleted()) {
       Future.delayed(cardSlideDuration, () {
@@ -320,6 +385,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       case AppLifecycleState.paused:
         if (_doingTask && !_paused) {
           _startDistracted = DateTime.now();
+          _focusedTimes[_focusedTimes.length - 1].add(DateTime.now());
+          _distractedTimes.add([DateTime.now()]);
           _numDistracted ++;
           if (Platform.isAndroid) {
             if (LocalNotificationHelper.notificationsOn) {
@@ -352,6 +419,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         if (!_paused) {
           _secondsDistracted +=
               DateTime.now().difference(_startDistracted).inSeconds;
+          _distractedTimes[_focusedTimes.length - 1].add(DateTime.now());
+          _focusedTimes.add([DateTime.now()]);
         }
         break;
       case AppLifecycleState.inactive:
@@ -523,9 +592,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     _tasks = [];
                     final data = snapshot.data.documents;
                     for (var task in data) {
-                      String name = task.data['name'];
                       TaskItem actionItem = TaskItem(
-                        name: name,
+                        name: task.data['name'],
                         id: task.documentID,
                         completed: task.data['completed'],
                         order: task.data['order'],

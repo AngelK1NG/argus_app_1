@@ -64,23 +64,66 @@ class _TodayStatsState extends State<TodayStats> {
   Widget taskColumn() {
     List<Widget> taskTiles = [];
     int maxTime = 0;
+    int completedTasks = 0;
+    int savedTasks = 0;
     _tasks.forEach((task) {
       if (task.completed) {
         if ((task.secondsFocused + task.secondsDistracted + task.secondsPaused) > maxTime) {
           maxTime = task.secondsFocused + task.secondsDistracted + task.secondsPaused;
         }
+        completedTasks ++;
+      } else if (task.secondsFocused != null && task.secondsDistracted != null && task.secondsPaused != null) {
+        if ((task.secondsFocused + task.secondsDistracted + task.secondsPaused) > maxTime) {
+          maxTime = task.secondsFocused + task.secondsDistracted + task.secondsPaused;
+        }
+        savedTasks ++;
       }
     });
-    _tasks.forEach((task) {
-      if (task.completed) {
-        taskTiles.add(Padding(
-          padding: const EdgeInsets.only(
-            bottom: 20,
+    if (completedTasks > 0) {
+      taskTiles.add(Padding(
+        padding: const EdgeInsets.only(top: 20, bottom: 10),
+        child: Text(
+          'Completed tasks',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
-          child: TaskStatTile(maxTime: maxTime, task: task),
-        ));
-      }
-    });
+        )
+      ));
+      _tasks.forEach((task) {
+        if (task.completed) {
+          taskTiles.add(Padding(
+            padding: const EdgeInsets.only(
+              bottom: 20,
+            ),
+            child: TaskStatTile(maxTime: maxTime, task: task, completed: true),
+          ));
+        }
+      });
+    }
+    if (savedTasks > 0) {
+      taskTiles.add(Padding(
+        padding: const EdgeInsets.only(top: 20, bottom: 10),
+        child: Text(
+          'Saved tasks',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).accentColor,
+          ),
+        )
+      ));
+      _tasks.forEach((task) {
+        if (!task.completed && task.secondsFocused != null && task.secondsDistracted != null && task.secondsPaused != null) {
+          taskTiles.add(Padding(
+            padding: const EdgeInsets.only(
+              bottom: 20,
+            ),
+            child: TaskStatTile(maxTime: maxTime, task: task, completed: false),
+          ));
+        }
+      });
+    }
     return Column(children: taskTiles);
   }
 
@@ -232,7 +275,7 @@ class _TodayStatsState extends State<TodayStats> {
           child: taskColumn(),
         ),
         Padding(
-          padding: EdgeInsets.only(bottom: 50,),
+          padding: EdgeInsets.only(bottom: 100,),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
