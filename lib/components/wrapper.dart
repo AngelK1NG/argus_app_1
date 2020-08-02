@@ -87,7 +87,7 @@ class _WrapperWidgetState extends State<WrapperWidget>
                     right: 0,
                     top: widget.cardPosition == null
                         ? MediaQuery.of(context).size.height
-                        : widget.cardPosition,
+                        : widget.cardPosition + MediaQuery.of(context).padding.top,
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.only(

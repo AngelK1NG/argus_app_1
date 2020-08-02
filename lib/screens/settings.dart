@@ -58,7 +58,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return WrapperWidget(
       loading: _loading,
       nav: true,
-      cardPosition: MediaQuery.of(context).size.height / 2 - 240,
+      cardPosition: 110,
       backgroundColor: Theme.of(context).primaryColor,
       staticChild: Stack(children: <Widget>[
         Positioned(
@@ -80,7 +80,7 @@ class _SettingsPageState extends State<SettingsPage> {
         Positioned(
           right: 40,
           left: 40,
-          top: MediaQuery.of(context).size.height / 2 - 220,
+          top: 150,
           child: Container(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

@@ -160,7 +160,7 @@ class _TaskItemState extends State<TaskItem> {
                         )),
                   ],
                 ),
-                height: 50,
+                height: 55,
                 width: MediaQuery.of(context).size.width,
                 alignment: Alignment.centerLeft,
               ),

@@ -529,7 +529,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         backgroundColor: _doingTask ? jetBlack : Theme.of(context).primaryColor,
         cardPosition: _doingTask
             ? MediaQuery.of(context).size.height / 2
-            : MediaQuery.of(context).size.height / 2 - 100,
+            : 240,
         dynamicChild: Stack(
           children: <Widget>[
             StreamBuilder<QuerySnapshot>(
@@ -551,7 +551,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         Positioned(
                           left: 40,
                           right: 40,
-                          bottom: MediaQuery.of(context).size.height / 2 + 180,
+                          top: 100,
                           child: Text(
                             'Good Morning!',
                             textAlign: TextAlign.center,
@@ -561,12 +561,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         Positioned(
                           left: 40,
                           right: 40,
-                          top: MediaQuery.of(context).size.height / 2,
-                          child: Text(
-                            'Add a task and start your day!',
-                            textAlign: TextAlign.center,
-                            style: taskTextStyle,
-                          ),
+                          top: 300,
+                          child: Container(
+                              alignment: Alignment.center,
+                              height: 100,
+                              child: Text(
+                                'Add a task and start your day!',
+                                textAlign: TextAlign.center,
+                                style: taskTextStyle,
+                              ),
+                            ),
                         ),
                         Positioned(
                           left: 0,
@@ -620,9 +624,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 40,
                             right: 40,
-                            bottom: !_doingTask
-                                ? MediaQuery.of(context).size.height / 2 + 180
-                                : MediaQuery.of(context).size.height / 2 + 150,
+                            top: 100,
                             child: Text(
                               'Congrats! 🎉',
                               textAlign: TextAlign.center,
@@ -663,11 +665,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             left: 40,
                             right: 40,
                             top: !_doingTask
-                                ? MediaQuery.of(context).size.height / 2 - 80
+                                ? 280
                                 : MediaQuery.of(context).size.height / 2 + 20,
                             child: Container(
                               alignment: Alignment.center,
-                              height: 117,
+                              height: 100,
                               child: Text(
                                 'You\'re done!',
                                 textAlign: TextAlign.center,
@@ -753,8 +755,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           Positioned(
                               left: 40,
                               right: 40,
-                              bottom:
-                                  MediaQuery.of(context).size.height / 2 + 150,
+                              top: 100,
                               child: _doingTask
                                   ? Text(
                                       _swatchDisplay,
@@ -801,10 +802,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             right: 40,
                             top: _doingTask
                                 ? MediaQuery.of(context).size.height / 2 + 20
-                                : MediaQuery.of(context).size.height / 2 - 80,
+                                : 280,
                             child: Container(
                               alignment: Alignment.center,
-                              height: 117,
+                              height: 100,
                               child: AutoSizeText(
                                 _tasks[0].name,
                                 textAlign: TextAlign.center,

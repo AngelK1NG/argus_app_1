@@ -26,7 +26,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return WrapperWidget(
       loading: _loading,
       nav: true,
-      cardPosition: MediaQuery.of(context).size.height / 2 - 240,
+      cardPosition: 110,
       backgroundColor: Theme.of(context).primaryColor,
       staticChild: Stack(children: <Widget>[
         Positioned(
@@ -40,7 +40,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
         Positioned(
           right: 0,
           left: 0,
-          top: MediaQuery.of(context).size.height / 2 - 240,
+          top: 130,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -121,9 +121,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
           Positioned(
             right: 40,
             left: 40,
-            top: MediaQuery.of(context).size.height / 2 - 180,
+            top: 200,
             child: SizedBox(
-              height: MediaQuery.of(context).size.height / 2 + 180,
+              height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - 200,
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: _timeFrame == 'today'

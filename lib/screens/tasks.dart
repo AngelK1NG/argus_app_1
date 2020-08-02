@@ -149,7 +149,7 @@ class _TasksPageState extends State<TasksPage> {
     return WrapperWidget(
       loading: _loading,
       nav: true,
-      cardPosition: MediaQuery.of(context).size.height / 2 - 240,
+      cardPosition: 110,
       backgroundColor: Theme.of(context).primaryColor,
       staticChild: Stack(
         children: <Widget>[
@@ -178,9 +178,9 @@ class _TasksPageState extends State<TasksPage> {
           Positioned(
             right: 0,
             left: 0,
-            top: MediaQuery.of(context).size.height / 2 - 240,
+            top: 130,
             child: SizedBox(
-              height: MediaQuery.of(context).size.height / 2 + 240,
+              height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - 130,
               child: ReorderableListView(
                 header: Container(
                   child: Row(
@@ -193,9 +193,9 @@ class _TasksPageState extends State<TasksPage> {
                           color: Theme.of(context).hintColor,
                         ),
                       ),
-                      SizedBox(
-                        height: 50,
-                        width: MediaQuery.of(context).size.width - 100,
+                      Container(
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width - 116,
                         child: Form(
                           key: _formKey,
                           child: TextFormField(
