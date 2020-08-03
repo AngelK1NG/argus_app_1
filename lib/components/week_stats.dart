@@ -1,84 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:Focal/constants.dart';
 import 'package:Focal/components/weekly_chart.dart';
 import 'package:Focal/components/weekly_stacked_chart.dart';
 import 'package:Focal/components/chart_value.dart';
-import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:Focal/utils/user.dart';
-import 'package:Focal/utils/date.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:Focal/utils/size_config.dart';
 
 class WeekStats extends StatefulWidget {
-  final VoidCallback callback;
-  WeekStats({@required this.callback, Key key}) : super(key: key);
+  final List<DocumentSnapshot> snapshots;
+  WeekStats({@required this.snapshots, Key key}) : super(key: key);
 
   @override
   _WeekStatsState createState() => _WeekStatsState();
 }
 
 class _WeekStatsState extends State<WeekStats> {
-  List<String> days = [];
-  List<ChartValue> numDistracted = [];
-  List<ChartValue> numPaused = [];
-  List<ChartValue> secondsPaused = [];
-  List<ChartValue> secondsDistracted = [];
-  List<ChartValue> secondsFocused = [];
-
-  void getThisWeeksDays() {
-    var now = DateTime.now();
-    if (now.weekday != 7) {
-      now = now.subtract(new Duration(days: now.weekday));
-    }
-    days.add(getDateString(now));
-    now = now.add(new Duration(days: 1));
-    while (now.weekday != 7) {
-      days.add(getDateString(now));
-      now = now.add(new Duration(days: 1));
-    }
-  }
+  List<ChartValue> _numDistracted = [];
+  List<ChartValue> _numPaused = [];
+  List<ChartValue> _secondsPaused = [];
+  List<ChartValue> _secondsDistracted = [];
+  List<ChartValue> _secondsFocused = [];
 
   void getNumberOfEvents(String event, List<ChartValue> chartValues) {
-    FirebaseUser _user = Provider.of<User>(context, listen: false).user;
-    for (int i = 0; i < days.length; i++) {
-      DocumentReference dateDoc = db
-          .collection('users')
-          .document(_user.uid)
-          .collection('tasks')
-          .document(days[i]);
-      dateDoc.get().then((snapshot) {
-        if (snapshot.data == null || snapshot.data[event] == null) {
-          chartValues.add(ChartValue(date: days[i], val: 0));
+    widget.snapshots.forEach((snapshot) {
+      print(snapshot.documentID);
+      if (snapshot.data == null || snapshot.data[event] == null) {
+        chartValues.add(ChartValue(date: snapshot.documentID, val: 0));
+      } else {
+        if (event.substring(0, 7) == 'seconds') {
+          chartValues.add(ChartValue(date: snapshot.documentID, val: snapshot.data[event] ~/ 60));
         } else {
-          if (event.substring(0, 7) == 'seconds') {
-            chartValues.add(
-                ChartValue(date: days[i], val: snapshot.data[event] ~/ 60));
-          } else {
-            chartValues
-                .add(ChartValue(date: days[i], val: snapshot.data[event]));
-          }
+          chartValues.add(ChartValue(date: snapshot.documentID, val: snapshot.data[event]));
         }
-        chartValues.sort((a, b) => a.date.compareTo(b.date));
-      });
-      if (i == days.length - 1 && event == 'secondsFocused') {
-        Future.delayed(navDuration, () {
-          widget.callback();
-        });
       }
-    }
+      chartValues.sort((a, b) => a.date.compareTo(b.date));
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    getThisWeeksDays();
-    getNumberOfEvents('numDistracted', numDistracted);
-    getNumberOfEvents('numPaused', numPaused);
-    getNumberOfEvents('secondsPaused', secondsPaused);
-    getNumberOfEvents('secondsDistracted', secondsDistracted);
-    getNumberOfEvents('secondsFocused', secondsFocused);
+    getNumberOfEvents('numDistracted', _numDistracted);
+    getNumberOfEvents('numPaused', _numPaused);
+    getNumberOfEvents('secondsPaused', _secondsPaused);
+    getNumberOfEvents('secondsDistracted', _secondsDistracted);
+    getNumberOfEvents('secondsFocused', _secondsFocused);
   }
 
   @override
@@ -101,9 +67,9 @@ class _WeekStatsState extends State<WeekStats> {
             child: WeeklyStackedChart(
               id: 'minutesData',
               data: [
-                secondsFocused,
-                secondsDistracted,
-                secondsPaused,
+                _secondsFocused,
+                _secondsDistracted,
+                _secondsPaused,
               ],
               colorList: [
                 charts.ColorUtil.fromDartColor(Theme.of(context).primaryColor),
@@ -126,7 +92,7 @@ class _WeekStatsState extends State<WeekStats> {
             height: SizeConfig.safeBlockHorizontal * 50,
             child: WeeklyChart(
               id: 'numDistracted',
-              data: numDistracted,
+              data: _numDistracted,
               barColor: charts.ColorUtil.fromDartColor(Colors.red),
               key: UniqueKey(),
             ),
@@ -144,7 +110,7 @@ class _WeekStatsState extends State<WeekStats> {
             height: SizeConfig.safeBlockHorizontal * 50,
             child: WeeklyChart(
               id: 'numPaused',
-              data: numPaused,
+              data: _numPaused,
               barColor: charts.ColorUtil.fromDartColor(
                   Theme.of(context).dividerColor),
               key: UniqueKey(),

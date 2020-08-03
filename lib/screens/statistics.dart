@@ -5,6 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:Focal/components/today_stats.dart';
 import 'package:Focal/components/week_stats.dart';
 import 'package:Focal/utils/size_config.dart';
+import 'package:Focal/utils/date.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:Focal/utils/user.dart';
 
 class StatisticsPage extends StatefulWidget {
   StatisticsPage({Key key}) : super(key: key);
@@ -14,12 +19,79 @@ class StatisticsPage extends StatefulWidget {
 }
 
 class _StatisticsPageState extends State<StatisticsPage> {
+  List<String> _days = [];
   bool _loading = true;
   String _timeFrame = 'today';
+  QuerySnapshot _todayTasksSnapshot;
+  DocumentSnapshot _todayDateSnapshot;
+  List<DocumentSnapshot> _weekSnapshots;
+
+  Future<void> getThisWeeksDays() async {
+    var now = DateTime.now();
+    if (now.weekday != 7) {
+      now = now.subtract(new Duration(days: now.weekday));
+    }
+    _days.add(getDateString(now));
+    now = now.add(new Duration(days: 1));
+    while (now.weekday != 7) {
+      _days.add(getDateString(now));
+      now = now.add(new Duration(days: 1));
+    }
+  }
+
+  Future<void> getTodaySnapshots() async {
+    FirebaseUser user = context.read<User>().user;
+    db
+        .collection('users')
+        .document(user.uid)
+        .collection('tasks')
+        .document(getDateString(DateTime.now()))
+        .collection('tasks')
+        .orderBy('order')
+        .getDocuments()
+        .then((snapshot) {
+          _todayTasksSnapshot = snapshot;
+        });
+    db
+        .collection('users')
+        .document(user.uid)
+        .collection('tasks')
+        .document(getDateString(DateTime.now()))
+        .get().then((snapshot) {
+          _todayDateSnapshot = snapshot;
+        });
+    await Future.delayed(Duration(seconds: 1), () {
+
+    });
+  }
+
+  Future<void> getWeekSnapshots() async {
+    FirebaseUser _user = Provider.of<User>(context, listen: false).user;
+    _days.forEach((day) {
+      db
+          .collection('users')
+          .document(_user.uid)
+          .collection('tasks')
+          .document(day)
+          .get().then((snapshot) {
+            _weekSnapshots.add(snapshot);
+          });
+    });
+  }
+
+  Future<void> getSnapshots() async {
+    await getThisWeeksDays();
+    await getTodaySnapshots();
+    await getWeekSnapshots();
+    setState(() {
+      _loading = false;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    getSnapshots();
   }
 
   @override
@@ -50,7 +122,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   HapticFeedback.heavyImpact();
                   if (_timeFrame != 'today') {
                     setState(() {
-                      _loading = true;
                       _timeFrame = 'today';
                     });
                   }
@@ -84,7 +155,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   HapticFeedback.heavyImpact();
                   if (_timeFrame != 'week') {
                     setState(() {
-                      _loading = true;
                       _timeFrame = 'week';
                     });
                   }
@@ -127,11 +197,13 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 height: SizeConfig.safeBlockVertical * 85 - 80,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  child: _timeFrame == 'today'
-                      ? TodayStats(
-                          callback: () => setState(() => _loading = false))
-                      : WeekStats(
-                          callback: () => setState(() => _loading = false)),
+                  child: _loading
+                      ? Container()
+                      : _timeFrame == 'today'
+                          ? TodayStats(
+                              tasksSnapshot: _todayTasksSnapshot, dateSnapshot: _todayDateSnapshot)
+                          : WeekStats(
+                              snapshots: _weekSnapshots),
                 ),
               )),
         ],
