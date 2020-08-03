@@ -299,7 +299,7 @@ class _TasksPageState extends State<TasksPage> {
           ),
           Positioned(
             right: 40,
-            bottom: 20,
+            bottom: SizeConfig.safeBlockVertical * 2,
             child: SqrButton(
               icon: Icon(
                 Icons.calendar_today,
