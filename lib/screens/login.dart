@@ -9,6 +9,7 @@ import '../components/rct_button.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'dart:io' show Platform;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -110,6 +111,29 @@ class _LoginPageState extends State<LoginPage> {
                             size: 30,
                           ),
                         ),
+                        Platform.isIOS
+                          ? Padding(
+                            padding: EdgeInsets.only(top: 15),
+                            child: RctButton(
+                              onTap: () async {
+                                setState(() {
+                                  _loginLoading = true;
+                                });
+                                AuthProvider().appleSignIn();
+                                LocalNotificationHelper.userLoggedIn = true;
+                              },
+                              buttonWidth: 315,
+                              colored: false,
+                              buttonText: "Sign in with Apple",
+                              textSize: 24,
+                              icon: FaIcon(
+                                FontAwesomeIcons.apple,
+                                color: Colors.white,
+                                size: 35,
+                              ),
+                            ),
+                          )
+                          : Container()
                       ],
                     ),
                   ),
