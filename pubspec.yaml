@@ -28,7 +28,6 @@ dependencies:
   flutter_dnd: ^0.1.2
   flutter_local_notifications: ^1.4.4+2
   url_launcher: ^5.5.0
-  screen_state: ^1.0.0
   dots_indicator: ^1.2.0
   percent_indicator: ^2.1.5
   auto_size_text: ^2.1.0
@@ -36,6 +35,8 @@ dependencies:
   screen: ^0.0.5
   confetti: ^0.5.4
   charts_flutter: ^0.9.0
+  wakelock: ^0.1.4+2
+  hardware_buttons: ^1.0.0
 
 dev_dependencies:
   flutter_test:

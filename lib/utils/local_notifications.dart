@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:Focal/constants.dart';
 import 'package:flutter/services.dart';
-import 'package:screen/screen.dart';
 
 class LocalNotificationHelper {
   static bool userLoggedIn = true;
-  static bool screenOff = false;
   static bool paused = false;
   static bool notificationsOn;
   static bool dndOn;
