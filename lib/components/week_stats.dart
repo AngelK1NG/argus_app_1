@@ -52,7 +52,13 @@ class _WeekStatsState extends State<WeekStats> {
         if (snapshot.data == null || snapshot.data[event] == null) {
           chartValues.add(ChartValue(date: days[i], val: 0));
         } else {
-          chartValues.add(ChartValue(date: days[i], val: snapshot.data[event]));
+          if (event.substring(0, 7) == 'seconds') {
+            chartValues.add(
+                ChartValue(date: days[i], val: snapshot.data[event] ~/ 60));
+          } else {
+            chartValues
+                .add(ChartValue(date: days[i], val: snapshot.data[event]));
+          }
         }
         chartValues.sort((a, b) => a.date.compareTo(b.date));
       });
@@ -85,7 +91,7 @@ class _WeekStatsState extends State<WeekStats> {
             padding: EdgeInsets.only(bottom: 10),
             alignment: Alignment.centerLeft,
             child: Text(
-              'Seconds by Day',
+              'Minutes by Day',
               style: TextStyle(fontSize: 20),
             ),
           ),
@@ -93,7 +99,7 @@ class _WeekStatsState extends State<WeekStats> {
             width: SizeConfig.safeBlockHorizontal * 90,
             height: SizeConfig.safeBlockHorizontal * 50,
             child: WeeklyStackedChart(
-              id: 'secondsData',
+              id: 'minutesData',
               data: [
                 secondsFocused,
                 secondsDistracted,
