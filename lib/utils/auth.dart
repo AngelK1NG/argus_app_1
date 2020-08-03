@@ -55,16 +55,10 @@ class AuthProvider {
           return firebaseUser;
         case AuthorizationStatus.error:
           print(result.error.toString());
-          throw PlatformException(
-            code: 'ERROR_AUTHORIZATION_DENIED',
-            message: result.error.toString(),
-          );
+          break;
 
         case AuthorizationStatus.cancelled:
-          throw PlatformException(
-            code: 'ERROR_ABORTED_BY_USER',
-            message: 'Sign in aborted by user',
-          );
+          break;
       }
       return null;
     }

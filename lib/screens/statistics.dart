@@ -63,7 +63,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
       days.add(getDateString(now));
       now = now.add(new Duration(days: 1));
     }
-    print(days);
     FirebaseUser _user = Provider.of<User>(context, listen: false).user;
     days.forEach((day) async {
       await db

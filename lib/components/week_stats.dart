@@ -22,7 +22,6 @@ class _WeekStatsState extends State<WeekStats> {
 
   void getNumberOfEvents(String event, List<ChartValue> chartValues) {
     widget.snapshots.forEach((snapshot) {
-      print(snapshot['documentID']);
       if (snapshot['data'] == null || snapshot['data'][event] == null) {
         chartValues.add(ChartValue(date: snapshot['documentID'], val: 0));
       } else {
@@ -64,8 +63,8 @@ class _WeekStatsState extends State<WeekStats> {
             ),
           ),
           Container(
-            width: SizeConfig.safeBlockHorizontal * 90,
-            height: SizeConfig.safeBlockHorizontal * 50,
+            width: SizeConfig.safeBlockHorizontal * 100 - 80,
+            height: 200,
             child: WeeklyStackedChart(
               id: 'minutesData',
               data: [
@@ -90,8 +89,8 @@ class _WeekStatsState extends State<WeekStats> {
             ),
           ),
           Container(
-            width: SizeConfig.safeBlockHorizontal * 90,
-            height: SizeConfig.safeBlockHorizontal * 50,
+            width: SizeConfig.safeBlockHorizontal * 100 - 80,
+            height: 200,
             child: WeeklyChart(
               id: 'numDistracted',
               data: _numDistracted,
@@ -108,8 +107,8 @@ class _WeekStatsState extends State<WeekStats> {
             ),
           ),
           Container(
-            width: SizeConfig.safeBlockHorizontal * 90,
-            height: SizeConfig.safeBlockHorizontal * 50,
+            width: SizeConfig.safeBlockHorizontal * 100 - 80,
+            height: 200,
             child: WeeklyChart(
               id: 'numPaused',
               data: _numPaused,

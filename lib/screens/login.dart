@@ -9,6 +9,7 @@ import '../components/rct_button.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io' show Platform;
 
 class LoginPage extends StatefulWidget {
@@ -98,8 +99,15 @@ class _LoginPageState extends State<LoginPage> {
                             setState(() {
                               _loginLoading = true;
                             });
-                            AuthProvider().googleSignIn();
-                            LocalNotificationHelper.userLoggedIn = true;
+                            dynamic result =
+                                await AuthProvider().googleSignIn();
+                            if (result == null) {
+                              setState(() {
+                                _loginLoading = false;
+                              });
+                            } else {
+                              LocalNotificationHelper.userLoggedIn = true;
+                            }
                           },
                           buttonWidth: 315,
                           colored: true,
@@ -112,28 +120,36 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         Platform.isIOS
-                          ? Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: RctButton(
-                              onTap: () async {
-                                setState(() {
-                                  _loginLoading = true;
-                                });
-                                AuthProvider().appleSignIn();
-                                LocalNotificationHelper.userLoggedIn = true;
-                              },
-                              buttonWidth: 315,
-                              colored: false,
-                              buttonText: "Sign in with Apple",
-                              textSize: 24,
-                              icon: FaIcon(
-                                FontAwesomeIcons.apple,
-                                color: Colors.white,
-                                size: 35,
-                              ),
-                            ),
-                          )
-                          : Container()
+                            ? Padding(
+                                padding: EdgeInsets.only(top: 15),
+                                child: RctButton(
+                                  onTap: () async {
+                                    setState(() {
+                                      _loginLoading = true;
+                                    });
+                                    dynamic result =
+                                        await AuthProvider().appleSignIn();
+                                    if (result == null) {
+                                      setState(() {
+                                        _loginLoading = false;
+                                      });
+                                    } else {
+                                      LocalNotificationHelper.userLoggedIn =
+                                          true;
+                                    }
+                                  },
+                                  buttonWidth: 315,
+                                  colored: false,
+                                  buttonText: "Sign in with Apple",
+                                  textSize: 24,
+                                  icon: FaIcon(
+                                    FontAwesomeIcons.apple,
+                                    color: Colors.white,
+                                    size: 35,
+                                  ),
+                                ),
+                              )
+                            : Container()
                       ],
                     ),
                   ),
