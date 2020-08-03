@@ -19,29 +19,17 @@ class StatisticsPage extends StatefulWidget {
 }
 
 class _StatisticsPageState extends State<StatisticsPage> {
-  List<String> _days = [];
   bool _loading = true;
   String _timeFrame = 'today';
   QuerySnapshot _todayTasksSnapshot;
   DocumentSnapshot _todayDateSnapshot;
-  List<DocumentSnapshot> _weekSnapshots;
+  List<Map> _weekSnapshots = [];
 
-  Future<void> getThisWeeksDays() async {
-    var now = DateTime.now();
-    if (now.weekday != 7) {
-      now = now.subtract(new Duration(days: now.weekday));
-    }
-    _days.add(getDateString(now));
-    now = now.add(new Duration(days: 1));
-    while (now.weekday != 7) {
-      _days.add(getDateString(now));
-      now = now.add(new Duration(days: 1));
-    }
-  }
+  Future<void> getThisWeeksDays() async {}
 
   Future<void> getTodaySnapshots() async {
     FirebaseUser user = context.read<User>().user;
-    db
+    await db
         .collection('users')
         .document(user.uid)
         .collection('tasks')
@@ -50,32 +38,48 @@ class _StatisticsPageState extends State<StatisticsPage> {
         .orderBy('order')
         .getDocuments()
         .then((snapshot) {
-          _todayTasksSnapshot = snapshot;
-        });
-    db
+      _todayTasksSnapshot = snapshot;
+    });
+    await db
         .collection('users')
         .document(user.uid)
         .collection('tasks')
         .document(getDateString(DateTime.now()))
-        .get().then((snapshot) {
-          _todayDateSnapshot = snapshot;
-        });
-    await Future.delayed(Duration(seconds: 1), () {
-
+        .get()
+        .then((snapshot) {
+      _todayDateSnapshot = snapshot;
     });
   }
 
   Future<void> getWeekSnapshots() async {
+    List<String> days = [];
+    var now = DateTime.now();
+    if (now.weekday != 7) {
+      now = now.subtract(new Duration(days: now.weekday));
+    }
+    days.add(getDateString(now));
+    now = now.add(new Duration(days: 1));
+    while (now.weekday != 7) {
+      days.add(getDateString(now));
+      now = now.add(new Duration(days: 1));
+    }
+    print(days);
     FirebaseUser _user = Provider.of<User>(context, listen: false).user;
-    _days.forEach((day) {
-      db
+    days.forEach((day) async {
+      await db
           .collection('users')
           .document(_user.uid)
           .collection('tasks')
           .document(day)
-          .get().then((snapshot) {
-            _weekSnapshots.add(snapshot);
-          });
+          .get()
+          .then((snapshot) {
+        if (snapshot == null) {
+          _weekSnapshots.add({'data': null});
+        } else {
+          _weekSnapshots
+              .add({'documentID': snapshot.documentID, 'data': snapshot.data});
+        }
+      });
     });
   }
 
@@ -201,9 +205,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       ? Container()
                       : _timeFrame == 'today'
                           ? TodayStats(
-                              tasksSnapshot: _todayTasksSnapshot, dateSnapshot: _todayDateSnapshot)
-                          : WeekStats(
-                              snapshots: _weekSnapshots),
+                              tasksSnapshot: _todayTasksSnapshot,
+                              dateSnapshot: _todayDateSnapshot)
+                          : WeekStats(snapshots: _weekSnapshots),
                 ),
               )),
         ],

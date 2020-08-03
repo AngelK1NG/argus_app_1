@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:Focal/components/weekly_chart.dart';
 import 'package:Focal/components/weekly_stacked_chart.dart';
 import 'package:Focal/components/chart_value.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:Focal/utils/size_config.dart';
 
 class WeekStats extends StatefulWidget {
-  final List<DocumentSnapshot> snapshots;
+  final List<Map> snapshots;
   WeekStats({@required this.snapshots, Key key}) : super(key: key);
 
   @override
@@ -23,14 +22,17 @@ class _WeekStatsState extends State<WeekStats> {
 
   void getNumberOfEvents(String event, List<ChartValue> chartValues) {
     widget.snapshots.forEach((snapshot) {
-      print(snapshot.documentID);
-      if (snapshot.data == null || snapshot.data[event] == null) {
-        chartValues.add(ChartValue(date: snapshot.documentID, val: 0));
+      print(snapshot['documentID']);
+      if (snapshot['data'] == null || snapshot['data'][event] == null) {
+        chartValues.add(ChartValue(date: snapshot['documentID'], val: 0));
       } else {
         if (event.substring(0, 7) == 'seconds') {
-          chartValues.add(ChartValue(date: snapshot.documentID, val: snapshot.data[event] ~/ 60));
+          chartValues.add(ChartValue(
+              date: snapshot['documentID'],
+              val: snapshot['data'][event] ~/ 60));
         } else {
-          chartValues.add(ChartValue(date: snapshot.documentID, val: snapshot.data[event]));
+          chartValues.add(ChartValue(
+              date: snapshot['documentID'], val: snapshot['data'][event]));
         }
       }
       chartValues.sort((a, b) => a.date.compareTo(b.date));
