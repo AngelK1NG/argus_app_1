@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'nav_burger.dart';
 import 'side_nav.dart';
 import 'package:Focal/constants.dart';
+import 'package:Focal/utils/size_config.dart';
 
 class WrapperWidget extends StatefulWidget {
   final Widget staticChild;
@@ -87,7 +88,8 @@ class _WrapperWidgetState extends State<WrapperWidget>
                     right: 0,
                     top: widget.cardPosition == null
                         ? MediaQuery.of(context).size.height
-                        : widget.cardPosition + MediaQuery.of(context).padding.top,
+                        : widget.cardPosition +
+                            MediaQuery.of(context).padding.top,
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.only(
@@ -121,14 +123,18 @@ class _WrapperWidgetState extends State<WrapperWidget>
                           absorbing: _navActive,
                           child: Stack(
                             children: <Widget>[
-                              widget.staticChild == null ? Container() : widget.staticChild,
+                              widget.staticChild == null
+                                  ? Container()
+                                  : widget.staticChild,
                               Opacity(
                                 opacity: widget.loading == true ? 0 : 1,
                                 child: AnimatedOpacity(
                                   duration: navDuration,
                                   curve: navCurve,
                                   opacity: widget.loading == true ? 0 : 1,
-                                  child: widget.dynamicChild == null ? Container() : widget.dynamicChild,
+                                  child: widget.dynamicChild == null
+                                      ? Container()
+                                      : widget.dynamicChild,
                                 ),
                               )
                             ],
@@ -145,11 +151,12 @@ class _WrapperWidgetState extends State<WrapperWidget>
                     child: Offstage(
                       offstage: !widget.nav,
                       child: NavBurger(
-                          onTap: () {
-                            toggleNav();
-                            FocusScope.of(context).unfocus();
-                          },
-                          active: _navActive),
+                        onTap: () {
+                          toggleNav();
+                          FocusScope.of(context).unfocus();
+                        },
+                        active: _navActive,
+                      ),
                     ),
                   ),
                 ],

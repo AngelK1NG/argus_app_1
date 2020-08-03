@@ -8,6 +8,7 @@ import 'package:Focal/utils/firestore.dart';
 import 'package:Focal/utils/analytics.dart';
 import 'package:flutter/services.dart';
 import 'package:Focal/utils/date.dart';
+import 'package:Focal/utils/size_config.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/components/sqr_button.dart';
 import 'package:Focal/components/task_item.dart';
@@ -106,11 +107,16 @@ class _TasksPageState extends State<TasksPage> {
         .collection('tasks')
         .document(_date);
     dateDoc.updateData({
-      'secondsFocused': FieldValue.increment(task.secondsFocused == null ? 0 : -task.secondsFocused),
-      'secondsDistracted': FieldValue.increment(task.secondsDistracted == null ? 0 : -task.secondsDistracted),
-      'secondsPaused': FieldValue.increment(task.secondsPaused == null ? 0 : -task.secondsPaused),
-      'numDistracted': FieldValue.increment(task.numDistracted == null ? 0 : -task.numDistracted),
-      'numPaused': FieldValue.increment(task.numPaused == null ? 0 : -task.numPaused),
+      'secondsFocused': FieldValue.increment(
+          task.secondsFocused == null ? 0 : -task.secondsFocused),
+      'secondsDistracted': FieldValue.increment(
+          task.secondsDistracted == null ? 0 : -task.secondsDistracted),
+      'secondsPaused': FieldValue.increment(
+          task.secondsPaused == null ? 0 : -task.secondsPaused),
+      'numDistracted': FieldValue.increment(
+          task.numDistracted == null ? 0 : -task.numDistracted),
+      'numPaused':
+          FieldValue.increment(task.numPaused == null ? 0 : -task.numPaused),
     }).then((_) {
       dateDoc.get().then((snapshot) {
         if (snapshot.data['secondsFocused'] < 0) {
@@ -149,38 +155,36 @@ class _TasksPageState extends State<TasksPage> {
     return WrapperWidget(
       loading: _loading,
       nav: true,
-      cardPosition: 110,
+      cardPosition: SizeConfig.safeBlockVertical * 15,
       backgroundColor: Theme.of(context).primaryColor,
-      staticChild: Stack(
-        children: <Widget>[
-          Positioned(
-            right: 40,
-            top: 40,
-            child: Text(
-              (DateTime.parse(_date).year == DateTime.now().year &&
-                      DateTime.parse(_date).month == DateTime.now().month &&
-                      DateTime.parse(_date).day == DateTime.now().day)
-                  ? "Today"
-                  : (DateTime.parse(_date).year == DateTime.now().year &&
-                          DateTime.parse(_date).month == DateTime.now().month &&
-                          DateTime.parse(_date).day == DateTime.now().day + 1)
-                      ? "Tomorrow"
-                      : DateTime.parse(_date).month.toString() +
-                          "/" +
-                          DateTime.parse(_date).day.toString(),
-              style: headerTextStyle,
-            ),
+      staticChild: Stack(children: <Widget>[
+        Positioned(
+          right: 40,
+          top: SizeConfig.safeBlockVertical * 5,
+          child: Text(
+            (DateTime.parse(_date).year == DateTime.now().year &&
+                    DateTime.parse(_date).month == DateTime.now().month &&
+                    DateTime.parse(_date).day == DateTime.now().day)
+                ? "Today"
+                : (DateTime.parse(_date).year == DateTime.now().year &&
+                        DateTime.parse(_date).month == DateTime.now().month &&
+                        DateTime.parse(_date).day == DateTime.now().day + 1)
+                    ? "Tomorrow"
+                    : DateTime.parse(_date).month.toString() +
+                        "/" +
+                        DateTime.parse(_date).day.toString(),
+            style: headerTextStyle,
           ),
-        ]
-      ),
+        ),
+      ]),
       dynamicChild: Stack(
         children: <Widget>[
           Positioned(
             right: 0,
             left: 0,
-            top: 130,
+            top: SizeConfig.safeBlockVertical * 15 + 20,
             child: SizedBox(
-              height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - 130,
+              height: SizeConfig.safeBlockVertical * 85 - 20,
               child: ReorderableListView(
                 header: Container(
                   child: Row(
@@ -219,11 +223,14 @@ class _TasksPageState extends State<TasksPage> {
                                     order: _tasks.length - _completedTasks,
                                     date: _date,
                                   );
-                                  newTask.onDismissed = () => removeTask(newTask);
-                                  newTask.onUpdate = (value) => newTask.name = value;
+                                  newTask.onDismissed =
+                                      () => removeTask(newTask);
+                                  newTask.onUpdate =
+                                      (value) => newTask.name = value;
                                   setState(() {
                                     _tasks.insert(
-                                        _tasks.length - _completedTasks, newTask);
+                                        _tasks.length - _completedTasks,
+                                        newTask);
                                   });
                                   String userId = user.uid;
                                   db
@@ -237,9 +244,10 @@ class _TasksPageState extends State<TasksPage> {
                                     'order': newTask.order,
                                     'completed': newTask.completed,
                                   }).then((doc) {
-                                    _tasks[_tasks.length - _completedTasks - 1].id =
-                                        doc.documentID;
-                                    firestoreProvider.updateTaskOrder(_tasks, _date);
+                                    _tasks[_tasks.length - _completedTasks - 1]
+                                        .id = doc.documentID;
+                                    firestoreProvider.updateTaskOrder(
+                                        _tasks, _date);
                                     DocumentReference dateDoc = db
                                         .collection('users')
                                         .document(user.uid)
@@ -250,7 +258,8 @@ class _TasksPageState extends State<TasksPage> {
                                     });
                                   });
                                   _formKey.currentState.reset();
-                                  AnalyticsProvider().logAddTask(newTask, DateTime.now());
+                                  AnalyticsProvider()
+                                      .logAddTask(newTask, DateTime.now());
                                 }
                               },
                               validator: (value) {
@@ -275,7 +284,8 @@ class _TasksPageState extends State<TasksPage> {
                     final task = tasks.removeAt(oldIndex);
                     if (newIndex >= tasks.length - _completedTasks) {
                       int distanceFromEnd = tasks.length - newIndex;
-                      tasks.insert(newIndex - (_completedTasks - distanceFromEnd), task);
+                      tasks.insert(
+                          newIndex - (_completedTasks - distanceFromEnd), task);
                       firestoreProvider.updateTaskOrder(tasks, _date);
                     } else {
                       tasks.insert(newIndex, task);
@@ -288,8 +298,8 @@ class _TasksPageState extends State<TasksPage> {
             ),
           ),
           Positioned(
-            right: 30,
-            bottom: 30,
+            right: 40,
+            bottom: 20,
             child: SqrButton(
               icon: Icon(
                 Icons.calendar_today,

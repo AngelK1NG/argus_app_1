@@ -1,6 +1,7 @@
 import 'package:Focal/components/settings_tile.dart';
 import 'package:Focal/utils/local_notifications.dart';
 import 'package:Focal/utils/user.dart';
+import 'package:Focal/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:Focal/constants.dart';
 import 'package:provider/provider.dart';
@@ -58,16 +59,16 @@ class _SettingsPageState extends State<SettingsPage> {
     return WrapperWidget(
       loading: _loading,
       nav: true,
-      cardPosition: 110,
+      cardPosition: SizeConfig.safeBlockVertical * 15,
       backgroundColor: Theme.of(context).primaryColor,
       staticChild: Stack(children: <Widget>[
         Positioned(
           right: 0,
           top: 0,
           child: Padding(
-            padding: const EdgeInsets.only(
+            padding: EdgeInsets.only(
               right: 40,
-              top: 40,
+              top: SizeConfig.safeBlockVertical * 5,
             ),
             child: Text(
               "Settings",
@@ -80,7 +81,7 @@ class _SettingsPageState extends State<SettingsPage> {
         Positioned(
           right: 40,
           left: 40,
-          top: 150,
+          top: SizeConfig.safeBlockVertical * 15 + 40,
           child: Container(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

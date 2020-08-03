@@ -10,7 +10,8 @@ final Firestore db = Firestore.instance;
 final FirebaseAnalytics analytics = FirebaseAnalytics();
 
 // local notifications
-final FlutterLocalNotificationsPlugin notificationsPlugin = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin notificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 //colors
 final Color jetBlack = Color(0xff2b2b2b);

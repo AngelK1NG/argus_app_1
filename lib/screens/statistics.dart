@@ -4,6 +4,7 @@ import 'package:Focal/constants.dart';
 import 'package:flutter/services.dart';
 import 'package:Focal/components/today_stats.dart';
 import 'package:Focal/components/week_stats.dart';
+import 'package:Focal/utils/size_config.dart';
 
 class StatisticsPage extends StatefulWidget {
   StatisticsPage({Key key}) : super(key: key);
@@ -26,12 +27,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return WrapperWidget(
       loading: _loading,
       nav: true,
-      cardPosition: 110,
+      cardPosition: SizeConfig.safeBlockVertical * 15,
       backgroundColor: Theme.of(context).primaryColor,
       staticChild: Stack(children: <Widget>[
         Positioned(
           right: 40,
-          top: 40,
+          top: SizeConfig.safeBlockVertical * 5,
           child: Text(
             'Statistics',
             style: headerTextStyle,
@@ -40,7 +41,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
         Positioned(
           right: 0,
           left: 0,
-          top: 130,
+          top: SizeConfig.safeBlockVertical * 15 + 20,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -56,7 +57,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 },
                 child: Container(
                   height: 30,
-                  width: MediaQuery.of(context).size.width / 2 - 40,
+                  width: SizeConfig.safeBlockHorizontal * 50 - 40,
                   decoration: BoxDecoration(
                       color: _timeFrame == 'today'
                           ? Theme.of(context).accentColor
@@ -90,7 +91,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 },
                 child: Container(
                   height: 30,
-                  width: MediaQuery.of(context).size.width / 2 - 40,
+                  width: SizeConfig.safeBlockHorizontal * 50 - 40,
                   decoration: BoxDecoration(
                       color: _timeFrame == 'week'
                           ? Theme.of(context).accentColor
@@ -119,19 +120,20 @@ class _StatisticsPageState extends State<StatisticsPage> {
       dynamicChild: Stack(
         children: <Widget>[
           Positioned(
-            right: 40,
-            left: 40,
-            top: 200,
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - 200,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: _timeFrame == 'today'
-                  ? TodayStats(callback: () => setState(() => _loading = false))
-                  : WeekStats(callback: () => setState(() => _loading = false)),
-              ),
-            )
-          ),
+              right: 40,
+              left: 40,
+              top: SizeConfig.safeBlockVertical * 15 + 80,
+              child: SizedBox(
+                height: SizeConfig.safeBlockVertical * 85 - 80,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: _timeFrame == 'today'
+                      ? TodayStats(
+                          callback: () => setState(() => _loading = false))
+                      : WeekStats(
+                          callback: () => setState(() => _loading = false)),
+                ),
+              )),
         ],
       ),
     );

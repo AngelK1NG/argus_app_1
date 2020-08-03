@@ -68,28 +68,37 @@ class _TodayStatsState extends State<TodayStats> {
     int savedTasks = 0;
     _tasks.forEach((task) {
       if (task.completed) {
-        if ((task.secondsFocused + task.secondsDistracted + task.secondsPaused) > maxTime) {
-          maxTime = task.secondsFocused + task.secondsDistracted + task.secondsPaused;
+        if ((task.secondsFocused +
+                task.secondsDistracted +
+                task.secondsPaused) >
+            maxTime) {
+          maxTime =
+              task.secondsFocused + task.secondsDistracted + task.secondsPaused;
         }
-        completedTasks ++;
-      } else if (task.secondsFocused != null && task.secondsDistracted != null && task.secondsPaused != null) {
-        if ((task.secondsFocused + task.secondsDistracted + task.secondsPaused) > maxTime) {
-          maxTime = task.secondsFocused + task.secondsDistracted + task.secondsPaused;
+        completedTasks++;
+      } else if (task.secondsFocused != null &&
+          task.secondsDistracted != null &&
+          task.secondsPaused != null) {
+        if ((task.secondsFocused +
+                task.secondsDistracted +
+                task.secondsPaused) >
+            maxTime) {
+          maxTime =
+              task.secondsFocused + task.secondsDistracted + task.secondsPaused;
         }
-        savedTasks ++;
+        savedTasks++;
       }
     });
     if (completedTasks > 0) {
       taskTiles.add(Padding(
-        padding: const EdgeInsets.only(top: 20, bottom: 10),
-        child: Text(
-          'Completed tasks',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        )
-      ));
+          padding: const EdgeInsets.only(top: 20, bottom: 10),
+          child: Text(
+            'Completed tasks',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          )));
       _tasks.forEach((task) {
         if (task.completed) {
           taskTiles.add(Padding(
@@ -103,18 +112,20 @@ class _TodayStatsState extends State<TodayStats> {
     }
     if (savedTasks > 0) {
       taskTiles.add(Padding(
-        padding: const EdgeInsets.only(top: 20, bottom: 10),
-        child: Text(
-          'Saved tasks',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Theme.of(context).accentColor,
-          ),
-        )
-      ));
+          padding: const EdgeInsets.only(top: 20, bottom: 10),
+          child: Text(
+            'Saved tasks',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).accentColor,
+            ),
+          )));
       _tasks.forEach((task) {
-        if (!task.completed && task.secondsFocused != null && task.secondsDistracted != null && task.secondsPaused != null) {
+        if (!task.completed &&
+            task.secondsFocused != null &&
+            task.secondsDistracted != null &&
+            task.secondsPaused != null) {
           taskTiles.add(Padding(
             padding: const EdgeInsets.only(
               bottom: 20,
@@ -128,7 +139,7 @@ class _TodayStatsState extends State<TodayStats> {
   }
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
     FirebaseUser user = Provider.of<User>(context, listen: false).user;
     DocumentReference dateDoc = db
@@ -156,7 +167,8 @@ class _TodayStatsState extends State<TodayStats> {
         if (snapshot.data['secondsDistracted'] == null) {
           _timeDistracted = Duration(seconds: 0);
         } else {
-          _timeDistracted = Duration(seconds: snapshot.data['secondsDistracted']);
+          _timeDistracted =
+              Duration(seconds: snapshot.data['secondsDistracted']);
         }
         if (snapshot.data['numDistracted'] == null) {
           _numDistracted = 0;
@@ -172,7 +184,6 @@ class _TodayStatsState extends State<TodayStats> {
       getTasks();
     });
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -195,23 +206,24 @@ class _TodayStatsState extends State<TodayStats> {
                           ? 0
                           : (_completedTasks / _totalTasks),
                       backgroundColor: jetBlack,
-                      valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).primaryColor),
                     ),
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        ((_totalTasks == null || _totalTasks == 0)
-                                ? 0
-                                : (_completedTasks / _totalTasks) * 100)
-                            .toInt()
-                            .toString() + '%',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500,
-                        )
-                      ),
+                          ((_totalTasks == null || _totalTasks == 0)
+                                      ? 0
+                                      : (_completedTasks / _totalTasks) * 100)
+                                  .toInt()
+                                  .toString() +
+                              '%',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                          )),
                       Text(
                         'Done',
                         style: TextStyle(
@@ -224,64 +236,78 @@ class _TodayStatsState extends State<TodayStats> {
                 ],
               ),
               Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text(
-                    _timeFocused.inHours.toString().padLeft(2, "0") +
-                    ":" +
-                    (_timeFocused.inMinutes % 60).toString().padLeft(2, "0") +
-                    ":" +
-                    (_timeFocused.inSeconds % 60).toString().padLeft(2, "0"),
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    'Focused',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 10),
-                    child: Text(
-                      _timeDistracted.inHours.toString().padLeft(2, "0") +
-                      ":" +
-                      (_timeDistracted.inMinutes % 60).toString().padLeft(2, "0") +
-                      ":" +
-                      (_timeDistracted.inSeconds % 60).toString().padLeft(2, "0"),
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Text(
+                      _timeFocused.inHours.toString().padLeft(2, "0") +
+                          ":" +
+                          (_timeFocused.inMinutes % 60)
+                              .toString()
+                              .padLeft(2, "0") +
+                          ":" +
+                          (_timeFocused.inSeconds % 60)
+                              .toString()
+                              .padLeft(2, "0"),
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                  Text(
-                    'Distracted',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.red,
+                    Text(
+                      'Focused',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).primaryColor,
+                      ),
                     ),
-                  ),
-                ]
-              ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Text(
+                        _timeDistracted.inHours.toString().padLeft(2, "0") +
+                            ":" +
+                            (_timeDistracted.inMinutes % 60)
+                                .toString()
+                                .padLeft(2, "0") +
+                            ":" +
+                            (_timeDistracted.inSeconds % 60)
+                                .toString()
+                                .padLeft(2, "0"),
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Distracted',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ]),
             ],
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 50, bottom: 25,),
+          padding: EdgeInsets.only(
+            top: 50,
+            bottom: 25,
+          ),
           child: taskColumn(),
         ),
         Padding(
-          padding: EdgeInsets.only(bottom: 100,),
+          padding: EdgeInsets.only(
+            bottom: 50,
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               RichText(
                 text: TextSpan(
-                  text: (_numDistracted == 1 ? 'Distraction: ' : 'Distractions: '),
+                  text: (_numDistracted == 1
+                      ? 'Distraction: '
+                      : 'Distractions: '),
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.red,

@@ -24,7 +24,9 @@ class _WeekStatsState extends State<WeekStats> {
 
   void getThisWeeksDays() {
     var now = DateTime.now();
-    now = now.subtract(new Duration(days: now.weekday));
+    if (now.weekday != 7) {
+      now = now.subtract(new Duration(days: now.weekday));
+    }
     days.add(getDateString(now));
     now = now.add(new Duration(days: 1));
     while (now.weekday != 7) {
@@ -117,7 +119,8 @@ class _WeekStatsState extends State<WeekStats> {
             child: WeeklyChart(
               id: 'totalPaused',
               data: totalPaused,
-              barColor: charts.ColorUtil.fromDartColor(Theme.of(context).dividerColor),
+              barColor: charts.ColorUtil.fromDartColor(
+                  Theme.of(context).dividerColor),
               key: UniqueKey(),
             ),
           ),

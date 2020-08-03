@@ -6,6 +6,7 @@ import 'package:Focal/utils/date.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:Focal/utils/local_notifications.dart';
 import 'package:Focal/utils/user.dart';
+import 'package:Focal/utils/size_config.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -61,24 +62,27 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _initSecondsDistracted = 0;
   int _initNumPaused = 0;
   int _initNumDistracted = 0;
-  List<List<DateTime>> _focusedTimes = [];
-  List<List<DateTime>> _distractedTimes = [];
-  List<List<DateTime>> _pausedTimes = [];
   ConfettiController _confettiController =
       ConfettiController(duration: Duration(seconds: 1));
-  
-  void startTask() async {
-    _secondsPaused = _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
-    _initSecondsPaused = _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
 
-    _secondsDistracted = _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
-    _initSecondsDistracted = _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
+  void startTask() async {
+    _secondsPaused =
+        _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
+    _initSecondsPaused =
+        _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
+
+    _secondsDistracted =
+        _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
+    _initSecondsDistracted =
+        _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
 
     _numPaused = _tasks[0].numPaused == null ? 0 : _tasks[0].numPaused;
     _initNumPaused = _tasks[0].numPaused == null ? 0 : _tasks[0].numPaused;
 
-    _numDistracted = _tasks[0].numDistracted == null ? 0 : _tasks[0].numDistracted;
-    _initNumDistracted = _tasks[0].numDistracted == null ? 0 : _tasks[0].numDistracted;
+    _numDistracted =
+        _tasks[0].numDistracted == null ? 0 : _tasks[0].numDistracted;
+    _initNumDistracted =
+        _tasks[0].numDistracted == null ? 0 : _tasks[0].numDistracted;
 
     int initSeconds;
     if (_tasks[0].secondsFocused == null) {
@@ -92,20 +96,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
 
     timer = new Timer.periodic(
-      const Duration(seconds: 1),
-      (Timer timer) => setState(() {
-        if (_doingTask && !_paused) {
-          final currentTime = DateTime.now();
-          _seconds =
-              (currentTime.difference(_startFocused).inSeconds) + initSeconds;
-          _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-              ":" +
-              (_seconds % 60).toString().padLeft(2, "0");
-        } else {
-          timer.cancel();
-        }
-      })
-    );
+        const Duration(seconds: 1),
+        (Timer timer) => setState(() {
+              if (_doingTask && !_paused) {
+                final currentTime = DateTime.now();
+                _seconds = (currentTime.difference(_startFocused).inSeconds) +
+                    initSeconds;
+                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                    ":" +
+                    (_seconds % 60).toString().padLeft(2, "0");
+              } else {
+                timer.cancel();
+              }
+            }));
     setState(() {
       _seconds = initSeconds;
       _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
@@ -114,9 +117,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _doingTask = true;
       _startFocused = DateTime.now();
       _paused = false;
-      _focusedTimes = [[DateTime.now()]];
-      _distractedTimes = [];
-      _pausedTimes = [];
     });
     if (Platform.isAndroid) {
       if (LocalNotificationHelper.dndOn) {
@@ -169,18 +169,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       setState(() {
         _startFocused = DateTime.now();
         _paused = false;
-        _pausedTimes[_pausedTimes.length - 1].add(DateTime.now());
-        _focusedTimes.add([DateTime.now()]);
       });
       LocalNotificationHelper.paused = false;
     } else {
       setState(() {
         _startPaused = DateTime.now();
         _paused = true;
-        _numPaused ++;
+        _numPaused++;
         LocalNotificationHelper.paused = true;
-        _focusedTimes[_focusedTimes.length - 1].add(DateTime.now());
-        _pausedTimes.add([DateTime.now()]);
       });
     }
   }
@@ -215,10 +211,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         });
       }
       dateDoc.updateData({
-        'secondsFocused': FieldValue.increment(_seconds - _secondsDistracted - _initSecondsFocused),
-        'secondsDistracted': FieldValue.increment(_secondsDistracted - _initSecondsDistracted),
-        'secondsPaused': FieldValue.increment(_secondsPaused - _initSecondsPaused),
-        'numDistracted': FieldValue.increment(_numDistracted - _initNumDistracted),
+        'secondsFocused': FieldValue.increment(
+            _seconds - _secondsDistracted - _initSecondsFocused),
+        'secondsDistracted':
+            FieldValue.increment(_secondsDistracted - _initSecondsDistracted),
+        'secondsPaused':
+            FieldValue.increment(_secondsPaused - _initSecondsPaused),
+        'numDistracted':
+            FieldValue.increment(_numDistracted - _initNumDistracted),
         'numPaused': FieldValue.increment(_numPaused - _initNumPaused),
       }).then((_) {
         _seconds = 0;
@@ -273,10 +273,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         });
       }
       dateDoc.updateData({
-        'secondsFocused': FieldValue.increment(_seconds - _secondsDistracted - _initSecondsFocused),
-        'secondsDistracted': FieldValue.increment(_secondsDistracted - _initSecondsDistracted),
-        'secondsPaused': FieldValue.increment(_secondsPaused - _initSecondsPaused),
-        'numDistracted': FieldValue.increment(_numDistracted - _initNumDistracted),
+        'secondsFocused': FieldValue.increment(
+            _seconds - _secondsDistracted - _initSecondsFocused),
+        'secondsDistracted':
+            FieldValue.increment(_secondsDistracted - _initSecondsDistracted),
+        'secondsPaused':
+            FieldValue.increment(_secondsPaused - _initSecondsPaused),
+        'numDistracted':
+            FieldValue.increment(_numDistracted - _initNumDistracted),
         'numPaused': FieldValue.increment(_numPaused - _initNumPaused),
       }).then((_) {
         _seconds = 0;
@@ -385,9 +389,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       case AppLifecycleState.paused:
         if (_doingTask && !_paused) {
           _startDistracted = DateTime.now();
-          _focusedTimes[_focusedTimes.length - 1].add(DateTime.now());
-          _distractedTimes.add([DateTime.now()]);
-          _numDistracted ++;
+          _numDistracted++;
           if (Platform.isAndroid) {
             if (LocalNotificationHelper.notificationsOn) {
               if (LocalNotificationHelper.dndOn) {
@@ -419,8 +421,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         if (!_paused) {
           _secondsDistracted +=
               DateTime.now().difference(_startDistracted).inSeconds;
-          _distractedTimes[_focusedTimes.length - 1].add(DateTime.now());
-          _focusedTimes.add([DateTime.now()]);
         }
         break;
       case AppLifecycleState.inactive:
@@ -495,6 +495,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     final TextStyle topTextStyle = TextStyle(
       fontSize: 40,
       color: Colors.white,
@@ -528,8 +529,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         nav: !_doingTask,
         backgroundColor: _doingTask ? jetBlack : Theme.of(context).primaryColor,
         cardPosition: _doingTask
-            ? MediaQuery.of(context).size.height / 2 - MediaQuery.of(context).padding.top
-            : 240,
+            ? SizeConfig.safeBlockVertical * 50
+            : SizeConfig.safeBlockVertical * 33,
         dynamicChild: Stack(
           children: <Widget>[
             StreamBuilder<QuerySnapshot>(
@@ -551,7 +552,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         Positioned(
                           left: 40,
                           right: 40,
-                          top: 100,
+                          top: SizeConfig.safeBlockVertical * 15,
                           child: Text(
                             'Good Morning!',
                             textAlign: TextAlign.center,
@@ -561,21 +562,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         Positioned(
                           left: 40,
                           right: 40,
-                          top: 300,
+                          top: SizeConfig.safeBlockVertical * 45,
                           child: Container(
-                              alignment: Alignment.center,
-                              height: 100,
-                              child: Text(
-                                'Add a task and start your day!',
-                                textAlign: TextAlign.center,
-                                style: taskTextStyle,
-                              ),
+                            alignment: Alignment.center,
+                            height: SizeConfig.safeBlockVertical * 18,
+                            child: Text(
+                              'Add a task and start your day!',
+                              textAlign: TextAlign.center,
+                              style: taskTextStyle,
                             ),
+                          ),
                         ),
                         Positioned(
                           left: 0,
                           right: 0,
-                          bottom: 120,
+                          bottom: SizeConfig.safeBlockVertical * 12,
                           child: Container(
                             alignment: Alignment.center,
                             child: RctButton(
@@ -624,7 +625,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 40,
                             right: 40,
-                            top: 100,
+                            top: SizeConfig.safeBlockVertical * 15,
                             child: Text(
                               'Congrats! 🎉',
                               textAlign: TextAlign.center,
@@ -634,7 +635,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           Positioned(
                             left: 0,
                             right: 0,
-                            top: (MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top) / 2 - 33,
+                            top: SizeConfig.safeBlockVertical * 50 - 33,
                             child: AnimatedOpacity(
                               duration: cardSlideDuration,
                               curve: cardSlideCurve,
@@ -663,11 +664,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             left: 40,
                             right: 40,
                             top: !_doingTask
-                                ? 280
-                                : MediaQuery.of(context).size.height / 2 + 20,
+                                ? SizeConfig.safeBlockVertical * 40
+                                : SizeConfig.safeBlockVertical * 57,
                             child: Container(
                               alignment: Alignment.center,
-                              height: 100,
+                              height: SizeConfig.safeBlockVertical * 18,
                               child: Text(
                                 'You\'re done!',
                                 textAlign: TextAlign.center,
@@ -680,7 +681,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 0,
                             right: 0,
-                            bottom: !_doingTask ? 190 : 450 - MediaQuery.of(context).size.height / 290,
+                            bottom: !_doingTask
+                                ? SizeConfig.safeBlockVertical * 26
+                                : SizeConfig.safeBlockVertical * 9,
                             child: Center(
                               child: RctButton(
                                 onTap: () {
@@ -701,7 +704,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 0,
                             right: 0,
-                            bottom: !_doingTask ? 130 : 390 - MediaQuery.of(context).size.height / 2,
+                            bottom: !_doingTask
+                                ? SizeConfig.safeBlockVertical * 19
+                                : SizeConfig.safeBlockVertical * 2,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
@@ -721,7 +726,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ),
                           Positioned(
                               right: 40,
-                              bottom: 90,
+                              bottom: SizeConfig.safeBlockVertical * 11,
                               child: Text(
                                 ((_totalTasks == null || _totalTasks == 0)
                                             ? 0
@@ -735,7 +740,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           Positioned(
                             left: 40,
                             right: 40,
-                            bottom: 60,
+                            bottom: SizeConfig.safeBlockVertical * 7,
                             child: LinearPercentIndicator(
                               percent: (_totalTasks == null || _totalTasks == 0)
                                   ? 0
@@ -753,7 +758,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           Positioned(
                               left: 40,
                               right: 40,
-                              top: 100,
+                              top: SizeConfig.safeBlockVertical * 13,
                               child: _doingTask
                                   ? Text(
                                       _swatchDisplay,
@@ -768,9 +773,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           Positioned(
                             left: 0,
                             right: 0,
-                            bottom: Platform.isIOS
-                                ? MediaQuery.of(context).size.height / 2 - 66
-                                : MediaQuery.of(context).size.height / 2 - 33,
+                            bottom: SizeConfig.safeBlockVertical * 50 - 33,
                             child: AnimatedOpacity(
                               duration: cardSlideDuration,
                               curve: cardSlideCurve,
@@ -798,12 +801,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 40,
                             right: 40,
-                            top: _doingTask
-                                ? MediaQuery.of(context).size.height / 2 + 20
-                                : 280,
+                            top: !_doingTask
+                                ? SizeConfig.safeBlockVertical * 40
+                                : SizeConfig.safeBlockVertical * 57,
                             child: Container(
                               alignment: Alignment.center,
-                              height: 100,
+                              height: SizeConfig.safeBlockVertical * 18,
                               child: AutoSizeText(
                                 _tasks[0].name,
                                 textAlign: TextAlign.center,
@@ -817,7 +820,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 0,
                             right: 0,
-                            bottom: _doingTask ? 450 - MediaQuery.of(context).size.height / 2 : 190,
+                            bottom: !_doingTask
+                                ? SizeConfig.safeBlockVertical * 26
+                                : SizeConfig.safeBlockVertical * 9,
                             child: Center(
                                 child: _doingTask
                                     ? RctButton(
@@ -851,7 +856,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 0,
                             right: 0,
-                            bottom: _doingTask ? 390 - MediaQuery.of(context).size.height / 2 : 130,
+                            bottom: !_doingTask
+                                ? SizeConfig.safeBlockVertical * 19
+                                : SizeConfig.safeBlockVertical * 2,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
@@ -869,7 +876,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ),
                           Positioned(
                               right: 40,
-                              bottom: 90,
+                              bottom: SizeConfig.safeBlockVertical * 11,
                               child: Visibility(
                                 visible: !_doingTask,
                                 child: Text(
@@ -887,7 +894,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           Positioned(
                             left: 40,
                             right: 40,
-                            bottom: 60,
+                            bottom: SizeConfig.safeBlockVertical * 7,
                             child: Visibility(
                               visible: !_doingTask,
                               child: LinearPercentIndicator(

@@ -15,7 +15,17 @@ class NavBurger extends StatelessWidget {
       height: 90,
       child: IconButton(
         onPressed: onTap,
-        icon: active ? FaIcon(FontAwesomeIcons.times, size: 28, color: jetBlack,) : FaIcon(FontAwesomeIcons.bars, size: 28, color: Colors.white,),
+        icon: active
+            ? FaIcon(
+                FontAwesomeIcons.times,
+                size: 28,
+                color: jetBlack,
+              )
+            : FaIcon(
+                FontAwesomeIcons.bars,
+                size: 28,
+                color: Colors.white,
+              ),
       ),
     );
   }
