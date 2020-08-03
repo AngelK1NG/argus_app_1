@@ -23,6 +23,7 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:confetti/confetti.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wakelock/wakelock.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -48,7 +49,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   AnalyticsProvider _analyticsProvider = AnalyticsProvider();
   List<TaskItem> _tasks = [];
   LocalNotificationHelper notificationHelper;
-  // StreamSubscription<ScreenStateEvent> _subscription;
   bool _notifConfirmation = false;
   bool _loading = true;
   bool _paused = false;
@@ -66,6 +66,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ConfettiController(duration: Duration(seconds: 1));
 
   void startTask() async {
+    if (Platform.isAndroid) {
+      Wakelock.enable();
+    }
     _secondsPaused =
         _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
     _initSecondsPaused =
@@ -130,6 +133,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void stopTask() async {
+    if (Platform.isAndroid) {
+      Wakelock.disable();
+    }
     if (_paused) {
       _secondsPaused += DateTime.now().difference(_startPaused).inSeconds;
     }
@@ -182,6 +188,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void saveTask(FirebaseUser user) async {
+    if (Platform.isAndroid) {
+      Wakelock.disable();
+    }
     TaskItem task = _tasks.removeAt(0);
     task.secondsFocused = _seconds - _secondsDistracted;
     task.secondsDistracted = _secondsDistracted;
@@ -332,7 +341,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     notificationHelper = LocalNotificationHelper();
     notificationHelper.initialize();
     WidgetsBinding.instance.addObserver(this);
-    // startListening();
     setState(() {
       _date = getDateString(DateTime.now());
       _user = Provider.of<User>(context, listen: false).user;
@@ -378,7 +386,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    // _subscription.cancel();
+    Wakelock.disable();
     super.dispose();
   }
 
@@ -388,9 +396,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.paused:
         if (_doingTask && !_paused) {
-          _startDistracted = DateTime.now();
-          _numDistracted++;
           if (Platform.isAndroid) {
+            _startDistracted = DateTime.now();
+            _numDistracted++;
             if (LocalNotificationHelper.notificationsOn) {
               if (LocalNotificationHelper.dndOn) {
                 Future.delayed(const Duration(milliseconds: 500), () {
@@ -408,9 +416,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 });
               }
             }
-          } else {
+          } else if (Platform.isIOS) {
             printBoi().then((value) {
               if (value) {
+                _startDistracted = DateTime.now();
+                _numDistracted++;
                 notificationHelper.showNotifications();
               }
             });
@@ -419,8 +429,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.resumed:
         if (!_paused) {
-          _secondsDistracted +=
-              DateTime.now().difference(_startDistracted).inSeconds;
+          if (Platform.isIOS) {
+            printBoi().then((value) {
+              if (value) {
+                _secondsDistracted +=
+                DateTime.now().difference(_startDistracted).inSeconds;
+              }
+            });
+          } else {
+            _secondsDistracted +=
+            DateTime.now().difference(_startDistracted).inSeconds;
+          }
         }
         break;
       case AppLifecycleState.inactive:
@@ -429,23 +448,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         break;
     }
   }
-
-  // void onData(ScreenStateEvent event) {
-  //   if (event == ScreenStateEvent.SCREEN_OFF) {
-  //     LocalNotificationHelper.screenOff = true;
-  //   }
-  //   if (event == ScreenStateEvent.SCREEN_UNLOCKED) {
-  //     LocalNotificationHelper.screenOff = false;
-  //   }
-  // }
-
-  // void startListening() {
-  //   _screen = new Screen();
-  //   try {
-  //     _subscription = _screen.screenStateStream.listen(onData);
-  //   } on ScreenStateException catch (exception) {
-  //   }
-  // }
 
 // android confirm for notification settings
   Future<void> showNotificationConfirmation() async {
