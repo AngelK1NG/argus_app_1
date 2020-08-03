@@ -24,7 +24,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:confetti/confetti.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock/wakelock.dart';
-import 'package:hardware_buttons/hardware_buttons.dart' as HardwareButtons;
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -35,7 +34,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static const platform = const MethodChannel("com.flutter.lockscreen");
-  static const androidPlatform = const MethodChannel("technology.focal.focal");
 
   Timer timer;
   DateTime _startFocused = DateTime.now();
@@ -66,21 +64,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _initNumDistracted = 0;
   ConfettiController _confettiController =
       ConfettiController(duration: Duration(seconds: 1));
-  StreamSubscription<HardwareButtons.LockButtonEvent> _lockButtonSubscription;
-  bool _screenOff = false;
-
-  void printy() async {
-    String val = '';
-    try {
-      val = await androidPlatform.invokeMethod("checkIfScreenOff");
-    } catch (e) {
-      print(e);
-    }
-    print(val);
-  }
 
   void startTask() async {
-    printy();
     if (Platform.isAndroid) {
       Wakelock.enable();
     }
@@ -353,15 +338,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     getSettings();
-    _lockButtonSubscription = HardwareButtons.lockButtonEvents.listen((event) {
-      print(event);
-      print('pressed');
-      _screenOff = true;
-    });
     notificationHelper = LocalNotificationHelper();
     notificationHelper.initialize();
     WidgetsBinding.instance.addObserver(this);
-    ;
     setState(() {
       _date = getDateString(DateTime.now());
       _user = Provider.of<User>(context, listen: false).user;
@@ -407,7 +386,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _lockButtonSubscription.cancel();
     Wakelock.disable();
     super.dispose();
   }
@@ -417,10 +395,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.paused:
-        if (_doingTask && !_paused && !_screenOff) {
-          _startDistracted = DateTime.now();
-          _numDistracted++;
+        if (_doingTask && !_paused) {
           if (Platform.isAndroid) {
+            _startDistracted = DateTime.now();
+            _numDistracted++;
             if (LocalNotificationHelper.notificationsOn) {
               if (LocalNotificationHelper.dndOn) {
                 Future.delayed(const Duration(milliseconds: 500), () {
@@ -438,9 +416,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 });
               }
             }
-          } else {
+          } else if (Platform.isIOS) {
             printBoi().then((value) {
               if (value) {
+                _startDistracted = DateTime.now();
+                _numDistracted++;
                 notificationHelper.showNotifications();
               }
             });
@@ -448,9 +428,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
         break;
       case AppLifecycleState.resumed:
-        if (!_paused && !_screenOff) {
-          _secondsDistracted +=
-              DateTime.now().difference(_startDistracted).inSeconds;
+        if (!_paused) {
+          if (Platform.isIOS) {
+            printBoi().then((value) {
+              if (value) {
+                _secondsDistracted +=
+                DateTime.now().difference(_startDistracted).inSeconds;
+              }
+            });
+          } else {
+            _secondsDistracted +=
+            DateTime.now().difference(_startDistracted).inSeconds;
+          }
         }
         break;
       case AppLifecycleState.inactive:
@@ -509,7 +498,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    _screenOff = false;
     final TextStyle topTextStyle = TextStyle(
       fontSize: 40,
       color: Colors.white,

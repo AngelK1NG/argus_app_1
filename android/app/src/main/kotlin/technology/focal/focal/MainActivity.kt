@@ -1,4 +1,4 @@
-package com.example.Focal
+package technology.focal.focal
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -43,7 +43,6 @@ class _WeekStatsState extends State<WeekStats> {
   void getNumberOfEvents(String event, List<ChartValue> chartValues) {
     FirebaseUser _user = Provider.of<User>(context, listen: false).user;
     for (int i = 0; i < days.length; i++) {
-      print(days[i]);
       DocumentReference dateDoc = db
           .collection('users')
           .document(_user.uid)

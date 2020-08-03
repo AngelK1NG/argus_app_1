@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'nav_burger.dart';
 import 'side_nav.dart';
 import 'package:Focal/constants.dart';
-import 'package:Focal/utils/size_config.dart';
 
 class WrapperWidget extends StatefulWidget {
   final Widget staticChild;
