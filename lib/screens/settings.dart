@@ -136,17 +136,21 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
         ),
-        Positioned(
-          right: 40,
-          left: 40,
-          bottom: 120,
-          child: Text("You are signed in as " + _email,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                color: Theme.of(context).hintColor,
-              )),
-        ),
+        _email == null
+            ? Container()
+            : Positioned(
+                right: 40,
+                left: 40,
+                bottom: 120,
+                child: Text(
+                  "You are signed in as " + _email,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Theme.of(context).hintColor,
+                  ),
+                ),
+              ),
         Positioned(
           right: 0,
           left: 0,
