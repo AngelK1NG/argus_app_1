@@ -52,6 +52,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _notifConfirmation = false;
   bool _loading = true;
   bool _paused = false;
+  bool _screenOn = true;
   int _seconds = 0;
   int _secondsPaused = 0;
   int _secondsDistracted = 0;
@@ -422,6 +423,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 _startDistracted = DateTime.now();
                 _numDistracted++;
                 notificationHelper.showNotifications();
+                _screenOn = true;
+              } else {
+                _screenOn = false;
               }
             });
           }
@@ -430,15 +434,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       case AppLifecycleState.resumed:
         if (!_paused) {
           if (Platform.isIOS) {
-            printBoi().then((value) {
-              if (value) {
-                _secondsDistracted +=
-                DateTime.now().difference(_startDistracted).inSeconds;
-              }
-            });
+            if (_screenOn) {
+              _secondsDistracted +=
+                  DateTime.now().difference(_startDistracted).inSeconds;
+            }
           } else {
             _secondsDistracted +=
-            DateTime.now().difference(_startDistracted).inSeconds;
+                DateTime.now().difference(_startDistracted).inSeconds;
           }
         }
         break;
