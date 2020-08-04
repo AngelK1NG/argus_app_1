@@ -7,7 +7,7 @@ import 'package:Focal/utils/user.dart';
 
 class OnboardingPage extends StatelessWidget {
   final String title;
-  final String text;
+  final Text text;
   final bool button;
 
   const OnboardingPage({
@@ -44,14 +44,7 @@ class OnboardingPage extends StatelessWidget {
             bottom: 50,
           ),
           width: 315,
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w300,
-            ),
-          ),
+          child: text,
         ),
         Offstage(
           offstage: !button,
