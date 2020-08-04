@@ -1,7 +1,6 @@
 import 'package:Focal/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SideNav extends StatelessWidget {
   final VoidCallback onTap;
@@ -30,15 +29,6 @@ class SideNav extends StatelessWidget {
     }
 
     onTap();
-  }
-
-  openFeedbackForm() async {
-    const feedbackURL = 'https://forms.gle/YKVpEAimFx3T6kn39';
-    if (await canLaunch(feedbackURL)) {
-      await launch(feedbackURL);
-    } else {
-      print('Couldn\'t find url');
-    }
   }
 
   @override

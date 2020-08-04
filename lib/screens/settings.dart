@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:Focal/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../components/wrapper.dart';
+import 'package:flutter/services.dart';
 import 'dart:io' show Platform;
 
 class SettingsPage extends StatefulWidget {
@@ -46,6 +48,16 @@ class _SettingsPageState extends State<SettingsPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool(key, val);
     print('$key is set to ${prefs.get}');
+  }
+
+  openPrivacyPolicy() async {
+    const URL =
+        'https://docs.google.com/document/d/1eIL0fXCFXXoiIfU59qPXqnQxhKp-8VG2XTvh63O0d-o/edit?usp=sharing';
+    if (await canLaunch(URL)) {
+      await launch(URL);
+    } else {
+      print('Couldn\'t find url');
+    }
   }
 
   @override
@@ -169,6 +181,7 @@ class _SettingsPageState extends State<SettingsPage> {
               children: <Widget>[
                 FlatButton(
                   onPressed: () {
+                    HapticFeedback.heavyImpact();
                     LocalNotificationHelper.userLoggedIn = false;
                     auth.signOut();
                   },
@@ -180,7 +193,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       )),
                 ),
                 FlatButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    HapticFeedback.heavyImpact();
+                    openPrivacyPolicy();
+                  },
                   child: Text("Privacy policy",
                       style: TextStyle(
                         fontSize: 18,
