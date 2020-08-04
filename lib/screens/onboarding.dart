@@ -16,7 +16,7 @@ class _OnboardingState extends State<Onboarding> {
   );
   double _index = 0;
   TextStyle descriptionStyle = TextStyle(
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: FontWeight.w300,
   );
 
@@ -76,7 +76,17 @@ class _OnboardingState extends State<Onboarding> {
                           ),
                         ),
                         TextSpan(
-                          text: ' when you’re done or ',
+                          text: ' when you’re done, the ',
+                        ),
+                        TextSpan(
+                          text: 'Pause Button',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).accentColor,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' to pause, or ',
                         ),
                         TextSpan(
                           text: 'Save for later',
@@ -97,7 +107,7 @@ class _OnboardingState extends State<Onboarding> {
                 OnboardingPage(
                   title: 'Prioritize',
                   text: Text(
-                    'Start the day by ordering your tasks based on what you need to get done first. You can hold to reorder or swipe to remove any tasks.',
+                    'Start the day by ordering your tasks based on what you need to get done first. You can hold to reorder or swipe to remove any task.',
                     textAlign: TextAlign.center,
                     style: descriptionStyle,
                   ),
@@ -133,7 +143,7 @@ class _OnboardingState extends State<Onboarding> {
                           text: '. Otherwise, tap the ',
                         ),
                         TextSpan(
-                          text: 'pause button',
+                          text: 'Pause Button',
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                             color: Theme.of(context).accentColor,
