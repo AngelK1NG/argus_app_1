@@ -121,11 +121,14 @@ class SideNav extends StatelessWidget {
               bottom: 0,
               left: 0,
               child: FlatButton(
-                onPressed: openFeedbackForm,
+                onPressed: () {
+                  goToRoute(context, '/home');
+                  Navigator.of(context).pushReplacementNamed('/onboarding');
+                },
                 child: Row(
                   children: <Widget>[
                     Text(
-                      "Feedback",
+                      "Help",
                       style: TextStyle(
                         color: Theme.of(context).hintColor,
                         fontSize: 24,
@@ -135,7 +138,7 @@ class SideNav extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(left: 10),
                       child: FaIcon(
-                        FontAwesomeIcons.fileAlt,
+                        FontAwesomeIcons.questionCircle,
                         color: Theme.of(context).hintColor,
                         size: 24,
                       ),

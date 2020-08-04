@@ -9,7 +9,6 @@ import '../components/rct_button.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io' show Platform;
 
 class LoginPage extends StatefulWidget {

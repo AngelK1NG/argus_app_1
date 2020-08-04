@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:apple_sign_in/apple_sign_in.dart';
-import 'package:flutter/services.dart';
 
 class AuthProvider {
   FirebaseAuth _auth = FirebaseAuth.instance;
