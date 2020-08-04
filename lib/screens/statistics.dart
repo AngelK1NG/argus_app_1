@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Focal/components/wrapper.dart';
 import 'package:Focal/constants.dart';
-import 'package:flutter/services.dart';
 import 'package:Focal/components/today_stats.dart';
 import 'package:Focal/components/week_stats.dart';
 import 'package:Focal/utils/size_config.dart';
@@ -99,6 +98,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     return WrapperWidget(
       loading: _loading,
       nav: true,
@@ -122,7 +122,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
             children: <Widget>[
               GestureDetector(
                 onTap: () {
-                  HapticFeedback.heavyImpact();
                   if (_timeFrame != 'today') {
                     setState(() {
                       _timeFrame = 'today';
@@ -155,7 +154,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
               ),
               GestureDetector(
                 onTap: () {
-                  HapticFeedback.heavyImpact();
                   if (_timeFrame != 'week') {
                     setState(() {
                       _timeFrame = 'week';

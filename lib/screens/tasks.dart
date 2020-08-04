@@ -28,6 +28,8 @@ class _TasksPageState extends State<TasksPage> {
   bool _loading = true;
   List<TaskItem> _tasks = [];
   int _completedTasks;
+  double _safeAreaDifference = 0;
+  double _bottomPadding = 0;
 
   void getCompletedTasks() {
     FirebaseUser user = context.read<User>().user;
@@ -149,18 +151,42 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final bool isKeyboardVisible =
+        MediaQuery.of(context).viewInsets.bottom > 0.0;
+    if (isKeyboardVisible) {
+      setState(() {
+        _safeAreaDifference = 0;
+      });
+    } else {
+      setState(() {
+        _bottomPadding = MediaQuery.of(context).padding.bottom;
+        _safeAreaDifference = MediaQuery.of(context).padding.bottom;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     FirebaseUser user = Provider.of<User>(context, listen: false).user;
     FirestoreProvider firestoreProvider = FirestoreProvider(user);
     return WrapperWidget(
       loading: _loading,
       nav: true,
-      cardPosition: SizeConfig.safeBlockVertical * 15,
+      cardPosition: (SizeConfig.safeBlockVertical * 100 +
+              _safeAreaDifference -
+              _bottomPadding) *
+          0.15,
       backgroundColor: Theme.of(context).primaryColor,
       staticChild: Stack(children: <Widget>[
         Positioned(
           right: 40,
-          top: SizeConfig.safeBlockVertical * 5,
+          top: (SizeConfig.safeBlockVertical * 100 +
+                  _safeAreaDifference -
+                  _bottomPadding) *
+              0.05,
           child: Text(
             (DateTime.parse(_date).year == DateTime.now().year &&
                     DateTime.parse(_date).month == DateTime.now().month &&
@@ -182,7 +208,11 @@ class _TasksPageState extends State<TasksPage> {
           Positioned(
             right: 0,
             left: 0,
-            top: SizeConfig.safeBlockVertical * 15 + 20,
+            top: (SizeConfig.safeBlockVertical * 100 +
+                        _safeAreaDifference -
+                        _bottomPadding) *
+                    0.15 +
+                20,
             child: SizedBox(
               height: SizeConfig.safeBlockVertical * 85 - 20,
               child: ReorderableListView(
