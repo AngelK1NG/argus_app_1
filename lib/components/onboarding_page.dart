@@ -23,7 +23,7 @@ class OnboardingPage extends StatelessWidget {
       children: <Widget>[
         Image(
             image: AssetImage('images/onboarding/' + title + '.png'),
-            height: 225),
+            height: 250),
         Padding(
           padding: const EdgeInsets.only(
             top: 50,

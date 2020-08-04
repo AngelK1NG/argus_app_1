@@ -7,6 +7,7 @@ import 'package:Focal/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/wrapper.dart';
+import 'dart:io' show Platform;
 
 class SettingsPage extends StatefulWidget {
   SettingsPage({Key key}) : super(key: key);
@@ -19,7 +20,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _loading = true;
   bool _notificationsOn = true;
   bool _dndOn = true;
-  bool _soundOn = true;
+  // bool _soundOn = true;
 
   void getSettings() {
     SharedPreferences.getInstance().then((SharedPreferences prefs) {
@@ -33,9 +34,9 @@ class _SettingsPageState extends State<SettingsPage> {
         _notificationsOn = prefs.getBool('notifications on') == null
             ? true
             : prefs.getBool('notifications on');
-        _soundOn = prefs.getBool('sound on') == null
-            ? true
-            : prefs.getBool('sound on');
+        // _soundOn = prefs.getBool('sound on') == null
+        //     ? true
+        //     : prefs.getBool('sound on');
         _loading = false;
       });
     });
@@ -105,34 +106,35 @@ class _SettingsPageState extends State<SettingsPage> {
                     setValue('notifications on', value);
                   },
                 ),
-                SettingsTile(
-                  title: 'Turn on Do Not Disturb when Focused',
-                  toggle: _dndOn,
-                  onChanged: (value) {
-                    setState(() {
-                      _dndOn = value;
-                    });
-                    LocalNotificationHelper.dndOn = value;
-                    setValue('do not disturb on', value);
-                  },
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 50, bottom: 25),
-                  child: Text(
-                    'Sounds',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-                  ),
-                ),
-                SettingsTile(
-                  title: 'Notification sounds',
-                  toggle: _soundOn,
-                  onChanged: (value) {
-                    setState(() {
-                      _soundOn = value;
-                    });
-                    setValue('sound on', value);
-                  },
-                ),
+                Platform.isAndroid
+                    ? SettingsTile(
+                        title: 'Turn on Do Not Disturb when Focused',
+                        toggle: _dndOn,
+                        onChanged: (value) {
+                          setState(() {
+                            _dndOn = value;
+                          });
+                          LocalNotificationHelper.dndOn = value;
+                          setValue('do not disturb on', value);
+                        })
+                    : Container(),
+                // Padding(
+                //   padding: EdgeInsets.only(top: 50, bottom: 25),
+                //   child: Text(
+                //     'Sounds',
+                //     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+                //   ),
+                // ),
+                // SettingsTile(
+                //   title: 'Notification sounds',
+                //   toggle: _soundOn,
+                //   onChanged: (value) {
+                //     setState(() {
+                //       _soundOn = value;
+                //     });
+                //     setValue('sound on', value);
+                //   },
+                // ),
               ],
             ),
           ),
@@ -179,7 +181,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 FlatButton(
                   onPressed: () {},
-                  child: Text("Terms of Service",
+                  child: Text("Privacy policy",
                       style: TextStyle(
                         fontSize: 18,
                         color: Theme.of(context).hintColor,

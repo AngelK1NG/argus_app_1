@@ -8,7 +8,9 @@ import 'package:Focal/utils/date.dart';
 class TodayStats extends StatefulWidget {
   final QuerySnapshot tasksSnapshot;
   final DocumentSnapshot dateSnapshot;
-  TodayStats({@required this.tasksSnapshot, @required this.dateSnapshot, Key key}) : super(key: key);
+  TodayStats(
+      {@required this.tasksSnapshot, @required this.dateSnapshot, Key key})
+      : super(key: key);
 
   @override
   _TodayStatsState createState() => _TodayStatsState();
@@ -75,7 +77,7 @@ class _TodayStatsState extends State<TodayStats> {
     });
     if (completedTasks > 0) {
       taskTiles.add(Padding(
-          padding: const EdgeInsets.only(top: 20, bottom: 10),
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
           child: Text(
             'Completed tasks',
             style: TextStyle(
@@ -96,7 +98,7 @@ class _TodayStatsState extends State<TodayStats> {
     }
     if (savedTasks > 0) {
       taskTiles.add(Padding(
-          padding: const EdgeInsets.only(top: 20, bottom: 10),
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
           child: Text(
             'Saved tasks',
             style: TextStyle(
@@ -139,7 +141,8 @@ class _TodayStatsState extends State<TodayStats> {
       if (widget.dateSnapshot.data['secondsFocused'] == null) {
         _timeFocused = Duration(seconds: 0);
       } else {
-        _timeFocused = Duration(seconds: widget.dateSnapshot.data['secondsFocused']);
+        _timeFocused =
+            Duration(seconds: widget.dateSnapshot.data['secondsFocused']);
       }
       if (widget.dateSnapshot.data['secondsDistracted'] == null) {
         _timeDistracted = Duration(seconds: 0);
