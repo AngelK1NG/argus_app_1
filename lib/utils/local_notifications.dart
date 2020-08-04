@@ -6,8 +6,10 @@ import 'package:flutter/services.dart';
 
 class LocalNotificationHelper {
   static bool userLoggedIn = true;
-  static bool screenOff = false;
   static bool paused = false;
+  static bool notificationsOn;
+  static bool dndOn;
+
   void initialize() async {
     var initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
@@ -20,7 +22,7 @@ class LocalNotificationHelper {
   }
 
   void showNotifications() async {
-    if (userLoggedIn && !screenOff && !paused) {
+    if (userLoggedIn && !paused && notificationsOn) {
       HapticFeedback.heavyImpact();
       await notification();
       print('Notification sent');

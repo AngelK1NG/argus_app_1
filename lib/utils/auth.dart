@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:apple_sign_in/apple_sign_in.dart';
-import 'package:flutter/services.dart';
 
 class AuthProvider {
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -30,12 +29,13 @@ class AuthProvider {
     }
   }
 
-  Future<FirebaseUser> appleSignIn({List<Scope> scopes = const []}) async {
+  Future<FirebaseUser> appleSignIn() async {
     if (!await AppleSignIn.isAvailable()) {
       return null; //Break from the program
     } else {
-      final result = await AppleSignIn.performRequests(
-          [AppleIdRequest(requestedScopes: scopes)]);
+      final result = await AppleSignIn.performRequests([
+        AppleIdRequest(requestedScopes: [Scope.email, Scope.fullName])
+      ]);
       switch (result.status) {
         case AuthorizationStatus.authorized:
           final appleIdCredential = result.credential;
@@ -47,25 +47,17 @@ class AuthProvider {
           );
           AuthResult authResult = await _auth.signInWithCredential(credential);
           FirebaseUser firebaseUser = authResult.user;
-          if (scopes.contains(Scope.fullName)) {
-            final updateUser = UserUpdateInfo();
-            updateUser.displayName =
-                '${appleIdCredential.fullName.givenName} ${appleIdCredential.fullName.familyName}';
-            await firebaseUser.updateProfile(updateUser);
-          }
+          final updateUser = UserUpdateInfo();
+          updateUser.displayName =
+              '${appleIdCredential.fullName.givenName} ${appleIdCredential.fullName.familyName}';
+          await firebaseUser.updateProfile(updateUser);
           return firebaseUser;
         case AuthorizationStatus.error:
           print(result.error.toString());
-          throw PlatformException(
-            code: 'ERROR_AUTHORIZATION_DENIED',
-            message: result.error.toString(),
-          );
+          break;
 
         case AuthorizationStatus.cancelled:
-          throw PlatformException(
-            code: 'ERROR_ABORTED_BY_USER',
-            message: 'Sign in aborted by user',
-          );
+          break;
       }
       return null;
     }

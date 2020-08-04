@@ -1,6 +1,6 @@
+import 'package:Focal/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SideNav extends StatelessWidget {
   final VoidCallback onTap;
@@ -31,20 +31,11 @@ class SideNav extends StatelessWidget {
     onTap();
   }
 
-  openFeedbackForm() async {
-    const feedbackURL = 'https://forms.gle/YKVpEAimFx3T6kn39';
-    if (await canLaunch(feedbackURL)) {
-      await launch(feedbackURL);
-    } else {
-      print('Couldn\'t find url');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return AnimatedPositioned(
-      duration: Duration(milliseconds: 200),
-      curve: Curves.ease,
+      duration: navDuration,
+      curve: navCurve,
       top: 0,
       bottom: 0,
       left: active ? 0 : -300,
@@ -75,6 +66,7 @@ class SideNav extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w400,
+                        color: jetBlack,
                       )),
                 ),
                 FlatButton(
@@ -86,6 +78,7 @@ class SideNav extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w400,
+                        color: jetBlack,
                       )),
                 ),
                 FlatButton(
@@ -97,6 +90,7 @@ class SideNav extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w400,
+                        color: jetBlack,
                       )),
                 ),
                 FlatButton(
@@ -108,6 +102,7 @@ class SideNav extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w400,
+                        color: jetBlack,
                       )),
                 ),
               ],
@@ -116,11 +111,14 @@ class SideNav extends StatelessWidget {
               bottom: 0,
               left: 0,
               child: FlatButton(
-                onPressed: openFeedbackForm,
+                onPressed: () {
+                  goToRoute(context, '/home');
+                  Navigator.of(context).pushReplacementNamed('/onboarding');
+                },
                 child: Row(
                   children: <Widget>[
                     Text(
-                      "Feedback",
+                      "Help",
                       style: TextStyle(
                         color: Theme.of(context).hintColor,
                         fontSize: 24,
@@ -130,7 +128,7 @@ class SideNav extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(left: 10),
                       child: FaIcon(
-                        FontAwesomeIcons.fileAlt,
+                        FontAwesomeIcons.questionCircle,
                         color: Theme.of(context).hintColor,
                         size: 24,
                       ),

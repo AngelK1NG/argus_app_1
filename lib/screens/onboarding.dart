@@ -15,6 +15,10 @@ class _OnboardingState extends State<Onboarding> {
     initialPage: 0,
   );
   double _index = 0;
+  TextStyle descriptionStyle = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w300,
+  );
 
   @override
   void initState() {
@@ -39,37 +43,138 @@ class _OnboardingState extends State<Onboarding> {
     return WillPopScope(
       onWillPop: () async => false,
       child: WrapperWidget(
-        loading: false,
-        transition: false,
         nav: false,
-        child: Stack(
+        staticChild: Stack(
           children: <Widget>[
             PageView(
               controller: _controller,
               children: <Widget>[
                 OnboardingPage(
-                  title: 'Welcome',
-                  text: 'You have been invited to test Focal in our closed Alpha! In the next few pages we will take you through the basics of app to get you started.',
-                  button: false,
-                ),
-                OnboardingPage(
                   title: 'Focus',
-                  text: 'This is where you will complete all of your tasks! Click start to begin your task at hand and the stopwatch will start. Once you finish, tap Complete. If you fail to complete the task, tap Abandon to start your next task.',
+                  text: Text.rich(
+                    TextSpan(
+                      style: descriptionStyle,
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: 'This is where you will focus! Tap ',
+                        ),
+                        TextSpan(
+                          text: 'Start',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' to begin the stopwatch for the current task. Tap ',
+                        ),
+                        TextSpan(
+                          text: 'Done',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' when you’re done, the ',
+                        ),
+                        TextSpan(
+                          text: 'Pause Button',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).accentColor,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' to pause, or ',
+                        ),
+                        TextSpan(
+                          text: 'Save for later',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).hintColor,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' to defer the task.',
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                   button: false,
                 ),
                 OnboardingPage(
                   title: 'Prioritize',
-                  text: 'Start the day by ordering your tasks based on what you need to get done first. Hold anywhere on the screen to drag and reorder your list. The task at the top will be shown first in Focus. You can also swipe to remove any tasks.',
+                  text: Text(
+                    'Start the day by ordering your tasks based on what you need to get done first. You can hold to reorder or swipe to remove any task.',
+                    textAlign: TextAlign.center,
+                    style: descriptionStyle,
+                  ),
                   button: false,
                 ),
                 OnboardingPage(
                   title: 'Statistics',
-                  text: 'At any point of the day, you can check your stats to see the total time you have been productive, how many tasks you have completed, and the percentage of tasks you have completed.',
+                  text: Text.rich(
+                    TextSpan(
+                      style: descriptionStyle,
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: 'Discover how much time you spent being productive with statistics. When you leave the app while ',
+                        ),
+                        TextSpan(
+                          text: 'Focused',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ', you become ',
+                        ),
+                        TextSpan(
+                          text: 'Distracted',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.red,
+                          ),
+                        ),
+                        TextSpan(
+                          text: '. Otherwise, tap the ',
+                        ),
+                        TextSpan(
+                          text: 'Pause Button',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).accentColor,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' to become ',
+                        ),
+                        TextSpan(
+                          text: 'Paused',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).hintColor,
+                          ),
+                        ),
+                        TextSpan(
+                          text: '.',
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                   button: false,
                 ),
                 OnboardingPage(
-                  title: 'Feedback',
-                  text: 'When you are ready, please fill out the feedback form that can be found at the bottom of the navigation bar. We will also be contacting you for more details.',
+                  title: 'Ready up',
+                  text: Text(
+                    'Let\'s get focused! 🚀',
+                    textAlign: TextAlign.center,
+                    style: descriptionStyle,
+                  ),
                   button: true,
                 ),
               ],
@@ -79,7 +184,7 @@ class _OnboardingState extends State<Onboarding> {
               right: 0,
               bottom: 20,
               child: DotsIndicator(
-                dotsCount: 5,
+                dotsCount: 4,
                 position: _index,
                 decorator: DotsDecorator(
                   color: Colors.transparent,

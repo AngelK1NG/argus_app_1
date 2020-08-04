@@ -10,3 +10,7 @@ String getDateString(DateTime date) {
   }
   return year + month + day;
 }
+
+DateTime getDateFromString(String date) {
+  return DateTime.parse(date);
+}

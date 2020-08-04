@@ -1,5 +1,7 @@
+
 # Uncomment this line to define a global platform for your project
 # platform :ios, '9.0'
+
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -33,7 +35,7 @@ def parse_KV_file(file, separator='=')
 end
 
 target 'Runner' do
-  use_frameworks!
+  use_frameworks! :linkage => :static
   use_modular_headers!
 
   # Flutter Pod
@@ -61,8 +63,9 @@ target 'Runner' do
     end
   end
 
-  # Keep pod path relative so it can be checked into Podfile.lock.
-  pod 'Flutter', :path => 'Flutter'
+# Keep pod path relative so it can be checked into Podfile.lock.
+pod 'Flutter', :path => 'Flutter'
+pod 'FirebaseFirestore', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git', :tag => '6.26.0'
 
   # Plugin Pods
 

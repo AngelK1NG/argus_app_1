@@ -9,6 +9,7 @@ import '../components/rct_button.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'dart:io' show Platform;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -83,10 +84,8 @@ class _LoginPageState extends State<LoginPage> {
           child: ModalProgressHUD(
             inAsyncCall: _loginLoading,
             child: WrapperWidget(
-              loading: false,
-              transition: false,
               nav: false,
-              child: Column(
+              staticChild: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
@@ -99,12 +98,18 @@ class _LoginPageState extends State<LoginPage> {
                             setState(() {
                               _loginLoading = true;
                             });
-                            AuthProvider().googleSignIn();
-                            LocalNotificationHelper.userLoggedIn = true;
+                            dynamic result =
+                                await AuthProvider().googleSignIn();
+                            if (result == null) {
+                              setState(() {
+                                _loginLoading = false;
+                              });
+                            } else {
+                              LocalNotificationHelper.userLoggedIn = true;
+                            }
                           },
                           buttonWidth: 315,
-                          buttonColor: Colors.black,
-                          textColor: Colors.white,
+                          colored: true,
                           buttonText: "Sign in with Google",
                           textSize: 24,
                           icon: FaIcon(
@@ -113,6 +118,37 @@ class _LoginPageState extends State<LoginPage> {
                             size: 30,
                           ),
                         ),
+                        Platform.isIOS
+                            ? Padding(
+                                padding: EdgeInsets.only(top: 15),
+                                child: RctButton(
+                                  onTap: () async {
+                                    setState(() {
+                                      _loginLoading = true;
+                                    });
+                                    dynamic result =
+                                        await AuthProvider().appleSignIn();
+                                    if (result == null) {
+                                      setState(() {
+                                        _loginLoading = false;
+                                      });
+                                    } else {
+                                      LocalNotificationHelper.userLoggedIn =
+                                          true;
+                                    }
+                                  },
+                                  buttonWidth: 315,
+                                  colored: false,
+                                  buttonText: "Sign in with Apple",
+                                  textSize: 24,
+                                  icon: FaIcon(
+                                    FontAwesomeIcons.apple,
+                                    color: Colors.white,
+                                    size: 35,
+                                  ),
+                                ),
+                              )
+                            : Container()
                       ],
                     ),
                   ),

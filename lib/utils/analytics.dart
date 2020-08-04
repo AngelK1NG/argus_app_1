@@ -17,7 +17,18 @@ class AnalyticsProvider {
       name: 'start_task',
       parameters: <String, dynamic>{
         'name': task.name,
-        'time': time.hour.toString() + time.minute.toString(),
+        'time': time.hour.toString() + ':' + time.minute.toString(),
+      },
+    );
+  }
+
+  void logPauseTask(TaskItem task, DateTime time, String duration) {
+    analytics.logEvent(
+      name: 'pause_task',
+      parameters: <String, dynamic>{
+        'name': task.name,
+        'time': time.hour.toString() + ':' + time.minute.toString(),
+        'duration': duration,
       },
     );
   }
@@ -27,18 +38,18 @@ class AnalyticsProvider {
       name: 'complete_task',
       parameters: <String, dynamic>{
         'name': task.name,
-        'time': time.hour.toString() + time.minute.toString(),
+        'time': time.hour.toString() + ':' + time.minute.toString(),
         'duration': duration,
       },
     );
   }
 
-  void logAbandonTask(TaskItem task, DateTime time, String duration) {
+  void logSaveTask(TaskItem task, DateTime time, String duration) {
     analytics.logEvent(
       name: 'abandon_task',
       parameters: <String, dynamic>{
         'name': task.name,
-        'time': time.hour.toString() + time.minute.toString(),
+        'time': time.hour.toString() + ':' + time.minute.toString(),
         'duration': duration,
       },
     );
