@@ -58,7 +58,7 @@ class _WeekStatsState extends State<WeekStats> {
             padding: EdgeInsets.only(bottom: 10),
             alignment: Alignment.centerLeft,
             child: Text(
-              'Minutes by Day',
+              'Total Minutes',
               style: TextStyle(fontSize: 20),
             ),
           ),
@@ -84,7 +84,7 @@ class _WeekStatsState extends State<WeekStats> {
             padding: EdgeInsets.only(top: 25, bottom: 10),
             alignment: Alignment.centerLeft,
             child: Text(
-              '# of Distractions by Day',
+              'Number of Distractions',
               style: TextStyle(fontSize: 20),
             ),
           ),
@@ -102,7 +102,7 @@ class _WeekStatsState extends State<WeekStats> {
             padding: EdgeInsets.only(top: 25, bottom: 10),
             alignment: Alignment.centerLeft,
             child: Text(
-              '# of Pauses by Day',
+              'Number of Pauses',
               style: TextStyle(fontSize: 20),
             ),
           ),
