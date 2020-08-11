@@ -5,16 +5,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug-prod",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "debug",
-            "args": [
-                "--flavor",
-                "prod"
-            ]
-        },
-        {
             "name": "Debug-dev",
             "request": "launch",
             "type": "dart",
@@ -25,10 +15,10 @@
             ]
         },
         {
-            "name": "Release-prod",
+            "name": "Debug-prod",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release",
+            "flutterMode": "debug",
             "args": [
                 "--flavor",
                 "prod"
@@ -45,10 +35,10 @@
             ]
         },
         {
-            "name": "Profile-prod",
+            "name": "Release-prod",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile",
+            "flutterMode": "release",
             "args": [
                 "--flavor",
                 "prod"
@@ -62,6 +52,16 @@
             "args": [
                 "--flavor",
                 "dev"
+            ]
+        },
+        {
+            "name": "Profile-prod",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--flavor",
+                "prod"
             ]
         }
     ]
