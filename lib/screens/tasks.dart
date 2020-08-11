@@ -80,7 +80,10 @@ class _TasksPageState extends State<TasksPage> {
           key: UniqueKey(),
           date: _date,
         );
-        newTask.onDismissed = () => removeTask(newTask);
+        newTask.onDismissed = () {
+          removeTask(newTask);
+          AnalyticsProvider().logDeleteTask(newTask, DateTime.now());
+        };
         newTask.onUpdate = (value) => newTask.name = value;
         setState(() {
           _tasks.add(newTask);
@@ -253,8 +256,10 @@ class _TasksPageState extends State<TasksPage> {
                                     order: _tasks.length - _completedTasks,
                                     date: _date,
                                   );
-                                  newTask.onDismissed =
-                                      () => removeTask(newTask);
+                                  newTask.onDismissed = () {
+                                    removeTask(newTask);
+                                    AnalyticsProvider().logDeleteTask(newTask, DateTime.now());
+                                  };
                                   newTask.onUpdate =
                                       (value) => newTask.name = value;
                                   setState(() {

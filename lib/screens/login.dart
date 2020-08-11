@@ -8,6 +8,7 @@ import '../components/wrapper.dart';
 import '../components/rct_button.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/utils/firestore.dart';
+import 'package:Focal/utils/analytics.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'dart:io' show Platform;
 
@@ -38,8 +39,8 @@ class _LoginPageState extends State<LoginPage> {
             _isLogin = true;
             _loading = false;
           });
-          Navigator.popUntil(context, (route) => route.isFirst);
         }
+        Navigator.popUntil(context, (route) => route.isFirst);
       } else {
         FirestoreProvider(user).userDocumentExists().then((exists) {
           if (mounted) {
@@ -106,6 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                               });
                             } else {
                               LocalNotificationHelper.userLoggedIn = true;
+                              AnalyticsProvider().logGoogleSignIn();
                             }
                           },
                           buttonWidth: 315,
@@ -133,8 +135,8 @@ class _LoginPageState extends State<LoginPage> {
                                         _loginLoading = false;
                                       });
                                     } else {
-                                      LocalNotificationHelper.userLoggedIn =
-                                          true;
+                                      LocalNotificationHelper.userLoggedIn = true;
+                                      AnalyticsProvider().logAppleSignIn();
                                     }
                                   },
                                   buttonWidth: 315,
