@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:facebook_app_events/facebook_app_events.dart';
 import 'screens/home.dart';
 import 'screens/tasks.dart';
 import 'screens/statistics.dart';
@@ -24,6 +25,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   final navigatorKey = GlobalKey<NavigatorState>();
+  final facebookAppEvents = FacebookAppEvents();
 
   @override
   Widget build(BuildContext context) {
