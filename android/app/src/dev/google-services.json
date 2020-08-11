@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "185754393263",
+    "firebase_url": "https://focal-technology-dev.firebaseio.com",
+    "project_id": "focal-technology-dev",
+    "storage_bucket": "focal-technology-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185754393263:android:6175db456ca6e8bab3525a",
+        "android_client_info": {
+          "package_name": "technology.focal.focal.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "185754393263-j20skj9r86762ruae4hen4a1t62vaom6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "technology.focal.focal.dev",
+            "certificate_hash": "f5728a8dec62a7302f23b562a11d3166603bfac1"
+          }
+        },
+        {
+          "client_id": "185754393263-t5tluf0m4a6qss0f9qt4hna80fook03u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAERKY_JQBQ46vSe6oJ4woWzGI6j0CYmBY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "185754393263-t5tluf0m4a6qss0f9qt4hna80fook03u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
