@@ -5,27 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Dev Debug",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "debug",
-            "args": [
-                "--flavor",
-                "dev"
-            ]
-        },
-        {
-            "name": "Dev Release",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release",
-            "args": [
-                "--flavor",
-                "dev"
-            ]
-        },
-        {
-            "name": "Prod Debug",
+            "name": "Debug-prod",
             "request": "launch",
             "type": "dart",
             "flutterMode": "debug",
@@ -35,13 +15,53 @@
             ]
         },
         {
-            "name": "Prod Release",
+            "name": "Debug-dev",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": [
+                "--flavor",
+                "dev"
+            ]
+        },
+        {
+            "name": "Release-prod",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release",
             "args": [
                 "--flavor",
                 "prod"
+            ]
+        },
+        {
+            "name": "Release-dev",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": [
+                "--flavor",
+                "dev"
+            ]
+        },
+        {
+            "name": "Profile-prod",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--flavor",
+                "prod"
+            ]
+        },
+        {
+            "name": "Profile-dev",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--flavor",
+                "dev"
             ]
         }
     ]
