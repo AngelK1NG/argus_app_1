@@ -142,7 +142,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     setState(() {
       _doingTask = false;
-      _swatchDisplay = "00:00";
       _paused = false;
     });
     if (Platform.isAndroid) {
@@ -178,6 +177,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         _paused = false;
       });
       LocalNotificationHelper.paused = false;
+      _analyticsProvider.logResumeTask(_tasks[0], DateTime.now());
     } else {
       setState(() {
         _startPaused = DateTime.now();
@@ -185,6 +185,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         _numPaused++;
         LocalNotificationHelper.paused = true;
       });
+      _analyticsProvider.logPauseTask(_tasks[0], DateTime.now());
     }
   }
 
@@ -231,6 +232,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             FieldValue.increment(_numDistracted - _initNumDistracted),
         'numPaused': FieldValue.increment(_numPaused - _initNumPaused),
       }).then((_) {
+        _analyticsProvider.logSaveTask(task, DateTime.now());
         _seconds = 0;
         _secondsPaused = 0;
         _secondsDistracted = 0;
@@ -243,7 +245,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         _initNumDistracted = 0;
       });
     });
-    _analyticsProvider.logSaveTask(_tasks[0], DateTime.now(), _swatchDisplay);
   }
 
   void completeTask(FirebaseUser user) {
@@ -293,6 +294,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             FieldValue.increment(_numDistracted - _initNumDistracted),
         'numPaused': FieldValue.increment(_numPaused - _initNumPaused),
       }).then((_) {
+        _analyticsProvider.logSaveTask(finishedTask, DateTime.now());
         _seconds = 0;
         _secondsPaused = 0;
         _secondsDistracted = 0;
@@ -305,8 +307,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         _initNumDistracted = 0;
       });
     });
-    _analyticsProvider.logCompleteTask(
-        finishedTask, DateTime.now(), _swatchDisplay);
     if (areTasksCompleted()) {
       Future.delayed(cardSlideDuration, () {
         _confettiController.play();

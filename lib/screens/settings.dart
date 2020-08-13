@@ -2,6 +2,7 @@ import 'package:Focal/components/settings_tile.dart';
 import 'package:Focal/utils/local_notifications.dart';
 import 'package:Focal/utils/user.dart';
 import 'package:Focal/utils/size_config.dart';
+import 'package:Focal/utils/analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:Focal/constants.dart';
 import 'package:provider/provider.dart';
@@ -184,6 +185,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     HapticFeedback.heavyImpact();
                     LocalNotificationHelper.userLoggedIn = false;
                     auth.signOut();
+                    AnalyticsProvider().logSignOut();
                   },
                   child: Text("Sign out",
                       style: TextStyle(

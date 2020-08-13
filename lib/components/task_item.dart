@@ -54,7 +54,6 @@ class _TaskItemState extends State<TaskItem> {
   Widget build(BuildContext context) {
     FirestoreProvider firestoreProvider =
         FirestoreProvider(Provider.of<User>(context, listen: false).user);
-
     return Container(
         child: Dismissible(
             background: Container(color: Colors.red),
