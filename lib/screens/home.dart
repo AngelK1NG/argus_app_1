@@ -33,7 +33,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  static const platform = const MethodChannel("com.flutter.lockscreen");
+  static const iosChannel = const MethodChannel("com.flutter.lockscreen");
+  static const androidChannel = const MethodChannel("plugins.flutter.io/screen");
 
   Timer timer;
   DateTime _startFocused = DateTime.now();
@@ -398,27 +399,27 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       case AppLifecycleState.paused:
         if (_doingTask && !_paused) {
           if (Platform.isAndroid) {
-            _startDistracted = DateTime.now();
-            _numDistracted++;
-            if (LocalNotificationHelper.notificationsOn) {
-              if (LocalNotificationHelper.dndOn) {
-                Future.delayed(const Duration(milliseconds: 500), () {
-                  FlutterDnd.setInterruptionFilter(
-                      FlutterDnd.INTERRUPTION_FILTER_ALL);
-                  notificationHelper.showNotifications();
-                  Future.delayed(const Duration(milliseconds: 3000), () {
+            androidScreenOn().then((value) {
+              if (value) {
+                _startDistracted = DateTime.now();
+                _numDistracted++;
+                if (LocalNotificationHelper.notificationsOn) {
+                  if (LocalNotificationHelper.dndOn) {
                     FlutterDnd.setInterruptionFilter(
-                        FlutterDnd.INTERRUPTION_FILTER_NONE);
-                  });
-                });
-              } else {
-                Future.delayed(const Duration(milliseconds: 500), () {
-                  notificationHelper.showNotifications();
-                });
+                        FlutterDnd.INTERRUPTION_FILTER_ALL);
+                    notificationHelper.showNotifications();
+                    Future.delayed(const Duration(milliseconds: 3000), () {
+                      FlutterDnd.setInterruptionFilter(
+                          FlutterDnd.INTERRUPTION_FILTER_NONE);
+                    });
+                  } else {
+                    notificationHelper.showNotifications();
+                  }
+                }
               }
-            }
+            });
           } else if (Platform.isIOS) {
-            printBoi().then((value) {
+            iosScreenOn().then((value) {
               if (value) {
                 _startDistracted = DateTime.now();
                 _numDistracted++;
@@ -492,8 +493,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  Future<bool> printBoi() async {
-    var value = await platform.invokeMethod("printBoi");
+  Future<bool> iosScreenOn() async {
+    var value = await iosChannel.invokeMethod("printBoi");
+    return value;
+  }
+
+  Future<bool> androidScreenOn() async {
+    var value = await androidChannel.invokeMethod("isScreenOn");
     return value;
   }
 
