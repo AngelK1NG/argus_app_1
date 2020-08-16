@@ -23,7 +23,6 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:confetti/confetti.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wakelock/wakelock.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -33,8 +32,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  static const iosChannel = const MethodChannel("com.flutter.lockscreen");
-  static const androidChannel = const MethodChannel("plugins.flutter.io/screen");
+  static const screenChannel = const MethodChannel("plugins.flutter.io/screen");
 
   Timer timer;
   DateTime _startFocused = DateTime.now();
@@ -69,7 +67,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void startTask() async {
     if (Platform.isAndroid) {
-      Wakelock.enable();
     }
     _secondsPaused =
         _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
@@ -136,7 +133,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void stopTask() async {
     if (Platform.isAndroid) {
-      Wakelock.disable();
     }
     if (_paused) {
       _secondsPaused += DateTime.now().difference(_startPaused).inSeconds;
@@ -192,7 +188,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void saveTask(FirebaseUser user) async {
     if (Platform.isAndroid) {
-      Wakelock.disable();
     }
     TaskItem task = _tasks.removeAt(0);
     task.secondsFocused = _seconds - _secondsDistracted;
@@ -388,7 +383,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    Wakelock.disable();
     super.dispose();
   }
 
@@ -408,6 +402,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     FlutterDnd.setInterruptionFilter(
                         FlutterDnd.INTERRUPTION_FILTER_ALL);
                     notificationHelper.showNotifications();
+                    _screenOn = true;
                     Future.delayed(const Duration(milliseconds: 3000), () {
                       FlutterDnd.setInterruptionFilter(
                           FlutterDnd.INTERRUPTION_FILTER_NONE);
@@ -416,6 +411,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     notificationHelper.showNotifications();
                   }
                 }
+              } else {
+                _screenOn = false;
               }
             });
           } else if (Platform.isIOS) {
@@ -434,15 +431,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.resumed:
         if (!_paused) {
-          if (Platform.isIOS) {
             if (_screenOn) {
               _secondsDistracted +=
                   DateTime.now().difference(_startDistracted).inSeconds;
             }
-          } else {
-            _secondsDistracted +=
-                DateTime.now().difference(_startDistracted).inSeconds;
-          }
         }
         break;
       case AppLifecycleState.inactive:
@@ -494,12 +486,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<bool> iosScreenOn() async {
-    var value = await iosChannel.invokeMethod("printBoi");
+    var value = await screenChannel.invokeMethod("printBoi");
     return value;
   }
 
   Future<bool> androidScreenOn() async {
-    var value = await androidChannel.invokeMethod("isScreenOn");
+    var value = await screenChannel.invokeMethod("isScreenOn");
     return value;
   }
 
