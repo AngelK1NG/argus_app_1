@@ -66,8 +66,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ConfettiController(duration: Duration(seconds: 1));
 
   void startTask() async {
-    if (Platform.isAndroid) {
-    }
     _secondsPaused =
         _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
     _initSecondsPaused =
@@ -132,8 +130,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void stopTask() async {
-    if (Platform.isAndroid) {
-    }
     if (_paused) {
       _secondsPaused += DateTime.now().difference(_startPaused).inSeconds;
     }
@@ -187,8 +183,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void saveTask(FirebaseUser user) async {
-    if (Platform.isAndroid) {
-    }
     TaskItem task = _tasks.removeAt(0);
     task.secondsFocused = _seconds - _secondsDistracted;
     task.secondsDistracted = _secondsDistracted;
@@ -431,10 +425,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.resumed:
         if (!_paused) {
-            if (_screenOn) {
-              _secondsDistracted +=
-                  DateTime.now().difference(_startDistracted).inSeconds;
-            }
+          if (_screenOn) {
+            _secondsDistracted +=
+                DateTime.now().difference(_startDistracted).inSeconds;
+          }
         }
         break;
       case AppLifecycleState.inactive:
@@ -486,7 +480,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<bool> iosScreenOn() async {
-    var value = await screenChannel.invokeMethod("printBoi");
+    var value = await screenChannel.invokeMethod("isScreenOn");
     return value;
   }
 

@@ -5,7 +5,7 @@ import Firebase
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
     override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        Bool screenOn = true
+        var screenOn = true
         
         let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
         let CHANNEL = FlutterMethodChannel(name: "plugins.flutter.io/screen", binaryMessenger: controller as! FlutterBinaryMessenger)
