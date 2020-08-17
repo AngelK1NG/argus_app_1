@@ -23,7 +23,6 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:confetti/confetti.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wakelock/wakelock.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -33,7 +32,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  static const platform = const MethodChannel("com.flutter.lockscreen");
+  static const screenChannel = const MethodChannel("plugins.flutter.io/screen");
 
   Timer timer;
   DateTime _startFocused = DateTime.now();
@@ -67,9 +66,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ConfettiController(duration: Duration(seconds: 1));
 
   void startTask() async {
-    if (Platform.isAndroid) {
-      Wakelock.enable();
-    }
     _secondsPaused =
         _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
     _initSecondsPaused =
@@ -134,9 +130,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void stopTask() async {
-    if (Platform.isAndroid) {
-      Wakelock.disable();
-    }
     if (_paused) {
       _secondsPaused += DateTime.now().difference(_startPaused).inSeconds;
     }
@@ -190,9 +183,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void saveTask(FirebaseUser user) async {
-    if (Platform.isAndroid) {
-      Wakelock.disable();
-    }
     TaskItem task = _tasks.removeAt(0);
     task.secondsFocused = _seconds - _secondsDistracted;
     task.secondsDistracted = _secondsDistracted;
@@ -387,7 +377,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    Wakelock.disable();
     super.dispose();
   }
 
@@ -398,27 +387,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       case AppLifecycleState.paused:
         if (_doingTask && !_paused) {
           if (Platform.isAndroid) {
-            _startDistracted = DateTime.now();
-            _numDistracted++;
-            if (LocalNotificationHelper.notificationsOn) {
-              if (LocalNotificationHelper.dndOn) {
-                Future.delayed(const Duration(milliseconds: 500), () {
-                  FlutterDnd.setInterruptionFilter(
-                      FlutterDnd.INTERRUPTION_FILTER_ALL);
-                  notificationHelper.showNotifications();
-                  Future.delayed(const Duration(milliseconds: 3000), () {
+            androidScreenOn().then((value) {
+              if (value) {
+                _startDistracted = DateTime.now();
+                _numDistracted++;
+                if (LocalNotificationHelper.notificationsOn) {
+                  if (LocalNotificationHelper.dndOn) {
                     FlutterDnd.setInterruptionFilter(
-                        FlutterDnd.INTERRUPTION_FILTER_NONE);
-                  });
-                });
+                        FlutterDnd.INTERRUPTION_FILTER_ALL);
+                    notificationHelper.showNotifications();
+                    _screenOn = true;
+                    Future.delayed(const Duration(milliseconds: 3000), () {
+                      FlutterDnd.setInterruptionFilter(
+                          FlutterDnd.INTERRUPTION_FILTER_NONE);
+                    });
+                  } else {
+                    notificationHelper.showNotifications();
+                  }
+                }
               } else {
-                Future.delayed(const Duration(milliseconds: 500), () {
-                  notificationHelper.showNotifications();
-                });
+                _screenOn = false;
               }
-            }
+            });
           } else if (Platform.isIOS) {
-            printBoi().then((value) {
+            iosScreenOn().then((value) {
               if (value) {
                 _startDistracted = DateTime.now();
                 _numDistracted++;
@@ -433,12 +425,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.resumed:
         if (!_paused) {
-          if (Platform.isIOS) {
-            if (_screenOn) {
-              _secondsDistracted +=
-                  DateTime.now().difference(_startDistracted).inSeconds;
-            }
-          } else {
+          if (_screenOn) {
             _secondsDistracted +=
                 DateTime.now().difference(_startDistracted).inSeconds;
           }
@@ -492,8 +479,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  Future<bool> printBoi() async {
-    var value = await platform.invokeMethod("printBoi");
+  Future<bool> iosScreenOn() async {
+    var value = await screenChannel.invokeMethod("isScreenOn");
+    return value;
+  }
+
+  Future<bool> androidScreenOn() async {
+    var value = await screenChannel.invokeMethod("isScreenOn");
     return value;
   }
 

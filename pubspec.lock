@@ -429,13 +429,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
-  screen:
-    dependency: "direct main"
-    description:
-      name: screen
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.5"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -567,13 +560,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.8"
-  wakelock:
-    dependency: "direct main"
-    description:
-      name: wakelock
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.4+2"
   xdg_directories:
     dependency: transitive
     description:

@@ -5,25 +5,25 @@ import Firebase
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
     override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        var screenStat = true
+        var screenOn = true
         
         let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
-        let CHANNEL = FlutterMethodChannel(name: "com.flutter.lockscreen", binaryMessenger: controller as! FlutterBinaryMessenger)
+        let CHANNEL = FlutterMethodChannel(name: "plugins.flutter.io/screen", binaryMessenger: controller as! FlutterBinaryMessenger)
         
         CHANNEL.setMethodCallHandler {
             [unowned self] (methodCall, result) in
-            if (methodCall.method == "printBoi") {
+            if (methodCall.method == "isScreenOn") {
                 if UIScreen.main.brightness == 0.0 {
-                    screenStat = false
+                    screenOn = false
                 } else {
-                    screenStat = true
+                    screenOn = true
                     if #available(iOS 10.0, *) {
                         UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
                     } else {
                         // Fallback on earlier versions
                     }
                 }
-                result(screenStat)
+                result(screenOn)
             }
         }
         FirebaseApp.configure()

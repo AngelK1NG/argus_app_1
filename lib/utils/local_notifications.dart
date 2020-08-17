@@ -48,11 +48,7 @@ class LocalNotificationHelper {
   }
 
   // ignore: missing_return
-  Future onSelectionNotification(String payLoad) {
-    if (payLoad != null) {
-      print(payLoad);
-    }
-  }
+  Future onSelectionNotification(String payLoad) {}
 
   Future onDidReceiveLocalNotification(
       int id, String title, String body, String payLoad) async {
