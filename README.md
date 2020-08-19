@@ -1,4 +1,6 @@
-# Focal
+<img align="left" alt="Focal" width="100px" src="images/logo/Focal%20Logo_Full.png" />
+
+---
 
 [focal.technology][focal]
 
