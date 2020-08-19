@@ -284,7 +284,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             FieldValue.increment(_numDistracted - _initNumDistracted),
         'numPaused': FieldValue.increment(_numPaused - _initNumPaused),
       }).then((_) {
-        _analyticsProvider.logSaveTask(finishedTask, DateTime.now());
+        _analyticsProvider.logCompleteTask(finishedTask, DateTime.now());
         _seconds = 0;
         _secondsPaused = 0;
         _secondsDistracted = 0;
