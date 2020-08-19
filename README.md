@@ -1,4 +1,4 @@
-# Focal [<img align="left" alt="Focal" width="50px" src="images/logo/Focal%20Logo_Colored.png" />][focal]
+## [<img align="left" alt="Focal" width="50px" src="images/logo/Focal%20Logo_Colored.png" />][focal] Focal
 
 
 ### Tasks in Focus
