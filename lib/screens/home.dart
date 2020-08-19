@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 import 'dart:async';
+import 'dart:math';
 import 'package:Focal/components/task_item.dart';
 import 'package:Focal/utils/analytics.dart';
 import 'package:Focal/utils/date.dart';
@@ -64,6 +65,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _initNumDistracted = 0;
   ConfettiController _confettiController =
       ConfettiController(duration: Duration(seconds: 1));
+  Random _random = Random();
+  final quotes = [
+    '''“Keep your eyes on the stars, and your feet on the ground.”''',
+    '''“You can waste your lives drawing lines. Or you can live your life crossing them.”''',
+    '''“Everything comes to him who hustles while he waits.”''',
+    '''"The only difference between ordinary and extraordinary is that little extra."''',
+    '''"The secret of getting ahead is getting started."''',
+  ];
+  final messages = [
+    'Keep up the good work! 🙌',
+    'You got this! 👊',
+    'You can do it! 💪',
+    'Don\'t forget to hydrate! 💧',
+    'Need a break? Take one! 😌'
+  ];
 
   void startTask() async {
     _secondsPaused =
@@ -550,7 +566,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           right: 40,
                           top: SizeConfig.safeBlockVertical * 15,
                           child: Text(
-                            'Good Morning!',
+                            TimeOfDay.now().hour < 13
+                              ? 'Good Morning!'
+                              : TimeOfDay.now().hour < 18
+                                ? 'Good Afternoon!'
+                                : 'Good Evening!'
+                            ,
                             textAlign: TextAlign.center,
                             style: topTextStyle,
                           ),
@@ -562,10 +583,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           child: Container(
                             alignment: Alignment.center,
                             height: SizeConfig.safeBlockVertical * 18,
-                            child: Text(
-                              'Add a task and start your day!',
-                              textAlign: TextAlign.center,
-                              style: taskTextStyle,
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: SizeConfig.safeBlockVertical * 18,
+                              child: AutoSizeText(
+                                quotes[_random.nextInt(quotes.length)],
+                                textAlign: TextAlign.center,
+                                style: taskTextStyle,
+                                maxLines: 3,
+                              ),
                             ),
                           ),
                         ),
@@ -752,20 +778,28 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       return Stack(
                         children: <Widget>[
                           Positioned(
-                              left: 40,
-                              right: 40,
-                              top: SizeConfig.safeBlockVertical * 13,
-                              child: _doingTask
-                                  ? Text(
-                                      _swatchDisplay,
-                                      textAlign: TextAlign.center,
-                                      style: swatchTextStyle,
-                                    )
-                                  : Text(
-                                      'Keep up the good work! 🙌',
-                                      textAlign: TextAlign.center,
-                                      style: topTextStyle,
-                                    )),
+                            left: 40,
+                            right: 40,
+                            top: SizeConfig.safeBlockVertical * 13,
+                            child: _doingTask
+                              ? Text(
+                                  _swatchDisplay,
+                                  textAlign: TextAlign.center,
+                                  style: swatchTextStyle,
+                                )
+                              : Container(
+                                alignment: Alignment.center,
+                                height: SizeConfig.safeBlockVertical * 15,
+                                child: AutoSizeText(
+                                  _totalTasks != null && _completedTasks != null && _totalTasks - _completedTasks == 1
+                                    ? 'Almost there! Keep pushing 👊'
+                                    : messages[_random.nextInt(messages.length)],
+                                  textAlign: TextAlign.center,
+                                  style: topTextStyle,
+                                  maxLines: 3,
+                                ),
+                              ),
+                          ),
                           Positioned(
                             left: 0,
                             right: 0,
