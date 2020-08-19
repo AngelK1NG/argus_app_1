@@ -1,7 +1,5 @@
-[<img align="left" alt="Focal" width="200px" src="images/logo/Focal%20Logo_Full.png" />][focal]
+# Focal [<img align="left" alt="Focal" width="50px" src="images/logo/Focal%20Logo_Colored.png" />][focal]
 
-<br />
-<br />
 
 ### Tasks in Focus
 Focal is a beautiful, easy-to-use productivity solution that enables you to supercharge your productivity and reach your goals, one task at a time.
