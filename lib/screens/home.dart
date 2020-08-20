@@ -35,7 +35,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static const screenChannel = const MethodChannel("plugins.flutter.io/screen");
 
-  Timer timer;
+  Timer _timer;
   DateTime _startFocused = DateTime.now();
   DateTime _startPaused = DateTime.now();
   DateTime _startDistracted = DateTime.now();
@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     'Keep up the good work! 🙌',
     'You got this! 👊',
     'You can do it! 💪',
-    'Don\'t forget to hydrate! 💧',
+    'Don\'t forget to hydrate! 💦',
     'Need a break? Take one! 😌'
   ];
 
@@ -111,20 +111,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _initSecondsFocused = _tasks[0].secondsFocused;
     }
 
-    timer = new Timer.periodic(
-        const Duration(seconds: 1),
-        (Timer timer) => setState(() {
-              if (_doingTask && !_paused) {
-                final currentTime = DateTime.now();
-                _seconds = (currentTime.difference(_startFocused).inSeconds) +
-                    initSeconds;
-                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-                    ":" +
-                    (_seconds % 60).toString().padLeft(2, "0");
-              } else {
-                timer.cancel();
-              }
-            }));
+    _timer = new Timer.periodic(
+      const Duration(seconds: 1),
+      (Timer timer) => setState(() {
+        final currentTime = DateTime.now();
+        _seconds = (currentTime.difference(_startFocused).inSeconds) +
+            initSeconds;
+        _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+            ":" +
+            (_seconds % 60).toString().padLeft(2, "0");
+      })
+    );
     setState(() {
       _seconds = initSeconds;
       _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
@@ -150,6 +147,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _secondsPaused += DateTime.now().difference(_startPaused).inSeconds;
     }
     setState(() {
+      _timer.cancel();
       _doingTask = false;
       _paused = false;
     });
@@ -167,20 +165,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (_paused) {
       int pausedDifference = _seconds;
       _secondsPaused += DateTime.now().difference(_startPaused).inSeconds;
-      timer = new Timer.periodic(
-          const Duration(seconds: 1),
-          (Timer timer) => setState(() {
-                if (_doingTask && !_paused) {
-                  final currentTime = DateTime.now();
-                  _seconds = currentTime.difference(_startFocused).inSeconds +
-                      pausedDifference;
-                  _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-                      ":" +
-                      (_seconds % 60).toString().padLeft(2, "0");
-                } else {
-                  timer.cancel();
-                }
-              }));
+      _timer = new Timer.periodic(
+        const Duration(seconds: 1),
+        (Timer timer) => setState(() {
+          final currentTime = DateTime.now();
+          _seconds = currentTime.difference(_startFocused).inSeconds +
+              pausedDifference;
+          _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+              ":" +
+              (_seconds % 60).toString().padLeft(2, "0");
+        })
+      );
       setState(() {
         _startFocused = DateTime.now();
         _paused = false;
@@ -189,6 +184,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _analyticsProvider.logResumeTask(_tasks[0], DateTime.now());
     } else {
       setState(() {
+        _timer.cancel();
         _startPaused = DateTime.now();
         _paused = true;
         _numPaused++;
