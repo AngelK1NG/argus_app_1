@@ -201,8 +201,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     task.secondsPaused = _secondsPaused;
     task.numDistracted = _numDistracted;
     task.numPaused = _numPaused;
+    task.saved = true;
     _tasks.insert(_tasks.length - _completedTasks, task);
-    _firestoreProvider.updateTaskOrder(_tasks, _date);
+    _firestoreProvider.updateTasks(_tasks, _date);
     Fluttertoast.showToast(
       msg: '${task.name} has been saved for later',
       backgroundColor: jetBlack,
@@ -250,26 +251,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void completeTask(FirebaseUser user) {
-    TaskItem currentTask = _tasks[0];
-    TaskItem finishedTask = TaskItem(
-      completed: true,
-      name: currentTask.name,
-      date: _date,
-      order: _tasks.length,
-      id: currentTask.id,
-      onDismissed: currentTask.onDismissed,
-      secondsFocused: _seconds - _secondsDistracted,
-      secondsDistracted: _secondsDistracted,
-      secondsPaused: _secondsPaused,
-      numDistracted: _numDistracted,
-      numPaused: _numPaused,
-    );
-    _firestoreProvider.deleteTask(_date, currentTask.id, false);
-    _tasks.remove(currentTask);
-    _firestoreProvider.addTask(finishedTask, _date);
-    _tasks.add(finishedTask);
-    _firestoreProvider.updateTaskOrder(_tasks, _date);
-    _firestoreProvider.addCompletedTaskNumber(_date);
+    TaskItem task = _tasks.removeAt(0);
+    task.secondsFocused = _seconds - _secondsDistracted;
+    task.secondsDistracted = _secondsDistracted;
+    task.secondsPaused = _secondsPaused;
+    task.numDistracted = _numDistracted;
+    task.numPaused = _numPaused;
+    task.completed = true;
+    _tasks.add(task);
+    _firestoreProvider.updateTasks(_tasks, _date);
     DocumentReference dateDoc = db
         .collection('users')
         .document(user.uid)
@@ -296,7 +286,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             FieldValue.increment(_numDistracted - _initNumDistracted),
         'numPaused': FieldValue.increment(_numPaused - _initNumPaused),
       }).then((_) {
-        _analyticsProvider.logCompleteTask(finishedTask, DateTime.now());
+        _analyticsProvider.logCompleteTask(task, DateTime.now());
         _seconds = 0;
         _secondsPaused = 0;
         _secondsDistracted = 0;
@@ -604,7 +594,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               },
                               buttonWidth: 220,
                               colored: true,
-                              buttonText: 'Add',
+                              buttonText: 'Add Task',
                               textSize: 32,
                             ),
                           ),
@@ -619,6 +609,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         name: task.data['name'],
                         id: task.documentID,
                         completed: task.data['completed'],
+                        saved: task.data['saved'],
                         order: task.data['order'],
                         secondsFocused: task.data['secondsFocused'],
                         secondsDistracted: task.data['secondsDistracted'],
@@ -629,7 +620,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         onDismissed: () {
                           _tasks.remove(_tasks.firstWhere(
                               (tasku) => tasku.id == task.documentID));
-                          _firestoreProvider.updateTaskOrder(_tasks, _date);
+                          _firestoreProvider.updateTasks(_tasks, _date);
                         },
                         date: _date,
                       );
@@ -873,7 +864,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                         },
                                         buttonWidth: 220,
                                         colored: true,
-                                        buttonText: 'Start',
+                                        buttonText: _tasks[0].saved
+                                          ? 'Resume'
+                                          : 'Start',
                                         textSize: 32,
                                       )),
                           ),
@@ -889,7 +882,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
                                 HapticFeedback.heavyImpact();
-                                stopTask();
+                                if (_doingTask) {
+                                  stopTask();
+                                }
                                 saveTask(_user);
                               },
                               child: Padding(

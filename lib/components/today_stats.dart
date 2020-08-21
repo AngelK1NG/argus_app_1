@@ -34,6 +34,7 @@ class _TodayStatsState extends State<TodayStats> {
         name: name,
         id: task.documentID,
         completed: task.data['completed'],
+        saved: task.data['saved'],
         order: task.data['order'],
         secondsFocused: task.data['secondsFocused'],
         secondsDistracted: task.data['secondsDistracted'],
@@ -62,9 +63,7 @@ class _TodayStatsState extends State<TodayStats> {
               task.secondsFocused + task.secondsDistracted + task.secondsPaused;
         }
         completedTasks++;
-      } else if (task.secondsFocused != null &&
-          task.secondsDistracted != null &&
-          task.secondsPaused != null) {
+      } else if (task.saved) {
         if ((task.secondsFocused +
                 task.secondsDistracted +
                 task.secondsPaused) >
@@ -108,10 +107,7 @@ class _TodayStatsState extends State<TodayStats> {
             ),
           )));
       _tasks.forEach((task) {
-        if (!task.completed &&
-            task.secondsFocused != null &&
-            task.secondsDistracted != null &&
-            task.secondsPaused != null) {
+        if (!task.completed && task.saved) {
           taskTiles.add(Padding(
             padding: const EdgeInsets.only(
               bottom: 20,

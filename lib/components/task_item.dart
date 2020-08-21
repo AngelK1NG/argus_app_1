@@ -9,11 +9,12 @@ import 'dart:io' show Platform;
 class TaskItem extends StatefulWidget {
   String name;
   String id;
-  final bool completed;
-  final int order;
+  bool completed;
+  bool saved;
+  int order;
   VoidCallback onDismissed;
   Function onUpdate;
-  final String date;
+  String date;
   int secondsFocused;
   int secondsPaused;
   int secondsDistracted;
@@ -24,6 +25,7 @@ class TaskItem extends StatefulWidget {
       {@required this.name,
       this.id,
       @required this.completed,
+      this.saved,
       this.order,
       this.onDismissed,
       this.onUpdate,
@@ -60,8 +62,7 @@ class _TaskItemState extends State<TaskItem> {
             key: UniqueKey(),
             direction: DismissDirection.horizontal,
             onDismissed: (direction) {
-              firestoreProvider.deleteTask(
-                  widget.date, widget.id, widget.completed);
+              firestoreProvider.deleteTask(widget.date, widget.id);
               widget.onDismissed();
             },
             child: GestureDetector(
@@ -152,7 +153,9 @@ class _TaskItemState extends State<TaskItem> {
                                     fontWeight: FontWeight.w400,
                                     color: widget.completed
                                         ? Theme.of(context).hintColor
-                                        : jetBlack,
+                                        : widget.saved
+                                          ? Theme.of(context).accentColor
+                                          : jetBlack,
                                     decoration: widget.completed ? TextDecoration.lineThrough : null,
                                   ),
                                 ),

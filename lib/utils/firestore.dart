@@ -33,36 +33,6 @@ class FirestoreProvider {
     });
   }
 
-  // add task
-  void addTask(TaskItem task, String date) {
-    String userId = user.uid;
-    db
-        .collection('users')
-        .document(userId)
-        .collection('tasks')
-        .document(date)
-        .collection('tasks')
-        .document(task.id)
-        .setData({
-      'name': task.name,
-      'order': task.order,
-      'completed': task.completed,
-      'secondsFocused': task.secondsFocused,
-      'secondsDistracted': task.secondsDistracted,
-      'secondsPaused': task.secondsPaused,
-      'numDistracted': task.numDistracted,
-      'numPaused': task.numPaused,
-    });
-    DocumentReference dateDoc = db
-        .collection('users')
-        .document(user.uid)
-        .collection('tasks')
-        .document(date);
-    dateDoc.updateData({
-      'totalTasks': FieldValue.increment(1),
-    });
-  }
-
   // update task name
   void updateTaskName(String name, String date, String taskId) {
     String userId = user.uid;
@@ -78,9 +48,11 @@ class FirestoreProvider {
     });
   }
 
-  // update task order
-  void updateTaskOrder(List<TaskItem> tasks, String date) {
+  // update tasks
+  void updateTasks(List<TaskItem> tasks, String date) {
     String userId = user.uid;
+    int totalTasks = 0;
+    int completedTasks = 0;
     for (TaskItem task in tasks) {
       db
           .collection('users')
@@ -96,12 +68,27 @@ class FirestoreProvider {
         'secondsPaused': task.secondsPaused,
         'numDistracted': task.numDistracted,
         'numPaused': task.numPaused,
+        'completed': task.completed,
+        'saved': task.saved,
       });
+      totalTasks ++;
+      if (task.completed) {
+        completedTasks ++;
+      }
     }
+    db
+        .collection('users')
+        .document(userId)
+        .collection('tasks')
+        .document(date)
+        .updateData({
+          'completedTasks': completedTasks,
+          'totalTasks': totalTasks,
+        });
   }
 
   // delete task
-  void deleteTask(String date, String taskId, bool isCompleted) {
+  void deleteTask(String date, String taskId) {
     String userId = user.uid;
     DocumentReference taskDocumentReference = db
         .collection('users')
@@ -111,33 +98,5 @@ class FirestoreProvider {
         .collection('tasks')
         .document(taskId);
     taskDocumentReference.delete();
-    DocumentReference dateDoc = db
-        .collection('users')
-        .document(userId)
-        .collection('tasks')
-        .document(date);
-    if (isCompleted) {
-      dateDoc.updateData({
-        'completedTasks': FieldValue.increment(-1),
-        'totalTasks': FieldValue.increment(-1),
-      });
-    } else {
-      dateDoc.updateData({
-        'totalTasks': FieldValue.increment(-1),
-      });
-    }
-  }
-
-  // add to completed number of tasks
-  void addCompletedTaskNumber(String date) {
-    String userId = user.uid;
-    db
-        .collection('users')
-        .document(userId)
-        .collection('tasks')
-        .document(date)
-        .updateData({
-      'completedTasks': FieldValue.increment(1),
-    });
   }
 }

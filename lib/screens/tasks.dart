@@ -71,6 +71,7 @@ class _TasksPageState extends State<TasksPage> {
           name: name,
           id: task.documentID,
           completed: task.data['completed'],
+          saved: task.data['saved'],
           order: task.data['order'],
           secondsFocused: task.data['secondsFocused'],
           secondsDistracted: task.data['secondsDistracted'],
@@ -105,7 +106,7 @@ class _TasksPageState extends State<TasksPage> {
         _completedTasks--;
       }
     });
-    firestoreProvider.updateTaskOrder(_tasks, _date);
+    firestoreProvider.updateTasks(_tasks, _date);
     DocumentReference dateDoc = db
         .collection('users')
         .document(user.uid)
@@ -252,6 +253,7 @@ class _TasksPageState extends State<TasksPage> {
                                     id: '',
                                     name: value,
                                     completed: false,
+                                    saved: false,
                                     key: UniqueKey(),
                                     order: _tasks.length - _completedTasks,
                                     date: _date,
@@ -278,19 +280,12 @@ class _TasksPageState extends State<TasksPage> {
                                     'name': newTask.name,
                                     'order': newTask.order,
                                     'completed': newTask.completed,
+                                    'saved': newTask.saved,
                                   }).then((doc) {
                                     _tasks[_tasks.length - _completedTasks - 1]
                                         .id = doc.documentID;
-                                    firestoreProvider.updateTaskOrder(
+                                    firestoreProvider.updateTasks(
                                         _tasks, _date);
-                                    DocumentReference dateDoc = db
-                                        .collection('users')
-                                        .document(user.uid)
-                                        .collection('tasks')
-                                        .document(_date);
-                                    dateDoc.updateData({
-                                      'totalTasks': FieldValue.increment(1),
-                                    });
                                   });
                                   _formKey.currentState.reset();
                                   AnalyticsProvider()
@@ -321,10 +316,10 @@ class _TasksPageState extends State<TasksPage> {
                       int distanceFromEnd = tasks.length - newIndex;
                       tasks.insert(
                           newIndex - (_completedTasks - distanceFromEnd), task);
-                      firestoreProvider.updateTaskOrder(tasks, _date);
+                      firestoreProvider.updateTasks(tasks, _date);
                     } else {
                       tasks.insert(newIndex, task);
-                      firestoreProvider.updateTaskOrder(tasks, _date);
+                      firestoreProvider.updateTasks(tasks, _date);
                     }
                   }
                 }),
