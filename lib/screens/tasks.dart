@@ -97,7 +97,6 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   void removeTask(TaskItem task) {
-    FirebaseUser user = context.read<User>().user;
     FirestoreProvider firestoreProvider =
         FirestoreProvider(Provider.of<User>(context, listen: false).user);
     setState(() {
@@ -106,42 +105,8 @@ class _TasksPageState extends State<TasksPage> {
         _completedTasks--;
       }
     });
+    firestoreProvider.deleteTask(task, _date);
     firestoreProvider.updateTasks(_tasks, _date);
-    DocumentReference dateDoc = db
-        .collection('users')
-        .document(user.uid)
-        .collection('tasks')
-        .document(_date);
-    dateDoc.updateData({
-      'secondsFocused': FieldValue.increment(
-          task.secondsFocused == null ? 0 : -task.secondsFocused),
-      'secondsDistracted': FieldValue.increment(
-          task.secondsDistracted == null ? 0 : -task.secondsDistracted),
-      'secondsPaused': FieldValue.increment(
-          task.secondsPaused == null ? 0 : -task.secondsPaused),
-      'numDistracted': FieldValue.increment(
-          task.numDistracted == null ? 0 : -task.numDistracted),
-      'numPaused':
-          FieldValue.increment(task.numPaused == null ? 0 : -task.numPaused),
-    }).then((_) {
-      dateDoc.get().then((snapshot) {
-        if (snapshot.data['secondsFocused'] < 0) {
-          dateDoc.updateData({
-            'secondsFocused': 0,
-          });
-        }
-        if (snapshot.data['secondsDistracted'] < 0) {
-          dateDoc.updateData({
-            'secondsDistracted': 0,
-          });
-        }
-        if (snapshot.data['secondsPaused'] < 0) {
-          dateDoc.updateData({
-            'secondsPaused': 0,
-          });
-        }
-      });
-    });
   }
 
   @override

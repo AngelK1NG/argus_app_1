@@ -61,10 +61,7 @@ class _TaskItemState extends State<TaskItem> {
             background: Container(color: Colors.red),
             key: UniqueKey(),
             direction: DismissDirection.horizontal,
-            onDismissed: (direction) {
-              firestoreProvider.deleteTask(widget.date, widget.id);
-              widget.onDismissed();
-            },
+            onDismissed: (direction) => widget.onDismissed(),
             child: GestureDetector(
               onTap: () {
                 setState(() {
@@ -134,7 +131,7 @@ class _TaskItemState extends State<TaskItem> {
                                               .validate()) {
                                             widget.onUpdate(value);
                                             firestoreProvider.updateTaskName(
-                                                value, widget.date, widget.id);
+                                                value, widget.id, widget.date);
                                           }
                                         });
                                       },
