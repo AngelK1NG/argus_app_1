@@ -67,11 +67,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ConfettiController(duration: Duration(seconds: 1));
   Random _random = Random();
   final quotes = [
-    '''“Keep your eyes on the stars, and your feet on the ground.”''',
     '''“You can waste your lives drawing lines. Or you can live your life crossing them.”''',
     '''“Everything comes to him who hustles while he waits.”''',
     '''"The only difference between ordinary and extraordinary is that little extra."''',
     '''"The secret of getting ahead is getting started."''',
+    '''"The way to get started is to quit talking and begin doing."''',
+    '''"Don't ask. Act! Action will delineate and define you."''',
+    '''“It’s not knowing what to do; it’s doing what you know.”''',
+    '''“The big secret in life is that there is no big secret. Whatever your goal, you can get there if you’re willing to work.”''',
+    '''“Action is the foundational key to all success.”''',
+    '''“Amateurs sit and wait for inspiration, the rest of us just get up and go to work.”''',
   ];
   final messages = [
     'Keep up the good work! 🙌',
