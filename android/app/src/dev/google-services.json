@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "185754393263-fqh6cac2e2mcba4mah0e64qq5grcsvmf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "technology.focal.focal.dev",
+            "certificate_hash": "b52cfd05e64ca98294523c669935a6f042ea9f35"
+          }
+        },
+        {
           "client_id": "185754393263-j20skj9r86762ruae4hen4a1t62vaom6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -36,8 +44,15 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "185754393263-t5tluf0m4a6qss0f9qt4hna80fook03u.apps.googleusercontent.com",
+              "client_id": "185754393263-6uuv8kjmt42bh3hi9on0jai8097ffkrm.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "185754393263-rb69c2um48d164u77ts4npuql1kci6n2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "asdasd"
+              }
             }
           ]
         }
