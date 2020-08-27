@@ -38,19 +38,19 @@
 				<string>com.googleusercontent.apps.185754393263-dp4m3j925t1mt56gjehc7qggfbl56dhf</string>
 			</array>
 		</dict>
-        <dict>
-            <key>CFBundleURLSchemes</key>
-            <array>
-              <string>fb1597319037142790</string>
-            </array>
-        </dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb1597319037142790</string>
+			</array>
+		</dict>
 	</array>
-    <key>FacebookAppID</key>
-    <string>1597319037142790</string>
-    <key>FacebookDisplayName</key>
-    <string>Focal</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FacebookAppID</key>
+	<string>1597319037142790</string>
+	<key>FacebookDisplayName</key>
+	<string>Focal</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
