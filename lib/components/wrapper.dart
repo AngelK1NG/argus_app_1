@@ -1,22 +1,11 @@
 import 'package:flutter/material.dart';
 
-class WrapperWidget extends StatefulWidget {
+class WrapperWidget extends StatelessWidget {
   final Widget child;
 
   const WrapperWidget({
     this.child,
   });
-
-  @override
-  _WrapperWidgetState createState() => _WrapperWidgetState();
-}
-
-class _WrapperWidgetState extends State<WrapperWidget> {
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +18,7 @@ class _WrapperWidgetState extends State<WrapperWidget> {
         },
         child: SizedBox.expand(
           child: SafeArea(
-            child: widget.child,
+            child: child,
           ),
         ),
       ),

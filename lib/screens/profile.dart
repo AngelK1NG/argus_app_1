@@ -11,14 +11,14 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
 import 'dart:io' show Platform;
 
-class SettingsPage extends StatefulWidget {
-  SettingsPage({Key key}) : super(key: key);
+class ProfilePage extends StatefulWidget {
+  ProfilePage({Key key}) : super(key: key);
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _ProfilePageState extends State<ProfilePage> {
   bool _loading = true;
   bool _notificationsOn = true;
   bool _dndOn = true;
@@ -77,7 +77,7 @@ class _SettingsPageState extends State<SettingsPage> {
         left: 30,
         top: SizeConfig.safeBlockVertical * 5,
         child: Text(
-          'Settings',
+          'Profile',
           style: headerTextStyle,
         ),
       ),

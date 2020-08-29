@@ -5,7 +5,7 @@ import 'package:Focal/components/bottom_nav.dart';
 import 'focus.dart';
 import 'tasks.dart';
 import 'statistics.dart';
-import 'settings.dart';
+import 'profile.dart';
 
 class Home extends StatefulWidget {
   const Home();
@@ -54,7 +54,7 @@ class _HomeState extends State<Home> {
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
         case 3: 
-          _child = SettingsPage();
+          _child = ProfilePage();
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
       }
