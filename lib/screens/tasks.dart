@@ -146,7 +146,7 @@ class _TasksPageState extends State<TasksPage> {
     return Stack(
       children: <Widget>[
         Positioned(
-          right: 40,
+          left: 30,
           top: (SizeConfig.safeBlockVertical * 100 +
                   _safeAreaDifference -
                   _bottomPadding) *
@@ -187,7 +187,7 @@ class _TasksPageState extends State<TasksPage> {
                       child: Row(
                         children: <Widget>[
                           Padding(
-                            padding: const EdgeInsets.only(left: 29, right: 11),
+                            padding: const EdgeInsets.only(left: 30, right: 11),
                             child: Icon(
                               FeatherIcons.plus,
                               size: 18,
@@ -291,8 +291,8 @@ class _TasksPageState extends State<TasksPage> {
                 ),
               ),
               Positioned(
-                right: 20,
-                bottom: 20,
+                right: 30,
+                bottom: 30,
                 child: SqrButton(
                   icon: Icon(
                     FeatherIcons.calendar,

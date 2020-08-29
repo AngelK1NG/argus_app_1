@@ -19,47 +19,42 @@ class BottomNav extends StatelessWidget {
         ? Stack(
           children: [
             SizedBox.expand(
-              child: BottomNavigationBar(
-                items: [
-                  BottomNavigationBarItem(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  IconButton(
                     icon: Icon(
                       FeatherIcons.clock,
+                      size: 24,
+                      color: Theme.of(context).primaryColor,
                     ),
-                    title: Text('Home'),
+                    onPressed: () => onTap(0),
                   ),
-                  BottomNavigationBarItem(
+                  IconButton(
                     icon: Icon(
                       FeatherIcons.list,
+                      size: 24,
+                      color: Theme.of(context).primaryColor,
                     ),
-                    title: Text('Tasks'),
+                    onPressed: () => onTap(1),
                   ),
-                  BottomNavigationBarItem(
+                  IconButton(
                     icon: Icon(
                       FeatherIcons.percent,
+                      size: 24,
+                      color: Theme.of(context).primaryColor,
                     ),
-                    title: Text('Statistics'),
+                    onPressed: () => onTap(2),
                   ),
-                  BottomNavigationBarItem(
+                  IconButton(
                     icon: Icon(
                       FeatherIcons.user,
+                      size: 24,
+                      color: Theme.of(context).primaryColor,
                     ),
-                    title: Text('Profile'),
+                    onPressed: () => onTap(3),
                   ),
                 ],
-                selectedIconTheme: IconThemeData(
-                  color: Theme.of(context).primaryColor,
-                ),
-                unselectedIconTheme: IconThemeData(
-                  color: Theme.of(context).primaryColor,
-                ),
-                iconSize: 24,
-                showSelectedLabels: false,
-                showUnselectedLabels: false,
-                type: BottomNavigationBarType.fixed,
-                currentIndex: index,
-                onTap: onTap,
-                backgroundColor: Colors.white,
-                elevation: 0,
               ),
             ),
             AnimatedPositioned(
@@ -71,12 +66,12 @@ class BottomNav extends StatelessWidget {
               duration: loadingDuration,
               curve: loadingCurve,
               left: index == 0
-                ? SizeConfig.safeBlockHorizontal * 9.5
+                ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) / 5 + 12
                 : index == 1
-                  ? SizeConfig.safeBlockHorizontal * 34.5
+                  ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) / 5 * 2 + 60
                   : index == 2
-                    ? SizeConfig.safeBlockHorizontal * 65.5 - 24
-                    : SizeConfig.safeBlockHorizontal * 90.5 - 24
+                    ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) / 5 * 3 + 108
+                    : (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) / 5 * 4 + 156
               ,
               bottom: 20,
             ),

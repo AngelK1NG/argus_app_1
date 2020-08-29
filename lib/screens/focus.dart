@@ -67,6 +67,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   ConfettiController _confettiController =
       ConfettiController(duration: Duration(seconds: 1));
   Random _random = Random();
+  String _quote;
   final quotes = [
     '''“You can waste your lives drawing lines. Or you can live your life crossing them.”''',
     '''“Everything comes to him who hustles while he waits.”''',
@@ -157,6 +158,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _timer.cancel();
       _doingTask = false;
       _paused = false;
+      _quote = quotes[_random.nextInt(quotes.length)];
     });
     if (Platform.isAndroid) {
       if (LocalNotificationHelper.dndOn) {
@@ -343,6 +345,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     notificationHelper.initialize();
     WidgetsBinding.instance.addObserver(this);
     setState(() {
+      _quote = quotes[_random.nextInt(quotes.length)];
       _date = getDateString(DateTime.now());
       _user = Provider.of<User>(context, listen: false).user;
       _firestoreProvider = FirestoreProvider(_user);
@@ -554,9 +557,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                     return Stack(
                       children: <Widget>[
                         Positioned(
-                          left: 40,
-                          right: 40,
-                          top: SizeConfig.safeBlockVertical * 15,
+                          left: 30,
+                          right: 30,
+                          top: SizeConfig.safeBlockVertical * 12,
                           child: Text(
                             TimeOfDay.now().hour < 13
                               ? 'Good Morning!'
@@ -569,28 +572,24 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                           ),
                         ),
                         Positioned(
-                          left: 40,
-                          right: 40,
-                          top: SizeConfig.safeBlockVertical * 45,
+                          left: 30,
+                          right: 30,
+                          top: SizeConfig.safeBlockVertical * 40,
                           child: Container(
                             alignment: Alignment.center,
-                            height: SizeConfig.safeBlockVertical * 18,
-                            child: Container(
-                              alignment: Alignment.center,
-                              height: SizeConfig.safeBlockVertical * 18,
-                              child: AutoSizeText(
-                                quotes[_random.nextInt(quotes.length)],
-                                textAlign: TextAlign.center,
-                                style: taskTextStyle,
-                                maxLines: 3,
-                              ),
+                            height: SizeConfig.safeBlockVertical * 20,
+                            child: AutoSizeText(
+                              _quote,
+                              textAlign: TextAlign.center,
+                              style: taskTextStyle,
+                              maxLines: 4,
                             ),
                           ),
                         ),
                         Positioned(
                           left: 0,
                           right: 0,
-                          bottom: SizeConfig.safeBlockVertical * 12,
+                          top: SizeConfig.safeBlockVertical * 65,
                           child: Container(
                             alignment: Alignment.center,
                             child: RctButton(
@@ -637,9 +636,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                           AnimatedPositioned(
                             duration: cardSlideDuration,
                             curve: cardSlideCurve,
-                            left: 40,
-                            right: 40,
-                            top: SizeConfig.safeBlockVertical * 15,
+                            left: 30,
+                            right: 30,
+                            top: SizeConfig.safeBlockVertical * 12,
                             child: Text(
                               'Congrats! 🎉',
                               textAlign: TextAlign.center,
@@ -675,14 +674,14 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                           AnimatedPositioned(
                             duration: cardSlideDuration,
                             curve: cardSlideCurve,
-                            left: 40,
-                            right: 40,
+                            left: 30,
+                            right: 30,
                             top: !_doingTask
                                 ? SizeConfig.safeBlockVertical * 40
-                                : SizeConfig.safeBlockVertical * 57,
+                                : SizeConfig.safeBlockVertical * 54,
                             child: Container(
                               alignment: Alignment.center,
-                              height: SizeConfig.safeBlockVertical * 18,
+                              height: SizeConfig.safeBlockVertical * 20,
                               child: Text(
                                 'You\'re done!',
                                 textAlign: TextAlign.center,
@@ -695,9 +694,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 0,
                             right: 0,
-                            bottom: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 19
-                                : SizeConfig.safeBlockVertical * 9,
+                            top: !_doingTask
+                              ? SizeConfig.safeBlockVertical * 63
+                              : SizeConfig.safeBlockVertical * 77,
                             child: Center(
                               child: RctButton(
                                 onTap: () {
@@ -715,9 +714,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 0,
                             right: 0,
-                            bottom: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 6
-                                : SizeConfig.safeBlockVertical * 2,
+                            top: !_doingTask
+                                ? SizeConfig.safeBlockVertical * 75
+                                : SizeConfig.safeBlockVertical * 89,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
@@ -740,9 +739,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                       return Stack(
                         children: <Widget>[
                           Positioned(
-                            left: 40,
-                            right: 40,
-                            top: SizeConfig.safeBlockVertical * 13,
+                            left: 30,
+                            right: 30,
+                            top: SizeConfig.safeBlockVertical * 12,
                             child: _doingTask
                               ? Text(
                                   _swatchDisplay,
@@ -758,14 +757,14 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                     : messages[_random.nextInt(messages.length)],
                                   textAlign: TextAlign.center,
                                   style: topTextStyle,
-                                  maxLines: 3,
+                                  maxLines: 2,
                                 ),
                               ),
                           ),
                           Positioned(
                             left: 0,
                             right: 0,
-                            bottom: SizeConfig.safeBlockVertical * 50 - 33,
+                            top: SizeConfig.safeBlockVertical * 50 - 33,
                             child: AnimatedOpacity(
                               duration: cardSlideDuration,
                               curve: cardSlideCurve,
@@ -791,19 +790,19 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                           AnimatedPositioned(
                             duration: cardSlideDuration,
                             curve: cardSlideCurve,
-                            left: 40,
-                            right: 40,
+                            left: 30,
+                            right: 30,
                             top: !_doingTask
                                 ? SizeConfig.safeBlockVertical * 40
                                 : SizeConfig.safeBlockVertical * 57,
                             child: Container(
                               alignment: Alignment.center,
-                              height: SizeConfig.safeBlockVertical * 18,
+                              height: SizeConfig.safeBlockVertical * 20,
                               child: AutoSizeText(
                                 _tasks[0].name,
                                 textAlign: TextAlign.center,
                                 style: taskTextStyle,
-                                maxLines: 3,
+                                maxLines: 4,
                               ),
                             ),
                           ),
@@ -812,9 +811,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 0,
                             right: 0,
-                            bottom: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 26
-                                : SizeConfig.safeBlockVertical * 9,
+                            top: !_doingTask
+                              ? SizeConfig.safeBlockVertical * 63
+                              : SizeConfig.safeBlockVertical * 77,
                             child: Center(
                                 child: _doingTask
                                     ? RctButton(
@@ -850,9 +849,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             curve: cardSlideCurve,
                             left: 0,
                             right: 0,
-                            bottom: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 19
-                                : SizeConfig.safeBlockVertical * 2,
+                            top: !_doingTask
+                                ? SizeConfig.safeBlockVertical * 75
+                                : SizeConfig.safeBlockVertical * 89,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {

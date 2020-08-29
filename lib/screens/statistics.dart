@@ -104,7 +104,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return Stack(
       children: <Widget>[
         Positioned(
-          right: 40,
+          left: 30,
           top: SizeConfig.safeBlockVertical * 5,
           child: Text(
             'Statistics',
@@ -134,7 +134,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       },
                       child: Container(
                         height: 30,
-                        width: SizeConfig.safeBlockHorizontal * 50 - 40,
+                        width: SizeConfig.safeBlockHorizontal * 50 - 30,
                         decoration: BoxDecoration(
                             color: _timeFrame == 'today'
                                 ? Theme.of(context).accentColor
@@ -166,7 +166,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       },
                       child: Container(
                         height: 30,
-                        width: SizeConfig.safeBlockHorizontal * 50 - 40,
+                        width: SizeConfig.safeBlockHorizontal * 50 - 30,
                         decoration: BoxDecoration(
                             color: _timeFrame == 'week'
                                 ? Theme.of(context).accentColor
@@ -192,8 +192,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 ),
               ),
               Positioned(
-                  right: 40,
-                  left: 40,
+                  right: 30,
+                  left: 30,
                   top: SizeConfig.safeBlockVertical * 15 + 80,
                   child: SizedBox(
                     height: SizeConfig.safeBlockVertical * 85 - 80,

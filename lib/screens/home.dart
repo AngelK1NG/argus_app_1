@@ -22,7 +22,7 @@ class _HomeState extends State<Home> {
   int _selectedIndex = 0;
 
   void toggleDoingTask() {
-    if (_cardPosition == SizeConfig.safeBlockVertical * 33) {
+    if (_cardPosition == SizeConfig.safeBlockVertical * 36) {
       setState(() {
         _cardPosition = SizeConfig.safeBlockVertical * 50;
         _backgroundColor = jetBlack;
@@ -30,7 +30,7 @@ class _HomeState extends State<Home> {
       });
     } else {
       setState(() {
-        _cardPosition = SizeConfig.safeBlockVertical * 33;
+        _cardPosition = SizeConfig.safeBlockVertical * 36;
         _backgroundColor = Theme.of(context).primaryColor;
         _showNav = true;
       });
@@ -43,7 +43,7 @@ class _HomeState extends State<Home> {
       switch (index) {
         case 0: 
           _child = FocusPage(toggleDoingTask: toggleDoingTask, goToPage: goToPage);
-          _cardPosition = SizeConfig.safeBlockVertical * 33;
+          _cardPosition = SizeConfig.safeBlockVertical * 36;
           break;
         case 1: 
           _child = TasksPage();
@@ -72,7 +72,7 @@ class _HomeState extends State<Home> {
     super.didChangeDependencies();
     SizeConfig().init(context);
     _backgroundColor = Theme.of(context).primaryColor;
-    _cardPosition = SizeConfig.safeBlockVertical * 33;
+    _cardPosition = SizeConfig.safeBlockVertical * 36;
   }
 
   @override
@@ -82,11 +82,8 @@ class _HomeState extends State<Home> {
       bottomNavigationBar: BottomNav(onTap: goToPage, show: _showNav, index: _selectedIndex),
       body: Stack(
         children: <Widget>[
-          AnimatedContainer(
-            duration: cardSlideDuration,
-            curve: cardSlideCurve,
+          Container(
             color: _backgroundColor,
-            child: Container(),
           ),
           AnimatedPositioned(
             duration: cardSlideDuration,

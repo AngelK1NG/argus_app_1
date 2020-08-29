@@ -1,6 +1,7 @@
 import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:Focal/utils/firestore.dart';
+import 'package:Focal/utils/size_config.dart';
 import 'package:provider/provider.dart';
 import 'package:Focal/constants.dart';
 import 'dart:io' show Platform;
@@ -76,7 +77,7 @@ class _TaskItemState extends State<TaskItem> {
                 child: Row(
                   children: <Widget>[
                     Padding(
-                        padding: const EdgeInsets.only(left: 33, right: 15),
+                        padding: const EdgeInsets.only(left: 34, right: 15),
                         child: widget.completed
                             ? Image(
                                 image: AssetImage(
@@ -92,7 +93,7 @@ class _TaskItemState extends State<TaskItem> {
                               )),
                     SizedBox(
                         height: 55,
-                        width: MediaQuery.of(context).size.width - 116,
+                        width: SizeConfig.safeBlockHorizontal * 100 - 89,
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: _active

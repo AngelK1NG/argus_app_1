@@ -74,17 +74,11 @@ class _SettingsPageState extends State<SettingsPage> {
     String _email = Provider.of<User>(context, listen: false).user.email;
     return Stack(children: <Widget>[
       Positioned(
-        right: 0,
-        top: 0,
-        child: Padding(
-          padding: EdgeInsets.only(
-            right: 40,
-            top: SizeConfig.safeBlockVertical * 5,
-          ),
-          child: Text(
-            "Settings",
-            style: headerTextStyle,
-          ),
+        left: 30,
+        top: SizeConfig.safeBlockVertical * 5,
+        child: Text(
+          'Settings',
+          style: headerTextStyle,
         ),
       ),
       AnimatedOpacity(
@@ -94,8 +88,8 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Stack(
           children: <Widget>[
             Positioned(
-              right: 40,
-              left: 40,
+              right: 30,
+              left: 30,
               top: SizeConfig.safeBlockVertical * 15 + 40,
               child: Container(
                   child: Column(
@@ -137,8 +131,8 @@ class _SettingsPageState extends State<SettingsPage> {
             _email == null
                 ? Container()
                 : Positioned(
-                    right: 40,
-                    left: 40,
+                    right: 30,
+                    left: 30,
                     bottom: 120,
                     child: Text(
                       "You are signed in as " + _email,
@@ -150,46 +144,39 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
             Positioned(
-              right: 0,
-              left: 0,
-              bottom: 0,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 30,
-                  right: 38,
-                  left: 38,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    FlatButton(
-                      onPressed: () {
-                        HapticFeedback.heavyImpact();
-                        LocalNotificationHelper.userLoggedIn = false;
-                        auth.signOut();
-                        AnalyticsProvider().logSignOut();
-                      },
-                      child: Text("Sign out",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.w400,
-                          )),
-                    ),
-                    FlatButton(
-                      onPressed: () {
-                        HapticFeedback.heavyImpact();
-                        openPrivacyPolicy();
-                      },
-                      child: Text("Privacy policy",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Theme.of(context).hintColor,
-                            fontWeight: FontWeight.w400,
-                          )),
-                    ),
-                  ],
-                ),
+              right: 30,
+              left: 30,
+              bottom: 30,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  FlatButton(
+                    onPressed: () {
+                      HapticFeedback.heavyImpact();
+                      LocalNotificationHelper.userLoggedIn = false;
+                      auth.signOut();
+                      AnalyticsProvider().logSignOut();
+                    },
+                    child: Text("Sign out",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.w400,
+                        )),
+                  ),
+                  FlatButton(
+                    onPressed: () {
+                      HapticFeedback.heavyImpact();
+                      openPrivacyPolicy();
+                    },
+                    child: Text("Privacy policy",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Theme.of(context).hintColor,
+                          fontWeight: FontWeight.w400,
+                        )),
+                  ),
+                ],
               ),
             ),
           ],
