@@ -24,7 +24,7 @@ final TextStyle headerTextStyle = TextStyle(
 );
 
 //animation transitions
-final Duration navDuration = Duration(milliseconds: 200);
-final Curve navCurve = Curves.ease;
+final Duration loadingDuration = Duration(milliseconds: 200);
+final Curve loadingCurve = Curves.ease;
 final Duration cardSlideDuration = Duration(milliseconds: 200);
 final Curve cardSlideCurve = Curves.ease;

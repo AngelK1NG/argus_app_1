@@ -4,7 +4,6 @@ import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import '../components/wrapper.dart';
 import '../components/rct_button.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/utils/firestore.dart';
@@ -84,73 +83,71 @@ class _LoginPageState extends State<LoginPage> {
           visible: _isLogin,
           child: ModalProgressHUD(
             inAsyncCall: _loginLoading,
-            child: WrapperWidget(
-              nav: false,
-              staticChild: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 180),
-                    child: Column(
-                      children: <Widget>[
-                        RctButton(
-                          onTap: () async {
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
+                Padding(
+                  padding: const EdgeInsets.only(top: 180),
+                  child: Column(
+                    children: <Widget>[
+                      RctButton(
+                        onTap: () async {
+                          setState(() {
+                            _loginLoading = true;
+                          });
+                          dynamic result =
+                              await AuthProvider().googleSignIn();
+                          if (result == null) {
                             setState(() {
-                              _loginLoading = true;
+                              _loginLoading = false;
                             });
-                            dynamic result =
-                                await AuthProvider().googleSignIn();
-                            if (result == null) {
-                              setState(() {
-                                _loginLoading = false;
-                              });
-                            } else {
-                              LocalNotificationHelper.userLoggedIn = true;
-                              AnalyticsProvider().logGoogleSignIn();
-                            }
-                          },
-                          buttonWidth: 315,
-                          colored: true,
-                          buttonText: "Sign in with Google",
-                          textSize: 24,
-                          icon: FaIcon(
-                            FontAwesomeIcons.google,
-                            color: Colors.white,
-                            size: 30,
-                          ),
+                          } else {
+                            LocalNotificationHelper.userLoggedIn = true;
+                            AnalyticsProvider().logGoogleSignIn();
+                          }
+                        },
+                        buttonWidth: 315,
+                        colored: true,
+                        buttonText: "Sign in with Google",
+                        textSize: 24,
+                        icon: FaIcon(
+                          FontAwesomeIcons.google,
+                          color: Colors.white,
+                          size: 30,
                         ),
-                        Platform.isIOS
-                            ? Padding(
-                                padding: EdgeInsets.only(top: 15),
-                                child: RctButton(
-                                  onTap: () async {
+                      ),
+                      Platform.isIOS
+                          ? Padding(
+                              padding: EdgeInsets.only(top: 15),
+                              child: RctButton(
+                                onTap: () async {
+                                  setState(() {
+                                    _loginLoading = true;
+                                  });
+                                  dynamic result =
+                                      await AuthProvider().appleSignIn();
+                                  if (result == null) {
                                     setState(() {
-                                      _loginLoading = true;
+                                      _loginLoading = false;
                                     });
-                                    dynamic result =
-                                        await AuthProvider().appleSignIn();
-                                    if (result == null) {
-                                      setState(() {
-                                        _loginLoading = false;
-                                      });
-                                    } else {
-                                      LocalNotificationHelper.userLoggedIn = true;
-                                      AnalyticsProvider().logAppleSignIn();
-                                    }
-                                  },
-                                  buttonWidth: 315,
-                                  colored: false,
-                                  buttonText: "Sign in with Apple",
-                                  textSize: 24,
-                                  icon: FaIcon(
-                                    FontAwesomeIcons.apple,
-                                    color: Colors.white,
-                                    size: 35,
-                                  ),
+                                  } else {
+                                    LocalNotificationHelper.userLoggedIn = true;
+                                    AnalyticsProvider().logAppleSignIn();
+                                  }
+                                },
+                                buttonWidth: 315,
+                                colored: false,
+                                buttonText: "Sign in with Apple",
+                                textSize: 24,
+                                icon: FaIcon(
+                                  FontAwesomeIcons.apple,
+                                  color: Colors.white,
+                                  size: 35,
                                 ),
-                              )
-                            : Container()
+                              ),
+                            )
+                          : Container()
                       ],
                     ),
                   ),
@@ -158,7 +155,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-        ),
         Visibility(
           visible: !_isLogin,
           child: AnimatedOpacity(

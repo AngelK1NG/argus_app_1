@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:Focal/components/wrapper.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/components/today_stats.dart';
 import 'package:Focal/components/week_stats.dart';
@@ -85,8 +84,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
     await getThisWeeksDays();
     await getTodaySnapshots();
     await getWeekSnapshots();
-    setState(() {
-      _loading = false;
+    Future.delayed(cardSlideDuration, () {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     });
   }
 
@@ -98,13 +101,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    return WrapperWidget(
-      loading: _loading,
-      nav: true,
-      cardPosition: SizeConfig.safeBlockVertical * 15,
-      backgroundColor: Theme.of(context).primaryColor,
-      staticChild: Stack(children: <Widget>[
+    return Stack(
+      children: <Widget>[
         Positioned(
           right: 40,
           top: SizeConfig.safeBlockVertical * 5,
@@ -113,102 +111,107 @@ class _StatisticsPageState extends State<StatisticsPage> {
             style: headerTextStyle,
           ),
         ),
-        Positioned(
-          right: 0,
-          left: 0,
-          top: SizeConfig.safeBlockVertical * 15 + 20,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+        AnimatedOpacity(
+          opacity: _loading ? 0 : 1,
+          duration: loadingDuration,
+          curve: loadingCurve,
+          child: Stack(
             children: <Widget>[
-              GestureDetector(
-                onTap: () {
-                  if (_timeFrame != 'today') {
-                    setState(() {
-                      _timeFrame = 'today';
-                    });
-                  }
-                },
-                child: Container(
-                  height: 30,
-                  width: SizeConfig.safeBlockHorizontal * 50 - 40,
-                  decoration: BoxDecoration(
-                      color: _timeFrame == 'today'
-                          ? Theme.of(context).accentColor
-                          : Theme.of(context).dividerColor,
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          bottomLeft: Radius.circular(15))),
-                  child: Center(
-                    child: Text(
-                      'Today',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: _timeFrame == 'today'
-                            ? Colors.white
-                            : Theme.of(context).accentColor,
-                        fontWeight: FontWeight.w500,
+              Positioned(
+                right: 0,
+                left: 0,
+                top: SizeConfig.safeBlockVertical * 15 + 20,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        if (_timeFrame != 'today') {
+                          setState(() {
+                            _timeFrame = 'today';
+                          });
+                        }
+                      },
+                      child: Container(
+                        height: 30,
+                        width: SizeConfig.safeBlockHorizontal * 50 - 40,
+                        decoration: BoxDecoration(
+                            color: _timeFrame == 'today'
+                                ? Theme.of(context).accentColor
+                                : Theme.of(context).dividerColor,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                bottomLeft: Radius.circular(15))),
+                        child: Center(
+                          child: Text(
+                            'Today',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: _timeFrame == 'today'
+                                  ? Colors.white
+                                  : Theme.of(context).accentColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  if (_timeFrame != 'week') {
-                    setState(() {
-                      _timeFrame = 'week';
-                    });
-                  }
-                },
-                child: Container(
-                  height: 30,
-                  width: SizeConfig.safeBlockHorizontal * 50 - 40,
-                  decoration: BoxDecoration(
-                      color: _timeFrame == 'week'
-                          ? Theme.of(context).accentColor
-                          : Theme.of(context).dividerColor,
-                      borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(15),
-                          bottomRight: Radius.circular(15))),
-                  child: Center(
-                    child: Text(
-                      'Week',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: _timeFrame == 'week'
-                            ? Colors.white
-                            : Theme.of(context).accentColor,
-                        fontWeight: FontWeight.w500,
+                    GestureDetector(
+                      onTap: () {
+                        if (_timeFrame != 'week') {
+                          setState(() {
+                            _timeFrame = 'week';
+                          });
+                        }
+                      },
+                      child: Container(
+                        height: 30,
+                        width: SizeConfig.safeBlockHorizontal * 50 - 40,
+                        decoration: BoxDecoration(
+                            color: _timeFrame == 'week'
+                                ? Theme.of(context).accentColor
+                                : Theme.of(context).dividerColor,
+                            borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(15),
+                                bottomRight: Radius.circular(15))),
+                        child: Center(
+                          child: Text(
+                            'Week',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: _timeFrame == 'week'
+                                  ? Colors.white
+                                  : Theme.of(context).accentColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
+              Positioned(
+                  right: 40,
+                  left: 40,
+                  top: SizeConfig.safeBlockVertical * 15 + 80,
+                  child: SizedBox(
+                    height: SizeConfig.safeBlockVertical * 85 - 80,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: _loading
+                          ? Container()
+                          : _timeFrame == 'today'
+                              ? TodayStats(
+                                  tasksSnapshot: _todayTasksSnapshot,
+                                  dateSnapshot: _todayDateSnapshot)
+                              : WeekStats(snapshots: _weekSnapshots),
+                    ),
+                  )),
             ],
           ),
         ),
-      ]),
-      dynamicChild: Stack(
-        children: <Widget>[
-          Positioned(
-              right: 40,
-              left: 40,
-              top: SizeConfig.safeBlockVertical * 15 + 80,
-              child: SizedBox(
-                height: SizeConfig.safeBlockVertical * 85 - 80,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: _loading
-                      ? Container()
-                      : _timeFrame == 'today'
-                          ? TodayStats(
-                              tasksSnapshot: _todayTasksSnapshot,
-                              dateSnapshot: _todayDateSnapshot)
-                          : WeekStats(snapshots: _weekSnapshots),
-                ),
-              )),
-        ],
-      ),
+      ]
     );
   }
 }
