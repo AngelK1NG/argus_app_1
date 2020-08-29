@@ -34,7 +34,7 @@ class _TodayStatsState extends State<TodayStats> {
         name: name,
         id: task.documentID,
         completed: task.data['completed'],
-        saved: task.data['saved'],
+        saved: task.data['saved'] == null ? false : task.data['saved'],
         order: task.data['order'],
         secondsFocused: task.data['secondsFocused'],
         secondsDistracted: task.data['secondsDistracted'],

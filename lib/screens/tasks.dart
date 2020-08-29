@@ -71,7 +71,7 @@ class _TasksPageState extends State<TasksPage> {
           name: name,
           id: task.documentID,
           completed: task.data['completed'],
-          saved: task.data['saved'],
+          saved: task.data['saved'] == null ? false : task.data['saved'],
           order: task.data['order'],
           secondsFocused: task.data['secondsFocused'],
           secondsDistracted: task.data['secondsDistracted'],
