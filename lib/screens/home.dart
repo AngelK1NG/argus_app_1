@@ -20,6 +20,7 @@ class _HomeState extends State<Home> {
   double _cardPosition;
   bool _showNav = true;
   int _selectedIndex = 0;
+  bool _initialized = false;
 
   void toggleDoingTask() {
     if (_cardPosition == SizeConfig.safeBlockVertical * 36) {
@@ -41,19 +42,20 @@ class _HomeState extends State<Home> {
     _selectedIndex = index;
     setState(() {
       switch (index) {
-        case 0: 
-          _child = FocusPage(toggleDoingTask: toggleDoingTask, goToPage: goToPage);
+        case 0:
+          _child =
+              FocusPage(toggleDoingTask: toggleDoingTask, goToPage: goToPage);
           _cardPosition = SizeConfig.safeBlockVertical * 36;
           break;
-        case 1: 
+        case 1:
           _child = TasksPage();
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
-        case 2: 
+        case 2:
           _child = StatisticsPage();
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
-        case 3: 
+        case 3:
           _child = ProfilePage();
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
@@ -70,16 +72,41 @@ class _HomeState extends State<Home> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    SizeConfig().init(context);
-    _backgroundColor = Theme.of(context).primaryColor;
-    _cardPosition = SizeConfig.safeBlockVertical * 36;
+    if (!_initialized) {
+      SizeConfig().init(context);
+      _initialized = true;
+    }
+    setState(() {
+      _backgroundColor = Theme.of(context).primaryColor;
+      switch (_selectedIndex) {
+        case 0:
+          _child =
+              FocusPage(toggleDoingTask: toggleDoingTask, goToPage: goToPage);
+          _cardPosition = SizeConfig.safeBlockVertical * 36;
+          break;
+        case 1:
+          _child = TasksPage();
+          _cardPosition = SizeConfig.safeBlockVertical * 15;
+          break;
+        case 2:
+          _child = StatisticsPage();
+          _cardPosition = SizeConfig.safeBlockVertical * 15;
+          break;
+        case 3:
+          _child = ProfilePage();
+          _cardPosition = SizeConfig.safeBlockVertical * 15;
+          break;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: BottomNav(onTap: goToPage, show: _showNav, index: _selectedIndex),
+      bottomNavigationBar: SafeArea(
+          child: BottomNav(
+              onTap: goToPage, show: _showNav, index: _selectedIndex)),
       body: Stack(
         children: <Widget>[
           Container(
@@ -110,7 +137,7 @@ class _HomeState extends State<Home> {
               height: MediaQuery.of(context).size.height,
             ),
           ),
-          _child,
+          SafeArea(child: _child),
         ],
       ),
     );

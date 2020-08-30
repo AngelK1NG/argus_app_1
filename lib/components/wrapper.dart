@@ -17,9 +17,7 @@ class WrapperWidget extends StatelessWidget {
           return null;
         },
         child: SizedBox.expand(
-          child: SafeArea(
-            child: child,
-          ),
+          child: child,
         ),
       ),
     );

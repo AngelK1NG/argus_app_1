@@ -27,7 +27,8 @@ class FocusPage extends StatefulWidget {
   final VoidCallback toggleDoingTask;
   final Function goToPage;
 
-  FocusPage({@required this.toggleDoingTask, @required this.goToPage, Key key}) : super(key: key);
+  FocusPage({@required this.toggleDoingTask, @required this.goToPage, Key key})
+      : super(key: key);
 
   @override
   _FocusPageState createState() => _FocusPageState();
@@ -119,16 +120,15 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     }
 
     _timer = new Timer.periodic(
-      const Duration(seconds: 1),
-      (Timer timer) => setState(() {
-        final currentTime = DateTime.now();
-        _seconds = (currentTime.difference(_startFocused).inSeconds) +
-            initSeconds;
-        _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-            ":" +
-            (_seconds % 60).toString().padLeft(2, "0");
-      })
-    );
+        const Duration(seconds: 1),
+        (Timer timer) => setState(() {
+              final currentTime = DateTime.now();
+              _seconds = (currentTime.difference(_startFocused).inSeconds) +
+                  initSeconds;
+              _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                  ":" +
+                  (_seconds % 60).toString().padLeft(2, "0");
+            }));
     setState(() {
       _seconds = initSeconds;
       _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
@@ -169,6 +169,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       }
     }
     widget.toggleDoingTask();
+    print(SizeConfig.safeBlockVertical);
   }
 
   void pauseTask() {
@@ -176,16 +177,15 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       int pausedDifference = _seconds;
       _secondsPaused += DateTime.now().difference(_startPaused).inSeconds;
       _timer = new Timer.periodic(
-        const Duration(seconds: 1),
-        (Timer timer) => setState(() {
-          final currentTime = DateTime.now();
-          _seconds = currentTime.difference(_startFocused).inSeconds +
-              pausedDifference;
-          _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-              ":" +
-              (_seconds % 60).toString().padLeft(2, "0");
-        })
-      );
+          const Duration(seconds: 1),
+          (Timer timer) => setState(() {
+                final currentTime = DateTime.now();
+                _seconds = currentTime.difference(_startFocused).inSeconds +
+                    pausedDifference;
+                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                    ":" +
+                    (_seconds % 60).toString().padLeft(2, "0");
+              }));
       setState(() {
         _startFocused = DateTime.now();
         _paused = false;
@@ -562,11 +562,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                           top: SizeConfig.safeBlockVertical * 12,
                           child: Text(
                             TimeOfDay.now().hour < 13
-                              ? 'Good Morning!'
-                              : TimeOfDay.now().hour < 18
-                                ? 'Good Afternoon!'
-                                : 'Good Evening!'
-                            ,
+                                ? 'Good Morning!'
+                                : TimeOfDay.now().hour < 18
+                                    ? 'Good Afternoon!'
+                                    : 'Good Evening!',
                             textAlign: TextAlign.center,
                             style: topTextStyle,
                           ),
@@ -574,7 +573,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                         Positioned(
                           left: 30,
                           right: 30,
-                          top: SizeConfig.safeBlockVertical * 40,
+                          top: SizeConfig.safeBlockVertical * 39,
                           child: Container(
                             alignment: Alignment.center,
                             height: SizeConfig.safeBlockVertical * 20,
@@ -613,7 +612,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                         name: task.data['name'],
                         id: task.documentID,
                         completed: task.data['completed'],
-                        saved: task.data['saved'] == null ? false : task.data['saved'],
+                        saved: task.data['saved'] == null
+                            ? false
+                            : task.data['saved'],
                         order: task.data['order'],
                         secondsFocused: task.data['secondsFocused'],
                         secondsDistracted: task.data['secondsDistracted'],
@@ -677,8 +678,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 30,
                             right: 30,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 40
-                                : SizeConfig.safeBlockVertical * 54,
+                                ? SizeConfig.safeBlockVertical * 39
+                                : SizeConfig.safeBlockVertical * 53,
                             child: Container(
                               alignment: Alignment.center,
                               height: SizeConfig.safeBlockVertical * 20,
@@ -695,8 +696,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 0,
                             right: 0,
                             top: !_doingTask
-                              ? SizeConfig.safeBlockVertical * 63
-                              : SizeConfig.safeBlockVertical * 77,
+                                ? SizeConfig.safeBlockVertical * 65
+                                : SizeConfig.safeBlockVertical * 79,
                             child: Center(
                               child: RctButton(
                                 onTap: () {
@@ -715,8 +716,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 0,
                             right: 0,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 75
-                                : SizeConfig.safeBlockVertical * 89,
+                                ? SizeConfig.safeBlockVertical * 76
+                                : SizeConfig.safeBlockVertical * 90,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
@@ -743,23 +744,26 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             right: 30,
                             top: SizeConfig.safeBlockVertical * 12,
                             child: _doingTask
-                              ? Text(
-                                  _swatchDisplay,
-                                  textAlign: TextAlign.center,
-                                  style: swatchTextStyle,
-                                )
-                              : Container(
-                                alignment: Alignment.center,
-                                height: SizeConfig.safeBlockVertical * 15,
-                                child: AutoSizeText(
-                                  _totalTasks != null && _completedTasks != null && _totalTasks - _completedTasks == 1
-                                    ? 'Almost there! Keep pushing 👊'
-                                    : messages[_random.nextInt(messages.length)],
-                                  textAlign: TextAlign.center,
-                                  style: topTextStyle,
-                                  maxLines: 2,
-                                ),
-                              ),
+                                ? Text(
+                                    _swatchDisplay,
+                                    textAlign: TextAlign.center,
+                                    style: swatchTextStyle,
+                                  )
+                                : Container(
+                                    alignment: Alignment.center,
+                                    height: SizeConfig.safeBlockVertical * 15,
+                                    child: AutoSizeText(
+                                      _totalTasks != null &&
+                                              _completedTasks != null &&
+                                              _totalTasks - _completedTasks == 1
+                                          ? 'Almost there! Keep pushing 👊'
+                                          : messages[
+                                              _random.nextInt(messages.length)],
+                                      textAlign: TextAlign.center,
+                                      style: topTextStyle,
+                                      maxLines: 2,
+                                    ),
+                                  ),
                           ),
                           Positioned(
                             left: 0,
@@ -793,8 +797,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 30,
                             right: 30,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 40
-                                : SizeConfig.safeBlockVertical * 57,
+                                ? SizeConfig.safeBlockVertical * 39
+                                : SizeConfig.safeBlockVertical * 53,
                             child: Container(
                               alignment: Alignment.center,
                               height: SizeConfig.safeBlockVertical * 20,
@@ -812,8 +816,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 0,
                             right: 0,
                             top: !_doingTask
-                              ? SizeConfig.safeBlockVertical * 63
-                              : SizeConfig.safeBlockVertical * 77,
+                                ? SizeConfig.safeBlockVertical * 65
+                                : SizeConfig.safeBlockVertical * 79,
                             child: Center(
                                 child: _doingTask
                                     ? RctButton(
@@ -839,8 +843,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                         buttonWidth: 220,
                                         colored: true,
                                         buttonText: _tasks[0].saved
-                                          ? 'Resume'
-                                          : 'Start',
+                                            ? 'Resume'
+                                            : 'Start',
                                         textSize: 32,
                                       )),
                           ),
@@ -850,8 +854,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 0,
                             right: 0,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 75
-                                : SizeConfig.safeBlockVertical * 89,
+                                ? SizeConfig.safeBlockVertical * 76
+                                : SizeConfig.safeBlockVertical * 90,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
