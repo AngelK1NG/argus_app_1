@@ -22,37 +22,57 @@ class BottomNav extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      FeatherIcons.clock,
-                      size: 24,
-                      color: Theme.of(context).primaryColor,
+                  GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () => onTap(0),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      child: Icon(
+                        FeatherIcons.clock,
+                        size: 24,
+                        color: Theme.of(context).primaryColor,
+                      ),
                     ),
-                    onPressed: () => onTap(0),
                   ),
-                  IconButton(
-                    icon: Icon(
-                      FeatherIcons.list,
-                      size: 24,
-                      color: Theme.of(context).primaryColor,
+                  GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () => onTap(1),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      child: Icon(
+                        FeatherIcons.list,
+                        size: 24,
+                        color: Theme.of(context).primaryColor,
+                      ),
                     ),
-                    onPressed: () => onTap(1),
                   ),
-                  IconButton(
-                    icon: Icon(
-                      FeatherIcons.percent,
-                      size: 24,
-                      color: Theme.of(context).primaryColor,
+                  GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () => onTap(2),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      child: Icon(
+                        FeatherIcons.percent,
+                        size: 24,
+                        color: Theme.of(context).primaryColor,
+                      ),
                     ),
-                    onPressed: () => onTap(2),
                   ),
-                  IconButton(
-                    icon: Icon(
-                      FeatherIcons.user,
-                      size: 24,
-                      color: Theme.of(context).primaryColor,
+                  GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () => onTap(3),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      child: Icon(
+                        FeatherIcons.user,
+                        size: 24,
+                        color: Theme.of(context).primaryColor,
+                      ),
                     ),
-                    onPressed: () => onTap(3),
                   ),
                 ],
               ),

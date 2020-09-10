@@ -48,15 +48,15 @@ class _HomeState extends State<Home> {
           _cardPosition = SizeConfig.safeBlockVertical * 36;
           break;
         case 1:
-          _child = TasksPage();
+          _child = TasksPage(goToPage: goToPage);
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
         case 2:
-          _child = StatisticsPage();
+          _child = StatisticsPage(goToPage: goToPage);
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
         case 3:
-          _child = ProfilePage();
+          _child = ProfilePage(goToPage: goToPage);
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
       }
@@ -78,25 +78,7 @@ class _HomeState extends State<Home> {
     }
     setState(() {
       _backgroundColor = Theme.of(context).primaryColor;
-      switch (_selectedIndex) {
-        case 0:
-          _child =
-              FocusPage(toggleDoingTask: toggleDoingTask, goToPage: goToPage);
-          _cardPosition = SizeConfig.safeBlockVertical * 36;
-          break;
-        case 1:
-          _child = TasksPage();
-          _cardPosition = SizeConfig.safeBlockVertical * 15;
-          break;
-        case 2:
-          _child = StatisticsPage();
-          _cardPosition = SizeConfig.safeBlockVertical * 15;
-          break;
-        case 3:
-          _child = ProfilePage();
-          _cardPosition = SizeConfig.safeBlockVertical * 15;
-          break;
-      }
+      goToPage(_selectedIndex);
     });
   }
 

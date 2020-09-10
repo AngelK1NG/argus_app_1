@@ -14,7 +14,9 @@ import 'package:Focal/components/task_item.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 
 class TasksPage extends StatefulWidget {
-  TasksPage({Key key}) : super(key: key);
+  final Function goToPage;
+  
+  TasksPage({@required this.goToPage, Key key}) : super(key: key);
 
   @override
   _TasksPageState createState() => _TasksPageState();
@@ -143,184 +145,187 @@ class _TasksPageState extends State<TasksPage> {
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<User>(context, listen: false).user;
     FirestoreProvider firestoreProvider = FirestoreProvider(user);
-    return Stack(
-      children: <Widget>[
-        Positioned(
-          left: 30,
-          top: (SizeConfig.safeBlockVertical * 100 +
-                  _safeAreaDifference -
-                  _bottomPadding) *
-              0.05,
-          child: Text(
-            (DateTime.parse(_date).year == DateTime.now().year &&
-                    DateTime.parse(_date).month == DateTime.now().month &&
-                    DateTime.parse(_date).day == DateTime.now().day)
-                ? "Today"
-                : (DateTime.parse(_date).year == DateTime.now().year &&
-                        DateTime.parse(_date).month == DateTime.now().month &&
-                        DateTime.parse(_date).day == DateTime.now().day + 1)
-                    ? "Tomorrow"
-                    : DateTime.parse(_date).month.toString() +
-                        "/" +
-                        DateTime.parse(_date).day.toString(),
-            style: headerTextStyle,
+    return WillPopScope(
+      onWillPop: () async => widget.goToPage(0),
+      child: Stack(
+        children: <Widget>[
+          Positioned(
+            left: 30,
+            top: (SizeConfig.safeBlockVertical * 100 +
+                    _safeAreaDifference -
+                    _bottomPadding) *
+                0.05,
+            child: Text(
+              (DateTime.parse(_date).year == DateTime.now().year &&
+                      DateTime.parse(_date).month == DateTime.now().month &&
+                      DateTime.parse(_date).day == DateTime.now().day)
+                  ? "Today"
+                  : (DateTime.parse(_date).year == DateTime.now().year &&
+                          DateTime.parse(_date).month == DateTime.now().month &&
+                          DateTime.parse(_date).day == DateTime.now().day + 1)
+                      ? "Tomorrow"
+                      : DateTime.parse(_date).month.toString() +
+                          "/" +
+                          DateTime.parse(_date).day.toString(),
+              style: headerTextStyle,
+            ),
           ),
-        ),
-        AnimatedOpacity(
-          opacity: _loading ? 0 : 1,
-          duration: loadingDuration,
-          curve: loadingCurve,
-          child: Stack(
-            children: <Widget>[
-              Positioned(
-                right: 0,
-                left: 0,
-                top: (SizeConfig.safeBlockVertical * 100 +
-                            _safeAreaDifference -
-                            _bottomPadding) *
-                        0.15 +
-                    20,
-                child: SizedBox(
-                  height: SizeConfig.safeBlockVertical * 85 - 20,
-                  child: ReorderableListView(
-                    header: Container(
-                      child: Row(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.only(left: 30, right: 11),
-                            child: Icon(
-                              FeatherIcons.plus,
-                              size: 18,
-                              color: Theme.of(context).hintColor,
+          AnimatedOpacity(
+            opacity: _loading ? 0 : 1,
+            duration: loadingDuration,
+            curve: loadingCurve,
+            child: Stack(
+              children: <Widget>[
+                Positioned(
+                  right: 0,
+                  left: 0,
+                  top: (SizeConfig.safeBlockVertical * 100 +
+                              _safeAreaDifference -
+                              _bottomPadding) *
+                          0.15 +
+                      20,
+                  child: SizedBox(
+                    height: SizeConfig.safeBlockVertical * 85 - 20,
+                    child: ReorderableListView(
+                      header: Container(
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(left: 30, right: 11),
+                              child: Icon(
+                                FeatherIcons.plus,
+                                size: 18,
+                                color: Theme.of(context).hintColor,
+                              ),
                             ),
-                          ),
-                          Container(
-                            alignment: Alignment.center,
-                            width: MediaQuery.of(context).size.width - 116,
-                            child: Form(
-                              key: _formKey,
-                              child: TextFormField(
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: "Add task...",
-                                  ),
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                  autofocus: false,
-                                  onFieldSubmitted: (value) async {
-                                    if (_formKey.currentState.validate()) {
-                                      HapticFeedback.heavyImpact();
-                                      TaskItem newTask = TaskItem(
-                                        id: '',
-                                        name: value,
-                                        completed: false,
-                                        saved: false,
-                                        key: UniqueKey(),
-                                        order: _tasks.length - _completedTasks,
-                                        date: _date,
-                                      );
-                                      newTask.onDismissed = () {
-                                        removeTask(newTask);
-                                        AnalyticsProvider().logDeleteTask(newTask, DateTime.now());
-                                      };
-                                      newTask.onUpdate =
-                                          (value) => newTask.name = value;
-                                      setState(() {
-                                        _tasks.insert(
-                                            _tasks.length - _completedTasks,
-                                            newTask);
-                                      });
-                                      String userId = user.uid;
-                                      db
-                                          .collection('users')
-                                          .document(userId)
-                                          .collection('tasks')
-                                          .document(_date)
-                                          .collection('tasks')
-                                          .add({
-                                        'name': newTask.name,
-                                        'order': newTask.order,
-                                        'completed': newTask.completed,
-                                        'saved': newTask.saved,
-                                      }).then((doc) {
-                                        _tasks[_tasks.length - _completedTasks - 1]
-                                            .id = doc.documentID;
-                                        firestoreProvider.updateTasks(
-                                            _tasks, _date);
-                                      });
-                                      _formKey.currentState.reset();
-                                      AnalyticsProvider()
-                                          .logAddTask(newTask, DateTime.now());
-                                    }
-                                  },
-                                  validator: (value) {
-                                    return value.isEmpty
-                                        ? 'You cannot add an empty task'
-                                        : null;
-                                  }),
+                            Container(
+                              alignment: Alignment.center,
+                              width: MediaQuery.of(context).size.width - 116,
+                              child: Form(
+                                key: _formKey,
+                                child: TextFormField(
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: "Add task...",
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    autofocus: false,
+                                    onFieldSubmitted: (value) async {
+                                      if (_formKey.currentState.validate()) {
+                                        HapticFeedback.heavyImpact();
+                                        TaskItem newTask = TaskItem(
+                                          id: '',
+                                          name: value,
+                                          completed: false,
+                                          saved: false,
+                                          key: UniqueKey(),
+                                          order: _tasks.length - _completedTasks,
+                                          date: _date,
+                                        );
+                                        newTask.onDismissed = () {
+                                          removeTask(newTask);
+                                          AnalyticsProvider().logDeleteTask(newTask, DateTime.now());
+                                        };
+                                        newTask.onUpdate =
+                                            (value) => newTask.name = value;
+                                        setState(() {
+                                          _tasks.insert(
+                                              _tasks.length - _completedTasks,
+                                              newTask);
+                                        });
+                                        String userId = user.uid;
+                                        db
+                                            .collection('users')
+                                            .document(userId)
+                                            .collection('tasks')
+                                            .document(_date)
+                                            .collection('tasks')
+                                            .add({
+                                          'name': newTask.name,
+                                          'order': newTask.order,
+                                          'completed': newTask.completed,
+                                          'saved': newTask.saved,
+                                        }).then((doc) {
+                                          _tasks[_tasks.length - _completedTasks - 1]
+                                              .id = doc.documentID;
+                                          firestoreProvider.updateTasks(
+                                              _tasks, _date);
+                                        });
+                                        _formKey.currentState.reset();
+                                        AnalyticsProvider()
+                                            .logAddTask(newTask, DateTime.now());
+                                      }
+                                    },
+                                    validator: (value) {
+                                      return value.isEmpty
+                                          ? 'You cannot add an empty task'
+                                          : null;
+                                    }),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        height: 55,
+                        width: MediaQuery.of(context).size.width,
+                        alignment: Alignment.centerLeft,
                       ),
-                      height: 55,
-                      width: MediaQuery.of(context).size.width,
-                      alignment: Alignment.centerLeft,
+                      onReorder: ((oldIndex, newIndex) {
+                        if (!_tasks[oldIndex].completed) {
+                          List<TaskItem> tasks = _tasks;
+                          if (oldIndex < newIndex) {
+                            newIndex -= 1;
+                          }
+                          final task = tasks.removeAt(oldIndex);
+                          if (newIndex >= tasks.length - _completedTasks) {
+                            int distanceFromEnd = tasks.length - newIndex;
+                            tasks.insert(
+                                newIndex - (_completedTasks - distanceFromEnd), task);
+                            firestoreProvider.updateTasks(tasks, _date);
+                          } else {
+                            tasks.insert(newIndex, task);
+                            firestoreProvider.updateTasks(tasks, _date);
+                          }
+                        }
+                      }),
+                      children: _tasks,
                     ),
-                    onReorder: ((oldIndex, newIndex) {
-                      if (!_tasks[oldIndex].completed) {
-                        List<TaskItem> tasks = _tasks;
-                        if (oldIndex < newIndex) {
-                          newIndex -= 1;
-                        }
-                        final task = tasks.removeAt(oldIndex);
-                        if (newIndex >= tasks.length - _completedTasks) {
-                          int distanceFromEnd = tasks.length - newIndex;
-                          tasks.insert(
-                              newIndex - (_completedTasks - distanceFromEnd), task);
-                          firestoreProvider.updateTasks(tasks, _date);
-                        } else {
-                          tasks.insert(newIndex, task);
-                          firestoreProvider.updateTasks(tasks, _date);
-                        }
-                      }
-                    }),
-                    children: _tasks,
                   ),
                 ),
-              ),
-              Positioned(
-                right: 30,
-                bottom: 30,
-                child: SqrButton(
-                  icon: Icon(
-                    FeatherIcons.calendar,
-                    color: Colors.white,
-                    size: 28,
+                Positioned(
+                  right: 30,
+                  bottom: 30,
+                  child: SqrButton(
+                    icon: Icon(
+                      FeatherIcons.calendar,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                    onTap: () {
+                      showDatePicker(
+                        context: context,
+                        initialDate: DateTime.parse(_date),
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2120),
+                      ).then((date) {
+                        if (date != null) {
+                          setState(() {
+                            _date = getDateString(date);
+                          });
+                          getCompletedTasks();
+                          getTasks();
+                        }
+                      });
+                    },
                   ),
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: DateTime.parse(_date),
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2120),
-                    ).then((date) {
-                      if (date != null) {
-                        setState(() {
-                          _date = getDateString(date);
-                        });
-                        getCompletedTasks();
-                        getTasks();
-                      }
-                    });
-                  },
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ]
+        ]
+      ),
     );
   }
 }
