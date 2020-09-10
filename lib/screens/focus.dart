@@ -573,7 +573,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                         Positioned(
                           left: 30,
                           right: 30,
-                          top: SizeConfig.safeBlockVertical * 39,
+                          top: SizeConfig.safeBlockVertical * 41,
                           child: Container(
                             alignment: Alignment.center,
                             height: SizeConfig.safeBlockVertical * 20,
@@ -588,7 +588,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                         Positioned(
                           left: 0,
                           right: 0,
-                          top: SizeConfig.safeBlockVertical * 65,
+                          top: SizeConfig.safeBlockVertical * 67,
                           child: Container(
                             alignment: Alignment.center,
                             child: RctButton(
@@ -678,8 +678,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 30,
                             right: 30,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 39
-                                : SizeConfig.safeBlockVertical * 53,
+                                ? SizeConfig.safeBlockVertical * 41
+                                : SizeConfig.safeBlockVertical * 55,
                             child: Container(
                               alignment: Alignment.center,
                               height: SizeConfig.safeBlockVertical * 20,
@@ -696,8 +696,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 0,
                             right: 0,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 65
-                                : SizeConfig.safeBlockVertical * 79,
+                                ? SizeConfig.safeBlockVertical * 67
+                                : SizeConfig.safeBlockVertical * 81,
                             child: Center(
                               child: RctButton(
                                 onTap: () {
@@ -716,8 +716,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 0,
                             right: 0,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 76
-                                : SizeConfig.safeBlockVertical * 90,
+                                ? SizeConfig.safeBlockVertical * 78
+                                : SizeConfig.safeBlockVertical * 92,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
@@ -797,8 +797,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 30,
                             right: 30,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 39
-                                : SizeConfig.safeBlockVertical * 53,
+                                ? SizeConfig.safeBlockVertical * 41
+                                : SizeConfig.safeBlockVertical * 55,
                             child: Container(
                               alignment: Alignment.center,
                               height: SizeConfig.safeBlockVertical * 20,
@@ -816,8 +816,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 0,
                             right: 0,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 65
-                                : SizeConfig.safeBlockVertical * 79,
+                                ? SizeConfig.safeBlockVertical * 67
+                                : SizeConfig.safeBlockVertical * 81,
                             child: Center(
                                 child: _doingTask
                                     ? RctButton(
@@ -854,8 +854,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 0,
                             right: 0,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 76
-                                : SizeConfig.safeBlockVertical * 90,
+                                ? SizeConfig.safeBlockVertical * 78
+                                : SizeConfig.safeBlockVertical * 92,
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
