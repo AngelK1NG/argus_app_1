@@ -1,6 +1,6 @@
 class ChartValue {
   String date;
-  int val;
+  num val;
 
   ChartValue({this.date, this.val});
 }

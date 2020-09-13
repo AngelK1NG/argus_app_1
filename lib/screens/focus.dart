@@ -69,6 +69,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       ConfettiController(duration: Duration(seconds: 1));
   Random _random = Random();
   String _quote;
+  String _message;
+  
   final quotes = [
     '''“You can waste your lives drawing lines. Or you can live your life crossing them.”''',
     '''“Everything comes to him who hustles while he waits.”''',
@@ -159,6 +161,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _doingTask = false;
       _paused = false;
       _quote = quotes[_random.nextInt(quotes.length)];
+      _message = messages[_random.nextInt(messages.length)];
     });
     if (Platform.isAndroid) {
       if (LocalNotificationHelper.dndOn) {
@@ -346,6 +349,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     setState(() {
       _quote = quotes[_random.nextInt(quotes.length)];
+      _message = messages[_random.nextInt(messages.length)];
       _date = getDateString(DateTime.now());
       _user = Provider.of<User>(context, listen: false).user;
       _firestoreProvider = FirestoreProvider(_user);
@@ -757,8 +761,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                               _completedTasks != null &&
                                               _totalTasks - _completedTasks == 1
                                           ? 'Almost there! Keep pushing 👊'
-                                          : messages[
-                                              _random.nextInt(messages.length)],
+                                          : _message,
                                       textAlign: TextAlign.center,
                                       style: topTextStyle,
                                       maxLines: 2,

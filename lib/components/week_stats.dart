@@ -28,7 +28,7 @@ class _WeekStatsState extends State<WeekStats> {
         if (event.substring(0, 7) == 'seconds') {
           chartValues.add(ChartValue(
               date: snapshot['documentID'],
-              val: snapshot['data'][event] ~/ 60));
+              val: snapshot['data'][event] / 3600));
         } else {
           chartValues.add(ChartValue(
               date: snapshot['documentID'], val: snapshot['data'][event]));
@@ -58,7 +58,7 @@ class _WeekStatsState extends State<WeekStats> {
             padding: EdgeInsets.only(bottom: 10),
             alignment: Alignment.centerLeft,
             child: Text(
-              'Total Minutes',
+              'Total Hours',
               style: TextStyle(fontSize: 20),
             ),
           ),
@@ -66,7 +66,7 @@ class _WeekStatsState extends State<WeekStats> {
             width: SizeConfig.safeBlockHorizontal * 100 - 80,
             height: 200,
             child: WeeklyStackedChart(
-              id: 'minutesData',
+              id: 'hoursData',
               data: [
                 _secondsFocused,
                 _secondsDistracted,
@@ -118,7 +118,7 @@ class _WeekStatsState extends State<WeekStats> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(bottom: 50),
+            padding: EdgeInsets.only(bottom: 30),
           )
         ],
       ),

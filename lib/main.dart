@@ -1,5 +1,4 @@
 import 'package:Focal/utils/user.dart';
-import 'package:Focal/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';

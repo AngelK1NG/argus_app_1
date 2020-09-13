@@ -266,14 +266,14 @@ class _TodayStatsState extends State<TodayStats> {
         ),
         Padding(
           padding: EdgeInsets.only(
-            top: 50,
-            bottom: 25,
+            top: 30,
+            bottom: 30,
           ),
           child: taskColumn(),
         ),
         Padding(
           padding: EdgeInsets.only(
-            bottom: 50,
+            bottom: 30,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
