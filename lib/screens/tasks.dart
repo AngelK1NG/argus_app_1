@@ -296,12 +296,12 @@ class _TasksPageState extends State<TasksPage> {
                 ),
                 Positioned(
                   right: 30,
-                  bottom: 30,
+                  bottom: 0,
                   child: SqrButton(
                     icon: Icon(
                       FeatherIcons.calendar,
                       color: Colors.white,
-                      size: 28,
+                      size: 24,
                     ),
                     onTap: () {
                       showDatePicker(

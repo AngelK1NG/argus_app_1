@@ -653,7 +653,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                           Positioned(
                             left: 0,
                             right: 0,
-                            top: SizeConfig.safeBlockVertical * 50 - 33,
+                            top: SizeConfig.safeBlockVertical * 50 - 30,
                             child: AnimatedOpacity(
                               duration: cardSlideDuration,
                               curve: cardSlideCurve,
@@ -665,12 +665,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                       ? Icon(
                                           Icons.play_arrow,
                                           color: Colors.white,
-                                          size: 32,
+                                          size: 24,
                                         )
                                       : Icon(
                                           Icons.pause,
                                           color: Colors.white,
-                                          size: 32,
+                                          size: 24,
                                         ),
                                 ),
                               ),
@@ -771,7 +771,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                           Positioned(
                             left: 0,
                             right: 0,
-                            top: SizeConfig.safeBlockVertical * 50 - 33,
+                            top: SizeConfig.safeBlockVertical * 50 - 30,
                             child: AnimatedOpacity(
                               duration: cardSlideDuration,
                               curve: cardSlideCurve,
@@ -783,12 +783,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                       ? Icon(
                                           Icons.play_arrow,
                                           color: Colors.white,
-                                          size: 32,
+                                          size: 24,
                                         )
                                       : Icon(
                                           Icons.pause,
                                           color: Colors.white,
-                                          size: 32,
+                                          size: 24,
                                         ),
                                 ),
                               ),

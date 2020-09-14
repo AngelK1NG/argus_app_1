@@ -14,15 +14,15 @@ class SqrButton extends StatelessWidget {
         HapticFeedback.heavyImpact();
         onTap();
       },
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(33)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       padding: const EdgeInsets.all(0.0),
       child: Container(
-        width: 66,
-        height: 66,
+        width: 60,
+        height: 60,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: Theme.of(context).accentColor,
-          borderRadius: BorderRadius.all(Radius.circular(33)),
+          borderRadius: BorderRadius.all(Radius.circular(30)),
         ),
         child: icon,
       ),
