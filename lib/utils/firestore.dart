@@ -50,11 +50,10 @@ class FirestoreProvider {
         'order': tasks.indexOf(task) + 1,
         'secondsFocused': task.secondsFocused,
         'secondsDistracted': task.secondsDistracted,
-        'secondsPaused': task.secondsPaused,
         'numDistracted': task.numDistracted,
         'numPaused': task.numPaused,
         'completed': task.completed,
-        'saved': task.saved,
+        'paused': task.paused,
       });
       totalTasks ++;
       if (task.completed) {
@@ -108,8 +107,6 @@ class FirestoreProvider {
           task.secondsFocused == null ? 0 : -task.secondsFocused),
       'secondsDistracted': FieldValue.increment(
           task.secondsDistracted == null ? 0 : -task.secondsDistracted),
-      'secondsPaused': FieldValue.increment(
-          task.secondsPaused == null ? 0 : -task.secondsPaused),
       'numDistracted': FieldValue.increment(
           task.numDistracted == null ? 0 : -task.numDistracted),
       'numPaused':
@@ -124,11 +121,6 @@ class FirestoreProvider {
         if (snapshot.data['secondsDistracted'] < 0) {
           dateDoc.updateData({
             'secondsDistracted': 0,
-          });
-        }
-        if (snapshot.data['secondsPaused'] < 0) {
-          dateDoc.updateData({
-            'secondsPaused': 0,
           });
         }
       });

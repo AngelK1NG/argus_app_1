@@ -53,14 +53,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   bool _loading = true;
   bool _screenOn = true;
   int _seconds = 0;
-  int _secondsPaused = 0;
   int _secondsDistracted = 0;
-  int _numPaused = 0;
   int _numDistracted = 0;
   int _initSecondsFocused = 0;
-  int _initSecondsPaused = 0;
   int _initSecondsDistracted = 0;
-  int _initNumPaused = 0;
   int _initNumDistracted = 0;
   ConfettiController _confettiController =
       ConfettiController(duration: Duration(seconds: 1));
@@ -89,18 +85,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   ];
 
   void startTask() async {
-    _secondsPaused =
-        _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
-    _initSecondsPaused =
-        _tasks[0].secondsPaused == null ? 0 : _tasks[0].secondsPaused;
-
     _secondsDistracted =
         _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
     _initSecondsDistracted =
         _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
-
-    _numPaused = _tasks[0].numPaused == null ? 0 : _tasks[0].numPaused;
-    _initNumPaused = _tasks[0].numPaused == null ? 0 : _tasks[0].numPaused;
 
     _numDistracted =
         _tasks[0].numDistracted == null ? 0 : _tasks[0].numDistracted;
@@ -170,10 +158,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     stopTask();
     _tasks[0].secondsFocused = _seconds - _secondsDistracted;
     _tasks[0].secondsDistracted = _secondsDistracted;
-    _tasks[0].secondsPaused = _secondsPaused;
+    _tasks[0].numPaused = _tasks[0].numPaused == null ? 1 : _tasks[0].numPaused + 1;
     _tasks[0].numDistracted = _numDistracted;
-    _tasks[0].numPaused = _numPaused;
-    _tasks[0].saved = true;
+    _tasks[0].paused = true;
     _firestoreProvider.updateTasks(_tasks, _date);
     DocumentReference dateDoc = db
         .collection('users')
@@ -185,7 +172,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         dateDoc.setData({
           'secondsFocused': 0,
           'secondsDistracted': 0,
-          'secondsPaused': 0,
           'numDistracted': 0,
           'numPaused': 0,
         });
@@ -195,22 +181,16 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             _seconds - _secondsDistracted - _initSecondsFocused),
         'secondsDistracted':
             FieldValue.increment(_secondsDistracted - _initSecondsDistracted),
-        'secondsPaused':
-            FieldValue.increment(_secondsPaused - _initSecondsPaused),
         'numDistracted':
             FieldValue.increment(_numDistracted - _initNumDistracted),
-        'numPaused': FieldValue.increment(_numPaused - _initNumPaused),
+        'numPaused': FieldValue.increment(1),
       }).then((_) {
-        _analyticsProvider.logSaveTask(_tasks[0], DateTime.now());
+        _analyticsProvider.logPauseTask(_tasks[0], DateTime.now());
         _seconds = 0;
-        _secondsPaused = 0;
         _secondsDistracted = 0;
-        _numPaused = 0;
         _numDistracted = 0;
         _initSecondsFocused = 0;
-        _initSecondsPaused = 0;
         _initSecondsDistracted = 0;
-        _initNumPaused = 0;
         _initNumDistracted = 0;
       });
     });
@@ -220,9 +200,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     TaskItem task = _tasks.removeAt(0);
     task.secondsFocused = _seconds - _secondsDistracted;
     task.secondsDistracted = _secondsDistracted;
-    task.secondsPaused = _secondsPaused;
     task.numDistracted = _numDistracted;
-    task.numPaused = _numPaused;
+    task.numPaused = task.numPaused == null ? 0 : task.numPaused;
     task.completed = true;
     _tasks.add(task);
     _firestoreProvider.updateTasks(_tasks, _date);
@@ -236,7 +215,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         dateDoc.setData({
           'secondsFocused': 0,
           'secondsDistracted': 0,
-          'secondsPaused': 0,
           'numDistracted': 0,
           'numPaused': 0,
         });
@@ -246,22 +224,15 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             _seconds - _secondsDistracted - _initSecondsFocused),
         'secondsDistracted':
             FieldValue.increment(_secondsDistracted - _initSecondsDistracted),
-        'secondsPaused':
-            FieldValue.increment(_secondsPaused - _initSecondsPaused),
         'numDistracted':
             FieldValue.increment(_numDistracted - _initNumDistracted),
-        'numPaused': FieldValue.increment(_numPaused - _initNumPaused),
       }).then((_) {
         _analyticsProvider.logCompleteTask(task, DateTime.now());
         _seconds = 0;
-        _secondsPaused = 0;
         _secondsDistracted = 0;
-        _numPaused = 0;
         _numDistracted = 0;
         _initSecondsFocused = 0;
-        _initSecondsPaused = 0;
         _initSecondsDistracted = 0;
-        _initNumPaused = 0;
         _initNumDistracted = 0;
       });
     });
@@ -509,7 +480,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                         Positioned(
                           left: 30,
                           right: 30,
-                          top: SizeConfig.safeBlockVertical * 12,
+                          top: SizeConfig.safeBlockVertical * 15,
                           child: Text(
                             TimeOfDay.now().hour < 13
                                 ? 'Good Morning!'
@@ -562,13 +533,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                         name: task.data['name'],
                         id: task.documentID,
                         completed: task.data['completed'],
-                        saved: task.data['saved'] == null
+                        paused: task.data['paused'] == null
                             ? false
-                            : task.data['saved'],
+                            : task.data['paused'],
                         order: task.data['order'],
                         secondsFocused: task.data['secondsFocused'],
                         secondsDistracted: task.data['secondsDistracted'],
-                        secondsPaused: task.data['secondsPaused'],
                         numDistracted: task.data['numDistracted'],
                         numPaused: task.data['numPaused'],
                         key: UniqueKey(),
@@ -584,12 +554,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                     if (areTasksCompleted()) {
                       return Stack(
                         children: <Widget>[
-                          AnimatedPositioned(
-                            duration: cardSlideDuration,
-                            curve: cardSlideCurve,
+                          Positioned(
                             left: 30,
                             right: 30,
-                            top: SizeConfig.safeBlockVertical * 12,
+                            top: SizeConfig.safeBlockVertical * 15,
                             child: Text(
                               'Congrats! 🎉',
                               textAlign: TextAlign.center,
@@ -755,7 +723,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                         },
                                         buttonWidth: 220,
                                         colored: true,
-                                        buttonText: _tasks[0].saved
+                                        buttonText: _tasks[0].paused
                                             ? 'Resume'
                                             : 'Start',
                                         textSize: 32,

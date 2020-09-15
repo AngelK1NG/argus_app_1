@@ -72,11 +72,10 @@ class _TasksPageState extends State<TasksPage> {
           name: name,
           id: task.documentID,
           completed: task.data['completed'],
-          saved: task.data['saved'] == null ? false : task.data['saved'],
+          paused: task.data['paused'] == null ? false : task.data['paused'],
           order: task.data['order'],
           secondsFocused: task.data['secondsFocused'],
           secondsDistracted: task.data['secondsDistracted'],
-          secondsPaused: task.data['secondsPaused'],
           numDistracted: task.data['numDistracted'],
           numPaused: task.data['numPaused'],
           key: UniqueKey(),
@@ -220,7 +219,7 @@ class _TasksPageState extends State<TasksPage> {
                                           id: '',
                                           name: value,
                                           completed: false,
-                                          saved: false,
+                                          paused: false,
                                           key: UniqueKey(),
                                           order: _tasks.length - _completedTasks,
                                           date: _date,
@@ -247,7 +246,7 @@ class _TasksPageState extends State<TasksPage> {
                                           'name': newTask.name,
                                           'order': newTask.order,
                                           'completed': newTask.completed,
-                                          'saved': newTask.saved,
+                                          'paused': newTask.paused,
                                         }).then((doc) {
                                           _tasks[_tasks.length - _completedTasks - 1]
                                               .id = doc.documentID;

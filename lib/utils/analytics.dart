@@ -13,16 +13,6 @@ class AnalyticsProvider {
     );
   }
 
-  void logPauseTask(TaskItem task, DateTime time) {
-    analytics.logEvent(
-      name: 'pause_task',
-      parameters: <String, dynamic>{
-        'name': task.name,
-        'time': time.hour.toString().padLeft(2, '0') + ':' + time.minute.toString().padLeft(2, '0'),
-      },
-    );
-  }
-
   void logResumeTask(TaskItem task, DateTime time) {
     analytics.logEvent(
       name: 'resume_task',
@@ -41,14 +31,13 @@ class AnalyticsProvider {
         'time': time.hour.toString().padLeft(2, '0') + ':' + time.minute.toString().padLeft(2, '0'),
         'secondsFocused': task.secondsFocused,
         'secondsDistracted': task.secondsDistracted,
-        'secondsPaused': task.secondsPaused,
         'numDistracted': task.numDistracted,
         'numPaused': task.numPaused,
       },
     );
   }
 
-  void logSaveTask(TaskItem task, DateTime time) {
+  void logPauseTask(TaskItem task, DateTime time) {
     analytics.logEvent(
       name: 'save_task',
       parameters: <String, dynamic>{
@@ -56,7 +45,6 @@ class AnalyticsProvider {
         'time': time.hour.toString().padLeft(2, '0') + ':' + time.minute.toString().padLeft(2, '0'),
         'secondsFocused': task.secondsFocused,
         'secondsDistracted': task.secondsDistracted,
-        'secondsPaused': task.secondsPaused,
         'numDistracted': task.numDistracted,
         'numPaused': task.numPaused,
       },

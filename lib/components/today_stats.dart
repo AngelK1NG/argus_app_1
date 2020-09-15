@@ -34,11 +34,10 @@ class _TodayStatsState extends State<TodayStats> {
         name: name,
         id: task.documentID,
         completed: task.data['completed'],
-        saved: task.data['saved'] == null ? false : task.data['saved'],
+        paused: task.data['paused'] == null ? false : task.data['paused'],
         order: task.data['order'],
         secondsFocused: task.data['secondsFocused'],
         secondsDistracted: task.data['secondsDistracted'],
-        secondsPaused: task.data['secondsPaused'],
         key: UniqueKey(),
         date: _date,
       );
@@ -52,26 +51,24 @@ class _TodayStatsState extends State<TodayStats> {
     List<Widget> taskTiles = [];
     int maxTime = 0;
     int completedTasks = 0;
-    int savedTasks = 0;
+    int pausedTasks = 0;
     _tasks.forEach((task) {
       if (task.completed) {
         if ((task.secondsFocused +
-                task.secondsDistracted +
-                task.secondsPaused) >
+                task.secondsDistracted) >
             maxTime) {
           maxTime =
-              task.secondsFocused + task.secondsDistracted + task.secondsPaused;
+              task.secondsFocused + task.secondsDistracted;
         }
         completedTasks++;
-      } else if (task.saved) {
+      } else if (task.paused) {
         if ((task.secondsFocused +
-                task.secondsDistracted +
-                task.secondsPaused) >
+                task.secondsDistracted) >
             maxTime) {
           maxTime =
-              task.secondsFocused + task.secondsDistracted + task.secondsPaused;
+              task.secondsFocused + task.secondsDistracted;
         }
-        savedTasks++;
+        pausedTasks++;
       }
     });
     if (completedTasks > 0) {
@@ -95,11 +92,11 @@ class _TodayStatsState extends State<TodayStats> {
         }
       });
     }
-    if (savedTasks > 0) {
+    if (pausedTasks > 0) {
       taskTiles.add(Padding(
           padding: const EdgeInsets.only(top: 20, bottom: 20),
           child: Text(
-            'Saved tasks',
+            'Paused tasks',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -107,7 +104,7 @@ class _TodayStatsState extends State<TodayStats> {
             ),
           )));
       _tasks.forEach((task) {
-        if (!task.completed && task.saved) {
+        if (!task.completed && task.paused) {
           taskTiles.add(Padding(
             padding: const EdgeInsets.only(
               bottom: 20,

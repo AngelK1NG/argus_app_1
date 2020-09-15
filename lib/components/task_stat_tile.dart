@@ -53,9 +53,7 @@ class TaskStatTile extends StatelessWidget {
                   height: height,
                   width: maxTime == 0
                       ? 0
-                      : (task.secondsPaused +
-                              task.secondsDistracted +
-                              task.secondsFocused) /
+                      : (task.secondsDistracted + task.secondsFocused) /
                           maxTime *
                           maxLength,
                   decoration: BoxDecoration(

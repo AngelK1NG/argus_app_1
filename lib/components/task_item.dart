@@ -11,13 +11,12 @@ class TaskItem extends StatefulWidget {
   String name;
   String id;
   bool completed;
-  bool saved;
+  bool paused;
   int order;
   VoidCallback onDismissed;
   Function onUpdate;
   String date;
   int secondsFocused;
-  int secondsPaused;
   int secondsDistracted;
   int numPaused;
   int numDistracted;
@@ -26,13 +25,12 @@ class TaskItem extends StatefulWidget {
       {@required this.name,
       this.id,
       @required this.completed,
-      this.saved,
+      this.paused,
       this.order,
       this.onDismissed,
       this.onUpdate,
       @required this.date,
       this.secondsFocused,
-      this.secondsPaused,
       this.secondsDistracted,
       this.numPaused,
       this.numDistracted,
@@ -151,7 +149,7 @@ class _TaskItemState extends State<TaskItem> {
                                     fontWeight: FontWeight.w400,
                                     color: widget.completed
                                         ? Theme.of(context).hintColor
-                                        : widget.saved
+                                        : widget.paused
                                           ? Theme.of(context).accentColor
                                           : jetBlack,
                                     decoration: widget.completed ? TextDecoration.lineThrough : null,

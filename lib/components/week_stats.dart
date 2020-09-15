@@ -16,7 +16,6 @@ class WeekStats extends StatefulWidget {
 class _WeekStatsState extends State<WeekStats> {
   List<ChartValue> _numDistracted = [];
   List<ChartValue> _numPaused = [];
-  List<ChartValue> _secondsPaused = [];
   List<ChartValue> _secondsDistracted = [];
   List<ChartValue> _secondsFocused = [];
 
@@ -43,7 +42,6 @@ class _WeekStatsState extends State<WeekStats> {
     super.initState();
     getNumberOfEvents('numDistracted', _numDistracted);
     getNumberOfEvents('numPaused', _numPaused);
-    getNumberOfEvents('secondsPaused', _secondsPaused);
     getNumberOfEvents('secondsDistracted', _secondsDistracted);
     getNumberOfEvents('secondsFocused', _secondsFocused);
   }
@@ -70,12 +68,10 @@ class _WeekStatsState extends State<WeekStats> {
               data: [
                 _secondsFocused,
                 _secondsDistracted,
-                _secondsPaused,
               ],
               colorList: [
                 charts.ColorUtil.fromDartColor(Theme.of(context).primaryColor),
                 charts.ColorUtil.fromDartColor(Colors.red),
-                charts.ColorUtil.fromDartColor(Theme.of(context).hintColor),
               ],
               key: UniqueKey(),
             ),
