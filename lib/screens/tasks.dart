@@ -191,7 +191,7 @@ class _TasksPageState extends State<TasksPage> {
                         child: Row(
                           children: <Widget>[
                             Padding(
-                              padding: const EdgeInsets.only(left: 30, right: 11),
+                              padding: const EdgeInsets.only(left: 26, right: 11),
                               child: Icon(
                                 FeatherIcons.plus,
                                 size: 18,
@@ -200,7 +200,7 @@ class _TasksPageState extends State<TasksPage> {
                             ),
                             Container(
                               alignment: Alignment.center,
-                              width: MediaQuery.of(context).size.width - 116,
+                              width: MediaQuery.of(context).size.width - 85,
                               child: Form(
                                 key: _formKey,
                                 child: TextFormField(

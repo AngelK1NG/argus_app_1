@@ -77,7 +77,7 @@ class _TaskItemState extends State<TaskItem> {
                 child: Row(
                   children: <Widget>[
                     Padding(
-                        padding: const EdgeInsets.only(left: 34, right: 15),
+                        padding: const EdgeInsets.only(left: 30, right: 15),
                         child: widget.completed
                             ? Image(
                                 image: AssetImage(
@@ -93,7 +93,7 @@ class _TaskItemState extends State<TaskItem> {
                               )),
                     SizedBox(
                         height: 55,
-                        width: SizeConfig.safeBlockHorizontal * 100 - 89,
+                        width: SizeConfig.safeBlockHorizontal * 100 - 85,
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: _active
