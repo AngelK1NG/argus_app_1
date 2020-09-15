@@ -134,7 +134,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   : Positioned(
                       right: 30,
                       left: 30,
-                      bottom: 120,
+                      bottom: 80,
                       child: Text(
                         "You are signed in as " + _email,
                         textAlign: TextAlign.center,
@@ -147,7 +147,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Positioned(
                 right: 30,
                 left: 30,
-                bottom: 30,
+                bottom: 0,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[

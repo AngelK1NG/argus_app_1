@@ -185,7 +185,7 @@ class _TasksPageState extends State<TasksPage> {
                           0.15 +
                       20,
                   child: SizedBox(
-                    height: SizeConfig.safeBlockVertical * 85 - 20,
+                    height: SizeConfig.safeBlockVertical * 85,
                     child: ReorderableListView(
                       header: Container(
                         child: Row(
