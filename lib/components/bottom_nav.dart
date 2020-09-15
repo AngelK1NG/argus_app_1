@@ -13,7 +13,6 @@ class BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.transparent,
       height: show ? 80 : 0,
       child: show
         ? Stack(

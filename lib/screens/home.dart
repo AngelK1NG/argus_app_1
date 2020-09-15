@@ -86,9 +86,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: SafeArea(
-          child: BottomNav(
-              onTap: goToPage, show: _showNav, index: _selectedIndex)),
       body: Stack(
         children: <Widget>[
           Container(
@@ -120,6 +117,14 @@ class _HomeState extends State<Home> {
             ),
           ),
           SafeArea(child: _child),
+          SafeArea(
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              child: BottomNav(
+                onTap: goToPage, show: _showNav, index: _selectedIndex
+              ),
+            ),
+          ),
         ],
       ),
     );

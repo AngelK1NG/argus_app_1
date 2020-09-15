@@ -198,9 +198,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 Positioned(
                     right: 30,
                     left: 30,
-                    top: SizeConfig.safeBlockVertical * 15 + 70,
+                    top: SizeConfig.safeBlockVertical * 15 + 80,
                     child: SizedBox(
-                      height: SizeConfig.safeBlockVertical * 85 - 150,
+                      height: SizeConfig.safeBlockVertical * 85 - 160,
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         child: _loading

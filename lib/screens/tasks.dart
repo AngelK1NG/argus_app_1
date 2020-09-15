@@ -296,7 +296,7 @@ class _TasksPageState extends State<TasksPage> {
                 ),
                 Positioned(
                   right: 30,
-                  bottom: 0,
+                  bottom: 80,
                   child: SqrButton(
                     icon: Icon(
                       FeatherIcons.calendar,

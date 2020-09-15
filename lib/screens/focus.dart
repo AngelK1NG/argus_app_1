@@ -16,7 +16,6 @@ import 'package:provider/provider.dart';
 import '../components/rct_button.dart';
 import '../components/sqr_button.dart';
 import '../constants.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_dnd/flutter_dnd.dart';
 import 'package:flutter/services.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -39,7 +38,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
 
   Timer _timer;
   DateTime _startFocused = DateTime.now();
-  DateTime _startPaused = DateTime.now();
   DateTime _startDistracted = DateTime.now();
   String _swatchDisplay = "00:00";
   int _completedTasks;
@@ -53,7 +51,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   LocalNotificationHelper notificationHelper;
   bool _notifConfirmation = false;
   bool _loading = true;
-  bool _paused = false;
   bool _screenOn = true;
   int _seconds = 0;
   int _secondsPaused = 0;
@@ -138,7 +135,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           (_seconds % 60).toString().padLeft(2, "0");
       _doingTask = true;
       _startFocused = DateTime.now();
-      _paused = false;
     });
     if (Platform.isAndroid) {
       if (LocalNotificationHelper.dndOn) {
@@ -153,13 +149,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   }
 
   void stopTask() async {
-    if (_paused) {
-      _secondsPaused += DateTime.now().difference(_startPaused).inSeconds;
-    }
     setState(() {
       _timer.cancel();
       _doingTask = false;
-      _paused = false;
       _quote = quotes[_random.nextInt(quotes.length)];
       _message = messages[_random.nextInt(messages.length)];
     });
@@ -172,56 +164,17 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       }
     }
     widget.toggleDoingTask();
-    print(SizeConfig.safeBlockVertical);
   }
 
-  void pauseTask() {
-    if (_paused) {
-      int pausedDifference = _seconds;
-      _secondsPaused += DateTime.now().difference(_startPaused).inSeconds;
-      _timer = new Timer.periodic(
-          const Duration(seconds: 1),
-          (Timer timer) => setState(() {
-                final currentTime = DateTime.now();
-                _seconds = currentTime.difference(_startFocused).inSeconds +
-                    pausedDifference;
-                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-                    ":" +
-                    (_seconds % 60).toString().padLeft(2, "0");
-              }));
-      setState(() {
-        _startFocused = DateTime.now();
-        _paused = false;
-      });
-      LocalNotificationHelper.paused = false;
-      _analyticsProvider.logResumeTask(_tasks[0], DateTime.now());
-    } else {
-      setState(() {
-        _timer.cancel();
-        _startPaused = DateTime.now();
-        _paused = true;
-        _numPaused++;
-        LocalNotificationHelper.paused = true;
-      });
-      _analyticsProvider.logPauseTask(_tasks[0], DateTime.now());
-    }
-  }
-
-  void saveTask(FirebaseUser user) async {
-    TaskItem task = _tasks.removeAt(0);
-    task.secondsFocused = _seconds - _secondsDistracted;
-    task.secondsDistracted = _secondsDistracted;
-    task.secondsPaused = _secondsPaused;
-    task.numDistracted = _numDistracted;
-    task.numPaused = _numPaused;
-    task.saved = true;
-    _tasks.insert(_tasks.length - _completedTasks, task);
+  void pauseTask(FirebaseUser user) async {
+    stopTask();
+    _tasks[0].secondsFocused = _seconds - _secondsDistracted;
+    _tasks[0].secondsDistracted = _secondsDistracted;
+    _tasks[0].secondsPaused = _secondsPaused;
+    _tasks[0].numDistracted = _numDistracted;
+    _tasks[0].numPaused = _numPaused;
+    _tasks[0].saved = true;
     _firestoreProvider.updateTasks(_tasks, _date);
-    Fluttertoast.showToast(
-      msg: '${task.name} has been saved for later',
-      backgroundColor: jetBlack,
-      textColor: Colors.white,
-    );
     DocumentReference dateDoc = db
         .collection('users')
         .document(user.uid)
@@ -248,7 +201,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             FieldValue.increment(_numDistracted - _initNumDistracted),
         'numPaused': FieldValue.increment(_numPaused - _initNumPaused),
       }).then((_) {
-        _analyticsProvider.logSaveTask(task, DateTime.now());
+        _analyticsProvider.logSaveTask(_tasks[0], DateTime.now());
         _seconds = 0;
         _secondsPaused = 0;
         _secondsDistracted = 0;
@@ -402,7 +355,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.paused:
-        if (_doingTask && !_paused) {
+        if (_doingTask) {
           if (Platform.isAndroid) {
             androidScreenOn().then((value) {
               if (value) {
@@ -441,11 +394,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         }
         break;
       case AppLifecycleState.resumed:
-        if (!_paused) {
-          if (_screenOn) {
-            _secondsDistracted +=
-                DateTime.now().difference(_startDistracted).inSeconds;
-          }
+        if (_screenOn) {
+          _secondsDistracted +=
+              DateTime.now().difference(_startDistracted).inSeconds;
         }
         break;
       case AppLifecycleState.inactive:
@@ -522,11 +473,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       fontSize: 36,
       fontWeight: FontWeight.w400,
     );
-    final TextStyle secondaryButtonTextStyle = TextStyle(
-      fontSize: 22,
-      color: Theme.of(context).hintColor,
-      fontWeight: FontWeight.w500,
-    );
 
     checkIfNotificationsOn();
 
@@ -577,7 +523,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                         Positioned(
                           left: 30,
                           right: 30,
-                          top: SizeConfig.safeBlockVertical * 41,
+                          top: SizeConfig.safeBlockVertical * 42,
                           child: Container(
                             alignment: Alignment.center,
                             height: SizeConfig.safeBlockVertical * 20,
@@ -592,7 +538,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                         Positioned(
                           left: 0,
                           right: 0,
-                          top: SizeConfig.safeBlockVertical * 67,
+                          top: SizeConfig.safeBlockVertical * 70,
                           child: Container(
                             alignment: Alignment.center,
                             child: RctButton(
@@ -660,18 +606,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                               opacity: !_doingTask ? 0 : 1,
                               child: Center(
                                 child: SqrButton(
-                                  onTap: pauseTask,
-                                  icon: _paused
-                                      ? Icon(
-                                          Icons.play_arrow,
-                                          color: Colors.white,
-                                          size: 24,
-                                        )
-                                      : Icon(
-                                          Icons.pause,
-                                          color: Colors.white,
-                                          size: 24,
-                                        ),
+                                  onTap: () => pauseTask(_user),
+                                  icon: Icon(
+                                    Icons.pause,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
                                 ),
                               ),
                             ),
@@ -682,8 +622,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 30,
                             right: 30,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 41
-                                : SizeConfig.safeBlockVertical * 55,
+                                ? SizeConfig.safeBlockVertical * 42
+                                : SizeConfig.safeBlockVertical * 56,
                             child: Container(
                               alignment: Alignment.center,
                               height: SizeConfig.safeBlockVertical * 20,
@@ -700,8 +640,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 0,
                             right: 0,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 67
-                                : SizeConfig.safeBlockVertical * 81,
+                                ? SizeConfig.safeBlockVertical * 70
+                                : SizeConfig.safeBlockVertical * 84,
                             child: Center(
                               child: RctButton(
                                 onTap: () {
@@ -711,30 +651,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                 colored: true,
                                 buttonText: 'Statistics',
                                 textSize: 32,
-                              ),
-                            ),
-                          ),
-                          AnimatedPositioned(
-                            duration: cardSlideDuration,
-                            curve: cardSlideCurve,
-                            left: 0,
-                            right: 0,
-                            top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 78
-                                : SizeConfig.safeBlockVertical * 92,
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              onTap: () {
-                                HapticFeedback.heavyImpact();
-                                widget.goToPage(1);
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text(
-                                  'Add another task',
-                                  textAlign: TextAlign.center,
-                                  style: secondaryButtonTextStyle,
-                                ),
                               ),
                             ),
                           ),
@@ -778,18 +694,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                               opacity: _doingTask ? 1 : 0,
                               child: Center(
                                 child: SqrButton(
-                                  onTap: pauseTask,
-                                  icon: _paused
-                                      ? Icon(
-                                          Icons.play_arrow,
-                                          color: Colors.white,
-                                          size: 24,
-                                        )
-                                      : Icon(
-                                          Icons.pause,
-                                          color: Colors.white,
-                                          size: 24,
-                                        ),
+                                  onTap: () => pauseTask(_user),
+                                  icon: Icon(
+                                    Icons.pause,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
                                 ),
                               ),
                             ),
@@ -800,8 +710,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 30,
                             right: 30,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 41
-                                : SizeConfig.safeBlockVertical * 55,
+                                ? SizeConfig.safeBlockVertical * 42
+                                : SizeConfig.safeBlockVertical * 56,
                             child: Container(
                               alignment: Alignment.center,
                               height: SizeConfig.safeBlockVertical * 20,
@@ -819,8 +729,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             left: 0,
                             right: 0,
                             top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 67
-                                : SizeConfig.safeBlockVertical * 81,
+                                ? SizeConfig.safeBlockVertical * 70
+                                : SizeConfig.safeBlockVertical * 84,
                             child: Center(
                                 child: _doingTask
                                     ? RctButton(
@@ -850,31 +760,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                             : 'Start',
                                         textSize: 32,
                                       )),
-                          ),
-                          AnimatedPositioned(
-                            duration: cardSlideDuration,
-                            curve: cardSlideCurve,
-                            left: 0,
-                            right: 0,
-                            top: !_doingTask
-                                ? SizeConfig.safeBlockVertical * 78
-                                : SizeConfig.safeBlockVertical * 92,
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              onTap: () {
-                                HapticFeedback.heavyImpact();
-                                if (_doingTask) {
-                                  stopTask();
-                                }
-                                saveTask(_user);
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text('Save for later',
-                                    textAlign: TextAlign.center,
-                                    style: secondaryButtonTextStyle),
-                              ),
-                            ),
                           ),
                         ],
                       );
