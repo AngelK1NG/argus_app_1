@@ -263,51 +263,54 @@ class _TodayStatsState extends State<TodayStats> {
         ),
         Padding(
           padding: EdgeInsets.only(
-            top: 30,
-            bottom: 0,
+            top: 25,
+            bottom: 25,
           ),
           child: taskColumn(),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            RichText(
-              text: TextSpan(
-                text: (_numDistracted == 1
-                    ? 'Distraction: '
-                    : 'Distractions: '),
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.red,
-                ),
-                children: [
-                  TextSpan(
-                    text: _numDistracted.toString(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                    ),
+        Padding(
+          padding: EdgeInsets.only(bottom: 25),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              RichText(
+                text: TextSpan(
+                  text: (_numDistracted == 1
+                      ? 'Distraction: '
+                      : 'Distractions: '),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.red,
                   ),
-                ],
-              ),
-            ),
-            RichText(
-              text: TextSpan(
-                text: (_numPaused == 1 ? 'Pause: ' : 'Pauses: '),
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).hintColor,
-                ),
-                children: [
-                  TextSpan(
-                    text: _numPaused.toString(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
+                  children: [
+                    TextSpan(
+                      text: _numDistracted.toString(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+              RichText(
+                text: TextSpan(
+                  text: (_numPaused == 1 ? 'Pause: ' : 'Pauses: '),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).hintColor,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: _numPaused.toString(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

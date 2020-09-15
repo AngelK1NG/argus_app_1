@@ -75,7 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
       onWillPop: () async => widget.goToPage(0),
       child: Stack(children: <Widget>[
         Positioned(
-          left: 30,
+          left: 25,
           top: SizeConfig.safeBlockVertical * 5,
           child: Text(
             'Profile',
@@ -89,8 +89,8 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Stack(
             children: <Widget>[
               Positioned(
-                right: 30,
-                left: 30,
+                right: 25,
+                left: 25,
                 top: SizeConfig.safeBlockVertical * 15 + 40,
                 child: Container(
                     child: Column(
@@ -132,8 +132,8 @@ class _ProfilePageState extends State<ProfilePage> {
               _email == null
                   ? Container()
                   : Positioned(
-                      right: 30,
-                      left: 30,
+                      right: 25,
+                      left: 25,
                       bottom: 160,
                       child: Text(
                         "You are signed in as " + _email,
@@ -145,8 +145,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
               Positioned(
-                right: 30,
-                left: 30,
+                right: 25,
+                left: 25,
                 bottom: 80,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

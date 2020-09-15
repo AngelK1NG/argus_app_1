@@ -108,7 +108,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
       child: Stack(
         children: <Widget>[
           Positioned(
-            left: 30,
+            left: 25,
             top: SizeConfig.safeBlockVertical * 5,
             child: Text(
               'Statistics',
@@ -138,7 +138,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                         },
                         child: Container(
                           height: 30,
-                          width: SizeConfig.safeBlockHorizontal * 50 - 30,
+                          width: SizeConfig.safeBlockHorizontal * 50 - 25,
                           decoration: BoxDecoration(
                               color: _timeFrame == 'today'
                                   ? Theme.of(context).accentColor
@@ -170,7 +170,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                         },
                         child: Container(
                           height: 30,
-                          width: SizeConfig.safeBlockHorizontal * 50 - 30,
+                          width: SizeConfig.safeBlockHorizontal * 50 - 25,
                           decoration: BoxDecoration(
                               color: _timeFrame == 'week'
                                   ? Theme.of(context).accentColor
@@ -196,11 +196,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   ),
                 ),
                 Positioned(
-                    right: 30,
-                    left: 30,
-                    top: SizeConfig.safeBlockVertical * 15 + 80,
+                    right: 25,
+                    left: 25,
+                    top: SizeConfig.safeBlockVertical * 15 + 75,
                     child: SizedBox(
-                      height: SizeConfig.safeBlockVertical * 85 - 160,
+                      height: SizeConfig.safeBlockVertical * 85 - 155,
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         child: _loading

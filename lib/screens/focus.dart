@@ -478,8 +478,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                     return Stack(
                       children: <Widget>[
                         Positioned(
-                          left: 30,
-                          right: 30,
+                          left: 40,
+                          right: 40,
                           top: SizeConfig.safeBlockVertical * 15,
                           child: Text(
                             TimeOfDay.now().hour < 13
@@ -492,8 +492,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                           ),
                         ),
                         Positioned(
-                          left: 30,
-                          right: 30,
+                          left: 40,
+                          right: 40,
                           top: SizeConfig.safeBlockVertical * 42,
                           child: Container(
                             alignment: Alignment.center,
@@ -555,8 +555,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                       return Stack(
                         children: <Widget>[
                           Positioned(
-                            left: 30,
-                            right: 30,
+                            left: 40,
+                            right: 40,
                             top: SizeConfig.safeBlockVertical * 15,
                             child: Text(
                               'Congrats! 🎉',
@@ -587,8 +587,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                           AnimatedPositioned(
                             duration: cardSlideDuration,
                             curve: cardSlideCurve,
-                            left: 30,
-                            right: 30,
+                            left: 40,
+                            right: 40,
                             top: !_doingTask
                                 ? SizeConfig.safeBlockVertical * 42
                                 : SizeConfig.safeBlockVertical * 56,
@@ -628,8 +628,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                       return Stack(
                         children: <Widget>[
                           Positioned(
-                            left: 30,
-                            right: 30,
+                            left: 40,
+                            right: 40,
                             top: SizeConfig.safeBlockVertical * 12,
                             child: _doingTask
                                 ? Text(
@@ -675,8 +675,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                           AnimatedPositioned(
                             duration: cardSlideDuration,
                             curve: cardSlideCurve,
-                            left: 30,
-                            right: 30,
+                            left: 40,
+                            right: 40,
                             top: !_doingTask
                                 ? SizeConfig.safeBlockVertical * 42
                                 : SizeConfig.safeBlockVertical * 56,

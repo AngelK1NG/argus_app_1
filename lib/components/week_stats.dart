@@ -104,6 +104,7 @@ class _WeekStatsState extends State<WeekStats> {
           ),
           Container(
             width: SizeConfig.safeBlockHorizontal * 100 - 80,
+            padding: EdgeInsets.only(bottom: 25),
             height: 200,
             child: WeeklyChart(
               id: 'numPaused',
@@ -113,9 +114,6 @@ class _WeekStatsState extends State<WeekStats> {
               key: UniqueKey(),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(bottom: 30),
-          )
         ],
       ),
     );
