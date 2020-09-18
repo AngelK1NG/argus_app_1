@@ -64,7 +64,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   Random _random = Random();
   String _quote;
   String _message;
-  
+
   final quotes = [
     '''“You can waste your lives drawing lines. Or you can live your life crossing them.”''',
     '''“Everything comes to him who hustles while he waits.”''',
@@ -109,25 +109,31 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       }
 
       _timer = new Timer.periodic(
-          const Duration(seconds: 1),
-          (Timer timer) => setState(() {
-                final currentTime = DateTime.now();
-                _seconds = (currentTime.difference(_startFocused).inSeconds) +
-                    initSeconds;
-                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-                    ":" +
-                    (_seconds % 60).toString().padLeft(2, "0");
-              }));
-
+        const Duration(seconds: 1),
+        (Timer timer) => setState(() {
+          _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
+              initSeconds;
+          _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+              ":" +
+              (_seconds % 60).toString().padLeft(2, "0");
+        })
+      );
       setState(() {
-        _seconds = initSeconds;
-        _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-            ":" +
-            (_seconds % 60).toString().padLeft(2, "0");
-        _doingTask = true;
         _startFocused = DateTime.now();
+        _seconds = (DateTime.now().difference(_startFocused).inSeconds) + initSeconds;
+        _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") + ":" + (_seconds % 60).toString().padLeft(2, "0");
         _doingTask = true;
       });
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setInt('secondsDistracted', _secondsDistracted);
+      prefs.setInt('initSecondsDistracted', _initSecondsDistracted);
+      prefs.setInt('numDistracted', _numDistracted);
+      prefs.setInt('initNumDistracted', _initNumDistracted);
+      prefs.setInt('initSeconds', initSeconds);
+      prefs.setInt('startFocused', _startFocused.millisecondsSinceEpoch);
+      prefs.setBool('doingTask', true);
+
       if (Platform.isAndroid) {
         if (LocalNotificationHelper.dndOn) {
           if (await FlutterDnd.isNotificationPolicyAccessGranted) {
@@ -157,6 +163,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         }
       }
     }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('doingTask', false);
     widget.toggleDoingTask();
   }
 
@@ -165,7 +173,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       stopTask();
       _tasks[0].secondsFocused = _seconds - _secondsDistracted;
       _tasks[0].secondsDistracted = _secondsDistracted;
-      _tasks[0].numPaused = _tasks[0].numPaused == null ? 1 : _tasks[0].numPaused + 1;
+      _tasks[0].numPaused =
+          _tasks[0].numPaused == null ? 1 : _tasks[0].numPaused + 1;
       _tasks[0].numDistracted = _numDistracted;
       _tasks[0].paused = true;
       _firestoreProvider.updateTasks(_tasks, _date);
@@ -277,10 +286,50 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     });
   }
 
+  void getState() {
+    SharedPreferences.getInstance().then((SharedPreferences prefs) async {
+      if (prefs.getBool('doingTask') == true) {
+        _secondsDistracted = prefs.getInt('secondsDistracted');
+        _initSecondsDistracted = prefs.getInt('initSecondsDistracted');
+        _numDistracted = prefs.getInt('numDistracted');
+        _initNumDistracted = prefs.getInt('initNumDistracted');
+        int initSeconds = prefs.getInt('initSeconds');
+        _timer = new Timer.periodic(
+          const Duration(seconds: 1),
+          (Timer timer) => setState(() {
+            _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
+                initSeconds;
+            _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                ":" +
+                (_seconds % 60).toString().padLeft(2, "0");
+          })
+        );
+        setState(() {
+          _startFocused = DateTime.fromMillisecondsSinceEpoch(prefs.getInt('startFocused'));
+          _seconds = (DateTime.now().difference(_startFocused).inSeconds) + initSeconds;
+          _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") + ":" + (_seconds % 60).toString().padLeft(2, "0");
+          _doingTask = true;
+        });
+
+        if (Platform.isAndroid) {
+          if (LocalNotificationHelper.dndOn) {
+            if (await FlutterDnd.isNotificationPolicyAccessGranted) {
+              await FlutterDnd.setInterruptionFilter(
+                  FlutterDnd.INTERRUPTION_FILTER_NONE);
+            }
+          }
+        }
+        _analyticsProvider.logStartTask(_tasks[0], DateTime.now());
+        widget.toggleDoingTask();
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     getSettings();
+    getState();
     notificationHelper = LocalNotificationHelper();
     notificationHelper.initialize();
     WidgetsBinding.instance.addObserver(this);
@@ -335,8 +384,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     switch (state) {
       case AppLifecycleState.paused:
         if (_doingTask) {
@@ -345,6 +395,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               if (value) {
                 _startDistracted = DateTime.now();
                 _numDistracted++;
+                prefs.setInt('numDistracted', _numDistracted);
                 if (LocalNotificationHelper.notificationsOn) {
                   if (LocalNotificationHelper.dndOn) {
                     FlutterDnd.setInterruptionFilter(
@@ -368,6 +419,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               if (value) {
                 _startDistracted = DateTime.now();
                 _numDistracted++;
+                prefs.setInt('numDistracted', _numDistracted);
                 notificationHelper.showNotifications();
                 _screenOn = true;
               } else {
@@ -381,6 +433,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         if (_screenOn) {
           _secondsDistracted +=
               DateTime.now().difference(_startDistracted).inSeconds;
+          prefs.setInt('secondsDistracted', _secondsDistracted);
         }
         break;
       case AppLifecycleState.inactive:
