@@ -1,5 +1,6 @@
 import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,8 +30,6 @@ class _TasksPageState extends State<TasksPage> {
   bool _loading = true;
   List<TaskItem> _tasks = [];
   int _completedTasks;
-  double _safeAreaDifference = 0;
-  double _bottomPadding = 0;
 
   void getCompletedTasks() {
     FirebaseUser user = context.read<User>().user;
@@ -124,23 +123,6 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final bool isKeyboardVisible =
-        MediaQuery.of(context).viewInsets.bottom > 0.0;
-    if (isKeyboardVisible) {
-      setState(() {
-        _safeAreaDifference = 0;
-      });
-    } else {
-      setState(() {
-        _bottomPadding = MediaQuery.of(context).padding.bottom;
-        _safeAreaDifference = MediaQuery.of(context).padding.bottom;
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<User>(context, listen: false).user;
     FirestoreProvider firestoreProvider = FirestoreProvider(user);
@@ -150,10 +132,7 @@ class _TasksPageState extends State<TasksPage> {
         children: <Widget>[
           Positioned(
             left: 25,
-            top: (SizeConfig.safeBlockVertical * 100 +
-                    _safeAreaDifference -
-                    _bottomPadding) *
-                0.05,
+            top: SizeConfig.safeBlockVertical * 5,
             child: Text(
               (DateTime.parse(_date).year == DateTime.now().year &&
                       DateTime.parse(_date).month == DateTime.now().month &&
@@ -178,99 +157,101 @@ class _TasksPageState extends State<TasksPage> {
                 Positioned(
                   right: 0,
                   left: 0,
-                  top: (SizeConfig.safeBlockVertical * 100 +
-                              _safeAreaDifference -
-                              _bottomPadding) *
-                          0.15 +
-                      20,
-                  child: SizedBox(
-                    height: SizeConfig.safeBlockVertical * 85,
-                    child: ReorderableListView(
-                      header: Container(
-                        child: Row(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 21, right: 11),
-                              child: Icon(
-                                FeatherIcons.plus,
-                                size: 18,
-                                color: Theme.of(context).hintColor,
-                              ),
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              width: MediaQuery.of(context).size.width - 75,
-                              child: Form(
-                                key: _formKey,
-                                child: TextFormField(
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: "Add task...",
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    autofocus: false,
-                                    onFieldSubmitted: (value) async {
-                                      if (_formKey.currentState.validate()) {
-                                        HapticFeedback.heavyImpact();
-                                        TaskItem newTask = TaskItem(
-                                          id: '',
-                                          name: value,
-                                          completed: false,
-                                          paused: false,
-                                          key: UniqueKey(),
-                                          order: _tasks.length - _completedTasks,
-                                          date: _date,
-                                        );
-                                        newTask.onDismissed = () {
-                                          removeTask(newTask);
-                                          AnalyticsProvider().logDeleteTask(newTask, DateTime.now());
-                                        };
-                                        newTask.onUpdate =
-                                            (value) => newTask.name = value;
-                                        setState(() {
-                                          _tasks.insert(
-                                              _tasks.length - _completedTasks,
-                                              newTask);
-                                        });
-                                        String userId = user.uid;
-                                        db
-                                            .collection('users')
-                                            .document(userId)
-                                            .collection('tasks')
-                                            .document(_date)
-                                            .collection('tasks')
-                                            .add({
-                                          'name': newTask.name,
-                                          'order': newTask.order,
-                                          'completed': newTask.completed,
-                                          'paused': newTask.paused,
-                                        }).then((doc) {
-                                          _tasks[_tasks.length - _completedTasks - 1]
-                                              .id = doc.documentID;
-                                          firestoreProvider.updateTasks(
-                                              _tasks, _date);
-                                        });
-                                        _formKey.currentState.reset();
-                                        AnalyticsProvider()
-                                            .logAddTask(newTask, DateTime.now());
-                                      }
-                                    },
-                                    validator: (value) {
-                                      return value.isEmpty
-                                          ? 'You cannot add an empty task'
-                                          : null;
-                                    }),
-                              ),
-                            ),
-                          ],
+                  top: SizeConfig.safeBlockVertical * 15 + 10,
+                  child: Container(
+                    height: 55,
+                    width: MediaQuery.of(context).size.width,
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 21, right: 11),
+                          child: Icon(
+                            FeatherIcons.plus,
+                            size: 18,
+                            color: Theme.of(context).hintColor,
+                          ),
                         ),
-                        height: 55,
-                        width: MediaQuery.of(context).size.width,
-                        alignment: Alignment.centerLeft,
-                      ),
+                        Container(
+                          alignment: Alignment.center,
+                          width: MediaQuery.of(context).size.width - 75,
+                          child: Form(
+                            key: _formKey,
+                            child: TextFormField(
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: "Add task...",
+                                ),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                autofocus: false,
+                                onFieldSubmitted: (value) async {
+                                  if (_formKey.currentState.validate()) {
+                                    HapticFeedback.heavyImpact();
+                                    TaskItem newTask = TaskItem(
+                                      id: '',
+                                      name: value,
+                                      completed: false,
+                                      paused: false,
+                                      key: UniqueKey(),
+                                      order: _tasks.length - _completedTasks,
+                                      date: _date,
+                                    );
+                                    newTask.onDismissed = () {
+                                      removeTask(newTask);
+                                      AnalyticsProvider().logDeleteTask(newTask, DateTime.now());
+                                    };
+                                    newTask.onUpdate =
+                                        (value) => newTask.name = value;
+                                    setState(() {
+                                      _tasks.insert(
+                                          _tasks.length - _completedTasks,
+                                          newTask);
+                                    });
+                                    String userId = user.uid;
+                                    db
+                                        .collection('users')
+                                        .document(userId)
+                                        .collection('tasks')
+                                        .document(_date)
+                                        .collection('tasks')
+                                        .add({
+                                      'name': newTask.name,
+                                      'order': newTask.order,
+                                      'completed': newTask.completed,
+                                      'paused': newTask.paused,
+                                    }).then((doc) {
+                                      _tasks[_tasks.length - _completedTasks - 1]
+                                          .id = doc.documentID;
+                                      firestoreProvider.updateTasks(
+                                          _tasks, _date);
+                                    });
+                                    _formKey.currentState.reset();
+                                    AnalyticsProvider()
+                                        .logAddTask(newTask, DateTime.now());
+                                  }
+                                },
+                                validator: (value) {
+                                  return value.isEmpty
+                                      ? 'You cannot add an empty task'
+                                      : null;
+                                }),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  left: 0,
+                  top: SizeConfig.safeBlockVertical * 15 + 65,
+                  child: SizedBox(
+                    height: SizeConfig.safeBlockVertical * 85 - 145,
+                    child: ReorderableListView(
+                      padding: EdgeInsets.all(0),
                       onReorder: ((oldIndex, newIndex) {
                         if (!_tasks[oldIndex].completed) {
                           List<TaskItem> tasks = _tasks;
