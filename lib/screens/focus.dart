@@ -23,10 +23,10 @@ import 'package:confetti/confetti.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FocusPage extends StatefulWidget {
-  final VoidCallback toggleDoingTask;
+  final Function setDoingTask;
   final Function goToPage;
 
-  FocusPage({@required this.toggleDoingTask, @required this.goToPage, Key key})
+  FocusPage({@required this.setDoingTask, @required this.goToPage, Key key})
       : super(key: key);
 
   @override
@@ -42,7 +42,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   String _swatchDisplay = "00:00";
   int _completedTasks;
   int _totalTasks;
-  bool _doingTask = false;
+  bool _doingTask;
   String _date;
   FirebaseUser _user;
   FirestoreProvider _firestoreProvider;
@@ -109,19 +109,22 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       }
 
       _timer = new Timer.periodic(
-        const Duration(seconds: 1),
-        (Timer timer) => setState(() {
-          _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
-              initSeconds;
-          _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-              ":" +
-              (_seconds % 60).toString().padLeft(2, "0");
-        })
-      );
+          const Duration(seconds: 1),
+          (Timer timer) => setState(() {
+                _seconds =
+                    (DateTime.now().difference(_startFocused).inSeconds) +
+                        initSeconds;
+                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                    ":" +
+                    (_seconds % 60).toString().padLeft(2, "0");
+              }));
       setState(() {
         _startFocused = DateTime.now();
-        _seconds = (DateTime.now().difference(_startFocused).inSeconds) + initSeconds;
-        _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") + ":" + (_seconds % 60).toString().padLeft(2, "0");
+        _seconds =
+            (DateTime.now().difference(_startFocused).inSeconds) + initSeconds;
+        _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+            ":" +
+            (_seconds % 60).toString().padLeft(2, "0");
         _doingTask = true;
       });
 
@@ -143,7 +146,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         }
       }
       _analyticsProvider.logStartTask(_tasks[0], DateTime.now());
-      widget.toggleDoingTask();
+      widget.setDoingTask(true);
     }
   }
 
@@ -152,6 +155,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _timer.cancel();
       _saving = true;
       _doingTask = false;
+      print(_doingTask);
       _quote = quotes[_random.nextInt(quotes.length)];
       _message = messages[_random.nextInt(messages.length)];
     });
@@ -165,7 +169,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     }
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('doingTask', false);
-    widget.toggleDoingTask();
+    widget.setDoingTask(false);
   }
 
   void pauseTask(FirebaseUser user) {
@@ -295,22 +299,25 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         _initNumDistracted = prefs.getInt('initNumDistracted');
         int initSeconds = prefs.getInt('initSeconds');
         _timer = new Timer.periodic(
-          const Duration(seconds: 1),
-          (Timer timer) => setState(() {
-            _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
-                initSeconds;
-            _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-                ":" +
-                (_seconds % 60).toString().padLeft(2, "0");
-          })
-        );
+            const Duration(seconds: 1),
+            (Timer timer) => setState(() {
+                  _seconds =
+                      (DateTime.now().difference(_startFocused).inSeconds) +
+                          initSeconds;
+                  _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                      ":" +
+                      (_seconds % 60).toString().padLeft(2, "0");
+                }));
         setState(() {
-          _startFocused = DateTime.fromMillisecondsSinceEpoch(prefs.getInt('startFocused'));
-          _seconds = (DateTime.now().difference(_startFocused).inSeconds) + initSeconds;
-          _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") + ":" + (_seconds % 60).toString().padLeft(2, "0");
+          _startFocused =
+              DateTime.fromMillisecondsSinceEpoch(prefs.getInt('startFocused'));
+          _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
+              initSeconds;
+          _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+              ":" +
+              (_seconds % 60).toString().padLeft(2, "0");
           _doingTask = true;
         });
-
         if (Platform.isAndroid) {
           if (LocalNotificationHelper.dndOn) {
             if (await FlutterDnd.isNotificationPolicyAccessGranted) {
@@ -319,8 +326,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             }
           }
         }
+        widget.setDoingTask(true);
         _analyticsProvider.logStartTask(_tasks[0], DateTime.now());
-        widget.toggleDoingTask();
+      } else {
+        setState(() {
+          _doingTask = false;
+        });
       }
     });
   }

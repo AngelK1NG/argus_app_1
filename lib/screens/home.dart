@@ -22,8 +22,8 @@ class _HomeState extends State<Home> {
   int _selectedIndex = 0;
   bool _initialized = false;
 
-  void toggleDoingTask() {
-    if (_cardPosition == SizeConfig.safeBlockVertical * 36) {
+  void setDoingTask(doingTask) {
+    if (doingTask) {
       setState(() {
         _cardPosition = SizeConfig.safeBlockVertical * 50;
         _backgroundColor = jetBlack;
@@ -43,8 +43,7 @@ class _HomeState extends State<Home> {
     setState(() {
       switch (index) {
         case 0:
-          _child =
-              FocusPage(toggleDoingTask: toggleDoingTask, goToPage: goToPage);
+          _child = FocusPage(setDoingTask: setDoingTask, goToPage: goToPage);
           _cardPosition = SizeConfig.safeBlockVertical * 36;
           break;
         case 1:
@@ -66,7 +65,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _child = FocusPage(toggleDoingTask: toggleDoingTask, goToPage: goToPage);
   }
 
   @override
@@ -121,8 +119,7 @@ class _HomeState extends State<Home> {
             child: Container(
               alignment: Alignment.bottomCenter,
               child: BottomNav(
-                onTap: goToPage, show: _showNav, index: _selectedIndex
-              ),
+                  onTap: goToPage, show: _showNav, index: _selectedIndex),
             ),
           ),
         ],
