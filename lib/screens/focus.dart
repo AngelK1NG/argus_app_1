@@ -155,7 +155,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _timer.cancel();
       _saving = true;
       _doingTask = false;
-      print(_doingTask);
       _quote = quotes[_random.nextInt(quotes.length)];
       _message = messages[_random.nextInt(messages.length)];
     });
@@ -319,7 +318,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           _doingTask = true;
         });
         if (Platform.isAndroid) {
-          if (LocalNotificationHelper.dndOn) {
+          if (LocalNotificationHelper.dndOn == true) {
             if (await FlutterDnd.isNotificationPolicyAccessGranted) {
               await FlutterDnd.setInterruptionFilter(
                   FlutterDnd.INTERRUPTION_FILTER_NONE);
@@ -327,7 +326,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           }
         }
         widget.setDoingTask(true);
-        _analyticsProvider.logStartTask(_tasks[0], DateTime.now());
       } else {
         setState(() {
           _doingTask = false;
@@ -339,11 +337,11 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     getSettings();
     getState();
     notificationHelper = LocalNotificationHelper();
     notificationHelper.initialize();
-    WidgetsBinding.instance.addObserver(this);
     setState(() {
       _quote = quotes[_random.nextInt(quotes.length)];
       _message = messages[_random.nextInt(messages.length)];
