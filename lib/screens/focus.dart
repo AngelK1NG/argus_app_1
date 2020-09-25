@@ -325,6 +325,16 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             }
           }
         }
+        if (prefs.getBool('distracted') == true) {
+          _startDistracted =
+              DateTime.fromMillisecondsSinceEpoch(prefs.getInt('startDistracted'));
+          _secondsDistracted +=
+              DateTime.now().difference(_startDistracted).inSeconds;
+          _numDistracted++;
+          prefs.setInt('secondsDistracted', _secondsDistracted);
+          prefs.setInt('numDistracted', _numDistracted);
+          prefs.setBool('distracted', false);
+        }
         widget.setDoingTask(true);
       } else {
         setState(() {
@@ -394,7 +404,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    super.didChangeAppLifecycleState(state);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     switch (state) {
       case AppLifecycleState.paused:
@@ -403,8 +412,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             androidScreenOn().then((value) {
               if (value) {
                 _startDistracted = DateTime.now();
-                _numDistracted++;
-                prefs.setInt('numDistracted', _numDistracted);
+                prefs.setInt('startDistracted', _startDistracted.millisecondsSinceEpoch);
+                prefs.setBool('distracted', true);
                 if (LocalNotificationHelper.notificationsOn) {
                   if (LocalNotificationHelper.dndOn) {
                     FlutterDnd.setInterruptionFilter(
@@ -427,8 +436,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             iosScreenOn().then((value) {
               if (value) {
                 _startDistracted = DateTime.now();
-                _numDistracted++;
-                prefs.setInt('numDistracted', _numDistracted);
+                prefs.setBool('distracted', true);
                 notificationHelper.showNotifications();
                 _screenOn = true;
               } else {
@@ -442,7 +450,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         if (_screenOn) {
           _secondsDistracted +=
               DateTime.now().difference(_startDistracted).inSeconds;
+          _numDistracted++;
           prefs.setInt('secondsDistracted', _secondsDistracted);
+          prefs.setInt('numDistracted', _numDistracted);
+          prefs.setBool('distracted', false);
         }
         break;
       case AppLifecycleState.inactive:

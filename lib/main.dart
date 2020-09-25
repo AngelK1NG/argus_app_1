@@ -51,7 +51,6 @@ class MyApp extends StatelessWidget {
           navigatorObservers: [
             FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
           ],
-          initialRoute: '/login',
           onGenerateRoute: (routeSettings) {
             switch (routeSettings.name) {
               case '/home':

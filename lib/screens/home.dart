@@ -74,9 +74,9 @@ class _HomeState extends State<Home> {
       SizeConfig().init(context);
       _initialized = true;
     }
+    goToPage(_selectedIndex);
     setState(() {
       _backgroundColor = Theme.of(context).primaryColor;
-      goToPage(_selectedIndex);
     });
   }
 
