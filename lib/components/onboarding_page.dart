@@ -22,7 +22,7 @@ class OnboardingPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Image(
-            image: AssetImage('images/onboarding/' + title + '.png'),
+            image: AssetImage('assets/images/onboarding/' + title + '.png'),
             height: 250),
         Padding(
           padding: const EdgeInsets.only(

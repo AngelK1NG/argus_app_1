@@ -79,13 +79,13 @@ class _TaskItemState extends State<TaskItem> {
                         child: widget.completed
                             ? Image(
                                 image: AssetImage(
-                                    'images/icons/Task Icon_Filled.png'),
+                                    'assets/images/icons/Task Icon_Filled.png'),
                                 width: 10,
                                 height: 10,
                               )
                             : Image(
                                 image: AssetImage(
-                                    'images/icons/Task Icon_Unfilled.png'),
+                                    'assets/images/icons/Task Icon_Unfilled.png'),
                                 width: 10,
                                 height: 10,
                               )),
@@ -150,9 +150,11 @@ class _TaskItemState extends State<TaskItem> {
                                     color: widget.completed
                                         ? Theme.of(context).hintColor
                                         : widget.paused
-                                          ? Theme.of(context).accentColor
-                                          : jetBlack,
-                                    decoration: widget.completed ? TextDecoration.lineThrough : null,
+                                            ? Theme.of(context).accentColor
+                                            : jetBlack,
+                                    decoration: widget.completed
+                                        ? TextDecoration.lineThrough
+                                        : null,
                                   ),
                                 ),
                         )),

@@ -42,7 +42,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   String _swatchDisplay = "00:00";
   int _completedTasks;
   int _totalTasks;
-  bool _doingTask;
+  bool _doingTask = false;
   String _date;
   FirebaseUser _user;
   FirestoreProvider _firestoreProvider;
@@ -135,6 +135,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       prefs.setInt('initNumDistracted', _initNumDistracted);
       prefs.setInt('initSeconds', initSeconds);
       prefs.setInt('startFocused', _startFocused.millisecondsSinceEpoch);
+      prefs.setString('taskId', _tasks[0].id);
       prefs.setBool('doingTask', true);
 
       if (Platform.isAndroid) {
@@ -292,50 +293,71 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   void getState() {
     SharedPreferences.getInstance().then((SharedPreferences prefs) async {
       if (prefs.getBool('doingTask') == true) {
-        _secondsDistracted = prefs.getInt('secondsDistracted');
-        _initSecondsDistracted = prefs.getInt('initSecondsDistracted');
-        _numDistracted = prefs.getInt('numDistracted');
-        _initNumDistracted = prefs.getInt('initNumDistracted');
-        int initSeconds = prefs.getInt('initSeconds');
-        _timer = new Timer.periodic(
-            const Duration(seconds: 1),
-            (Timer timer) => setState(() {
-                  _seconds =
-                      (DateTime.now().difference(_startFocused).inSeconds) +
-                          initSeconds;
-                  _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-                      ":" +
-                      (_seconds % 60).toString().padLeft(2, "0");
-                }));
-        setState(() {
-          _startFocused =
-              DateTime.fromMillisecondsSinceEpoch(prefs.getInt('startFocused'));
-          _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
-              initSeconds;
-          _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-              ":" +
-              (_seconds % 60).toString().padLeft(2, "0");
-          _doingTask = true;
-        });
-        if (Platform.isAndroid) {
-          if (LocalNotificationHelper.dndOn == true) {
-            if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-              await FlutterDnd.setInterruptionFilter(
-                  FlutterDnd.INTERRUPTION_FILTER_NONE);
+        db
+            .collection('users')
+            .document(_user.uid)
+            .collection('tasks')
+            .document(_date)
+            .collection('tasks')
+            .where('order', isEqualTo: 1)
+            .getDocuments()
+            .then((snapshot) async {
+          if (snapshot == null ||
+              snapshot.documents == null ||
+              snapshot.documents.isEmpty ||
+              snapshot.documents[0].documentID != prefs.getString('taskId')) {
+            setState(() {
+              _doingTask = false;
+            });
+            prefs.setBool('doingTask', false);
+          } else {
+            _secondsDistracted = prefs.getInt('secondsDistracted');
+            _initSecondsDistracted = prefs.getInt('initSecondsDistracted');
+            _numDistracted = prefs.getInt('numDistracted');
+            _initNumDistracted = prefs.getInt('initNumDistracted');
+            int initSeconds = prefs.getInt('initSeconds');
+            _timer = new Timer.periodic(
+                const Duration(seconds: 1),
+                (Timer timer) => setState(() {
+                      _seconds =
+                          (DateTime.now().difference(_startFocused).inSeconds) +
+                              initSeconds;
+                      _swatchDisplay =
+                          (_seconds ~/ 60).toString().padLeft(2, "0") +
+                              ":" +
+                              (_seconds % 60).toString().padLeft(2, "0");
+                    }));
+            setState(() {
+              _startFocused = DateTime.fromMillisecondsSinceEpoch(
+                  prefs.getInt('startFocused'));
+              _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
+                  initSeconds;
+              _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                  ":" +
+                  (_seconds % 60).toString().padLeft(2, "0");
+              _doingTask = true;
+            });
+            if (Platform.isAndroid) {
+              if (LocalNotificationHelper.dndOn == true) {
+                if (await FlutterDnd.isNotificationPolicyAccessGranted) {
+                  await FlutterDnd.setInterruptionFilter(
+                      FlutterDnd.INTERRUPTION_FILTER_NONE);
+                }
+              }
             }
+            if (prefs.getBool('distracted') == true) {
+              _startDistracted = DateTime.fromMillisecondsSinceEpoch(
+                  prefs.getInt('startDistracted'));
+              _secondsDistracted +=
+                  DateTime.now().difference(_startDistracted).inSeconds;
+              _numDistracted++;
+              prefs.setInt('secondsDistracted', _secondsDistracted);
+              prefs.setInt('numDistracted', _numDistracted);
+              prefs.setBool('distracted', false);
+            }
+            widget.setDoingTask(true);
           }
-        }
-        if (prefs.getBool('distracted') == true) {
-          _startDistracted =
-              DateTime.fromMillisecondsSinceEpoch(prefs.getInt('startDistracted'));
-          _secondsDistracted +=
-              DateTime.now().difference(_startDistracted).inSeconds;
-          _numDistracted++;
-          prefs.setInt('secondsDistracted', _secondsDistracted);
-          prefs.setInt('numDistracted', _numDistracted);
-          prefs.setBool('distracted', false);
-        }
-        widget.setDoingTask(true);
+        });
       } else {
         setState(() {
           _doingTask = false;
@@ -412,7 +434,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             androidScreenOn().then((value) {
               if (value) {
                 _startDistracted = DateTime.now();
-                prefs.setInt('startDistracted', _startDistracted.millisecondsSinceEpoch);
+                prefs.setInt(
+                    'startDistracted', _startDistracted.millisecondsSinceEpoch);
                 prefs.setBool('distracted', true);
                 if (LocalNotificationHelper.notificationsOn) {
                   if (LocalNotificationHelper.dndOn) {

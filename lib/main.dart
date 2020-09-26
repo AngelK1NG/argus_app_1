@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
             hintColor: const Color(0xffb0b0b0),
             dividerColor: const Color(0xffe5e5e5),
             splashColor: Colors.transparent,
-            fontFamily: 'Roboto',
+            textSelectionColor: const Color(0xffddddff),
             textTheme: Theme.of(context)
                 .textTheme
                 .apply(bodyColor: jetBlack, displayColor: jetBlack),

@@ -86,7 +86,9 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
+                Image(
+                    image:
+                        AssetImage('assets/images/logo/Focal Logo_Full.png')),
                 Padding(
                   padding: const EdgeInsets.only(top: 180),
                   child: Column(
@@ -96,8 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                           setState(() {
                             _loginLoading = true;
                           });
-                          dynamic result =
-                              await AuthProvider().googleSignIn();
+                          dynamic result = await AuthProvider().googleSignIn();
                           if (result == null) {
                             setState(() {
                               _loginLoading = false;
@@ -148,13 +149,13 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             )
                           : Container()
-                      ],
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
+        ),
         Visibility(
           visible: !_isLogin,
           child: AnimatedOpacity(
@@ -163,8 +164,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Container(
               alignment: Alignment.center,
               color: Colors.white,
-              child:
-                  Image(image: AssetImage('images/logo/Focal Logo_Full.png')),
+              child: Image(
+                  image: AssetImage('assets/images/logo/Focal Logo_Full.png')),
             ),
           ),
         ),
