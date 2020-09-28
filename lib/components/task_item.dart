@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:Focal/utils/size_config.dart';
 import 'package:provider/provider.dart';
-import 'package:Focal/constants.dart';
-import 'dart:io' show Platform;
 
 // ignore: must_be_immutable
 class TaskItem extends StatefulWidget {
@@ -12,6 +10,7 @@ class TaskItem extends StatefulWidget {
   String id;
   bool completed;
   bool paused;
+  bool newTask;
   int order;
   VoidCallback onDismissed;
   Function onUpdate;
@@ -27,6 +26,7 @@ class TaskItem extends StatefulWidget {
       @required this.completed,
       this.paused,
       this.order,
+      this.newTask,
       this.onDismissed,
       this.onUpdate,
       @required this.date,
@@ -49,6 +49,9 @@ class _TaskItemState extends State<TaskItem> {
   @override
   void initState() {
     super.initState();
+    if (widget.newTask == true) {
+      _active = true;
+    }
   }
 
   @override
@@ -64,9 +67,11 @@ class _TaskItemState extends State<TaskItem> {
             child: GestureDetector(
               onTap: () {
                 setState(() {
-                  if (!widget.completed && !Platform.isIOS) {
+                  if (!widget.completed) {
                     _active = true;
-                    _focus.requestFocus();
+                    Future.delayed(Duration(milliseconds: 50), () {
+                      FocusScope.of(context).requestFocus(_focus);
+                    });
                   }
                 });
               },
@@ -93,71 +98,50 @@ class _TaskItemState extends State<TaskItem> {
                         height: 55,
                         width: SizeConfig.safeBlockHorizontal * 100 - 75,
                         child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: _active
-                              ? Focus(
-                                  onFocusChange: (focus) {
-                                    if (!focus &&
-                                        _formKey.currentState.validate()) {
-                                      setState(() {
-                                        _active = false;
-                                      });
-                                    }
-                                    if (!_formKey.currentState.validate()) {
-                                      Future.delayed(Duration(milliseconds: 1),
-                                          () {
-                                        _focus.requestFocus();
-                                      });
-                                    }
-                                  },
-                                  child: Form(
-                                    key: _formKey,
-                                    child: TextFormField(
-                                      focusNode: _focus,
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                      ),
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                      initialValue: widget.name,
-                                      autofocus: false,
-                                      onChanged: (value) {
-                                        Future.delayed(
-                                            Duration(milliseconds: 1), () {
-                                          if (_formKey.currentState
-                                              .validate()) {
-                                            widget.onUpdate(value);
-                                            firestoreProvider.updateTaskName(
-                                                value, widget.id, widget.date);
-                                          }
-                                        });
-                                      },
-                                      validator: (value) {
-                                        return value.isEmpty
-                                            ? 'You cannot add an empty task'
-                                            : null;
-                                      },
-                                    ),
+                            alignment: Alignment.centerLeft,
+                            child: Focus(
+                              onFocusChange: (focus) {
+                                if (!focus &&
+                                    _formKey.currentState.validate()) {
+                                  setState(() {
+                                    _active = false;
+                                  });
+                                }
+                                if (!_formKey.currentState.validate()) {
+                                  _focus.requestFocus();
+                                }
+                              },
+                              child: Form(
+                                key: _formKey,
+                                child: TextFormField(
+                                  focusNode: _focus,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
                                   ),
-                                )
-                              : Text(
-                                  widget.name,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
-                                    color: widget.completed
-                                        ? Theme.of(context).hintColor
-                                        : widget.paused
-                                            ? Theme.of(context).accentColor
-                                            : jetBlack,
-                                    decoration: widget.completed
-                                        ? TextDecoration.lineThrough
-                                        : null,
                                   ),
+                                  initialValue: widget.name,
+                                  autofocus: true,
+                                  enabled: _active,
+                                  onChanged: (value) {
+                                    Future.delayed(Duration.zero, () {
+                                      if (_formKey.currentState.validate()) {
+                                        widget.onUpdate(value);
+                                        firestoreProvider.updateTaskName(
+                                            value, widget.id, widget.date);
+                                      }
+                                    });
+                                  },
+                                  validator: (value) {
+                                    return value.isEmpty
+                                        ? 'You cannot add an empty task'
+                                        : null;
+                                  },
                                 ),
-                        )),
+                              ),
+                            ))),
                   ],
                 ),
                 height: 55,
