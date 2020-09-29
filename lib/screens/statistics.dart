@@ -124,7 +124,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 Positioned(
                   right: 0,
                   left: 0,
-                  top: SizeConfig.safeBlockVertical * 15 + 20,
+                  top: SizeConfig.safeBlockVertical * 15 + 15,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -137,7 +137,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           }
                         },
                         child: Container(
-                          height: 30,
+                          height: 25,
                           width: SizeConfig.safeBlockHorizontal * 50 - 25,
                           decoration: BoxDecoration(
                               color: _timeFrame == 'today'
@@ -150,7 +150,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                             child: Text(
                               'Today',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 11,
                                 color: _timeFrame == 'today'
                                     ? Colors.white
                                     : Theme.of(context).accentColor,
@@ -169,7 +169,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           }
                         },
                         child: Container(
-                          height: 30,
+                          height: 25,
                           width: SizeConfig.safeBlockHorizontal * 50 - 25,
                           decoration: BoxDecoration(
                               color: _timeFrame == 'week'
@@ -182,7 +182,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                             child: Text(
                               'Week',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 11,
                                 color: _timeFrame == 'week'
                                     ? Colors.white
                                     : Theme.of(context).accentColor,
@@ -198,9 +198,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 Positioned(
                     right: 25,
                     left: 25,
-                    top: SizeConfig.safeBlockVertical * 15 + 75,
+                    top: SizeConfig.safeBlockVertical * 15 + 65,
                     child: SizedBox(
-                      height: SizeConfig.safeBlockVertical * 85 - 155,
+                      height: SizeConfig.safeBlockVertical * 85 - 145,
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         child: _loading

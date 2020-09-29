@@ -9,7 +9,6 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'screens/home.dart';
 import 'screens/login.dart';
 import 'screens/onboarding.dart';
-import 'components/wrapper.dart';
 import 'constants.dart';
 
 void main() {
@@ -33,56 +32,59 @@ class MyApp extends StatelessWidget {
       create: (_) => User(),
       child: KeyboardVisibilityProvider(
         child: KeyboardDismissOnTap(
-          child: MaterialApp(
-              navigatorKey: navigatorKey,
-              theme: ThemeData(
-                buttonTheme: ButtonThemeData(
-                  height: 60,
-                  minWidth: 60,
+          child: NotificationListener<OverscrollIndicatorNotification>(
+            onNotification: (OverscrollIndicatorNotification overscroll) {
+              overscroll.disallowGlow();
+              return null;
+            },
+            child: MaterialApp(
+                navigatorKey: navigatorKey,
+                theme: ThemeData(
+                  buttonTheme: ButtonThemeData(
+                    height: 60,
+                    minWidth: 60,
+                  ),
+                  primarySwatch: focalBlue,
+                  primaryColor: const Color(0xff3c25d7),
+                  accentColor: const Color(0xff7c4efd),
+                  hintColor: const Color(0xffb0b0b0),
+                  dividerColor: const Color(0xffe5e5e5),
+                  splashColor: Colors.transparent,
+                  textSelectionColor: const Color(0xffddddff),
+                  textTheme: Theme.of(context)
+                      .textTheme
+                      .apply(bodyColor: jetBlack, displayColor: jetBlack),
                 ),
-                primarySwatch: focalPurple,
-                primaryColor: const Color(0xff3c25d7),
-                accentColor: const Color(0xff7c4efd),
-                hintColor: const Color(0xffb0b0b0),
-                dividerColor: const Color(0xffe5e5e5),
-                splashColor: Colors.transparent,
-                textSelectionColor: const Color(0xffddddff),
-                textTheme: Theme.of(context)
-                    .textTheme
-                    .apply(bodyColor: jetBlack, displayColor: jetBlack),
-              ),
-              navigatorObservers: [
-                FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
-              ],
-              onGenerateRoute: (routeSettings) {
-                switch (routeSettings.name) {
-                  case '/home':
-                    return PageRouteBuilder(
-                        settings: RouteSettings(name: routeSettings.name),
-                        pageBuilder: (_, a1, a2) =>
-                            WrapperWidget(child: Home()));
-                    break;
-                  case '/onboarding':
-                    return PageRouteBuilder(
-                        settings: RouteSettings(name: routeSettings.name),
-                        pageBuilder: (_, a1, a2) =>
-                            WrapperWidget(child: Onboarding()));
-                    break;
-                  default:
-                    return PageRouteBuilder(
-                        settings: RouteSettings(name: routeSettings.name),
-                        pageBuilder: (_, a1, a2) =>
-                            WrapperWidget(child: LoginPage()));
-                    break;
-                }
-              }),
+                navigatorObservers: [
+                  FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
+                ],
+                onGenerateRoute: (routeSettings) {
+                  switch (routeSettings.name) {
+                    case '/home':
+                      return PageRouteBuilder(
+                          settings: RouteSettings(name: routeSettings.name),
+                          pageBuilder: (_, a1, a2) => Home());
+                      break;
+                    case '/onboarding':
+                      return PageRouteBuilder(
+                          settings: RouteSettings(name: routeSettings.name),
+                          pageBuilder: (_, a1, a2) => Onboarding());
+                      break;
+                    default:
+                      return PageRouteBuilder(
+                          settings: RouteSettings(name: routeSettings.name),
+                          pageBuilder: (_, a1, a2) => LoginPage());
+                      break;
+                  }
+                }),
+          ),
         ),
       ),
     );
   }
 }
 
-const MaterialColor focalPurple =
+const MaterialColor focalBlue =
     const MaterialColor(0xff3c25d7, const <int, Color>{
   50: const Color(0xff3c25d7),
   100: const Color(0xff3c25d7),
