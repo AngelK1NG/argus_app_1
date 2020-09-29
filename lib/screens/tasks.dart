@@ -152,8 +152,7 @@ class _TasksPageState extends State<TasksPage> {
                     : (DateTime.parse(_date).year == DateTime.now().year &&
                             DateTime.parse(_date).month ==
                                 DateTime.now().month &&
-                            DateTime.parse(_date).day ==
-                                DateTime.now().day + 1)
+                            DateTime.parse(_date).day == DateTime.now().day + 1)
                         ? "Tomorrow"
                         : DateTime.parse(_date).month.toString() +
                             "/" +
@@ -220,7 +219,8 @@ class _TasksPageState extends State<TasksPage> {
               AnimatedPositioned(
                 duration: keyboardDuration,
                 curve: keyboardCurve,
-                bottom: MediaQuery.of(context).viewInsets.bottom,
+                bottom:
+                    _addingTask ? MediaQuery.of(context).viewInsets.bottom : 0,
                 left: 0,
                 right: 0,
                 child: Offstage(
@@ -291,14 +291,15 @@ class _TasksPageState extends State<TasksPage> {
                                     );
                                     newTask.onDismissed = () {
                                       removeTask(newTask);
-                                      AnalyticsProvider()
-                                          .logDeleteTask(newTask, DateTime.now());
+                                      AnalyticsProvider().logDeleteTask(
+                                          newTask, DateTime.now());
                                     };
                                     newTask.onUpdate =
                                         (value) => newTask.name = value;
                                     setState(() {
                                       _tasks.insert(
-                                          _tasks.length - _completedTasks, newTask);
+                                          _tasks.length - _completedTasks,
+                                          newTask);
                                     });
                                     String userId = user.uid;
                                     db
@@ -313,9 +314,12 @@ class _TasksPageState extends State<TasksPage> {
                                       'completed': newTask.completed,
                                       'paused': newTask.paused,
                                     }).then((doc) {
-                                      _tasks[_tasks.length - _completedTasks - 1].id =
-                                          doc.documentID;
-                                      firestoreProvider.updateTasks(_tasks, _date);
+                                      _tasks[_tasks.length -
+                                              _completedTasks -
+                                              1]
+                                          .id = doc.documentID;
+                                      firestoreProvider.updateTasks(
+                                          _tasks, _date);
                                     });
                                     _formKey.currentState.reset();
                                     AnalyticsProvider()
@@ -334,22 +338,25 @@ class _TasksPageState extends State<TasksPage> {
               Positioned(
                 right: 25,
                 bottom: 80,
-                child: AnimatedOpacity(
-                  duration: keyboardDuration,
-                  curve: keyboardCurve,
-                  opacity: (_addingTask || _keyboard) ? 0 : 1,
-                  child: SqrButton(
-                    icon: Icon(
-                      FeatherIcons.plus,
-                      color: Colors.white,
-                      size: 24,
+                child: Offstage(
+                  offstage: _addingTask || _keyboard,
+                  child: AnimatedOpacity(
+                    duration: keyboardDuration,
+                    curve: keyboardCurve,
+                    opacity: (_addingTask || _keyboard) ? 0 : 1,
+                    child: SqrButton(
+                      icon: Icon(
+                        FeatherIcons.plus,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      onTap: () {
+                        setState(() {
+                          _addingTask = true;
+                        });
+                        FocusScope.of(context).requestFocus(_focus);
+                      },
                     ),
-                    onTap: () {
-                      setState(() {
-                        _addingTask = true;
-                      });
-                      FocusScope.of(context).requestFocus(_focus);
-                    },
                   ),
                 ),
               ),
