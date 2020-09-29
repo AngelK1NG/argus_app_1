@@ -23,10 +23,10 @@ import 'package:confetti/confetti.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FocusPage extends StatefulWidget {
-  final Function setDoingTask;
   final Function goToPage;
+  final Function setDoingTask;
 
-  FocusPage({@required this.setDoingTask, @required this.goToPage, Key key})
+  FocusPage({@required this.goToPage, @required this.setDoingTask, Key key})
       : super(key: key);
 
   @override

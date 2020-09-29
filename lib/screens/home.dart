@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/utils/size_config.dart';
 import 'package:Focal/components/bottom_nav.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'focus.dart';
 import 'tasks.dart';
 import 'statistics.dart';
@@ -38,12 +39,18 @@ class _HomeState extends State<Home> {
     }
   }
 
+  void setNav(visible) {
+    setState(() {
+      _showNav = visible;
+    });
+  }
+
   void goToPage(int index) {
     _selectedIndex = index;
     setState(() {
       switch (index) {
         case 0:
-          _child = FocusPage(setDoingTask: setDoingTask, goToPage: goToPage);
+          _child = FocusPage(goToPage: goToPage, setDoingTask: setDoingTask);
           _cardPosition = SizeConfig.safeBlockVertical * 36;
           break;
         case 1:
@@ -65,6 +72,9 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    KeyboardVisibility.onChange.listen((bool visible) {
+      setNav(!visible);
+    });
   }
 
   @override
@@ -84,6 +94,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: <Widget>[
           Container(

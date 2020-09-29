@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:Focal/utils/size_config.dart';
 import 'package:provider/provider.dart';
+import 'package:Focal/constants.dart';
 
 // ignore: must_be_immutable
 class TaskItem extends StatefulWidget {
@@ -119,9 +120,11 @@ class _TaskItemState extends State<TaskItem> {
                                     border: InputBorder.none,
                                   ),
                                   style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                      color: widget.paused
+                                          ? Theme.of(context).accentColor
+                                          : jetBlack),
                                   initialValue: widget.name,
                                   autofocus: true,
                                   enabled: _active,

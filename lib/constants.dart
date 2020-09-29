@@ -28,3 +28,5 @@ final Duration loadingDuration = Duration(milliseconds: 200);
 final Curve loadingCurve = Curves.ease;
 final Duration cardSlideDuration = Duration(milliseconds: 200);
 final Curve cardSlideCurve = Curves.ease;
+final Duration keyboardDuration = Duration(milliseconds: 200);
+final Curve keyboardCurve = Curves.ease;
