@@ -14,6 +14,7 @@ import 'package:Focal/components/sqr_button.dart';
 import 'package:Focal/components/task_item.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 class TasksPage extends StatefulWidget {
   final Function goToPage;
@@ -31,6 +32,7 @@ class _TasksPageState extends State<TasksPage> {
   FirebaseUser user;
   bool _loading = true;
   bool _addingTask = false;
+  bool _editingTask = false;
   bool _keyboard = false;
   List<TaskItem> _tasks = [];
   int _completedTasks;
@@ -129,52 +131,231 @@ class _TasksPageState extends State<TasksPage> {
         setState(() {
           _keyboard = visible;
         });
+        if (!visible) {
+          FocusScope.of(context).unfocus();
+          setState(() {
+            _addingTask = false;
+            _editingTask = false;
+          });
+        } else {
+          if (!_addingTask) {
+            setState(() {
+              _editingTask = true;
+            });
+          }
+        }
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final TextStyle dateTextStyle = TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w500,
+      color: Colors.white,
+    );
+    final TextStyle todayTextStyle = TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w500,
+      color: Theme.of(context).primaryColor,
+    );
+
     FirebaseUser user = Provider.of<User>(context, listen: false).user;
     FirestoreProvider firestoreProvider = FirestoreProvider(user);
     return WillPopScope(
       onWillPop: () async => widget.goToPage(0),
       child: Stack(children: <Widget>[
         Positioned(
-          left: 25,
-          top: SizeConfig.safeBlockVertical * 5,
-          child: GestureDetector(
+          left: 0,
+          right: 0,
+          top: SizeConfig.safeBlockVertical * 5 - 20,
+          child: Center(
+            child: Offstage(
+              offstage: (DateTime.parse(_date).year == DateTime.now().year &&
+                          DateTime.parse(_date).month == DateTime.now().month &&
+                          DateTime.parse(_date).day == DateTime.now().day) ||
+                      (DateTime.parse(_date).year == DateTime.now().year &&
+                          DateTime.parse(_date).month == DateTime.now().month &&
+                          DateTime.parse(_date).day == DateTime.now().day + 1)
+                  ? false
+                  : true,
               child: Text(
-                (DateTime.parse(_date).year == DateTime.now().year &&
-                        DateTime.parse(_date).month == DateTime.now().month &&
-                        DateTime.parse(_date).day == DateTime.now().day)
-                    ? "Today"
-                    : (DateTime.parse(_date).year == DateTime.now().year &&
-                            DateTime.parse(_date).month ==
-                                DateTime.now().month &&
-                            DateTime.parse(_date).day == DateTime.now().day + 1)
-                        ? "Tomorrow"
-                        : DateTime.parse(_date).month.toString() +
-                            "/" +
-                            DateTime.parse(_date).day.toString(),
-                style: headerTextStyle,
+                DateTime.parse(_date).month.toString() +
+                    "/" +
+                    DateTime.parse(_date).day.toString(),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300,
+                  color: Colors.white,
+                ),
               ),
-              onTap: () {
-                showDatePicker(
-                  context: context,
-                  initialDate: DateTime.parse(_date),
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime(2120),
-                ).then((date) {
-                  if (date != null) {
-                    setState(() {
-                      _date = getDateString(date);
-                    });
-                    getCompletedTasks();
-                    getTasks();
-                  }
+            ),
+          ),
+        ),
+        Positioned(
+          left: 40,
+          right: 40,
+          top: SizeConfig.safeBlockVertical * 5 - 20,
+          child: GestureDetector(
+            onHorizontalDragEnd: (details) {
+              print(details.velocity.pixelsPerSecond.dx);
+              print(_date);
+              if (details.velocity.pixelsPerSecond.dx > 50) {
+                setState(() {
+                  _loading = true;
+                  _date = getDateString(
+                      DateTime.parse(_date).add(Duration(days: -1)));
                 });
-              }),
+                getCompletedTasks();
+                getTasks();
+                FocusScope.of(context).unfocus();
+              }
+              if (details.velocity.pixelsPerSecond.dx < -50) {
+                setState(() {
+                  _loading = true;
+                  _date = getDateString(
+                      DateTime.parse(_date).add(Duration(days: 1)));
+                });
+                getCompletedTasks();
+                getTasks();
+                FocusScope.of(context).unfocus();
+              }
+            },
+            child: Container(
+              color: Colors.transparent,
+              padding: EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _loading = true;
+                        _date = getDateString(
+                            DateTime.parse(_date).add(Duration(days: -1)));
+                      });
+                      getCompletedTasks();
+                      getTasks();
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: (DateTime.parse(_date).year ==
+                                    DateTime.now().year &&
+                                DateTime.parse(_date).month ==
+                                    DateTime.now().month &&
+                                DateTime.parse(_date).day - 1 ==
+                                    DateTime.now().day)
+                            ? Colors.white
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                      child: Center(
+                        child: Text(
+                            DateTime.parse(_date)
+                                .add(Duration(days: -1))
+                                .day
+                                .toString(),
+                            style: (DateTime.parse(_date).year ==
+                                        DateTime.now().year &&
+                                    DateTime.parse(_date).month ==
+                                        DateTime.now().month &&
+                                    DateTime.parse(_date).day - 1 ==
+                                        DateTime.now().day)
+                                ? todayTextStyle
+                                : dateTextStyle),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      showDatePicker(
+                        context: context,
+                        initialDate: DateTime.parse(_date),
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2120),
+                      ).then((date) {
+                        if (date != null) {
+                          setState(() {
+                            _loading = true;
+                            _date = getDateString(date);
+                          });
+                          getCompletedTasks();
+                          getTasks();
+                        }
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        Text(
+                          (DateTime.parse(_date).year == DateTime.now().year &&
+                                  DateTime.parse(_date).month ==
+                                      DateTime.now().month &&
+                                  DateTime.parse(_date).day ==
+                                      DateTime.now().day)
+                              ? "Today"
+                              : (DateTime.parse(_date).year ==
+                                          DateTime.now().year &&
+                                      DateTime.parse(_date).month ==
+                                          DateTime.now().month &&
+                                      DateTime.parse(_date).day ==
+                                          DateTime.now().day + 1)
+                                  ? "Tomorrow"
+                                  : DateTime.parse(_date).month.toString() +
+                                      "/" +
+                                      DateTime.parse(_date).day.toString(),
+                          style: headerTextStyle,
+                        ),
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _loading = true;
+                        _date = getDateString(
+                            DateTime.parse(_date).add(Duration(days: 1)));
+                      });
+                      getCompletedTasks();
+                      getTasks();
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: (DateTime.parse(_date).year ==
+                                    DateTime.now().year &&
+                                DateTime.parse(_date).month ==
+                                    DateTime.now().month &&
+                                DateTime.parse(_date).day + 1 ==
+                                    DateTime.now().day)
+                            ? Colors.white
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                      child: Center(
+                        child: Text(
+                            DateTime.parse(_date)
+                                .add(Duration(days: 1))
+                                .day
+                                .toString(),
+                            style: (DateTime.parse(_date).year ==
+                                        DateTime.now().year &&
+                                    DateTime.parse(_date).month ==
+                                        DateTime.now().month &&
+                                    DateTime.parse(_date).day + 1 ==
+                                        DateTime.now().day)
+                                ? todayTextStyle
+                                : dateTextStyle),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
         AnimatedOpacity(
           opacity: _loading ? 0 : 1,
@@ -183,14 +364,30 @@ class _TasksPageState extends State<TasksPage> {
           child: Stack(
             children: <Widget>[
               Positioned(
+                right: 28,
+                left: 28,
+                top: SizeConfig.safeBlockVertical * 15 + 15,
+                child: Center(
+                  child: LinearPercentIndicator(
+                    percent: (_tasks.length == null || _tasks.length == 0)
+                        ? 0
+                        : (_completedTasks / _tasks.length),
+                    lineHeight: 25,
+                    progressColor: Theme.of(context).accentColor,
+                    backgroundColor: Theme.of(context).dividerColor,
+                  ),
+                ),
+              ),
+              Positioned(
                 right: 0,
                 left: 0,
-                top: SizeConfig.safeBlockVertical * 15 + 10,
+                top: SizeConfig.safeBlockVertical * 15 + 55,
                 child: SizedBox(
-                  height: _keyboard
+                  height: _editingTask
                       ? SizeConfig.safeBlockVertical * 85 -
-                          MediaQuery.of(context).viewInsets.bottom
-                      : SizeConfig.safeBlockVertical * 85 - 90,
+                          MediaQuery.of(context).viewInsets.bottom -
+                          55
+                      : SizeConfig.safeBlockVertical * 85 - 135,
                   child: ReorderableListView(
                     padding: EdgeInsets.all(0),
                     onReorder: ((oldIndex, newIndex) {
@@ -219,8 +416,9 @@ class _TasksPageState extends State<TasksPage> {
               AnimatedPositioned(
                 duration: keyboardDuration,
                 curve: keyboardCurve,
-                bottom:
-                    _addingTask ? MediaQuery.of(context).viewInsets.bottom : 0,
+                bottom: _addingTask
+                    ? MediaQuery.of(context).viewInsets.bottom
+                    : -150,
                 left: 0,
                 right: 0,
                 child: Offstage(
@@ -339,11 +537,11 @@ class _TasksPageState extends State<TasksPage> {
                 right: 25,
                 bottom: 80,
                 child: Offstage(
-                  offstage: _addingTask || _keyboard,
+                  offstage: _keyboard,
                   child: AnimatedOpacity(
                     duration: keyboardDuration,
                     curve: keyboardCurve,
-                    opacity: (_addingTask || _keyboard) ? 0 : 1,
+                    opacity: _keyboard ? 0 : 1,
                     child: SqrButton(
                       icon: Icon(
                         FeatherIcons.plus,
