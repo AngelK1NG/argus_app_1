@@ -348,7 +348,7 @@ class _TasksPageState extends State<TasksPage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      setDate(DateTime.parse(_date).add(Duration(days: -1)));
+                      setDate(DateTime.parse(_date).add(Duration(days: 1)));
                     },
                     child: Container(
                       width: 40,
