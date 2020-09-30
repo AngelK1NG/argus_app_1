@@ -36,6 +36,8 @@ class _TasksPageState extends State<TasksPage> {
   bool _keyboard = false;
   List<TaskItem> _tasks = [];
   int _completedTasks;
+  String _dateString = 'Today';
+  String _secondaryDateString;
 
   void getCompletedTasks() {
     FirebaseUser user = context.read<User>().user;
@@ -118,14 +120,99 @@ class _TasksPageState extends State<TasksPage> {
     firestoreProvider.updateTasks(_tasks, _date);
   }
 
-  @override
-  void initState() {
-    super.initState();
+  void setDate(DateTime date) {
     setState(() {
-      _date = getDateString(DateTime.now());
+      _loading = true;
+      _date = getDateString(date);
+      if (date.year == DateTime.now().year &&
+          date.month == DateTime.now().month &&
+          date.day == DateTime.now().day) {
+        _dateString = 'Today';
+      } else if (date.year == DateTime.now().year &&
+          date.month == DateTime.now().month &&
+          date.day == DateTime.now().day - 1) {
+        _dateString = 'Yesterday';
+      } else if (date.year == DateTime.now().year &&
+          date.month == DateTime.now().month &&
+          date.day == DateTime.now().day + 1) {
+        _dateString = 'Tomorrow';
+      } else {
+        switch (date.weekday) {
+          case 1: {
+            _dateString = 'Monday';
+            break;
+          }
+          case 2: {
+            _dateString = 'Tuesday';
+            break;
+          }
+          case 3: {
+            _dateString = 'Wednesday';
+            break;
+          }
+          case 4: {
+            _dateString = 'Thursday';
+            break;
+          }
+          case 5: {
+            _dateString = 'Friday';
+            break;
+          }
+          case 6: {
+            _dateString = 'Saturday';
+            break;
+          }
+          case 7: {
+            _dateString = 'Sunday';
+            break;
+          }
+        }
+      }
+      if ((date.year == DateTime.now().year && date.month == DateTime.now().month && date.day == DateTime.now().day) ||
+          (date.year == DateTime.now().year && date.month == DateTime.now().month && date.day == DateTime.now().day - 1) ||
+          (date.year == DateTime.now().year && date.month == DateTime.now().month && date.day == DateTime.now().day + 1)) {
+        switch (date.weekday) {
+          case 1: {
+            _secondaryDateString = 'Mon ' + date.month.toString() + '/' + date.day.toString();
+            break;
+          }
+          case 2: {
+            _secondaryDateString = 'Tue ' + date.month.toString() + '/' + date.day.toString();
+            break;
+          }
+          case 3: {
+            _secondaryDateString = 'Wed ' + date.month.toString() + '/' + date.day.toString();
+            break;
+          }
+          case 4: {
+            _secondaryDateString = 'Thu ' + date.month.toString() + '/' + date.day.toString();
+            break;
+          }
+          case 5: {
+            _secondaryDateString = 'Fri ' + date.month.toString() + '/' + date.day.toString();
+            break;
+          }
+          case 6: {
+            _secondaryDateString = 'Sat ' + date.month.toString() + '/' + date.day.toString();
+            break;
+          }
+          case 7: {
+            _secondaryDateString = 'Sun ' + date.month.toString() + '/' + date.day.toString();
+            break;
+          }
+        }
+      } else {
+        _secondaryDateString = date.month.toString() + '/' + date.day.toString();
+      }
     });
     getCompletedTasks();
     getTasks();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setDate(DateTime.now());
     KeyboardVisibility.onChange.listen((bool visible) {
       if (mounted) {
         setState(() {
@@ -171,54 +258,28 @@ class _TasksPageState extends State<TasksPage> {
           right: 0,
           top: SizeConfig.safeBlockVertical * 5 - 20,
           child: Center(
-            child: Offstage(
-              offstage: (DateTime.parse(_date).year == DateTime.now().year &&
-                          DateTime.parse(_date).month == DateTime.now().month &&
-                          DateTime.parse(_date).day == DateTime.now().day) ||
-                      (DateTime.parse(_date).year == DateTime.now().year &&
-                          DateTime.parse(_date).month == DateTime.now().month &&
-                          DateTime.parse(_date).day == DateTime.now().day + 1)
-                  ? false
-                  : true,
-              child: Text(
-                DateTime.parse(_date).month.toString() +
-                    "/" +
-                    DateTime.parse(_date).day.toString(),
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w300,
-                  color: Colors.white,
-                ),
+            child: Text(
+              _secondaryDateString,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w300,
+                color: Colors.white,
               ),
             ),
           ),
         ),
         Positioned(
-          left: 40,
-          right: 40,
+          left: 5,
+          right: 5,
           top: SizeConfig.safeBlockVertical * 5 - 20,
           child: GestureDetector(
             onHorizontalDragEnd: (details) {
-              print(details.velocity.pixelsPerSecond.dx);
-              print(_date);
               if (details.velocity.pixelsPerSecond.dx > 50) {
-                setState(() {
-                  _loading = true;
-                  _date = getDateString(
-                      DateTime.parse(_date).add(Duration(days: -1)));
-                });
-                getCompletedTasks();
-                getTasks();
+                setDate(DateTime.parse(_date).add(Duration(days: -1)));
                 FocusScope.of(context).unfocus();
               }
               if (details.velocity.pixelsPerSecond.dx < -50) {
-                setState(() {
-                  _loading = true;
-                  _date = getDateString(
-                      DateTime.parse(_date).add(Duration(days: 1)));
-                });
-                getCompletedTasks();
-                getTasks();
+                setDate(DateTime.parse(_date).add(Duration(days: 1)));
                 FocusScope.of(context).unfocus();
               }
             },
@@ -230,13 +291,7 @@ class _TasksPageState extends State<TasksPage> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      setState(() {
-                        _loading = true;
-                        _date = getDateString(
-                            DateTime.parse(_date).add(Duration(days: -1)));
-                      });
-                      getCompletedTasks();
-                      getTasks();
+                      setDate(DateTime.parse(_date).add(Duration(days: -1)));
                     },
                     child: Container(
                       width: 40,
@@ -278,34 +333,14 @@ class _TasksPageState extends State<TasksPage> {
                         lastDate: DateTime(2120),
                       ).then((date) {
                         if (date != null) {
-                          setState(() {
-                            _loading = true;
-                            _date = getDateString(date);
-                          });
-                          getCompletedTasks();
-                          getTasks();
+                          setDate(date);
                         }
                       });
                     },
                     child: Column(
                       children: [
                         Text(
-                          (DateTime.parse(_date).year == DateTime.now().year &&
-                                  DateTime.parse(_date).month ==
-                                      DateTime.now().month &&
-                                  DateTime.parse(_date).day ==
-                                      DateTime.now().day)
-                              ? "Today"
-                              : (DateTime.parse(_date).year ==
-                                          DateTime.now().year &&
-                                      DateTime.parse(_date).month ==
-                                          DateTime.now().month &&
-                                      DateTime.parse(_date).day ==
-                                          DateTime.now().day + 1)
-                                  ? "Tomorrow"
-                                  : DateTime.parse(_date).month.toString() +
-                                      "/" +
-                                      DateTime.parse(_date).day.toString(),
+                          _dateString,
                           style: headerTextStyle,
                         ),
                       ],
@@ -313,13 +348,7 @@ class _TasksPageState extends State<TasksPage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      setState(() {
-                        _loading = true;
-                        _date = getDateString(
-                            DateTime.parse(_date).add(Duration(days: 1)));
-                      });
-                      getCompletedTasks();
-                      getTasks();
+                      setDate(DateTime.parse(_date).add(Duration(days: -1)));
                     },
                     child: Container(
                       width: 40,

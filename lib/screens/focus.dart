@@ -428,7 +428,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     switch (state) {
-      case AppLifecycleState.paused:
+      case AppLifecycleState.paused: {
         if (_doingTask) {
           if (Platform.isAndroid) {
             androidScreenOn().then((value) {
@@ -469,7 +469,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           }
         }
         break;
-      case AppLifecycleState.resumed:
+      }
+      case AppLifecycleState.resumed: {
         if (_screenOn) {
           _secondsDistracted +=
               DateTime.now().difference(_startDistracted).inSeconds;
@@ -479,10 +480,13 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           prefs.setBool('distracted', false);
         }
         break;
-      case AppLifecycleState.inactive:
+      }
+      case AppLifecycleState.inactive: {
         break;
-      case AppLifecycleState.detached:
+      }
+      case AppLifecycleState.detached: {
         break;
+      }
     }
   }
 

@@ -37,7 +37,7 @@ class AuthProvider {
         AppleIdRequest(requestedScopes: [Scope.email, Scope.fullName])
       ]);
       switch (result.status) {
-        case AuthorizationStatus.authorized:
+        case AuthorizationStatus.authorized: {
           final appleIdCredential = result.credential;
           final oAuthProvider = OAuthProvider(providerId: 'apple.com');
           final credential = oAuthProvider.getCredential(
@@ -52,12 +52,14 @@ class AuthProvider {
               '${appleIdCredential.fullName.givenName} ${appleIdCredential.fullName.familyName}';
           await firebaseUser.updateProfile(updateUser);
           return firebaseUser;
-        case AuthorizationStatus.error:
+        }
+        case AuthorizationStatus.error: {
           print(result.error.toString());
           break;
-
-        case AuthorizationStatus.cancelled:
+        }
+        case AuthorizationStatus.cancelled: {
           break;
+        }
       }
       return null;
     }

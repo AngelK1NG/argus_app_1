@@ -49,22 +49,26 @@ class _HomeState extends State<Home> {
     _selectedIndex = index;
     setState(() {
       switch (index) {
-        case 0:
+        case 0: {
           _child = FocusPage(goToPage: goToPage, setDoingTask: setDoingTask);
           _cardPosition = SizeConfig.safeBlockVertical * 36;
           break;
-        case 1:
+        }
+        case 1: {
           _child = TasksPage(goToPage: goToPage);
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
-        case 2:
+        }
+        case 2: {
           _child = StatisticsPage(goToPage: goToPage);
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
-        case 3:
+        }
+        case 3: {
           _child = ProfilePage(goToPage: goToPage);
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
+        }
       }
     });
   }

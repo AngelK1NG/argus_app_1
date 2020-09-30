@@ -60,21 +60,24 @@ class MyApp extends StatelessWidget {
                 ],
                 onGenerateRoute: (routeSettings) {
                   switch (routeSettings.name) {
-                    case '/home':
+                    case '/home': {
                       return PageRouteBuilder(
-                          settings: RouteSettings(name: routeSettings.name),
-                          pageBuilder: (_, a1, a2) => Home());
-                      break;
-                    case '/onboarding':
+                        settings: RouteSettings(name: routeSettings.name),
+                        pageBuilder: (_, a1, a2) => Home(),
+                      );
+                    }
+                    case '/onboarding': {
                       return PageRouteBuilder(
-                          settings: RouteSettings(name: routeSettings.name),
-                          pageBuilder: (_, a1, a2) => Onboarding());
-                      break;
-                    default:
+                        settings: RouteSettings(name: routeSettings.name),
+                        pageBuilder: (_, a1, a2) => Onboarding(),
+                      );
+                    }
+                    default: {
                       return PageRouteBuilder(
-                          settings: RouteSettings(name: routeSettings.name),
-                          pageBuilder: (_, a1, a2) => LoginPage());
-                      break;
+                        settings: RouteSettings(name: routeSettings.name),
+                        pageBuilder: (_, a1, a2) => LoginPage(),
+                      );
+                    }
                   }
                 }),
           ),
