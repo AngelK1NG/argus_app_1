@@ -34,6 +34,7 @@ class _TasksPageState extends State<TasksPage> {
   bool _addingTask = false;
   bool _editingTask = false;
   bool _keyboard = false;
+  String _newTask = '';
   List<TaskItem> _tasks = [];
   int _completedTasks;
   String _dateString = 'Today';
@@ -292,6 +293,7 @@ class _TasksPageState extends State<TasksPage> {
                   GestureDetector(
                     onTap: () {
                       setDate(DateTime.parse(_date).add(Duration(days: -1)));
+                      FocusScope.of(context).unfocus();
                     },
                     child: Container(
                       width: 40,
@@ -326,6 +328,7 @@ class _TasksPageState extends State<TasksPage> {
                   ),
                   GestureDetector(
                     onTap: () {
+                      FocusScope.of(context).unfocus();
                       showDatePicker(
                         context: context,
                         initialDate: DateTime.parse(_date),
@@ -349,6 +352,7 @@ class _TasksPageState extends State<TasksPage> {
                   GestureDetector(
                     onTap: () {
                       setDate(DateTime.parse(_date).add(Duration(days: 1)));
+                      FocusScope.of(context).unfocus();
                     },
                     child: Container(
                       width: 40,
@@ -390,204 +394,253 @@ class _TasksPageState extends State<TasksPage> {
           opacity: _loading ? 0 : 1,
           duration: loadingDuration,
           curve: loadingCurve,
-          child: Stack(
-            children: <Widget>[
-              Positioned(
-                right: 28,
-                left: 28,
-                top: SizeConfig.safeBlockVertical * 15 + 15,
-                child: Center(
-                  child: LinearPercentIndicator(
-                    percent: (_tasks.length == null || _tasks.length == 0)
-                        ? 0
-                        : (_completedTasks / _tasks.length),
-                    lineHeight: 25,
-                    progressColor: Theme.of(context).accentColor,
-                    backgroundColor: Theme.of(context).dividerColor,
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 0,
-                left: 0,
-                top: SizeConfig.safeBlockVertical * 15 + 55,
-                child: SizedBox(
-                  height: _editingTask
-                      ? SizeConfig.safeBlockVertical * 85 -
-                          MediaQuery.of(context).viewInsets.bottom -
-                          55
-                      : SizeConfig.safeBlockVertical * 85 - 135,
-                  child: ReorderableListView(
-                    padding: EdgeInsets.all(0),
-                    onReorder: ((oldIndex, newIndex) {
-                      if (!_tasks[oldIndex].completed) {
-                        List<TaskItem> tasks = _tasks;
-                        if (oldIndex < newIndex) {
-                          newIndex -= 1;
-                        }
-                        final task = tasks.removeAt(oldIndex);
-                        if (newIndex >= tasks.length - _completedTasks) {
-                          int distanceFromEnd = tasks.length - newIndex;
-                          tasks.insert(
-                              newIndex - (_completedTasks - distanceFromEnd),
-                              task);
-                          firestoreProvider.updateTasks(tasks, _date);
-                        } else {
-                          tasks.insert(newIndex, task);
-                          firestoreProvider.updateTasks(tasks, _date);
-                        }
-                      }
-                    }),
-                    children: _tasks,
-                  ),
-                ),
-              ),
-              AnimatedPositioned(
-                duration: keyboardDuration,
-                curve: keyboardCurve,
-                bottom: _addingTask
-                    ? MediaQuery.of(context).viewInsets.bottom
-                    : -150,
-                left: 0,
-                right: 0,
-                child: Offstage(
-                  offstage: !_addingTask,
-                  child: Container(
-                    height: 75,
-                    width: MediaQuery.of(context).size.width,
-                    alignment: Alignment.centerLeft,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(40),
-                        topRight: Radius.circular(40),
+          child: Opacity(
+            opacity: _loading ? 0 : 1,
+            child: Stack(
+              children: <Widget>[
+                Positioned(
+                  right: 28,
+                  left: 28,
+                  top: SizeConfig.safeBlockVertical * 15 + 15,
+                  child: Offstage(
+                    offstage: _tasks.length == 0,
+                    child: Center(
+                      child: LinearPercentIndicator(
+                        percent: (_tasks.length == null || _tasks.length == 0)
+                            ? 0
+                            : (_completedTasks / _tasks.length),
+                        lineHeight: 25,
+                        progressColor: Theme.of(context).accentColor,
+                        backgroundColor: Theme.of(context).dividerColor,
                       ),
-                      color: Color(0xff666666),
-                      boxShadow: [
-                        BoxShadow(
-                          spreadRadius: -5,
-                          blurRadius: 15,
-                        )
-                      ],
                     ),
-                    child: Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 21, right: 11),
-                          child: Icon(
-                            FeatherIcons.plus,
-                            size: 18,
-                            color: Theme.of(context).hintColor,
+                  ),
+                ),
+                Positioned(
+                  right: 80,
+                  left: 80,
+                  top: SizeConfig.safeBlockVertical * 45,
+                  child: Offstage(
+                    offstage: _tasks.length != 0,
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Start fresh.',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 20),
+                            child: Text(
+                              'Got something to do? Add it by tapping the + button.',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  left: 0,
+                  top: SizeConfig.safeBlockVertical * 15 + 55,
+                  child: SizedBox(
+                    height: _editingTask
+                        ? SizeConfig.safeBlockVertical * 85 -
+                            MediaQuery.of(context).viewInsets.bottom -
+                            55
+                        : SizeConfig.safeBlockVertical * 85 - 135,
+                    child: ReorderableListView(
+                      padding: EdgeInsets.all(0),
+                      onReorder: ((oldIndex, newIndex) {
+                        if (!_tasks[oldIndex].completed) {
+                          List<TaskItem> tasks = _tasks;
+                          if (oldIndex < newIndex) {
+                            newIndex -= 1;
+                          }
+                          final task = tasks.removeAt(oldIndex);
+                          if (newIndex >= tasks.length - _completedTasks) {
+                            int distanceFromEnd = tasks.length - newIndex;
+                            tasks.insert(
+                                newIndex - (_completedTasks - distanceFromEnd),
+                                task);
+                            firestoreProvider.updateTasks(tasks, _date);
+                          } else {
+                            tasks.insert(newIndex, task);
+                            firestoreProvider.updateTasks(tasks, _date);
+                          }
+                        }
+                      }),
+                      children: _tasks,
+                    ),
+                  ),
+                ),
+                AnimatedPositioned(
+                  duration: keyboardDuration,
+                  curve: keyboardCurve,
+                  bottom: _addingTask
+                      ? MediaQuery.of(context).viewInsets.bottom
+                      : -150,
+                  left: 0,
+                  right: 0,
+                  child: Offstage(
+                    offstage: !_addingTask,
+                    child: AnimatedContainer(
+                      duration: loadingDuration,
+                      curve: loadingCurve,
+                      height: 75,
+                      width: MediaQuery.of(context).size.width,
+                      alignment: Alignment.centerLeft,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(40),
+                          topRight: Radius.circular(40),
                         ),
-                        Container(
-                          alignment: Alignment.center,
-                          width: MediaQuery.of(context).size.width - 75,
-                          child: Focus(
-                            onFocusChange: (focus) {
-                              if (!focus) {
-                                setState(() {
-                                  _addingTask = false;
-                                });
-                              }
-                            },
-                            child: Form(
-                              key: _formKey,
-                              child: TextFormField(
-                                focusNode: _focus,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "Add task...",
-                                ),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white,
-                                ),
-                                autofocus: false,
-                                onFieldSubmitted: (value) async {
-                                  if (value.isNotEmpty) {
-                                    HapticFeedback.heavyImpact();
-                                    TaskItem newTask = TaskItem(
-                                      id: '',
-                                      name: value,
-                                      completed: false,
-                                      paused: false,
-                                      key: UniqueKey(),
-                                      order: _tasks.length - _completedTasks,
-                                      date: _date,
-                                    );
-                                    newTask.onDismissed = () {
-                                      removeTask(newTask);
-                                      AnalyticsProvider().logDeleteTask(
-                                          newTask, DateTime.now());
-                                    };
-                                    newTask.onUpdate =
-                                        (value) => newTask.name = value;
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            spreadRadius: -5,
+                            blurRadius: 15,
+                            color: _newTask == '' ? jetBlack : Theme.of(context).accentColor,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 21, right: 11),
+                            child: Icon(
+                              FeatherIcons.plus,
+                              size: 18,
+                              color: Theme.of(context).hintColor,
+                            ),
+                          ),
+                          Container(
+                            alignment: Alignment.center,
+                            width: MediaQuery.of(context).size.width - 75,
+                            child: Focus(
+                              onFocusChange: (focus) {
+                                if (!focus) {
+                                  setState(() {
+                                    _addingTask = false;
+                                  });
+                                }
+                              },
+                              child: Form(
+                                key: _formKey,
+                                child: TextFormField(
+                                  focusNode: _focus,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "Add task...",
+                                  ),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: jetBlack,
+                                  ),
+                                  autofocus: false,
+                                  onChanged: (value) {
                                     setState(() {
-                                      _tasks.insert(
-                                          _tasks.length - _completedTasks,
-                                          newTask);
+                                      _newTask = value;
                                     });
-                                    String userId = user.uid;
-                                    db
-                                        .collection('users')
-                                        .document(userId)
-                                        .collection('tasks')
-                                        .document(_date)
-                                        .collection('tasks')
-                                        .add({
-                                      'name': newTask.name,
-                                      'order': newTask.order,
-                                      'completed': newTask.completed,
-                                      'paused': newTask.paused,
-                                    }).then((doc) {
-                                      _tasks[_tasks.length -
-                                              _completedTasks -
-                                              1]
-                                          .id = doc.documentID;
-                                      firestoreProvider.updateTasks(
-                                          _tasks, _date);
-                                    });
-                                    _formKey.currentState.reset();
-                                    AnalyticsProvider()
-                                        .logAddTask(newTask, DateTime.now());
-                                  }
-                                },
+                                  },
+                                  onFieldSubmitted: (value) async {
+                                    if (value.isNotEmpty) {
+                                      HapticFeedback.heavyImpact();
+                                      TaskItem newTask = TaskItem(
+                                        id: '',
+                                        name: value,
+                                        completed: false,
+                                        paused: false,
+                                        key: UniqueKey(),
+                                        order: _tasks.length - _completedTasks,
+                                        date: _date,
+                                      );
+                                      newTask.onDismissed = () {
+                                        removeTask(newTask);
+                                        AnalyticsProvider().logDeleteTask(
+                                            newTask, DateTime.now());
+                                      };
+                                      newTask.onUpdate =
+                                          (value) => newTask.name = value;
+                                      setState(() {
+                                        _tasks.insert(
+                                            _tasks.length - _completedTasks,
+                                            newTask);
+                                      });
+                                      String userId = user.uid;
+                                      db
+                                          .collection('users')
+                                          .document(userId)
+                                          .collection('tasks')
+                                          .document(_date)
+                                          .collection('tasks')
+                                          .add({
+                                        'name': newTask.name,
+                                        'order': newTask.order,
+                                        'completed': newTask.completed,
+                                        'paused': newTask.paused,
+                                      }).then((doc) {
+                                        _tasks[_tasks.length -
+                                                _completedTasks -
+                                                1]
+                                            .id = doc.documentID;
+                                        firestoreProvider.updateTasks(
+                                            _tasks, _date);
+                                      });
+                                      _formKey.currentState.reset();
+                                      setState(() {
+                                        _newTask = '';
+                                      });
+                                      AnalyticsProvider()
+                                          .logAddTask(newTask, DateTime.now());
+                                    }
+                                  },
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 25,
-                bottom: 80,
-                child: Offstage(
-                  offstage: _keyboard,
-                  child: AnimatedOpacity(
-                    duration: keyboardDuration,
-                    curve: keyboardCurve,
-                    opacity: _keyboard ? 0 : 1,
-                    child: SqrButton(
-                      icon: Icon(
-                        FeatherIcons.plus,
-                        color: Colors.white,
-                        size: 24,
+                        ],
                       ),
-                      onTap: () {
-                        setState(() {
-                          _addingTask = true;
-                        });
-                        FocusScope.of(context).requestFocus(_focus);
-                      },
                     ),
                   ),
                 ),
-              ),
-            ],
+                Positioned(
+                  right: 25,
+                  bottom: 80,
+                  child: Offstage(
+                    offstage: _keyboard,
+                    child: AnimatedOpacity(
+                      duration: keyboardDuration,
+                      curve: keyboardCurve,
+                      opacity: _keyboard ? 0 : 1,
+                      child: SqrButton(
+                        icon: Icon(
+                          FeatherIcons.plus,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _addingTask = true;
+                          });
+                          FocusScope.of(context).requestFocus(_focus);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ]),

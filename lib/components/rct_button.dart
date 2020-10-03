@@ -78,4 +78,3 @@ class RctButton extends StatelessWidget {
     );
   }
 }
-

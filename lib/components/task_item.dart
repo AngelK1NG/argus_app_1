@@ -139,7 +139,7 @@ class _TaskItemState extends State<TaskItem> {
                           },
                           validator: (value) {
                             return value.isEmpty
-                                ? 'You cannot add an empty task'
+                                ? 'A task cannot be empty'
                                 : null;
                           },
                         ),
