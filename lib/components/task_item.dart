@@ -119,12 +119,18 @@ class _TaskItemState extends State<TaskItem> {
                           decoration: InputDecoration(
                             border: InputBorder.none,
                           ),
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: widget.paused
-                                  ? Theme.of(context).accentColor
-                                  : jetBlack),
+                          style: widget.completed
+                              ? TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  decoration: TextDecoration.lineThrough,
+                                  color: Theme.of(context).hintColor)
+                              : TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  color: widget.paused
+                                      ? Theme.of(context).accentColor
+                                      : jetBlack),
                           initialValue: widget.name,
                           autofocus: true,
                           enabled: _active,
