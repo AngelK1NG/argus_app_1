@@ -83,7 +83,7 @@ class _TaskItemState extends State<TaskItem> {
           ),
         ),
         key: UniqueKey(),
-        direction: DismissDirection.horizontal,
+        direction: widget.completed ? DismissDirection.endToStart : DismissDirection.horizontal,
         onDismissed: widget.onDismissed,
         child: GestureDetector(
           onTap: () {
