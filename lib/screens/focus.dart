@@ -386,14 +386,14 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           .collection('tasks')
           .document(_date);
       dateDoc.get().then((snapshot) {
-        if (snapshot.data == null ||
-            snapshot.data['totalTasks'] == null ||
-            snapshot.data['completedTasks'] == null) {
-          _completedTasks = 0;
-          _totalTasks = 0;
+        if (snapshot.data == null) {
           dateDoc.setData({
             'completedTasks': 0,
             'totalTasks': 0,
+            'secondsFocused': 0,
+            'secondsDistracted': 0,
+            'numDistracted': 0,
+            'numPaused': 0,
           }).then((_) {
             dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
               if (mounted) {
@@ -642,7 +642,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                     _tasks = [];
                     final data = snapshot.data.documents;
                     for (var task in data) {
-                      TaskItem actionItem = TaskItem(
+                      TaskItem newTask = TaskItem(
                         name: task.data['name'],
                         id: task.documentID,
                         completed: task.data['completed'],
@@ -655,14 +655,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                         numDistracted: task.data['numDistracted'],
                         numPaused: task.data['numPaused'],
                         key: UniqueKey(),
-                        onDismissed: () {
-                          _tasks.remove(_tasks.firstWhere(
-                              (tasku) => tasku.id == task.documentID));
-                          _firestoreProvider.updateTasks(_tasks, _date);
-                        },
                         date: _date,
                       );
-                      _tasks.add(actionItem);
+                      _tasks.add(newTask);
                     }
                     if (areTasksCompleted()) {
                       return Stack(

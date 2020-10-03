@@ -62,6 +62,16 @@ class AnalyticsProvider {
     );
   }
 
+  void logDeferTask(TaskItem task, DateTime time) {
+    analytics.logEvent(
+      name: 'defer_task',
+      parameters: <String, dynamic>{
+        'name': task.name,
+        'time': time.hour.toString().padLeft(2, '0') + ':' + time.minute.toString().padLeft(2, '0'),
+      },
+    );
+  }
+
   void logDeleteTask(TaskItem task, DateTime time) {
     analytics.logEvent(
       name: 'delete_task',

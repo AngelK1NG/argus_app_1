@@ -1,4 +1,5 @@
 import 'package:Focal/utils/user.dart';
+import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:Focal/utils/size_config.dart';
@@ -13,7 +14,7 @@ class TaskItem extends StatefulWidget {
   bool paused;
   bool newTask;
   int order;
-  VoidCallback onDismissed;
+  Function onDismissed;
   Function onUpdate;
   String date;
   int secondsFocused;
@@ -61,10 +62,29 @@ class _TaskItemState extends State<TaskItem> {
         FirestoreProvider(Provider.of<User>(context, listen: false).user);
     return Container(
       child: Dismissible(
-        background: Container(color: Colors.red),
+        background: Container(
+          color: Theme.of(context).accentColor,
+          padding: EdgeInsets.only(left: 20),
+          alignment: AlignmentDirectional.centerStart,
+          child: Icon(
+            FeatherIcons.sunrise,
+            color: Colors.white,
+            size: 20,
+          ),
+        ),
+        secondaryBackground: Container(
+          color: Colors.red,
+          padding: EdgeInsets.only(right: 20),
+          alignment: AlignmentDirectional.centerEnd,
+          child: Icon(
+            FeatherIcons.trash,
+            color: Colors.white,
+            size: 20,
+          ),
+        ),
         key: UniqueKey(),
         direction: DismissDirection.horizontal,
-        onDismissed: (direction) => widget.onDismissed(),
+        onDismissed: widget.onDismissed,
         child: GestureDetector(
           onTap: () {
             setState(() {

@@ -36,6 +36,7 @@ class _TasksPageState extends State<TasksPage> {
   bool _keyboard = false;
   String _newTask = '';
   List<TaskItem> _tasks = [];
+  List<TaskItem> _tmrTasks = [];
   int _completedTasks;
   String _dateString = 'Today';
   String _secondaryDateString;
@@ -50,10 +51,6 @@ class _TasksPageState extends State<TasksPage> {
     dateDoc.get().then((snapshot) {
       if (snapshot.data == null) {
         _completedTasks = 0;
-        dateDoc.setData({
-          'completedTasks': 0,
-          'totalTasks': 0,
-        });
       } else {
         setState(() {
           _completedTasks = snapshot.data['completedTasks'];
@@ -89,9 +86,14 @@ class _TasksPageState extends State<TasksPage> {
           key: UniqueKey(),
           date: _date,
         );
-        newTask.onDismissed = () {
-          removeTask(newTask);
-          AnalyticsProvider().logDeleteTask(newTask, DateTime.now());
+        newTask.onDismissed = (direction) {
+          if (direction == DismissDirection.startToEnd) {
+            deferTask(newTask);
+            AnalyticsProvider().logDeferTask(newTask, DateTime.now());
+          } else {
+            deleteTask(newTask);
+            AnalyticsProvider().logDeleteTask(newTask, DateTime.now());
+          }
         };
         newTask.onUpdate = (value) => newTask.name = value;
         setState(() {
@@ -108,7 +110,60 @@ class _TasksPageState extends State<TasksPage> {
     });
   }
 
-  void removeTask(TaskItem task) {
+  void deferTask(TaskItem task) {
+    FirestoreProvider firestoreProvider =
+        FirestoreProvider(Provider.of<User>(context, listen: false).user);
+    setState(() {
+      _tasks.remove(_tasks.firstWhere((tasku) => tasku.id == task.id));
+      if (task.completed) {
+        _completedTasks--;
+      }
+    });
+    firestoreProvider.deleteTask(task, _date);
+    firestoreProvider.updateTasks(_tasks, _date);
+    String tomorrow =
+        getDateString(DateTime.parse(_date).add(Duration(days: 1)));
+
+    _tmrTasks = [];
+    int completedTasks = 0;
+    FirebaseUser user = context.read<User>().user;
+    db
+        .collection('users')
+        .document(user.uid)
+        .collection('tasks')
+        .document(tomorrow)
+        .collection('tasks')
+        .orderBy('order')
+        .getDocuments()
+        .then((snapshot) async {
+      snapshot.documents.forEach((task) {
+        String name = task.data['name'];
+        TaskItem newTask = TaskItem(
+          name: name,
+          id: task.documentID,
+          completed: task.data['completed'],
+          paused: task.data['paused'] == null ? false : task.data['paused'],
+          order: task.data['order'],
+          secondsFocused: task.data['secondsFocused'],
+          secondsDistracted: task.data['secondsDistracted'],
+          numDistracted: task.data['numDistracted'],
+          numPaused: task.data['numPaused'],
+          key: UniqueKey(),
+          date: tomorrow,
+        );
+        _tmrTasks.add(newTask);
+        if (newTask.completed) {
+          completedTasks++;
+        }
+      });
+      _tmrTasks.insert(_tmrTasks.length - completedTasks, task);
+      _tmrTasks[_tmrTasks.length - completedTasks - 1].id =
+          await firestoreProvider.addTask(task, tomorrow);
+      firestoreProvider.updateTasks(_tmrTasks, tomorrow);
+    });
+  }
+
+  void deleteTask(TaskItem task) {
     FirestoreProvider firestoreProvider =
         FirestoreProvider(Provider.of<User>(context, listen: false).user);
     setState(() {
@@ -139,71 +194,99 @@ class _TasksPageState extends State<TasksPage> {
         _dateString = 'Tomorrow';
       } else {
         switch (date.weekday) {
-          case 1: {
-            _dateString = 'Monday';
-            break;
-          }
-          case 2: {
-            _dateString = 'Tuesday';
-            break;
-          }
-          case 3: {
-            _dateString = 'Wednesday';
-            break;
-          }
-          case 4: {
-            _dateString = 'Thursday';
-            break;
-          }
-          case 5: {
-            _dateString = 'Friday';
-            break;
-          }
-          case 6: {
-            _dateString = 'Saturday';
-            break;
-          }
-          case 7: {
-            _dateString = 'Sunday';
-            break;
-          }
+          case 1:
+            {
+              _dateString = 'Monday';
+              break;
+            }
+          case 2:
+            {
+              _dateString = 'Tuesday';
+              break;
+            }
+          case 3:
+            {
+              _dateString = 'Wednesday';
+              break;
+            }
+          case 4:
+            {
+              _dateString = 'Thursday';
+              break;
+            }
+          case 5:
+            {
+              _dateString = 'Friday';
+              break;
+            }
+          case 6:
+            {
+              _dateString = 'Saturday';
+              break;
+            }
+          case 7:
+            {
+              _dateString = 'Sunday';
+              break;
+            }
         }
       }
-      if ((date.year == DateTime.now().year && date.month == DateTime.now().month && date.day == DateTime.now().day) ||
-          (date.year == DateTime.now().year && date.month == DateTime.now().month && date.day == DateTime.now().day - 1) ||
-          (date.year == DateTime.now().year && date.month == DateTime.now().month && date.day == DateTime.now().day + 1)) {
+      if ((date.year == DateTime.now().year &&
+              date.month == DateTime.now().month &&
+              date.day == DateTime.now().day) ||
+          (date.year == DateTime.now().year &&
+              date.month == DateTime.now().month &&
+              date.day == DateTime.now().day - 1) ||
+          (date.year == DateTime.now().year &&
+              date.month == DateTime.now().month &&
+              date.day == DateTime.now().day + 1)) {
         switch (date.weekday) {
-          case 1: {
-            _secondaryDateString = 'Mon ' + date.month.toString() + '/' + date.day.toString();
-            break;
-          }
-          case 2: {
-            _secondaryDateString = 'Tue ' + date.month.toString() + '/' + date.day.toString();
-            break;
-          }
-          case 3: {
-            _secondaryDateString = 'Wed ' + date.month.toString() + '/' + date.day.toString();
-            break;
-          }
-          case 4: {
-            _secondaryDateString = 'Thu ' + date.month.toString() + '/' + date.day.toString();
-            break;
-          }
-          case 5: {
-            _secondaryDateString = 'Fri ' + date.month.toString() + '/' + date.day.toString();
-            break;
-          }
-          case 6: {
-            _secondaryDateString = 'Sat ' + date.month.toString() + '/' + date.day.toString();
-            break;
-          }
-          case 7: {
-            _secondaryDateString = 'Sun ' + date.month.toString() + '/' + date.day.toString();
-            break;
-          }
+          case 1:
+            {
+              _secondaryDateString =
+                  'Mon ' + date.month.toString() + '/' + date.day.toString();
+              break;
+            }
+          case 2:
+            {
+              _secondaryDateString =
+                  'Tue ' + date.month.toString() + '/' + date.day.toString();
+              break;
+            }
+          case 3:
+            {
+              _secondaryDateString =
+                  'Wed ' + date.month.toString() + '/' + date.day.toString();
+              break;
+            }
+          case 4:
+            {
+              _secondaryDateString =
+                  'Thu ' + date.month.toString() + '/' + date.day.toString();
+              break;
+            }
+          case 5:
+            {
+              _secondaryDateString =
+                  'Fri ' + date.month.toString() + '/' + date.day.toString();
+              break;
+            }
+          case 6:
+            {
+              _secondaryDateString =
+                  'Sat ' + date.month.toString() + '/' + date.day.toString();
+              break;
+            }
+          case 7:
+            {
+              _secondaryDateString =
+                  'Sun ' + date.month.toString() + '/' + date.day.toString();
+              break;
+            }
         }
       } else {
-        _secondaryDateString = date.month.toString() + '/' + date.day.toString();
+        _secondaryDateString =
+            date.month.toString() + '/' + date.day.toString();
       }
     });
     getCompletedTasks();
@@ -509,7 +592,9 @@ class _TasksPageState extends State<TasksPage> {
                           BoxShadow(
                             spreadRadius: -5,
                             blurRadius: 15,
-                            color: _newTask == '' ? jetBlack : Theme.of(context).accentColor,
+                            color: _newTask == ''
+                                ? jetBlack
+                                : Theme.of(context).accentColor,
                           ),
                         ],
                       ),
@@ -565,10 +650,17 @@ class _TasksPageState extends State<TasksPage> {
                                         order: _tasks.length - _completedTasks,
                                         date: _date,
                                       );
-                                      newTask.onDismissed = () {
-                                        removeTask(newTask);
-                                        AnalyticsProvider().logDeleteTask(
-                                            newTask, DateTime.now());
+                                      newTask.onDismissed = (direction) {
+                                        if (direction ==
+                                            DismissDirection.startToEnd) {
+                                          deferTask(newTask);
+                                          AnalyticsProvider().logDeferTask(
+                                              newTask, DateTime.now());
+                                        } else {
+                                          deleteTask(newTask);
+                                          AnalyticsProvider().logDeleteTask(
+                                              newTask, DateTime.now());
+                                        }
                                       };
                                       newTask.onUpdate =
                                           (value) => newTask.name = value;
@@ -577,26 +669,12 @@ class _TasksPageState extends State<TasksPage> {
                                             _tasks.length - _completedTasks,
                                             newTask);
                                       });
-                                      String userId = user.uid;
-                                      db
-                                          .collection('users')
-                                          .document(userId)
-                                          .collection('tasks')
-                                          .document(_date)
-                                          .collection('tasks')
-                                          .add({
-                                        'name': newTask.name,
-                                        'order': newTask.order,
-                                        'completed': newTask.completed,
-                                        'paused': newTask.paused,
-                                      }).then((doc) {
-                                        _tasks[_tasks.length -
-                                                _completedTasks -
-                                                1]
-                                            .id = doc.documentID;
-                                        firestoreProvider.updateTasks(
-                                            _tasks, _date);
-                                      });
+                                      _tasks[_tasks.length -
+                                                  _completedTasks -
+                                                  1]
+                                              .id =
+                                          await firestoreProvider.addTask(
+                                              newTask, _date);
                                       _formKey.currentState.reset();
                                       setState(() {
                                         _newTask = '';
