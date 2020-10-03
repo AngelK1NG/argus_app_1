@@ -111,6 +111,8 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   void deferTask(TaskItem task) {
+    final date = _date;
+    final tasks = _tasks;
     FirestoreProvider firestoreProvider =
         FirestoreProvider(Provider.of<User>(context, listen: false).user);
     setState(() {
@@ -123,7 +125,6 @@ class _TasksPageState extends State<TasksPage> {
     firestoreProvider.updateTasks(_tasks, _date);
     String tomorrow =
         getDateString(DateTime.parse(_date).add(Duration(days: 1)));
-
     _tmrTasks = [];
     int completedTasks = 0;
     FirebaseUser user = context.read<User>().user;
@@ -160,10 +161,43 @@ class _TasksPageState extends State<TasksPage> {
       _tmrTasks[_tmrTasks.length - completedTasks - 1].id =
           await firestoreProvider.addTask(task, tomorrow);
       firestoreProvider.updateTasks(_tmrTasks, tomorrow);
+      Scaffold.of(context).showSnackBar(SnackBar(
+        padding: EdgeInsets.only(left: 16, top: 10, bottom: 10),
+        content: Text(task.name + ' has been deferred to tomorrow'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () async {
+            _tmrTasks.remove(_tmrTasks.firstWhere((tasku) => tasku.id == task.id));
+            firestoreProvider.deleteTask(task, tomorrow);
+            firestoreProvider.updateTasks(_tmrTasks, tomorrow);
+            if (date == _date) {
+              setState(() {
+                _tasks.insert(
+                    task.order - 1,
+                    task);
+                if (task.completed) {
+                  _completedTasks++;
+                }
+              });
+              await firestoreProvider.addTask(task, _date);
+              firestoreProvider.updateTasks(_tasks, _date);
+            } else {
+              tasks.insert(
+                  task.order - 1,
+                  task);
+              await firestoreProvider.addTask(task, date);
+              firestoreProvider.updateTasks(tasks, date);
+              getTasks();
+            }
+          },
+        ),
+      ));
     });
   }
 
   void deleteTask(TaskItem task) {
+    final date = _date;
+    final tasks = _tasks;
     FirestoreProvider firestoreProvider =
         FirestoreProvider(Provider.of<User>(context, listen: false).user);
     setState(() {
@@ -174,6 +208,34 @@ class _TasksPageState extends State<TasksPage> {
     });
     firestoreProvider.deleteTask(task, _date);
     firestoreProvider.updateTasks(_tasks, _date);
+    Scaffold.of(context).showSnackBar(SnackBar(
+      padding: EdgeInsets.only(left: 16, top: 10, bottom: 10),
+      content: Text(task.name + ' has been deleted'),
+      action: SnackBarAction(
+        label: 'Undo',
+        onPressed: () async {
+          if (date == _date) {
+            setState(() {
+              _tasks.insert(
+                  task.order - 1,
+                  task);
+              if (task.completed) {
+                _completedTasks++;
+              }
+            });
+            await firestoreProvider.addTask(task, _date);
+            firestoreProvider.updateTasks(_tasks, _date);
+          } else {
+            tasks.insert(
+                task.order - 1,
+                task);
+            await firestoreProvider.addTask(task, date);
+            firestoreProvider.updateTasks(tasks, date);
+            getTasks();
+          }
+        },
+      ),
+    ));
   }
 
   void setDate(DateTime date) {
@@ -642,12 +704,11 @@ class _TasksPageState extends State<TasksPage> {
                                     if (value.isNotEmpty) {
                                       HapticFeedback.heavyImpact();
                                       TaskItem newTask = TaskItem(
-                                        id: '',
                                         name: value,
                                         completed: false,
                                         paused: false,
                                         key: UniqueKey(),
-                                        order: _tasks.length - _completedTasks,
+                                        order: _tasks.length - _completedTasks + 1,
                                         date: _date,
                                       );
                                       newTask.onDismissed = (direction) {
@@ -669,10 +730,7 @@ class _TasksPageState extends State<TasksPage> {
                                             _tasks.length - _completedTasks,
                                             newTask);
                                       });
-                                      _tasks[_tasks.length -
-                                                  _completedTasks -
-                                                  1]
-                                              .id =
+                                      _tasks[_tasks.length - _completedTasks - 1].id =
                                           await firestoreProvider.addTask(
                                               newTask, _date);
                                       _formKey.currentState.reset();

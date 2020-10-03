@@ -64,7 +64,7 @@ class _TaskItemState extends State<TaskItem> {
       child: Dismissible(
         background: Container(
           color: Theme.of(context).accentColor,
-          padding: EdgeInsets.only(left: 20),
+          padding: EdgeInsets.only(left: 25),
           alignment: AlignmentDirectional.centerStart,
           child: Icon(
             FeatherIcons.sunrise,
@@ -74,7 +74,7 @@ class _TaskItemState extends State<TaskItem> {
         ),
         secondaryBackground: Container(
           color: Colors.red,
-          padding: EdgeInsets.only(right: 20),
+          padding: EdgeInsets.only(right: 25),
           alignment: AlignmentDirectional.centerEnd,
           child: Icon(
             FeatherIcons.trash,

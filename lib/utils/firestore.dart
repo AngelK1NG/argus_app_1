@@ -89,43 +89,82 @@ class FirestoreProvider {
 
   // add task
   Future<String> addTask(TaskItem task, String date) async {
-    String taskId;
     String userId = user.uid;
-    await db
-        .collection('users')
-        .document(userId)
-        .collection('tasks')
-        .document(date)
-        .collection('tasks')
-        .add({
-      'name': task.name,
-      'order': task.order,
-      'secondsFocused': task.secondsFocused,
-      'secondsDistracted': task.secondsDistracted,
-      'numDistracted': task.numDistracted,
-      'numPaused': task.numPaused,
-      'completed': task.completed,
-      'paused': task.paused,
-    }).then((doc) {
-      taskId = doc.documentID;
-      DocumentReference dateDoc = db
-        .collection('users')
-        .document(user.uid)
-        .collection('tasks')
-        .document(date);
-      dateDoc.setData({
-        'secondsFocused': FieldValue.increment(
-            task.secondsFocused == null ? 0 : task.secondsFocused),
-        'secondsDistracted': FieldValue.increment(
-            task.secondsDistracted == null ? 0 : task.secondsDistracted),
-        'numDistracted': FieldValue.increment(
-            task.numDistracted == null ? 0 : task.numDistracted),
-        'numPaused':
-            FieldValue.increment(task.numPaused == null ? 0 : task.numPaused),
-        'completedTasks': FieldValue.increment(0),
-        'totalTasks': FieldValue.increment(1),
-      }, merge: true);
-    });
+    String taskId;
+    if (task.id != null) {
+      taskId = task.id;
+      await db
+          .collection('users')
+          .document(userId)
+          .collection('tasks')
+          .document(date)
+          .collection('tasks')
+          .document(task.id)
+          .setData({
+        'name': task.name,
+        'order': task.order,
+        'secondsFocused': task.secondsFocused,
+        'secondsDistracted': task.secondsDistracted,
+        'numDistracted': task.numDistracted,
+        'numPaused': task.numPaused,
+        'completed': task.completed,
+        'paused': task.paused,
+      }).then((doc) {
+        DocumentReference dateDoc = db
+          .collection('users')
+          .document(user.uid)
+          .collection('tasks')
+          .document(date);
+        dateDoc.setData({
+          'secondsFocused': FieldValue.increment(
+              task.secondsFocused == null ? 0 : task.secondsFocused),
+          'secondsDistracted': FieldValue.increment(
+              task.secondsDistracted == null ? 0 : task.secondsDistracted),
+          'numDistracted': FieldValue.increment(
+              task.numDistracted == null ? 0 : task.numDistracted),
+          'numPaused':
+              FieldValue.increment(task.numPaused == null ? 0 : task.numPaused),
+          'completedTasks': FieldValue.increment(0),
+          'totalTasks': FieldValue.increment(1),
+        }, merge: true);
+      });
+    } else {
+      await db
+          .collection('users')
+          .document(userId)
+          .collection('tasks')
+          .document(date)
+          .collection('tasks')
+          .add({
+        'name': task.name,
+        'order': task.order,
+        'secondsFocused': task.secondsFocused,
+        'secondsDistracted': task.secondsDistracted,
+        'numDistracted': task.numDistracted,
+        'numPaused': task.numPaused,
+        'completed': task.completed,
+        'paused': task.paused,
+      }).then((doc) {
+        taskId = doc.documentID;
+        DocumentReference dateDoc = db
+          .collection('users')
+          .document(user.uid)
+          .collection('tasks')
+          .document(date);
+        dateDoc.setData({
+          'secondsFocused': FieldValue.increment(
+              task.secondsFocused == null ? 0 : task.secondsFocused),
+          'secondsDistracted': FieldValue.increment(
+              task.secondsDistracted == null ? 0 : task.secondsDistracted),
+          'numDistracted': FieldValue.increment(
+              task.numDistracted == null ? 0 : task.numDistracted),
+          'numPaused':
+              FieldValue.increment(task.numPaused == null ? 0 : task.numPaused),
+          'completedTasks': FieldValue.increment(0),
+          'totalTasks': FieldValue.increment(1),
+        }, merge: true);
+      });
+    }
     return taskId;
   }
 
