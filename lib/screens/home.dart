@@ -77,7 +77,9 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     KeyboardVisibility.onChange.listen((bool visible) {
-      setNav(!visible);
+      if (mounted) {
+        setNav(!visible);
+      }
     });
   }
 

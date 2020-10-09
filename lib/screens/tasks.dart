@@ -120,6 +120,7 @@ class _TasksPageState extends State<TasksPage> {
         _completedTasks--;
       }
     });
+    updateTaskOrder();
     firestoreProvider.deleteTask(task, _date);
     firestoreProvider.updateTasks(_tasks, _date);
     String tomorrow =
@@ -155,7 +156,7 @@ class _TasksPageState extends State<TasksPage> {
         if (newTask.completed) {
           completedTasks++;
         }
-      });
+      }); 
       _tmrTasks.insert(_tmrTasks.length - completedTasks, task);
       _tmrTasks[_tmrTasks.length - completedTasks - 1].id =
           await firestoreProvider.addTask(task, tomorrow);
@@ -178,6 +179,7 @@ class _TasksPageState extends State<TasksPage> {
                   _completedTasks++;
                 }
               });
+              updateTaskOrder();
               await firestoreProvider.addTask(task, _date);
               firestoreProvider.updateTasks(_tasks, _date);
             } else {
@@ -205,6 +207,7 @@ class _TasksPageState extends State<TasksPage> {
         _completedTasks--;
       }
     });
+    updateTaskOrder();
     firestoreProvider.deleteTask(task, _date);
     firestoreProvider.updateTasks(_tasks, _date);
     Scaffold.of(context).showSnackBar(SnackBar(
@@ -222,6 +225,7 @@ class _TasksPageState extends State<TasksPage> {
                 _completedTasks++;
               }
             });
+            updateTaskOrder();
             await firestoreProvider.addTask(task, _date);
             firestoreProvider.updateTasks(_tasks, _date);
           } else {
@@ -352,6 +356,12 @@ class _TasksPageState extends State<TasksPage> {
     });
     getCompletedTasks();
     getTasks();
+  }
+
+  void updateTaskOrder() {
+    for (TaskItem task in _tasks) {
+      task.order = _tasks.indexOf(task) + 1;
+    }
   }
 
   @override
@@ -625,6 +635,7 @@ class _TasksPageState extends State<TasksPage> {
                             tasks.insert(newIndex, task);
                             firestoreProvider.updateTasks(tasks, _date);
                           }
+                          updateTaskOrder();
                         }
                       }),
                       children: _tasks,
