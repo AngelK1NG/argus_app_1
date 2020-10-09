@@ -21,7 +21,11 @@ class SqrButton extends StatelessWidget {
         height: 60,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Theme.of(context).accentColor,
+          gradient: LinearGradient(
+            colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
           borderRadius: BorderRadius.all(Radius.circular(30)),
         ),
         child: icon,

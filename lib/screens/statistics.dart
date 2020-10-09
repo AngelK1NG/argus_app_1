@@ -141,7 +141,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           width: SizeConfig.safeBlockHorizontal * 50 - 25,
                           decoration: BoxDecoration(
                               color: _timeFrame == 'today'
-                                  ? Theme.of(context).accentColor
+                                  ? Theme.of(context).primaryColor
                                   : Theme.of(context).dividerColor,
                               borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(15),
@@ -153,8 +153,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                 fontSize: 11,
                                 color: _timeFrame == 'today'
                                     ? Colors.white
-                                    : Theme.of(context).accentColor,
-                                fontWeight: FontWeight.w500,
+                                    : Theme.of(context).primaryColor,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -173,7 +173,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           width: SizeConfig.safeBlockHorizontal * 50 - 25,
                           decoration: BoxDecoration(
                               color: _timeFrame == 'week'
-                                  ? Theme.of(context).accentColor
+                                  ? Theme.of(context).primaryColor
                                   : Theme.of(context).dividerColor,
                               borderRadius: BorderRadius.only(
                                   topRight: Radius.circular(15),
@@ -185,8 +185,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                 fontSize: 11,
                                 color: _timeFrame == 'week'
                                     ? Colors.white
-                                    : Theme.of(context).accentColor,
-                                fontWeight: FontWeight.w500,
+                                    : Theme.of(context).primaryColor,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),

@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
                   textSelectionColor: const Color(0xffddddff),
                   textTheme: Theme.of(context)
                       .textTheme
-                      .apply(bodyColor: jetBlack, displayColor: jetBlack),
+                      .apply(bodyColor: jetBlack, displayColor: jetBlack, fontFamily: 'Cabin'),
                 ),
                 navigatorObservers: [
                   FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),

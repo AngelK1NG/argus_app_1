@@ -19,7 +19,7 @@ final Color jetBlack = Color(0xff2b2b2b);
 //styles
 final TextStyle headerTextStyle = TextStyle(
   fontSize: 30,
-  fontWeight: FontWeight.w500,
+  fontWeight: FontWeight.w600,
   color: Colors.white,
 );
 

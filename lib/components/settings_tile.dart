@@ -23,7 +23,7 @@ class SettingsTile extends StatelessWidget {
             ),
           ),
           CupertinoSwitch(
-            activeColor: Theme.of(context).accentColor,
+            activeColor: Theme.of(context).primaryColor,
             trackColor: Colors.grey,
             value: toggle,
             onChanged: (value) {

@@ -35,7 +35,7 @@ class OnboardingPage extends StatelessWidget {
             style: TextStyle(
               fontSize: 48,
               color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),

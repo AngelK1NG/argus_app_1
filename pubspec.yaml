@@ -48,3 +48,30 @@ flutter:
     - assets/images/logo/
     - assets/images/icons/
     - assets/images/onboarding/
+  fonts:
+    - family: Cabin
+      fonts:
+        - asset: assets/fonts/Cabin-Regular.ttf
+          style: normal
+          weight: 400
+        - asset: assets/fonts/Cabin-Italic.ttf
+          style: italic
+          weight: 400
+        - asset: assets/fonts/Cabin-Medium.ttf
+          style: normal
+          weight: 500
+        - asset: assets/fonts/Cabin-MediumItalic.ttf
+          style: italic
+          weight: 500
+        - asset: assets/fonts/Cabin-SemiBold.ttf
+          style: normal
+          weight: 600
+        - asset: assets/fonts/Cabin-SemiBoldItalic.ttf
+          style: italic
+          weight: 600
+        - asset: assets/fonts/Cabin-Bold.ttf
+          style: normal
+          weight: 700
+        - asset: assets/fonts/Cabin-BoldItalic.ttf
+          style: italic
+          weight: 700

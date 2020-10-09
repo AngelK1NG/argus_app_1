@@ -78,7 +78,7 @@ class _TodayStatsState extends State<TodayStats> {
             'Completed tasks',
             style: TextStyle(
               fontSize: 16,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           )));
       _tasks.forEach((task) {
@@ -99,8 +99,8 @@ class _TodayStatsState extends State<TodayStats> {
             'Paused tasks',
             style: TextStyle(
               fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).accentColor,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).primaryColor,
             ),
           )));
       _tasks.forEach((task) {
@@ -194,7 +194,7 @@ class _TodayStatsState extends State<TodayStats> {
                               '%',
                           style: TextStyle(
                             fontSize: 22,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                           )),
                       Text(
                         'Done',
@@ -222,7 +222,7 @@ class _TodayStatsState extends State<TodayStats> {
                               .padLeft(2, "0"),
                       style: TextStyle(
                         fontSize: 24,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
@@ -246,7 +246,7 @@ class _TodayStatsState extends State<TodayStats> {
                                 .padLeft(2, "0"),
                         style: TextStyle(
                           fontSize: 24,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -278,7 +278,7 @@ class _TodayStatsState extends State<TodayStats> {
                   text: (_numDistracted == 1
                       ? 'Distraction: '
                       : 'Distractions: '),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyText1.copyWith(
                     fontSize: 16,
                     color: Colors.red,
                   ),
@@ -286,7 +286,7 @@ class _TodayStatsState extends State<TodayStats> {
                     TextSpan(
                       text: _numDistracted.toString(),
                       style: TextStyle(
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -295,7 +295,7 @@ class _TodayStatsState extends State<TodayStats> {
               RichText(
                 text: TextSpan(
                   text: (_numPaused == 1 ? 'Pause: ' : 'Pauses: '),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyText1.copyWith(
                     fontSize: 16,
                     color: Theme.of(context).hintColor,
                   ),
@@ -303,7 +303,7 @@ class _TodayStatsState extends State<TodayStats> {
                     TextSpan(
                       text: _numPaused.toString(),
                       style: TextStyle(
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],

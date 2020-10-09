@@ -63,7 +63,7 @@ class _TaskItemState extends State<TaskItem> {
     return Container(
       child: Dismissible(
         background: Container(
-          color: Theme.of(context).accentColor,
+          color: Theme.of(context).primaryColor,
           padding: EdgeInsets.only(left: 25),
           alignment: AlignmentDirectional.centerStart,
           child: Icon(
@@ -149,7 +149,7 @@ class _TaskItemState extends State<TaskItem> {
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
                                   color: widget.paused
-                                      ? Theme.of(context).accentColor
+                                      ? Theme.of(context).primaryColor
                                       : jetBlack),
                           initialValue: widget.name,
                           autofocus: true,

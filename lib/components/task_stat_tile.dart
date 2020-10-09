@@ -26,7 +26,7 @@ class TaskStatTile extends StatelessWidget {
               task.name,
               style: TextStyle(
                 fontSize: 16,
-                color: completed ? jetBlack : Theme.of(context).accentColor,
+                color: completed ? jetBlack : Theme.of(context).primaryColor,
               ),
             ),
           ),
@@ -39,7 +39,7 @@ class TaskStatTile extends StatelessWidget {
                   (task.secondsFocused % 60).toString().padLeft(2, "0"),
               style: TextStyle(
                 fontSize: 12,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
                 color: Theme.of(context).primaryColor,
               ),
             ),

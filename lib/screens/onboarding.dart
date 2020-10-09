@@ -58,7 +58,7 @@ class _OnboardingState extends State<Onboarding> {
                       TextSpan(
                         text: 'Start',
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           color: Theme.of(context).primaryColor,
                         ),
                       ),
@@ -68,7 +68,7 @@ class _OnboardingState extends State<Onboarding> {
                       TextSpan(
                         text: 'Done',
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           color: Theme.of(context).primaryColor,
                         ),
                       ),
@@ -78,8 +78,8 @@ class _OnboardingState extends State<Onboarding> {
                       TextSpan(
                         text: 'Pause Button',
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).accentColor,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).primaryColor,
                         ),
                       ),
                       TextSpan(
@@ -88,7 +88,7 @@ class _OnboardingState extends State<Onboarding> {
                       TextSpan(
                         text: 'Save for later',
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           color: Theme.of(context).hintColor,
                         ),
                       ),
@@ -122,7 +122,7 @@ class _OnboardingState extends State<Onboarding> {
                       TextSpan(
                         text: 'Focused',
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           color: Theme.of(context).primaryColor,
                         ),
                       ),
@@ -132,7 +132,7 @@ class _OnboardingState extends State<Onboarding> {
                       TextSpan(
                         text: 'Distracted',
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           color: Colors.red,
                         ),
                       ),
@@ -142,8 +142,8 @@ class _OnboardingState extends State<Onboarding> {
                       TextSpan(
                         text: 'Pause Button',
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).accentColor,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).primaryColor,
                         ),
                       ),
                       TextSpan(
@@ -152,7 +152,7 @@ class _OnboardingState extends State<Onboarding> {
                       TextSpan(
                         text: 'Paused',
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           color: Theme.of(context).hintColor,
                         ),
                       ),
@@ -185,8 +185,8 @@ class _OnboardingState extends State<Onboarding> {
               position: _index,
               decorator: DotsDecorator(
                 color: Colors.transparent,
-                activeColor: Theme.of(context).accentColor,
-                shape: CircleBorder(side: BorderSide(color: Theme.of(context).accentColor, width: 2)),
+                activeColor: Theme.of(context).primaryColor,
+                shape: CircleBorder(side: BorderSide(color: Theme.of(context).primaryColor, width: 2)),
               ),
             ),
           ),

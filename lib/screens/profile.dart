@@ -101,7 +101,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Text(
                           'Notifications',
                           style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.w500),
+                              fontSize: 22, fontWeight: FontWeight.w600),
                         ),
                       ),
                       SettingsTile(

@@ -14,7 +14,6 @@ import 'package:Focal/components/sqr_button.dart';
 import 'package:Focal/components/task_item.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 
 class TasksPage extends StatefulWidget {
   final Function goToPage;
@@ -385,12 +384,12 @@ class _TasksPageState extends State<TasksPage> {
   Widget build(BuildContext context) {
     final TextStyle dateTextStyle = TextStyle(
       fontSize: 18,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w600,
       color: Colors.white,
     );
     final TextStyle todayTextStyle = TextStyle(
       fontSize: 18,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w600,
       color: Theme.of(context).primaryColor,
     );
 
@@ -546,17 +545,21 @@ class _TasksPageState extends State<TasksPage> {
                 Positioned(
                   right: 28,
                   left: 28,
-                  top: SizeConfig.safeBlockVertical * 15 + 15,
+                  top: SizeConfig.safeBlockVertical * 15,
                   child: Offstage(
                     offstage: _tasks.length == 0,
-                    child: Center(
-                      child: LinearPercentIndicator(
-                        percent: (_tasks.length == null || _tasks.length == 0)
-                            ? 0
-                            : (_completedTasks / _tasks.length),
-                        lineHeight: 25,
-                        progressColor: Theme.of(context).accentColor,
-                        backgroundColor: Theme.of(context).dividerColor,
+                    child: Container(
+                      height: 55,
+                      alignment: Alignment.center,
+                      child: Text(
+                        ((_tasks.length == null || _tasks.length == 0)
+                            ? '0'
+                            : (_completedTasks / _tasks.length * 100).round().toString())
+                        + '% completed',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
@@ -574,7 +577,7 @@ class _TasksPageState extends State<TasksPage> {
                             'Start fresh.',
                             style: TextStyle(
                               fontSize: 24,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           Padding(
@@ -656,7 +659,7 @@ class _TasksPageState extends State<TasksPage> {
                             blurRadius: 15,
                             color: _newTask == ''
                                 ? jetBlack
-                                : Theme.of(context).accentColor,
+                                : Theme.of(context).primaryColor,
                           ),
                         ],
                       ),
