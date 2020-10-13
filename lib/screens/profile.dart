@@ -29,12 +29,12 @@ class _ProfilePageState extends State<ProfilePage> {
   void getSettings() {
     SharedPreferences.getInstance().then((SharedPreferences prefs) {
       setState(() {
-        _notificationsOn = prefs.getBool('notifications on') == null
+        _notificationsOn = prefs.getBool('focusNotifications') == null
             ? true
-            : prefs.getBool('notifications on');
-        _dndOn = prefs.getBool('do not disturb on') == null
+            : prefs.getBool('focusNotifications');
+        _dndOn = prefs.getBool('focusDND') == null
             ? true
-            : prefs.getBool('do not disturb on');
+            : prefs.getBool('focusDND');
       });
       Future.delayed(cardSlideDuration, () {
         if (mounted) {
@@ -49,7 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void setValue(String key, bool val) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool(key, val);
-    print('$key is set to ${prefs.get}');
+    print('$key is set to ${prefs.get(key)}');
   }
 
   openPrivacyPolicy() async {
@@ -112,7 +112,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             _notificationsOn = value;
                           });
                           LocalNotificationHelper.notificationsOn = value;
-                          setValue('notifications on', value);
+                          setValue('focusNotifications', value);
                         },
                       ),
                       Platform.isAndroid
@@ -124,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   _dndOn = value;
                                 });
                                 LocalNotificationHelper.dndOn = value;
-                                setValue('do not disturb on', value);
+                                setValue('focusDND', value);
                               })
                           : Container(),
                     ])),

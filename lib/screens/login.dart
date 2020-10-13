@@ -109,7 +109,11 @@ class _LoginPageState extends State<LoginPage> {
                           }
                         },
                         buttonWidth: 315,
-                        colored: true,
+                        gradient: LinearGradient(
+                          colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
                         buttonText: "Sign in with Google",
                         textSize: 24,
                         icon: FaIcon(
@@ -117,6 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                           color: Colors.white,
                           size: 30,
                         ),
+                        vibrate: true,
                       ),
                       Platform.isIOS
                           ? Padding(
@@ -138,7 +143,9 @@ class _LoginPageState extends State<LoginPage> {
                                   }
                                 },
                                 buttonWidth: 315,
-                                colored: false,
+                                gradient: LinearGradient(
+                                  colors: [jetBlack, jetBlack],
+                                ),
                                 buttonText: "Sign in with Apple",
                                 textSize: 24,
                                 icon: FaIcon(
@@ -146,6 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                                   color: Colors.white,
                                   size: 35,
                                 ),
+                                vibrate: true,
                               ),
                             )
                           : Container()

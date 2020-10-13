@@ -21,6 +21,7 @@ import 'package:flutter/services.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:confetti/confetti.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 
 class FocusPage extends StatefulWidget {
   final Function goToPage;
@@ -53,6 +54,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   bool _loading = true;
   bool _saving = false;
   bool _screenOn = true;
+  bool _distractionTracking = true;
+  bool _distractionTrackingNotice = false;
+  int _distractionTrackingNoticeCount = 0;
   int _seconds = 0;
   int _secondsDistracted = 0;
   int _numDistracted = 0;
@@ -87,6 +91,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
 
   void startTask() async {
     if (!_saving) {
+      HapticFeedback.heavyImpact();
       _secondsDistracted =
           _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
       _initSecondsDistracted =
@@ -107,7 +112,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         initSeconds = _tasks[0].secondsFocused + _tasks[0].secondsDistracted;
         _initSecondsFocused = _tasks[0].secondsFocused;
       }
-
       _timer = new Timer.periodic(
           const Duration(seconds: 1),
           (Timer timer) => setState(() {
@@ -158,6 +162,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _doingTask = false;
       _quote = quotes[_random.nextInt(quotes.length)];
       _message = messages[_random.nextInt(messages.length)];
+      _distractionTracking = true;
+      _distractionTrackingNotice = false;
+      _distractionTrackingNoticeCount = 0;
     });
     if (Platform.isAndroid) {
       if (LocalNotificationHelper.dndOn) {
@@ -280,13 +287,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
 
   void getSettings() {
     SharedPreferences.getInstance().then((SharedPreferences prefs) {
-      LocalNotificationHelper.dndOn = prefs.getBool('do not disturb on') == null
-          ? true
-          : prefs.getBool('do not disturb on');
+      LocalNotificationHelper.dndOn =
+          prefs.getBool('focusDND') == null ? true : prefs.getBool('focusDND');
       LocalNotificationHelper.notificationsOn =
-          prefs.getBool('notifications on') == null
+          prefs.getBool('focusNotifications') == null
               ? true
-              : prefs.getBool('notifications on');
+              : prefs.getBool('focusNotifications');
     });
   }
 
@@ -429,64 +435,71 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     switch (state) {
       case AppLifecycleState.paused: {
-        if (_doingTask) {
+        if (_doingTask && _distractionTracking) {
           if (Platform.isAndroid) {
             androidScreenOn().then((value) {
               if (value) {
                 _startDistracted = DateTime.now();
-                prefs.setInt(
-                    'startDistracted', _startDistracted.millisecondsSinceEpoch);
-                prefs.setBool('distracted', true);
-                if (LocalNotificationHelper.notificationsOn) {
-                  if (LocalNotificationHelper.dndOn) {
-                    FlutterDnd.setInterruptionFilter(
-                        FlutterDnd.INTERRUPTION_FILTER_ALL);
-                    notificationHelper.showNotifications();
-                    _screenOn = true;
-                    Future.delayed(const Duration(milliseconds: 3000), () {
+                  prefs.setInt('startDistracted',
+                      _startDistracted.millisecondsSinceEpoch);
+                  prefs.setBool('distracted', true);
+                  if (LocalNotificationHelper.notificationsOn) {
+                    if (LocalNotificationHelper.dndOn) {
                       FlutterDnd.setInterruptionFilter(
-                          FlutterDnd.INTERRUPTION_FILTER_NONE);
-                    });
-                  } else {
-                    notificationHelper.showNotifications();
+                          FlutterDnd.INTERRUPTION_FILTER_ALL);
+                      notificationHelper.showNotifications();
+                      _screenOn = true;
+                      Future.delayed(const Duration(milliseconds: 3000), () {
+                        FlutterDnd.setInterruptionFilter(
+                            FlutterDnd.INTERRUPTION_FILTER_NONE);
+                      });
+                    } else {
+                      notificationHelper.showNotifications();
+                    }
                   }
+                } else {
+                  _screenOn = false;
                 }
-              } else {
-                _screenOn = false;
-              }
-            });
-          } else if (Platform.isIOS) {
-            iosScreenOn().then((value) {
-              if (value) {
-                _startDistracted = DateTime.now();
-                prefs.setBool('distracted', true);
-                notificationHelper.showNotifications();
-                _screenOn = true;
-              } else {
-                _screenOn = false;
-              }
+              });
+            } else if (Platform.isIOS) {
+              iosScreenOn().then((value) {
+                if (value) {
+                  _startDistracted = DateTime.now();
+                  prefs.setBool('distracted', true);
+                  notificationHelper.showNotifications();
+                  _screenOn = true;
+                } else {
+                  _screenOn = false;
+                }
+              });
+            }
+          }
+          break;
+        }
+      case AppLifecycleState.resumed:
+        {
+          if (_screenOn && _distractionTracking) {
+            _secondsDistracted +=
+                DateTime.now().difference(_startDistracted).inSeconds;
+            _numDistracted++;
+            prefs.setInt('secondsDistracted', _secondsDistracted);
+            prefs.setInt('numDistracted', _numDistracted);
+            prefs.setBool('distracted', false);
+          } else if (_distractionTracking == false) {
+            setState(() {
+              _distractionTracking = true;
             });
           }
+          break;
         }
-        break;
-      }
-      case AppLifecycleState.resumed: {
-        if (_screenOn) {
-          _secondsDistracted +=
-              DateTime.now().difference(_startDistracted).inSeconds;
-          _numDistracted++;
-          prefs.setInt('secondsDistracted', _secondsDistracted);
-          prefs.setInt('numDistracted', _numDistracted);
-          prefs.setBool('distracted', false);
+      case AppLifecycleState.inactive:
+        {
+          break;
         }
-        break;
-      }
-      case AppLifecycleState.inactive: {
-        break;
-      }
-      case AppLifecycleState.detached: {
-        break;
-      }
+      case AppLifecycleState.detached:
+        {
+          break;
+        }
     }
   }
 
@@ -630,9 +643,14 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                 widget.goToPage(1);
                               },
                               buttonWidth: 220,
-                              colored: true,
+                              gradient: LinearGradient(
+                                colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
                               buttonText: 'Add Task',
                               textSize: 32,
+                              vibrate: true,
                             ),
                           ),
                         )
@@ -688,6 +706,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                     color: Colors.white,
                                     size: 24,
                                   ),
+                                  gradient: LinearGradient(
+                                    colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  vibrate: true,
                                 ),
                               ),
                             ),
@@ -724,9 +748,14 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                   widget.goToPage(2);
                                 },
                                 buttonWidth: 220,
-                                colored: true,
+                                gradient: LinearGradient(
+                                  colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
                                 buttonText: 'Statistics',
                                 textSize: 32,
+                                vibrate: true,
                               ),
                             ),
                           ),
@@ -736,15 +765,101 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                       return Stack(
                         children: <Widget>[
                           Positioned(
+                            left: 20,
+                            top: 20,
+                            child: Offstage(
+                              offstage: !_doingTask,
+                              child: GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.heavyImpact();
+                                  if (_distractionTracking) {
+                                    setState(() {
+                                      _distractionTracking = false;
+                                      _distractionTrackingNotice = true;
+                                      _distractionTrackingNoticeCount ++;
+                                    });
+                                    final distractionTrackingNoticeCount = _distractionTrackingNoticeCount;
+                                    Future.delayed(Duration(milliseconds: 4000), () {
+                                      if (mounted) {
+                                        if (_distractionTrackingNoticeCount == distractionTrackingNoticeCount) {
+                                          setState(() {
+                                            _distractionTrackingNotice = false;
+                                          });
+                                        }
+                                      }
+                                    });
+                                  } else {
+                                    setState(() {
+                                      _distractionTracking = true;
+                                      _distractionTrackingNotice = false;
+                                    });
+                                  }
+                                  
+                                },
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  color: Colors.transparent,
+                                  child: Center(
+                                    child: Icon(
+                                      FeatherIcons.logOut,
+                                      color: _distractionTracking ? Colors.white : Colors.red,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
                             left: 40,
                             right: 40,
                             top: SizeConfig.safeBlockVertical * 12,
                             child: _doingTask
-                                ? Text(
-                                    _swatchDisplay,
-                                    textAlign: TextAlign.center,
-                                    style: swatchTextStyle,
-                                  )
+                                ? Stack(
+                                  children: <Widget>[
+                                    AnimatedOpacity(
+                                      opacity: _distractionTrackingNotice ? 0 : 1,
+                                      duration: loadingDuration,
+                                      curve: loadingCurve,
+                                      child: Center(
+                                        child: Text(
+                                          _swatchDisplay,
+                                          textAlign: TextAlign.center,
+                                          style: swatchTextStyle,
+                                        ),
+                                      ),
+                                    ),
+                                    AnimatedOpacity(
+                                      opacity: _distractionTrackingNotice ? 1 : 0,
+                                      duration: loadingDuration,
+                                      curve: loadingCurve,
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        height: SizeConfig.safeBlockVertical * 20,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Text(
+                                              'Distraction tracking is off',
+                                              textAlign: TextAlign.center,
+                                              style: topTextStyle,
+                                            ),
+                                            Text(
+                                              'You can now leave the app',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
                                 : Container(
                                     alignment: Alignment.center,
                                     height: SizeConfig.safeBlockVertical * 15,
@@ -776,6 +891,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                     color: Colors.white,
                                     size: 24,
                                   ),
+                                  gradient: LinearGradient(
+                                    colors: _distractionTracking ? [Theme.of(context).primaryColor, Theme.of(context).accentColor] : [darkRed, Colors.red],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  vibrate: true,
                                 ),
                               ),
                             ),
@@ -811,23 +932,42 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                 child: _doingTask
                                     ? RctButton(
                                         onTap: () {
-                                          completeTask(_user);
+                                          if (_distractionTracking) {
+                                            completeTask(_user);
+                                          } else {
+                                            setState(() {
+                                              _distractionTracking = true;
+                                              _distractionTrackingNotice = false;
+                                            });
+                                          }
                                         },
                                         buttonWidth: 220,
-                                        colored: true,
-                                        buttonText: 'Done',
+                                        gradient: LinearGradient(
+                                          colors: _distractionTracking ? [Theme.of(context).primaryColor, Theme.of(context).accentColor] : [darkRed, Colors.red],
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                        ),
+                                        buttonText: _distractionTracking
+                                            ? 'Done'
+                                            : 'Cancel',
                                         textSize: 32,
+                                        vibrate: true,
                                       )
                                     : RctButton(
                                         onTap: () {
                                           startTask();
                                         },
                                         buttonWidth: 220,
-                                        colored: true,
+                                        gradient: LinearGradient(
+                                          colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                        ),
                                         buttonText: _tasks[0].paused
                                             ? 'Resume'
                                             : 'Start',
                                         textSize: 32,
+                                        vibrate: false,
                                       )),
                           ),
                         ],

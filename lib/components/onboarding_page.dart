@@ -56,9 +56,14 @@ class OnboardingPage extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/home');
             },
             buttonWidth: 220,
-            colored: true,
+            gradient: LinearGradient(
+              colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
             buttonText: 'Let\'s go!',
             textSize: 28,
+            vibrate: true,
           ),
         ),
       ],

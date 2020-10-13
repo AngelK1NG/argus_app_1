@@ -164,6 +164,7 @@ class _TasksPageState extends State<TasksPage> {
       Scaffold.of(context).showSnackBar(SnackBar(
         padding: EdgeInsets.only(left: 16, top: 10, bottom: 10),
         content: Text(task.name + ' has been deferred to tomorrow'),
+        duration: snackbarDuration,
         action: SnackBarAction(
           label: 'Undo',
           onPressed: () async {
@@ -213,6 +214,7 @@ class _TasksPageState extends State<TasksPage> {
     Scaffold.of(context).showSnackBar(SnackBar(
       padding: EdgeInsets.only(left: 16, top: 10, bottom: 10),
       content: Text(task.name + ' has been deleted'),
+      duration: snackbarDuration,
       action: SnackBarAction(
         label: 'Undo',
         onPressed: () async {
@@ -785,6 +787,12 @@ class _TasksPageState extends State<TasksPage> {
                           });
                           FocusScope.of(context).requestFocus(_focus);
                         },
+                        gradient: LinearGradient(
+                          colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        vibrate: true,
                       ),
                     ),
                   ),

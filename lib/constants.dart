@@ -15,6 +15,7 @@ final FlutterLocalNotificationsPlugin notificationsPlugin =
 
 //colors
 final Color jetBlack = Color(0xff2b2b2b);
+final Color darkRed = Color(0xffd54321);
 
 //styles
 final TextStyle headerTextStyle = TextStyle(
@@ -26,7 +27,14 @@ final TextStyle headerTextStyle = TextStyle(
 //animation transitions
 final Duration loadingDuration = Duration(milliseconds: 200);
 final Curve loadingCurve = Curves.ease;
+
 final Duration cardSlideDuration = Duration(milliseconds: 200);
 final Curve cardSlideCurve = Curves.ease;
+
 final Duration keyboardDuration = Duration(milliseconds: 600);
 final Curve keyboardCurve = Cubic(0.380, 0.700, 0.125, 1.000);
+
+final Duration buttonDuration = Duration(milliseconds: 200);
+final Curve buttonCurve = Curves.ease;
+
+final Duration snackbarDuration = Duration(milliseconds: 2000);
