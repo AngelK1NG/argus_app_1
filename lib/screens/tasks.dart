@@ -749,6 +749,7 @@ class _TasksPageState extends State<TasksPage> {
                                       _tasks[_tasks.length - _completedTasks - 1].id =
                                           await firestoreProvider.addTask(
                                               newTask, _date);
+                                      firestoreProvider.updateTasks(_tasks, _date);
                                       _formKey.currentState.reset();
                                       setState(() {
                                         _newTask = '';
