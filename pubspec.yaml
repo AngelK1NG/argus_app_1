@@ -28,7 +28,7 @@ dependencies:
   intl: ^0.16.1
   fluttertoast: ^7.0.1
   flutter_dnd: ^0.1.2
-  flutter_local_notifications: ^1.4.4+2
+  flutter_local_notifications: ^2.0.0+1
   url_launcher: ^5.5.0
   dots_indicator: ^1.2.0
   percent_indicator: ^2.1.5

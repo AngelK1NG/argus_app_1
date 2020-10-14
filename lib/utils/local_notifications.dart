@@ -13,58 +13,51 @@ class LocalNotifications {
     var initializationSettingsIOS = IOSInitializationSettings(
         onDidReceiveLocalNotification: onDidReceiveLocalNotification);
     var initializationSettings = InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     await notificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: onSelectionNotification);
+        onSelectNotification: selectNotification);
     _prefs = await SharedPreferences.getInstance();
   }
 
-  void showDistractedNotification() async {
-    if (_prefs.getBool('distractedNotification')) {
-      AndroidNotificationDetails androidNotificationDetails =
-          AndroidNotificationDetails(
-        'Distracted Notification',
-        'Distracted Notification',
-        'Notify when Distracted',
-        priority: Priority.High,
-        importance: Importance.Max,
+  void distractedNotification() async {
+    AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails(
+      'Distracted Notification',
+      'Distracted Notification',
+      'Notify when Distracted',
+      priority: Priority.high,
+      importance: Importance.max,
+    );
+    IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
+    NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails, iOS: iosNotificationDetails);
+    await notificationsPlugin.show(
+      0,
+      'You\'re getting Distracted!',
+      'You\'re losing Volts, come back before it\'s too late!',
+      notificationDetails,
+    );
+    if (_prefs.getBool('repeatDistractedNotification')) {
+      await notificationsPlugin.periodicallyShow(
+        0,
+        'You\'re still Distracted!',
+        'Are you still doing your task? You\'re losing Volts!',
+        RepeatInterval.everyMinute,
+        notificationDetails,
+        androidAllowWhileIdle: true,
       );
-      IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
-      NotificationDetails notificationDetails =
-          NotificationDetails(androidNotificationDetails, iosNotificationDetails);
-      await notificationsPlugin.show(0, 'You\'re getting Distracted!',
-          'You\'re losing Volts, come back before it\'s too late!', notificationDetails,);
-      print('Distracted, notification sent');
     }
-  }
-
-  void repeatDistractedNotification() async {
-    if (_prefs.getBool('distractedNotification')) {
-      AndroidNotificationDetails androidNotificationDetails =
-          AndroidNotificationDetails(
-        'Repeating Distracted Notification',
-        'Repeating Distracted Notification',
-        'Notify repeatedly when Distracted',
-        priority: Priority.High,
-        importance: Importance.Max,
-      );
-      IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
-      NotificationDetails notificationDetails =
-          NotificationDetails(androidNotificationDetails, iosNotificationDetails);
-      await notificationsPlugin.periodicallyShow(1, 'You\'re still Distracted!',
-          'Are you still doing your task? You\'re losing Volts!', RepeatInterval.EveryMinute, notificationDetails,);
-      print('Still distracted, notification sent');
-    }
+    print('Distracted notification');
   }
 
   void cancelDistractedNotification() async {
     await notificationsPlugin.cancel(0);
-    await notificationsPlugin.cancel(1);
     print('Distracted notification canceled');
   }
 
-  // ignore: missing_return
-  Future onSelectionNotification(String payLoad) {}
+  Future selectNotification(String payLoad) {
+    return null;
+  }
 
   Future onDidReceiveLocalNotification(
       int id, String title, String body, String payLoad) async {

@@ -274,8 +274,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
 
   void getPrefs() async {
     _prefs = await SharedPreferences.getInstance();
-    if (_prefs.getBool('distractedNotification') == null) {
-      _prefs.setBool('distractedNotification', true);
+    if (_prefs.getBool('repeatDistractedNotification') == null) {
+      _prefs.setBool('repeatDistractedNotification', true);
     }
     if (_prefs.getBool('focusDnd') == null) {
       _prefs.setBool('focusDnd', true);
@@ -372,20 +372,23 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             child: ListBody(
               children: <Widget>[
                 Text(
-                    'This will help maintain your focus while you are doing your task. Clicking OK will redirect you to Settings.'),
+                    'This will help maintain your focus while you are doing your task. Clicking Ok will redirect you to Settings.'),
               ],
             ),
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('TURN OFF', style: TextStyle(color: Colors.red,)),
+              child: Text('Turn off',
+                  style: TextStyle(
+                    color: Colors.red,
+                  )),
               onPressed: () {
                 Navigator.of(context).pop();
                 _prefs.setBool('focusDnd', false);
               },
             ),
             FlatButton(
-              child: Text('OK'),
+              child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
                 FlutterDnd.gotoPolicySettings();
@@ -479,21 +482,19 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
-      case AppLifecycleState.paused: {
-        if (_doingTask && _distractionTracking) {
-          if (Platform.isAndroid) {
-            androidScreenOn().then((value) {
-              if (value) {
-                _startDistracted = DateTime.now();
-                _prefs.setInt('startDistracted',
-                    _startDistracted.millisecondsSinceEpoch);
-                _prefs.setBool('distracted', true);
-                _screenOn = true;
-                  if (_prefs.getBool('distractedNotification')) {
-                    localNotifications.showDistractedNotification();
-                    localNotifications.repeatDistractedNotification();
-                    setDnd(false);
-                  }
+      case AppLifecycleState.paused:
+        {
+          if (_doingTask && _distractionTracking) {
+            if (Platform.isAndroid) {
+              androidScreenOn().then((value) {
+                if (value) {
+                  _startDistracted = DateTime.now();
+                  _prefs.setInt('startDistracted',
+                      _startDistracted.millisecondsSinceEpoch);
+                  _prefs.setBool('distracted', true);
+                  _screenOn = true;
+                  localNotifications.distractedNotification();
+                  setDnd(false);
                 } else {
                   _screenOn = false;
                 }
@@ -503,8 +504,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                 if (value) {
                   _startDistracted = DateTime.now();
                   _prefs.setBool('distracted', true);
-                  localNotifications.showDistractedNotification();
-                  localNotifications.repeatDistractedNotification();
+                  localNotifications.distractedNotification();
                   _screenOn = true;
                 } else {
                   _screenOn = false;
@@ -631,7 +631,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                               },
                               buttonWidth: 220,
                               gradient: LinearGradient(
-                                colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+                                colors: [
+                                  Theme.of(context).primaryColor,
+                                  Theme.of(context).accentColor
+                                ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                               ),
@@ -694,7 +697,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                     size: 24,
                                   ),
                                   gradient: LinearGradient(
-                                    colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+                                    colors: [
+                                      Theme.of(context).primaryColor,
+                                      Theme.of(context).accentColor
+                                    ],
                                     begin: Alignment.centerLeft,
                                     end: Alignment.centerRight,
                                   ),
@@ -736,7 +742,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                 },
                                 buttonWidth: 220,
                                 gradient: LinearGradient(
-                                  colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+                                  colors: [
+                                    Theme.of(context).primaryColor,
+                                    Theme.of(context).accentColor
+                                  ],
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
                                 ),
@@ -763,12 +772,15 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                     setState(() {
                                       _distractionTracking = false;
                                       _distractionTrackingNotice = true;
-                                      _distractionTrackingNoticeCount ++;
+                                      _distractionTrackingNoticeCount++;
                                     });
-                                    final distractionTrackingNoticeCount = _distractionTrackingNoticeCount;
-                                    Future.delayed(Duration(milliseconds: 4000), () {
+                                    final distractionTrackingNoticeCount =
+                                        _distractionTrackingNoticeCount;
+                                    Future.delayed(Duration(milliseconds: 4000),
+                                        () {
                                       if (mounted) {
-                                        if (_distractionTrackingNoticeCount == distractionTrackingNoticeCount) {
+                                        if (_distractionTrackingNoticeCount ==
+                                            distractionTrackingNoticeCount) {
                                           setState(() {
                                             _distractionTrackingNotice = false;
                                           });
@@ -781,7 +793,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                       _distractionTrackingNotice = false;
                                     });
                                   }
-                                  
                                 },
                                 child: Container(
                                   width: 40,
@@ -790,7 +801,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                   child: Center(
                                     child: Icon(
                                       FeatherIcons.logOut,
-                                      color: _distractionTracking ? Colors.white : Colors.red,
+                                      color: _distractionTracking
+                                          ? Colors.white
+                                          : Colors.red,
                                       size: 24,
                                     ),
                                   ),
@@ -804,49 +817,53 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             top: SizeConfig.safeBlockVertical * 12,
                             child: _doingTask
                                 ? Stack(
-                                  children: <Widget>[
-                                    AnimatedOpacity(
-                                      opacity: _distractionTrackingNotice ? 0 : 1,
-                                      duration: loadingDuration,
-                                      curve: loadingCurve,
-                                      child: Center(
-                                        child: Text(
-                                          _swatchDisplay,
-                                          textAlign: TextAlign.center,
-                                          style: swatchTextStyle,
+                                    children: <Widget>[
+                                      AnimatedOpacity(
+                                        opacity:
+                                            _distractionTrackingNotice ? 0 : 1,
+                                        duration: loadingDuration,
+                                        curve: loadingCurve,
+                                        child: Center(
+                                          child: Text(
+                                            _swatchDisplay,
+                                            textAlign: TextAlign.center,
+                                            style: swatchTextStyle,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    AnimatedOpacity(
-                                      opacity: _distractionTrackingNotice ? 1 : 0,
-                                      duration: loadingDuration,
-                                      curve: loadingCurve,
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        height: SizeConfig.safeBlockVertical * 20,
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: <Widget>[
-                                            Text(
-                                              'Distraction tracking is off',
-                                              textAlign: TextAlign.center,
-                                              style: topTextStyle,
-                                            ),
-                                            Text(
-                                              'You can now leave the app',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w400,
-                                                color: Colors.white,
+                                      AnimatedOpacity(
+                                        opacity:
+                                            _distractionTrackingNotice ? 1 : 0,
+                                        duration: loadingDuration,
+                                        curve: loadingCurve,
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          height:
+                                              SizeConfig.safeBlockVertical * 20,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              Text(
+                                                'Distraction tracking is off',
+                                                textAlign: TextAlign.center,
+                                                style: topTextStyle,
                                               ),
-                                            )
-                                          ],
+                                              Text(
+                                                'You can now leave the app',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Colors.white,
+                                                ),
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                )
+                                    ],
+                                  )
                                 : Container(
                                     alignment: Alignment.center,
                                     height: SizeConfig.safeBlockVertical * 15,
@@ -879,7 +896,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                     size: 24,
                                   ),
                                   gradient: LinearGradient(
-                                    colors: _distractionTracking ? [Theme.of(context).primaryColor, Theme.of(context).accentColor] : [darkRed, Colors.red],
+                                    colors: _distractionTracking
+                                        ? [
+                                            Theme.of(context).primaryColor,
+                                            Theme.of(context).accentColor
+                                          ]
+                                        : [darkRed, Colors.red],
                                     begin: Alignment.centerLeft,
                                     end: Alignment.centerRight,
                                   ),
@@ -924,13 +946,20 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                           } else {
                                             setState(() {
                                               _distractionTracking = true;
-                                              _distractionTrackingNotice = false;
+                                              _distractionTrackingNotice =
+                                                  false;
                                             });
                                           }
                                         },
                                         buttonWidth: 220,
                                         gradient: LinearGradient(
-                                          colors: _distractionTracking ? [Theme.of(context).primaryColor, Theme.of(context).accentColor] : [darkRed, Colors.red],
+                                          colors: _distractionTracking
+                                              ? [
+                                                  Theme.of(context)
+                                                      .primaryColor,
+                                                  Theme.of(context).accentColor
+                                                ]
+                                              : [darkRed, Colors.red],
                                           begin: Alignment.centerLeft,
                                           end: Alignment.centerRight,
                                         ),
@@ -946,7 +975,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                         },
                                         buttonWidth: 220,
                                         gradient: LinearGradient(
-                                          colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+                                          colors: [
+                                            Theme.of(context).primaryColor,
+                                            Theme.of(context).accentColor
+                                          ],
                                           begin: Alignment.centerLeft,
                                           end: Alignment.centerRight,
                                         ),

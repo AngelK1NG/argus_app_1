@@ -27,11 +27,11 @@ class _ProfilePageState extends State<ProfilePage> {
   void getPrefs() {
     SharedPreferences.getInstance().then((SharedPreferences prefs) {
       setState(() {
-        if (prefs.getBool('distractedNotification') == null) {
+        if (prefs.getBool('repeatDistractedNotification') == null) {
           _distractedNotification = true;
-          prefs.setBool('distractedNotification', true);
+          prefs.setBool('repeatDistractedNotification', true);
         } else {
-          _distractedNotification = prefs.getBool('distractedNotification');
+          _distractedNotification = prefs.getBool('repeatDistractedNotification');
         }
         if (prefs.getBool('focusDnd') == null) {
           _focusDnd = true;
@@ -109,13 +109,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       SettingsTile(
-                        title: 'Notify when Distracted',
+                        title: 'Repeatedly notify when Distracted',
                         toggle: _distractedNotification,
                         onChanged: (value) {
                           setState(() {
                             _distractedNotification = value;
                           });
-                          setValue('distractedNotification', value);
+                          setValue('repeatDistractedNotification', value);
                         },
                       ),
                       Platform.isAndroid
