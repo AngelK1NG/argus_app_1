@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:Focal/constants.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalNotifications {
@@ -34,9 +33,34 @@ class LocalNotifications {
       NotificationDetails notificationDetails =
           NotificationDetails(androidNotificationDetails, iosNotificationDetails);
       await notificationsPlugin.show(0, 'You\'re getting Distracted!',
-          'You\'re losing Volts, come back before it\'s too late!', notificationDetails);
+          'You\'re losing Volts, come back before it\'s too late!', notificationDetails,);
       print('Distracted, notification sent');
     }
+  }
+
+  void repeatDistractedNotification() async {
+    if (_prefs.getBool('distractedNotification')) {
+      AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails(
+        'Repeating Distracted Notification',
+        'Repeating Distracted Notification',
+        'Notify repeatedly when Distracted',
+        priority: Priority.High,
+        importance: Importance.Max,
+      );
+      IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
+      NotificationDetails notificationDetails =
+          NotificationDetails(androidNotificationDetails, iosNotificationDetails);
+      await notificationsPlugin.periodicallyShow(1, 'You\'re still Distracted!',
+          'Are you still doing your task? You\'re losing Volts!', RepeatInterval.EveryMinute, notificationDetails,);
+      print('Still distracted, notification sent');
+    }
+  }
+
+  void cancelDistractedNotification() async {
+    await notificationsPlugin.cancel(0);
+    await notificationsPlugin.cancel(1);
+    print('Distracted notification canceled');
   }
 
   // ignore: missing_return
