@@ -56,9 +56,9 @@ class FirestoreProvider {
         'completed': task.completed,
         'paused': task.paused,
       });
-      totalTasks ++;
+      totalTasks++;
       if (task.completed) {
-        completedTasks ++;
+        completedTasks++;
       }
     }
     db

@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:Focal/constants.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LocalNotificationHelper {
-  static bool userLoggedIn = true;
-  static bool paused = false;
-  static bool notificationsOn;
-  static bool dndOn;
+class LocalNotifications {
+  SharedPreferences _prefs;
 
   void initialize() async {
     var initializationSettingsAndroid =
@@ -19,32 +17,26 @@ class LocalNotificationHelper {
         initializationSettingsAndroid, initializationSettingsIOS);
     await notificationsPlugin.initialize(initializationSettings,
         onSelectNotification: onSelectionNotification);
+    _prefs = await SharedPreferences.getInstance();
   }
 
-  void showNotifications() async {
-    if (userLoggedIn && !paused && notificationsOn) {
-      HapticFeedback.heavyImpact();
-      await notification();
-      print('Notification sent');
+  void showDistractedNotification() async {
+    if (_prefs.getBool('distractedNotification')) {
+      AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails(
+        'Distracted Notification',
+        'Distracted Notification',
+        'Notify when Distracted',
+        priority: Priority.High,
+        importance: Importance.Max,
+      );
+      IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
+      NotificationDetails notificationDetails =
+          NotificationDetails(androidNotificationDetails, iosNotificationDetails);
+      await notificationsPlugin.show(0, 'You\'re getting Distracted!',
+          'You\'re losing Volts, come back before it\'s too late!', notificationDetails);
+      print('Distracted, notification sent');
     }
-  }
-
-  Future<void> notification() async {
-    AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(
-      'Channel ID',
-      'Focus Notification',
-      'Channel Body',
-      priority: Priority.High,
-      importance: Importance.Max,
-      ticker: 'test',
-    );
-
-    IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
-    NotificationDetails notificationDetails =
-        NotificationDetails(androidNotificationDetails, iosNotificationDetails);
-    await notificationsPlugin.show(0, 'You\'re abandoning your task!',
-        'Come back, don\'t give up', notificationDetails);
   }
 
   // ignore: missing_return

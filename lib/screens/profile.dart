@@ -1,6 +1,5 @@
 import 'package:Focal/constants.dart';
 import 'package:Focal/components/settings_tile.dart';
-import 'package:Focal/utils/local_notifications.dart';
 import 'package:Focal/utils/user.dart';
 import 'package:Focal/utils/size_config.dart';
 import 'package:Focal/utils/analytics.dart';
@@ -22,19 +21,24 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool _loading = true;
-  bool _notificationsOn = true;
-  bool _dndOn = true;
-  // bool _soundOn = true;
+  bool _distractedNotification = true;
+  bool _focusDnd = true;
 
-  void getSettings() {
+  void getPrefs() {
     SharedPreferences.getInstance().then((SharedPreferences prefs) {
       setState(() {
-        _notificationsOn = prefs.getBool('focusNotifications') == null
-            ? true
-            : prefs.getBool('focusNotifications');
-        _dndOn = prefs.getBool('focusDND') == null
-            ? true
-            : prefs.getBool('focusDND');
+        if (prefs.getBool('distractedNotification') == null) {
+          _distractedNotification = true;
+          prefs.setBool('distractedNotification', true);
+        } else {
+          _distractedNotification = prefs.getBool('distractedNotification');
+        }
+        if (prefs.getBool('focusDnd') == null) {
+          _focusDnd = true;
+          prefs.setBool('focusDnd', true);
+        } else {
+          _focusDnd = prefs.getBool('focusDnd');
+        }
       });
       Future.delayed(cardSlideDuration, () {
         if (mounted) {
@@ -65,7 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    getSettings();
+    getPrefs();
   }
 
   @override
@@ -105,26 +109,24 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       SettingsTile(
-                        title: 'Notify upon exiting app when Focused',
-                        toggle: _notificationsOn,
+                        title: 'Notify when Distracted',
+                        toggle: _distractedNotification,
                         onChanged: (value) {
                           setState(() {
-                            _notificationsOn = value;
+                            _distractedNotification = value;
                           });
-                          LocalNotificationHelper.notificationsOn = value;
-                          setValue('focusNotifications', value);
+                          setValue('distractedNotification', value);
                         },
                       ),
                       Platform.isAndroid
                           ? SettingsTile(
                               title: 'Turn on Do Not Disturb when Focused',
-                              toggle: _dndOn,
+                              toggle: _focusDnd,
                               onChanged: (value) {
                                 setState(() {
-                                  _dndOn = value;
+                                  _focusDnd = value;
                                 });
-                                LocalNotificationHelper.dndOn = value;
-                                setValue('focusDND', value);
+                                setValue('focusDnd', value);
                               })
                           : Container(),
                     ])),
@@ -154,7 +156,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     FlatButton(
                       onPressed: () {
                         HapticFeedback.heavyImpact();
-                        LocalNotificationHelper.userLoggedIn = false;
                         auth.signOut();
                         AnalyticsProvider().logSignOut();
                       },

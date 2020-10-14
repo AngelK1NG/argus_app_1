@@ -49,14 +49,15 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   FirestoreProvider _firestoreProvider;
   AnalyticsProvider _analyticsProvider = AnalyticsProvider();
   List<TaskItem> _tasks = [];
-  LocalNotificationHelper notificationHelper;
-  bool _notifConfirmation = false;
+  LocalNotifications localNotifications;
+  SharedPreferences _prefs;
   bool _loading = true;
   bool _saving = false;
   bool _screenOn = true;
   bool _distractionTracking = true;
   bool _distractionTrackingNotice = false;
   int _distractionTrackingNoticeCount = 0;
+  int _dndCount = 0;
   int _seconds = 0;
   int _secondsDistracted = 0;
   int _numDistracted = 0;
@@ -132,22 +133,18 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         _doingTask = true;
       });
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setInt('secondsDistracted', _secondsDistracted);
-      prefs.setInt('initSecondsDistracted', _initSecondsDistracted);
-      prefs.setInt('numDistracted', _numDistracted);
-      prefs.setInt('initNumDistracted', _initNumDistracted);
-      prefs.setInt('initSeconds', initSeconds);
-      prefs.setInt('startFocused', _startFocused.millisecondsSinceEpoch);
-      prefs.setString('taskId', _tasks[0].id);
-      prefs.setBool('doingTask', true);
+      _prefs.setInt('secondsDistracted', _secondsDistracted);
+      _prefs.setInt('initSecondsDistracted', _initSecondsDistracted);
+      _prefs.setInt('numDistracted', _numDistracted);
+      _prefs.setInt('initNumDistracted', _initNumDistracted);
+      _prefs.setInt('initSeconds', initSeconds);
+      _prefs.setInt('startFocused', _startFocused.millisecondsSinceEpoch);
+      _prefs.setString('taskId', _tasks[0].id);
+      _prefs.setBool('doingTask', true);
 
       if (Platform.isAndroid) {
-        if (LocalNotificationHelper.dndOn) {
-          if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-            await FlutterDnd.setInterruptionFilter(
-                FlutterDnd.INTERRUPTION_FILTER_NONE);
-          }
+        if (_prefs.getBool('focusDnd')) {
+          setDnd(true);
         }
       }
       _analyticsProvider.logStartTask(_tasks[0], DateTime.now());
@@ -164,18 +161,13 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _message = messages[_random.nextInt(messages.length)];
       _distractionTracking = true;
       _distractionTrackingNotice = false;
-      _distractionTrackingNoticeCount = 0;
     });
     if (Platform.isAndroid) {
-      if (LocalNotificationHelper.dndOn) {
-        if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-          await FlutterDnd.setInterruptionFilter(
-              FlutterDnd.INTERRUPTION_FILTER_ALL);
-        }
+      if (_prefs.getBool('focusDnd')) {
+        setDnd(false);
       }
     }
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('doingTask', false);
+    _prefs.setBool('doingTask', false);
     widget.setDoingTask(false);
   }
 
@@ -285,101 +277,176 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     return true;
   }
 
-  void getSettings() {
-    SharedPreferences.getInstance().then((SharedPreferences prefs) {
-      LocalNotificationHelper.dndOn =
-          prefs.getBool('focusDND') == null ? true : prefs.getBool('focusDND');
-      LocalNotificationHelper.notificationsOn =
-          prefs.getBool('focusNotifications') == null
-              ? true
-              : prefs.getBool('focusNotifications');
+  void getPrefs() async {
+    _prefs = await SharedPreferences.getInstance();
+    if (_prefs.getBool('distractedNotification') == null) {
+      _prefs.setBool('distractedNotification', true);
+    }
+    if (_prefs.getBool('focusDnd') == null) {
+      _prefs.setBool('focusDnd', true);
+    }
+    if (_prefs.getBool('doingTask')) {
+      db
+          .collection('users')
+          .document(_user.uid)
+          .collection('tasks')
+          .document(_date)
+          .collection('tasks')
+          .where('order', isEqualTo: 1)
+          .getDocuments()
+          .then((snapshot) async {
+        if (snapshot == null ||
+            snapshot.documents == null ||
+            snapshot.documents.isEmpty ||
+            snapshot.documents[0].documentID != _prefs.getString('taskId')) {
+          setState(() {
+            _doingTask = false;
+          });
+          _prefs.setBool('doingTask', false);
+        } else {
+          _secondsDistracted = _prefs.getInt('secondsDistracted');
+          _initSecondsDistracted = _prefs.getInt('initSecondsDistracted');
+          _numDistracted = _prefs.getInt('numDistracted');
+          _initNumDistracted = _prefs.getInt('initNumDistracted');
+          int initSeconds = _prefs.getInt('initSeconds');
+          _timer = new Timer.periodic(
+              const Duration(seconds: 1),
+              (Timer timer) => setState(() {
+                    _seconds =
+                        (DateTime.now().difference(_startFocused).inSeconds) +
+                            initSeconds;
+                    _swatchDisplay =
+                        (_seconds ~/ 60).toString().padLeft(2, "0") +
+                            ":" +
+                            (_seconds % 60).toString().padLeft(2, "0");
+                  }));
+          setState(() {
+            _startFocused = DateTime.fromMillisecondsSinceEpoch(
+                _prefs.getInt('startFocused'));
+            _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
+                initSeconds;
+            _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                ":" +
+                (_seconds % 60).toString().padLeft(2, "0");
+            _doingTask = true;
+          });
+          if (_prefs.getBool('distracted')) {
+            _startDistracted = DateTime.fromMillisecondsSinceEpoch(
+                _prefs.getInt('startDistracted'));
+            _secondsDistracted +=
+                DateTime.now().difference(_startDistracted).inSeconds;
+            _numDistracted++;
+            _prefs.setInt('secondsDistracted', _secondsDistracted);
+            _prefs.setInt('numDistracted', _numDistracted);
+            _prefs.setBool('distracted', false);
+          }
+          widget.setDoingTask(true);
+        }
+      });
+    } else {
+      setState(() {
+        _doingTask = false;
+      });
+    }
+  }
+
+  void setDnd(bool on) async {
+    if (on) {
+      if (await FlutterDnd.isNotificationPolicyAccessGranted) {
+        await FlutterDnd.setInterruptionFilter(
+            FlutterDnd.INTERRUPTION_FILTER_NONE);
+      }
+    } else {
+      if (await FlutterDnd.isNotificationPolicyAccessGranted) {
+        await FlutterDnd.setInterruptionFilter(
+            FlutterDnd.INTERRUPTION_FILTER_ALL);
+      }
+    }
+  }
+
+  Future<void> showDndConfirmation() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Allow Do Not Disturb access'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'This will help maintain your focus while you are doing your task. Clicking OK will redirect you to Settings.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('TURN OFF', style: TextStyle(color: Colors.red,)),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _prefs.setBool('focusDnd', false);
+              },
+            ),
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                FlutterDnd.gotoPolicySettings();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void checkIfDndOn() async {
+    if (Platform.isAndroid) {
+      if (await FlutterDnd.isNotificationPolicyAccessGranted == false) {
+        if (_prefs.getBool('focusDnd')) {
+          showDndConfirmation();
+        }
+      }
+    }
+  }
+
+  void repeatDistractedNotification(AppLifecycleState state, TaskItem task, int numDistracted) {
+    Future.delayed(const Duration(minutes: 10), () {
+      if (_doingTask && state == AppLifecycleState.paused && task == _tasks[0] && numDistracted == _numDistracted) {
+        localNotifications.showDistractedNotification();
+        if (_prefs.getBool('focusDnd')) {
+          setDnd(false);
+          _dndCount++;
+          final dndCount = _dndCount;
+          Future.delayed(const Duration(milliseconds: 4000), () {
+            if (_doingTask && dndCount == _dndCount) {
+              setDnd(true);
+            }
+          });
+        }
+        repeatDistractedNotification(state, task, numDistracted);
+      }
     });
   }
 
-  void getState() {
-    SharedPreferences.getInstance().then((SharedPreferences prefs) async {
-      if (prefs.getBool('doingTask') == true) {
-        db
-            .collection('users')
-            .document(_user.uid)
-            .collection('tasks')
-            .document(_date)
-            .collection('tasks')
-            .where('order', isEqualTo: 1)
-            .getDocuments()
-            .then((snapshot) async {
-          if (snapshot == null ||
-              snapshot.documents == null ||
-              snapshot.documents.isEmpty ||
-              snapshot.documents[0].documentID != prefs.getString('taskId')) {
-            setState(() {
-              _doingTask = false;
-            });
-            prefs.setBool('doingTask', false);
-          } else {
-            _secondsDistracted = prefs.getInt('secondsDistracted');
-            _initSecondsDistracted = prefs.getInt('initSecondsDistracted');
-            _numDistracted = prefs.getInt('numDistracted');
-            _initNumDistracted = prefs.getInt('initNumDistracted');
-            int initSeconds = prefs.getInt('initSeconds');
-            _timer = new Timer.periodic(
-                const Duration(seconds: 1),
-                (Timer timer) => setState(() {
-                      _seconds =
-                          (DateTime.now().difference(_startFocused).inSeconds) +
-                              initSeconds;
-                      _swatchDisplay =
-                          (_seconds ~/ 60).toString().padLeft(2, "0") +
-                              ":" +
-                              (_seconds % 60).toString().padLeft(2, "0");
-                    }));
-            setState(() {
-              _startFocused = DateTime.fromMillisecondsSinceEpoch(
-                  prefs.getInt('startFocused'));
-              _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
-                  initSeconds;
-              _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-                  ":" +
-                  (_seconds % 60).toString().padLeft(2, "0");
-              _doingTask = true;
-            });
-            if (Platform.isAndroid) {
-              if (LocalNotificationHelper.dndOn == true) {
-                if (await FlutterDnd.isNotificationPolicyAccessGranted) {
-                  await FlutterDnd.setInterruptionFilter(
-                      FlutterDnd.INTERRUPTION_FILTER_NONE);
-                }
-              }
-            }
-            if (prefs.getBool('distracted') == true) {
-              _startDistracted = DateTime.fromMillisecondsSinceEpoch(
-                  prefs.getInt('startDistracted'));
-              _secondsDistracted +=
-                  DateTime.now().difference(_startDistracted).inSeconds;
-              _numDistracted++;
-              prefs.setInt('secondsDistracted', _secondsDistracted);
-              prefs.setInt('numDistracted', _numDistracted);
-              prefs.setBool('distracted', false);
-            }
-            widget.setDoingTask(true);
-          }
-        });
-      } else {
-        setState(() {
-          _doingTask = false;
-        });
-      }
-    });
+  Future<bool> iosScreenOn() async {
+    var value = await screenChannel.invokeMethod("isScreenOn");
+    return value;
+  }
+
+  Future<bool> androidScreenOn() async {
+    var value = await screenChannel.invokeMethod("isScreenOn");
+    return value;
   }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    getSettings();
-    getState();
-    notificationHelper = LocalNotificationHelper();
-    notificationHelper.initialize();
+    getPrefs();
+    checkIfDndOn();
+    localNotifications = LocalNotifications();
+    localNotifications.initialize();
     setState(() {
       _quote = quotes[_random.nextInt(quotes.length)];
       _message = messages[_random.nextInt(messages.length)];
@@ -432,30 +499,30 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     switch (state) {
       case AppLifecycleState.paused: {
         if (_doingTask && _distractionTracking) {
           if (Platform.isAndroid) {
             androidScreenOn().then((value) {
               if (value) {
+                _screenOn = true;
                 _startDistracted = DateTime.now();
-                  prefs.setInt('startDistracted',
+                  _prefs.setInt('startDistracted',
                       _startDistracted.millisecondsSinceEpoch);
-                  prefs.setBool('distracted', true);
-                  if (LocalNotificationHelper.notificationsOn) {
-                    if (LocalNotificationHelper.dndOn) {
-                      FlutterDnd.setInterruptionFilter(
-                          FlutterDnd.INTERRUPTION_FILTER_ALL);
-                      notificationHelper.showNotifications();
-                      _screenOn = true;
-                      Future.delayed(const Duration(milliseconds: 3000), () {
-                        FlutterDnd.setInterruptionFilter(
-                            FlutterDnd.INTERRUPTION_FILTER_NONE);
+                  _prefs.setBool('distracted', true);
+                  if (_prefs.getBool('distractedNotification')) {
+                    localNotifications.showDistractedNotification();
+                    if (_prefs.getBool('focusDnd')) {
+                      setDnd(false);
+                      _dndCount++;
+                      final dndCount = _dndCount;
+                      Future.delayed(const Duration(milliseconds: 4000), () {
+                        if (_doingTask && dndCount == _dndCount) {
+                          setDnd(true);
+                        }
                       });
-                    } else {
-                      notificationHelper.showNotifications();
                     }
+                    repeatDistractedNotification(state, _tasks[0], _numDistracted);
                   }
                 } else {
                   _screenOn = false;
@@ -465,8 +532,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               iosScreenOn().then((value) {
                 if (value) {
                   _startDistracted = DateTime.now();
-                  prefs.setBool('distracted', true);
-                  notificationHelper.showNotifications();
+                  _prefs.setBool('distracted', true);
+                  localNotifications.showDistractedNotification();
                   _screenOn = true;
                 } else {
                   _screenOn = false;
@@ -482,9 +549,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             _secondsDistracted +=
                 DateTime.now().difference(_startDistracted).inSeconds;
             _numDistracted++;
-            prefs.setInt('secondsDistracted', _secondsDistracted);
-            prefs.setInt('numDistracted', _numDistracted);
-            prefs.setBool('distracted', false);
+            _prefs.setInt('secondsDistracted', _secondsDistracted);
+            _prefs.setInt('numDistracted', _numDistracted);
+            _prefs.setBool('distracted', false);
           } else if (_distractionTracking == false) {
             setState(() {
               _distractionTracking = true;
@@ -503,57 +570,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     }
   }
 
-// android confirm for notification settings
-  Future<void> showNotificationConfirmation() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Allow do not disturb access'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                    'This will keep you in focus while you are doing your task. Clicking OK will redirect you to Settings.'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                FlutterDnd.gotoPolicySettings();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void checkIfNotificationsOn() async {
-    if (Platform.isAndroid) {
-      if (await FlutterDnd.isNotificationPolicyAccessGranted == false) {
-        if (_notifConfirmation == false) {
-          _notifConfirmation = true;
-          showNotificationConfirmation();
-        }
-      }
-    }
-  }
-
-  Future<bool> iosScreenOn() async {
-    var value = await screenChannel.invokeMethod("isScreenOn");
-    return value;
-  }
-
-  Future<bool> androidScreenOn() async {
-    var value = await screenChannel.invokeMethod("isScreenOn");
-    return value;
-  }
-
   @override
   Widget build(BuildContext context) {
     final TextStyle topTextStyle = TextStyle(
@@ -570,8 +586,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       fontSize: 36,
       fontWeight: FontWeight.w400,
     );
-
-    checkIfNotificationsOn();
 
     return WillPopScope(
       onWillPop: () async => false,

@@ -1,5 +1,4 @@
 import 'package:Focal/utils/auth.dart';
-import 'package:Focal/utils/local_notifications.dart';
 import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -104,7 +103,6 @@ class _LoginPageState extends State<LoginPage> {
                               _loginLoading = false;
                             });
                           } else {
-                            LocalNotificationHelper.userLoggedIn = true;
                             AnalyticsProvider().logGoogleSignIn();
                           }
                         },
@@ -138,7 +136,6 @@ class _LoginPageState extends State<LoginPage> {
                                       _loginLoading = false;
                                     });
                                   } else {
-                                    LocalNotificationHelper.userLoggedIn = true;
                                     AnalyticsProvider().logAppleSignIn();
                                   }
                                 },
