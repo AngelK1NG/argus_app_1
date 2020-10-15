@@ -199,14 +199,19 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               FieldValue.increment(_numDistracted - _initNumDistracted),
           'numPaused': FieldValue.increment(1),
         }).then((_) {
-          _analyticsProvider.logPauseTask(_tasks[0], DateTime.now());
-          _seconds = 0;
-          _secondsDistracted = 0;
-          _numDistracted = 0;
-          _initSecondsFocused = 0;
-          _initSecondsDistracted = 0;
-          _initNumDistracted = 0;
-          _saving = false;
+          db.collection('users').document(user.uid).updateData({
+            'secondsFocused': FieldValue.increment(
+                _seconds - _secondsDistracted - _initSecondsFocused),
+          }).then((_) {
+            _analyticsProvider.logPauseTask(_tasks[0], DateTime.now());
+            _seconds = 0;
+            _secondsDistracted = 0;
+            _numDistracted = 0;
+            _initSecondsFocused = 0;
+            _initSecondsDistracted = 0;
+            _initNumDistracted = 0;
+            _saving = false;
+          });
         });
       });
     }
@@ -245,14 +250,20 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           'numDistracted':
               FieldValue.increment(_numDistracted - _initNumDistracted),
         }).then((_) {
-          _analyticsProvider.logCompleteTask(task, DateTime.now());
-          _seconds = 0;
-          _secondsDistracted = 0;
-          _numDistracted = 0;
-          _initSecondsFocused = 0;
-          _initSecondsDistracted = 0;
-          _initNumDistracted = 0;
-          _saving = false;
+          db.collection('users').document(user.uid).updateData({
+            'secondsFocused': FieldValue.increment(
+                _seconds - _secondsDistracted - _initSecondsFocused),
+            'completedTasks': FieldValue.increment(1),
+          }).then((_) {
+            _analyticsProvider.logCompleteTask(task, DateTime.now());
+            _seconds = 0;
+            _secondsDistracted = 0;
+            _numDistracted = 0;
+            _initSecondsFocused = 0;
+            _initSecondsDistracted = 0;
+            _initNumDistracted = 0;
+            _saving = false;
+          });
         });
       });
       if (areTasksCompleted()) {
@@ -435,6 +446,15 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _date = getDateString(DateTime.now());
       _user = Provider.of<User>(context, listen: false).user;
       _firestoreProvider = FirestoreProvider(_user);
+      DocumentReference userDoc = db.collection('users').document(_user.uid);
+      userDoc.get().then((snapshot) {
+        if (snapshot.data != null && snapshot.data['lastActive'] != _date) {
+          userDoc.updateData({
+            'lastActive': _date,
+            'daysActive': FieldValue.increment(1),
+          });
+        }
+      });
       DocumentReference dateDoc = db
           .collection('users')
           .document(_user.uid)
@@ -545,17 +565,17 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle topTextStyle = TextStyle(
+    TextStyle topTextStyle = TextStyle(
       fontSize: 40,
       color: Colors.white,
       fontWeight: FontWeight.w600,
     );
-    final TextStyle swatchTextStyle = TextStyle(
+    TextStyle swatchTextStyle = TextStyle(
       fontSize: 80,
       color: Colors.white,
       fontWeight: FontWeight.w600,
     );
-    final TextStyle taskTextStyle = TextStyle(
+    TextStyle taskTextStyle = TextStyle(
       fontSize: 36,
       fontWeight: FontWeight.w400,
     );
@@ -839,21 +859,21 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                         child: Container(
                                           alignment: Alignment.center,
                                           height:
-                                              SizeConfig.safeBlockVertical * 20,
+                                              SizeConfig.safeBlockVertical * 25,
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: <Widget>[
                                               Text(
-                                                'Distraction tracking is off',
+                                                'You can now leave Focal.',
                                                 textAlign: TextAlign.center,
                                                 style: topTextStyle,
                                               ),
                                               Text(
-                                                'You can now leave the app',
+                                                'Your time outside of Focal will not be counted as Distraction, but you will only receive 50% Volts until you return. Keep up the good work!',
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 14,
                                                   fontWeight: FontWeight.w400,
                                                   color: Colors.white,
                                                 ),

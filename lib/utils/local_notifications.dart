@@ -47,12 +47,10 @@ class LocalNotifications {
         androidAllowWhileIdle: true,
       );
     }
-    print('Distracted notification');
   }
 
   void cancelDistractedNotification() async {
     await notificationsPlugin.cancel(0);
-    print('Distracted notification canceled');
   }
 
   Future selectNotification(String payLoad) {

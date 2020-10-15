@@ -14,11 +14,7 @@ class _OnboardingState extends State<Onboarding> {
     initialPage: 0,
   );
   double _index = 0;
-  TextStyle descriptionStyle = TextStyle(
-    fontSize: 20,
-    fontWeight: FontWeight.w300,
-  );
-
+  
   @override
   void initState() {
     super.initState();
@@ -39,6 +35,11 @@ class _OnboardingState extends State<Onboarding> {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle descriptionStyle = TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.w300,
+    );
+
     return WillPopScope(
       onWillPop: () async => false,
       child: Stack(

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/components/task_item.dart';
+import 'package:Focal/utils/date.dart';
 
 class FirestoreProvider {
   FirebaseUser user;
@@ -28,6 +29,10 @@ class FirestoreProvider {
         db.collection('users').document(user.uid).setData({
           'name': user.displayName,
           'email': user.email,
+          'daysActive': 1,
+          'lastActive': getDateString(DateTime.now()),
+          'secondsFocused': 0,
+          'completedTasks': 0,
         });
       }
     });
@@ -67,9 +72,9 @@ class FirestoreProvider {
         .collection('tasks')
         .document(date)
         .updateData({
-          'completedTasks': completedTasks,
-          'totalTasks': totalTasks,
-        });
+      'completedTasks': completedTasks,
+      'totalTasks': totalTasks,
+    });
   }
 
   // update task name
@@ -91,6 +96,22 @@ class FirestoreProvider {
   Future<String> addTask(TaskItem task, String date) async {
     String userId = user.uid;
     String taskId;
+    DocumentReference dateDoc = db
+        .collection('users')
+        .document(user.uid)
+        .collection('tasks')
+        .document(date);
+    DocumentSnapshot snapshot = await dateDoc.get();
+    if (snapshot.data == null) {
+      await dateDoc.setData({
+        'secondsFocused': 0,
+        'secondsDistracted': 0,
+        'numDistracted': 0,
+        'numPaused': 0,
+        'completedTasks': 0,
+        'totalTasks': 0,
+      });
+    }
     if (task.id != null) {
       taskId = task.id;
       await db
@@ -109,24 +130,6 @@ class FirestoreProvider {
         'numPaused': task.numPaused,
         'completed': task.completed,
         'paused': task.paused,
-      }).then((doc) {
-        DocumentReference dateDoc = db
-          .collection('users')
-          .document(user.uid)
-          .collection('tasks')
-          .document(date);
-        dateDoc.setData({
-          'secondsFocused': FieldValue.increment(
-              task.secondsFocused == null ? 0 : task.secondsFocused),
-          'secondsDistracted': FieldValue.increment(
-              task.secondsDistracted == null ? 0 : task.secondsDistracted),
-          'numDistracted': FieldValue.increment(
-              task.numDistracted == null ? 0 : task.numDistracted),
-          'numPaused':
-              FieldValue.increment(task.numPaused == null ? 0 : task.numPaused),
-          'completedTasks': FieldValue.increment(0),
-          'totalTasks': FieldValue.increment(1),
-        }, merge: true);
       });
     } else {
       await db
@@ -146,23 +149,6 @@ class FirestoreProvider {
         'paused': task.paused,
       }).then((doc) {
         taskId = doc.documentID;
-        DocumentReference dateDoc = db
-          .collection('users')
-          .document(user.uid)
-          .collection('tasks')
-          .document(date);
-        dateDoc.setData({
-          'secondsFocused': FieldValue.increment(
-              task.secondsFocused == null ? 0 : task.secondsFocused),
-          'secondsDistracted': FieldValue.increment(
-              task.secondsDistracted == null ? 0 : task.secondsDistracted),
-          'numDistracted': FieldValue.increment(
-              task.numDistracted == null ? 0 : task.numDistracted),
-          'numPaused':
-              FieldValue.increment(task.numPaused == null ? 0 : task.numPaused),
-          'completedTasks': FieldValue.increment(0),
-          'totalTasks': FieldValue.increment(1),
-        }, merge: true);
       });
     }
     return taskId;
@@ -179,33 +165,5 @@ class FirestoreProvider {
         .collection('tasks')
         .document(task.id)
         .delete();
-    DocumentReference dateDoc = db
-        .collection('users')
-        .document(user.uid)
-        .collection('tasks')
-        .document(date);
-    dateDoc.updateData({
-      'secondsFocused': FieldValue.increment(
-          task.secondsFocused == null ? 0 : -task.secondsFocused),
-      'secondsDistracted': FieldValue.increment(
-          task.secondsDistracted == null ? 0 : -task.secondsDistracted),
-      'numDistracted': FieldValue.increment(
-          task.numDistracted == null ? 0 : -task.numDistracted),
-      'numPaused':
-          FieldValue.increment(task.numPaused == null ? 0 : -task.numPaused),
-    }).then((_) {
-      dateDoc.get().then((snapshot) {
-        if (snapshot.data['secondsFocused'] < 0) {
-          dateDoc.updateData({
-            'secondsFocused': 0,
-          });
-        }
-        if (snapshot.data['secondsDistracted'] < 0) {
-          dateDoc.updateData({
-            'secondsDistracted': 0,
-          });
-        }
-      });
-    });
   }
 }

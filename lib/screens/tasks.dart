@@ -171,25 +171,33 @@ class _TasksPageState extends State<TasksPage> {
             _tmrTasks.remove(_tmrTasks.firstWhere((tasku) => tasku.id == task.id));
             firestoreProvider.deleteTask(task, tomorrow);
             firestoreProvider.updateTasks(_tmrTasks, tomorrow);
-            if (date == _date) {
-              setState(() {
-                _tasks.insert(
+            if (mounted) {
+              if (date == _date) {
+                setState(() {
+                  _tasks.insert(
+                      task.order - 1,
+                      task);
+                  if (task.completed) {
+                    _completedTasks++;
+                  }
+                });
+                updateTaskOrder();
+                await firestoreProvider.addTask(task, _date);
+                firestoreProvider.updateTasks(_tasks, _date);
+              } else {
+                tasks.insert(
                     task.order - 1,
                     task);
-                if (task.completed) {
-                  _completedTasks++;
-                }
-              });
-              updateTaskOrder();
-              await firestoreProvider.addTask(task, _date);
-              firestoreProvider.updateTasks(_tasks, _date);
+                await firestoreProvider.addTask(task, date);
+                firestoreProvider.updateTasks(tasks, date);
+                getTasks();
+              }
             } else {
               tasks.insert(
                   task.order - 1,
                   task);
               await firestoreProvider.addTask(task, date);
               firestoreProvider.updateTasks(tasks, date);
-              getTasks();
             }
           },
         ),
@@ -218,25 +226,33 @@ class _TasksPageState extends State<TasksPage> {
       action: SnackBarAction(
         label: 'Undo',
         onPressed: () async {
-          if (date == _date) {
-            setState(() {
-              _tasks.insert(
+          if (mounted) {
+            if (date == _date) {
+              setState(() {
+                _tasks.insert(
+                    task.order - 1,
+                    task);
+                if (task.completed) {
+                  _completedTasks++;
+                }
+              });
+              updateTaskOrder();
+              await firestoreProvider.addTask(task, _date);
+              firestoreProvider.updateTasks(_tasks, _date);
+            } else {
+              tasks.insert(
                   task.order - 1,
                   task);
-              if (task.completed) {
-                _completedTasks++;
-              }
-            });
-            updateTaskOrder();
-            await firestoreProvider.addTask(task, _date);
-            firestoreProvider.updateTasks(_tasks, _date);
+              await firestoreProvider.addTask(task, date);
+              firestoreProvider.updateTasks(tasks, date);
+              getTasks();
+            }
           } else {
             tasks.insert(
                 task.order - 1,
                 task);
             await firestoreProvider.addTask(task, date);
             firestoreProvider.updateTasks(tasks, date);
-            getTasks();
           }
         },
       ),
@@ -394,12 +410,12 @@ class _TasksPageState extends State<TasksPage> {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle dateTextStyle = TextStyle(
+    TextStyle dateTextStyle = TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.w600,
       color: Colors.white,
     );
-    final TextStyle todayTextStyle = TextStyle(
+    TextStyle todayTextStyle = TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.w600,
       color: Theme.of(context).primaryColor,
