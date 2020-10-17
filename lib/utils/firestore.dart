@@ -33,6 +33,10 @@ class FirestoreProvider {
           'lastActive': getDateString(DateTime.now()),
           'secondsFocused': 0,
           'completedTasks': 0,
+          'volts': {
+            'dateTime': getDateTimeString(DateTime.now()),
+            'val': 1000,
+          }
         });
       }
     });

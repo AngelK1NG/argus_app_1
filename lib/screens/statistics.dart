@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:Focal/constants.dart';
-import 'package:Focal/components/today_stats.dart';
-import 'package:Focal/components/week_stats.dart';
 import 'package:Focal/utils/size_config.dart';
 import 'package:Focal/utils/date.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:Focal/utils/user.dart';
+import 'package:Focal/components/volts.dart';
+import 'package:Focal/components/volts_chart.dart';
 
 class StatisticsPage extends StatefulWidget {
   final Function goToPage;
@@ -125,93 +125,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   right: 0,
                   left: 0,
                   top: SizeConfig.safeBlockVertical * 15 + 15,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () {
-                          if (_timeFrame != 'today') {
-                            setState(() {
-                              _timeFrame = 'today';
-                            });
-                          }
-                        },
-                        child: Container(
-                          height: 25,
-                          width: SizeConfig.safeBlockHorizontal * 50 - 25,
-                          decoration: BoxDecoration(
-                              color: _timeFrame == 'today'
-                                  ? Theme.of(context).primaryColor
-                                  : Theme.of(context).dividerColor,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(15),
-                                  bottomLeft: Radius.circular(15))),
-                          child: Center(
-                            child: Text(
-                              'Today',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: _timeFrame == 'today'
-                                    ? Colors.white
-                                    : Theme.of(context).primaryColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          if (_timeFrame != 'week') {
-                            setState(() {
-                              _timeFrame = 'week';
-                            });
-                          }
-                        },
-                        child: Container(
-                          height: 25,
-                          width: SizeConfig.safeBlockHorizontal * 50 - 25,
-                          decoration: BoxDecoration(
-                              color: _timeFrame == 'week'
-                                  ? Theme.of(context).primaryColor
-                                  : Theme.of(context).dividerColor,
-                              borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(15),
-                                  bottomRight: Radius.circular(15))),
-                          child: Center(
-                            child: Text(
-                              'Week',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: _timeFrame == 'week'
-                                    ? Colors.white
-                                    : Theme.of(context).primaryColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: Container(),
                 ),
-                Positioned(
-                    right: 25,
-                    left: 25,
-                    top: SizeConfig.safeBlockVertical * 15 + 55,
-                    child: SizedBox(
-                      height: SizeConfig.safeBlockVertical * 85 - 135,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: _loading
-                            ? Container()
-                            : _timeFrame == 'today'
-                                ? TodayStats(
-                                    tasksSnapshot: _todayTasksSnapshot,
-                                    dateSnapshot: _todayDateSnapshot)
-                                : WeekStats(snapshots: _weekSnapshots),
-                      ),
-                    )),
               ],
             ),
           ),

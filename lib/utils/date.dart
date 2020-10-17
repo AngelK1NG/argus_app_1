@@ -1,16 +1,16 @@
 String getDateString(DateTime date) {
-  String day = date.day.toString();
-  String month = date.month.toString();
+  String day = date.day.toString().padLeft(2, '0');
+  String month = date.month.toString().padLeft(2, '0');
   String year = date.year.toString();
-  if (day.length == 1) {
-    day = '0' + day;
-  }
-  if (month.length == 1) {
-    month = '0' + month;
-  }
   return year + month + day;
 }
 
-DateTime getDateFromString(String date) {
-  return DateTime.parse(date);
+String getDateTimeString(DateTime date) {
+  String day = date.day.toString().padLeft(2, '0');
+  String month = date.month.toString().padLeft(2, '0');
+  String year = date.year.toString();
+  String hour = date.hour.toString().padLeft(2, '0');
+  String minute = date.minute.toString().padLeft(2, '0');
+  String second = date.second.toString().padLeft(2, '0');
+  return year + month + day + ' $hour:$minute:$second';
 }
