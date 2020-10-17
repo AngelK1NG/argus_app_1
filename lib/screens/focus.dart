@@ -158,7 +158,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _message = messages[_random.nextInt(messages.length)];
       _distractionTracking = true;
       _distractionTrackingNotice = false;
-      _date = getDateString(DateTime.now().subtract(Duration(hours: _prefs.getInt('dayStartHour'), minutes: _prefs.getInt('dayStartMinute'))));
+      _date = getDateString(DateTime.now().subtract(Duration(
+          hours: _prefs.getInt('dayStartHour'),
+          minutes: _prefs.getInt('dayStartMinute'))));
     });
     if (Platform.isAndroid) {
       setDnd(false);
@@ -298,7 +300,54 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     if (_prefs.getInt('dayStartMinute') == null) {
       _prefs.setInt('dayStartMinute', 0);
     }
-    _date = getDateString(DateTime.now().subtract(Duration(hours: _prefs.getInt('dayStartHour'), minutes: _prefs.getInt('dayStartMinute'))));
+    _date = getDateString(DateTime.now().subtract(Duration(
+        hours: _prefs.getInt('dayStartHour'),
+        minutes: _prefs.getInt('dayStartMinute'))));
+    DocumentReference userDoc = db.collection('users').document(_user.uid);
+    userDoc.get().then((snapshot) {
+      if (snapshot.data != null && snapshot.data['lastActive'] != _date) {
+        userDoc.updateData({
+          'lastActive': _date,
+          'daysActive': FieldValue.increment(1),
+        });
+      }
+    });
+    DocumentReference dateDoc = db
+        .collection('users')
+        .document(_user.uid)
+        .collection('dates')
+        .document(_date);
+    dateDoc.get().then((snapshot) {
+      if (snapshot.data == null) {
+        print(_date);
+        dateDoc.setData({
+          'completedTasks': 0,
+          'totalTasks': 0,
+          'secondsFocused': 0,
+          'secondsDistracted': 0,
+          'numDistracted': 0,
+          'numPaused': 0,
+        }).then((_) {
+          dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
+            if (mounted) {
+              setState(() {
+                _totalTasks = snapshot.data['totalTasks'];
+                _completedTasks = snapshot.data['completedTasks'];
+              });
+            }
+          });
+        });
+      } else {
+        dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
+          if (mounted) {
+            setState(() {
+              _totalTasks = snapshot.data['totalTasks'];
+              _completedTasks = snapshot.data['completedTasks'];
+            });
+          }
+        });
+      }
+    });
     if (_prefs.getBool('doingTask') == true) {
       db
           .collection('users')
@@ -453,50 +502,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _message = messages[_random.nextInt(messages.length)];
       _user = Provider.of<User>(context, listen: false).user;
       _firestoreProvider = FirestoreProvider(_user);
-      DocumentReference userDoc = db.collection('users').document(_user.uid);
-      userDoc.get().then((snapshot) {
-        if (snapshot.data != null && snapshot.data['lastActive'] != _date) {
-          userDoc.updateData({
-            'lastActive': _date,
-            'daysActive': FieldValue.increment(1),
-          });
-        }
-      });
-      DocumentReference dateDoc = db
-          .collection('users')
-          .document(_user.uid)
-          .collection('dates')
-          .document(_date);
-      dateDoc.get().then((snapshot) {
-        if (snapshot.data == null) {
-          dateDoc.setData({
-            'completedTasks': 0,
-            'totalTasks': 0,
-            'secondsFocused': 0,
-            'secondsDistracted': 0,
-            'numDistracted': 0,
-            'numPaused': 0,
-          }).then((_) {
-            dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
-              if (mounted) {
-                setState(() {
-                  _totalTasks = snapshot.data['totalTasks'];
-                  _completedTasks = snapshot.data['completedTasks'];
-                });
-              }
-            });
-          });
-        } else {
-          dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
-            if (mounted) {
-              setState(() {
-                _totalTasks = snapshot.data['totalTasks'];
-                _completedTasks = snapshot.data['completedTasks'];
-              });
-            }
-          });
-        }
-      });
     });
   }
 
