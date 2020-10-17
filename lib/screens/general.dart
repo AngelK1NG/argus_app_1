@@ -201,12 +201,14 @@ class _GeneralPageState extends State<GeneralPage> {
                             minute: _dayStartMinute,
                           ),
                         ).then((time) {
-                          setState(() {
-                            _dayStartHour = time.hour;
-                            _dayStartMinute = time.minute;
-                            setInt('dayStartHour', time.hour);
-                            setInt('dayStartMinute', time.minute);
-                          });
+                          if (time != null) {
+                            setState(() {
+                              _dayStartHour = time.hour;
+                              _dayStartMinute = time.minute;
+                              setInt('dayStartHour', time.hour);
+                              setInt('dayStartMinute', time.minute);
+                            });
+                          }
                         });
                       },
                     ),

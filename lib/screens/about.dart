@@ -19,9 +19,9 @@ class _AboutPageState extends State<AboutPage> {
   bool _loading = true;
   String _version = '';
 
-  void openURL(String URL) async {
-    if (await canLaunch(URL)) {
-      await launch(URL);
+  void openUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
     } else {
       print('Couldn\'t find url');
     }
@@ -145,21 +145,21 @@ class _AboutPageState extends State<AboutPage> {
                     ),
                     textButton(
                       () {
-                        openURL(
+                        openUrl(
                             'https://docs.google.com/document/d/1h0fBpGKMKHna0MSA8NTt0FXAdc551ALwSkVWJkh0mbY/edit?usp=sharing');
                       },
                       'Terms & Conditions',
                     ),
                     textButton(
                       () {
-                        openURL(
+                        openUrl(
                             'https://docs.google.com/document/d/1eIL0fXCFXXoiIfU59qPXqnQxhKp-8VG2XTvh63O0d-o/edit?usp=sharing');
                       },
                       'Privacy Policy',
                     ),
                     textButton(
                       () {
-                        openURL('https://focal.technology');
+                        openUrl('https://focal.technology');
                       },
                       'Website',
                     ),
