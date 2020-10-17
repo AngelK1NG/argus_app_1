@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/utils/size_config.dart';
 import 'package:Focal/components/bottom_nav.dart';
@@ -57,6 +58,7 @@ class _HomeState extends State<Home> {
             _child = FocusPage(goToPage: goToPage, setDoingTask: setDoingTask);
             _cardPosition = SizeConfig.safeBlockVertical * 36;
             setNav(true);
+            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
           }
         case 1:
@@ -64,6 +66,7 @@ class _HomeState extends State<Home> {
             _child = TasksPage(goToPage: goToPage);
             _cardPosition = SizeConfig.safeBlockVertical * 15;
             setNav(true);
+            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
           }
         case 2:
@@ -71,6 +74,7 @@ class _HomeState extends State<Home> {
             _child = StatisticsPage(goToPage: goToPage);
             _cardPosition = SizeConfig.safeBlockVertical * 15;
             setNav(true);
+            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
           }
         case 3:
@@ -78,6 +82,7 @@ class _HomeState extends State<Home> {
             _child = ProfilePage(goToPage: goToPage);
             _cardPosition = SizeConfig.safeBlockVertical * 15;
             setNav(true);
+            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
           }
         case 4:
@@ -85,6 +90,7 @@ class _HomeState extends State<Home> {
             _child = GeneralPage(goToPage: goToPage);
             _cardPosition = SizeConfig.safeBlockVertical * 15;
             setNav(true);
+            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
           }
         case 5:
@@ -92,6 +98,7 @@ class _HomeState extends State<Home> {
             _child = HelpPage(goToPage: goToPage);
             _cardPosition = 0;
             setNav(false);
+            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
             break;
           }
         case 6:
@@ -99,6 +106,7 @@ class _HomeState extends State<Home> {
             _child = AboutPage(goToPage: goToPage);
             _cardPosition = 0;
             setNav(false);
+            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
             break;
           }
       }
@@ -143,14 +151,18 @@ class _HomeState extends State<Home> {
             curve: cardSlideCurve,
             left: 0,
             right: 0,
-            top: _cardPosition == 0 ? 0 : _cardPosition + MediaQuery.of(context).padding.top,
+            top: _cardPosition == 0
+                ? 0
+                : _cardPosition + MediaQuery.of(context).padding.top,
             child: AnimatedContainer(
               duration: cardSlideDuration,
               curve: cardSlideCurve,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
-                  topLeft: _cardPosition == 0 ? Radius.zero : Radius.circular(40),
-                  topRight: _cardPosition == 0 ? Radius.zero : Radius.circular(40),
+                  topLeft:
+                      _cardPosition == 0 ? Radius.zero : Radius.circular(40),
+                  topRight:
+                      _cardPosition == 0 ? Radius.zero : Radius.circular(40),
                 ),
                 color: Colors.white,
                 boxShadow: [

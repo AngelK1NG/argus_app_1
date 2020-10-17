@@ -106,148 +106,145 @@ class _ProfilePageState extends State<ProfilePage> {
                 scrollDirection: Axis.vertical,
                 child: Column(
                   children: <Widget>[
-                    SizedBox(
-                      height: 175,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            height: 60,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _photoUrl == null
-                                    ? Icon(
-                                        FeatherIcons.user,
-                                        color: jetBlack,
-                                        size: 60,
-                                      )
-                                    : CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage: NetworkImage(_photoUrl),
-                                      ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: <Widget>[
-                                    Text(
-                                      _name,
-                                      style: TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                    Offstage(
+                      offstage: _name == null,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 25),
+                        child: SizedBox(
+                          height: 60,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              _photoUrl == null
+                                  ? Icon(
+                                      FeatherIcons.user,
+                                      color: jetBlack,
+                                      size: 60,
+                                    )
+                                  : CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: NetworkImage(_photoUrl),
                                     ),
-                                    Text(
-                                      _email,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Theme.of(context).hintColor,
-                                      ),
+                              Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  Text(
+                                    _name == null ? '' : _name,
+                                    style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                  ],
-                                )
-                              ],
-                            ),
+                                  ),
+                                  Text(
+                                    _email == null ? '' : _email,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Theme.of(context).hintColor,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
                           ),
-                          SizedBox(
-                            height: 100,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 100,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              SizedBox(
+                                height: 45,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(
-                                      height: 45,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            _totalFocused.inHours.toString() +
-                                                'h ' +
-                                                _totalFocused.inMinutes.toString() +
-                                                'm',
-                                            style: statTextStyle,
-                                          ),
-                                          Text(
-                                            'Total Focused',
-                                            style: blueStatDescriptionTextStyle,
-                                          ),
-                                        ],
-                                      ),
+                                  children: [
+                                    Text(
+                                      _totalFocused.inHours.toString() +
+                                          'h ' +
+                                          _totalFocused.inMinutes.toString() +
+                                          'm',
+                                      style: statTextStyle,
                                     ),
-                                    SizedBox(
-                                      height: 45,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            _avgFocused.inHours.toString() +
-                                                'h ' +
-                                                _avgFocused.inMinutes.toString() +
-                                                'm',
-                                            style: statTextStyle,
-                                          ),
-                                          Text(
-                                            'Avg. Focused',
-                                            style: redStatDescriptionTextStyle,
-                                          ),
-                                        ],
-                                      ),
+                                    Text(
+                                      'Total Focused',
+                                      style: blueStatDescriptionTextStyle,
                                     ),
                                   ],
                                 ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              ),
+                              SizedBox(
+                                height: 45,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _avgFocused.inHours.toString() +
+                                          'h ' +
+                                          _avgFocused.inMinutes.toString() +
+                                          'm',
+                                      style: statTextStyle,
+                                    ),
+                                    Text(
+                                      'Avg. Focused',
+                                      style: redStatDescriptionTextStyle,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: <Widget>[
+                              SizedBox(
+                                height: 45,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: <Widget>[
-                                    SizedBox(
-                                      height: 45,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            _totalTasks.toString(),
-                                            style: statTextStyle,
-                                          ),
-                                          Text(
-                                            'Total Tasks Completed',
-                                            style: blueStatDescriptionTextStyle,
-                                          ),
-                                        ],
-                                      ),
+                                  children: [
+                                    Text(
+                                      _totalTasks.toString(),
+                                      style: statTextStyle,
                                     ),
-                                    SizedBox(
-                                      height: 45,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            _avgTasks.toString(),
-                                            style: statTextStyle,
-                                          ),
-                                          Text(
-                                            'Avg. Tasks Completed',
-                                            style: redStatDescriptionTextStyle,
-                                          ),
-                                        ],
-                                      ),
+                                    Text(
+                                      'Total Tasks Completed',
+                                      style: blueStatDescriptionTextStyle,
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              SizedBox(
+                                height: 45,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      _avgTasks.toString(),
+                                      style: statTextStyle,
+                                    ),
+                                    Text(
+                                      'Avg. Tasks Completed',
+                                      style: redStatDescriptionTextStyle,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

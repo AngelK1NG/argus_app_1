@@ -1,6 +1,7 @@
 import 'package:Focal/utils/auth.dart';
 import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import '../components/rct_button.dart';
@@ -73,6 +74,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     return Stack(
       children: <Widget>[
         Container(
@@ -106,9 +108,12 @@ class _LoginPageState extends State<LoginPage> {
                             AnalyticsProvider().logGoogleSignIn();
                           }
                         },
-                        buttonWidth: 315,
+                        buttonWidth: 300,
                         gradient: LinearGradient(
-                          colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+                          colors: [
+                            Theme.of(context).primaryColor,
+                            Theme.of(context).accentColor
+                          ],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
                         ),
@@ -139,7 +144,7 @@ class _LoginPageState extends State<LoginPage> {
                                     AnalyticsProvider().logAppleSignIn();
                                   }
                                 },
-                                buttonWidth: 315,
+                                buttonWidth: 300,
                                 gradient: LinearGradient(
                                   colors: [jetBlack, jetBlack],
                                 ),

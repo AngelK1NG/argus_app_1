@@ -27,7 +27,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     return ChangeNotifierProvider<User>(
       create: (_) => User(),
       child: KeyboardVisibilityProvider(
@@ -51,33 +50,37 @@ class MyApp extends StatelessWidget {
                   dividerColor: const Color(0xffe5e5e5),
                   splashColor: Colors.transparent,
                   textSelectionColor: const Color(0xffddddff),
-                  textTheme: Theme.of(context)
-                      .textTheme
-                      .apply(bodyColor: jetBlack, displayColor: jetBlack, fontFamily: 'Cabin'),
+                  textTheme: Theme.of(context).textTheme.apply(
+                      bodyColor: jetBlack,
+                      displayColor: jetBlack,
+                      fontFamily: 'Cabin'),
                 ),
                 navigatorObservers: [
                   FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
                 ],
                 onGenerateRoute: (routeSettings) {
                   switch (routeSettings.name) {
-                    case '/home': {
-                      return PageRouteBuilder(
-                        settings: RouteSettings(name: routeSettings.name),
-                        pageBuilder: (_, a1, a2) => Home(),
-                      );
-                    }
-                    case '/onboarding': {
-                      return PageRouteBuilder(
-                        settings: RouteSettings(name: routeSettings.name),
-                        pageBuilder: (_, a1, a2) => Onboarding(),
-                      );
-                    }
-                    default: {
-                      return PageRouteBuilder(
-                        settings: RouteSettings(name: routeSettings.name),
-                        pageBuilder: (_, a1, a2) => LoginPage(),
-                      );
-                    }
+                    case '/home':
+                      {
+                        return PageRouteBuilder(
+                          settings: RouteSettings(name: routeSettings.name),
+                          pageBuilder: (_, a1, a2) => Home(),
+                        );
+                      }
+                    case '/onboarding':
+                      {
+                        return PageRouteBuilder(
+                          settings: RouteSettings(name: routeSettings.name),
+                          pageBuilder: (_, a1, a2) => Onboarding(),
+                        );
+                      }
+                    default:
+                      {
+                        return PageRouteBuilder(
+                          settings: RouteSettings(name: routeSettings.name),
+                          pageBuilder: (_, a1, a2) => LoginPage(),
+                        );
+                      }
                   }
                 }),
           ),

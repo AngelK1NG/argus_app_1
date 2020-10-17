@@ -37,29 +37,37 @@ class AuthProvider {
         AppleIdRequest(requestedScopes: [Scope.email, Scope.fullName])
       ]);
       switch (result.status) {
-        case AuthorizationStatus.authorized: {
-          final appleIdCredential = result.credential;
-          final oAuthProvider = OAuthProvider(providerId: 'apple.com');
-          final credential = oAuthProvider.getCredential(
-            idToken: String.fromCharCodes(appleIdCredential.identityToken),
-            accessToken:
-                String.fromCharCodes(appleIdCredential.authorizationCode),
-          );
-          AuthResult authResult = await _auth.signInWithCredential(credential);
-          FirebaseUser firebaseUser = authResult.user;
-          final updateUser = UserUpdateInfo();
-          updateUser.displayName =
-              '${appleIdCredential.fullName.givenName} ${appleIdCredential.fullName.familyName}';
-          await firebaseUser.updateProfile(updateUser);
-          return firebaseUser;
-        }
-        case AuthorizationStatus.error: {
-          print(result.error.toString());
-          break;
-        }
-        case AuthorizationStatus.cancelled: {
-          break;
-        }
+        case AuthorizationStatus.authorized:
+          {
+            final appleIdCredential = result.credential;
+            final oAuthProvider = OAuthProvider(providerId: 'apple.com');
+            final credential = oAuthProvider.getCredential(
+              idToken: String.fromCharCodes(appleIdCredential.identityToken),
+              accessToken:
+                  String.fromCharCodes(appleIdCredential.authorizationCode),
+            );
+            AuthResult authResult =
+                await _auth.signInWithCredential(credential);
+            FirebaseUser firebaseUser = authResult.user;
+            if (appleIdCredential.fullName.givenName != null &&
+                appleIdCredential.fullName.familyName != null) {
+              final updateUser = UserUpdateInfo();
+              updateUser.displayName =
+                  '${appleIdCredential.fullName.givenName} ${appleIdCredential.fullName.familyName}';
+              await firebaseUser.updateProfile(updateUser);
+            }
+            print("Login successful, uid: " + firebaseUser.uid);
+            return firebaseUser;
+          }
+        case AuthorizationStatus.error:
+          {
+            print(result.error.toString());
+            break;
+          }
+        case AuthorizationStatus.cancelled:
+          {
+            break;
+          }
       }
       return null;
     }
