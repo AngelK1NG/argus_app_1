@@ -166,9 +166,7 @@ class _LoginPageState extends State<LoginPage> {
           child: AnimatedOpacity(
             opacity: _loading ? 1.0 : 0.0,
             duration: Duration(milliseconds: 500),
-            child: Container(
-              alignment: Alignment.center,
-              color: Colors.white,
+            child: Center(
               child: Image(
                 image: AssetImage('assets/images/logo/Focal Logo_Full.png'),
               ),

@@ -117,7 +117,7 @@ class _GeneralPageState extends State<GeneralPage> {
                                 child: Container(
                                   width: 40,
                                   height: 40,
-                                  color: Colors.white,
+                                  color: Colors.transparent,
                                   child: Icon(
                                     FeatherIcons.chevronLeft,
                                     size: 20,

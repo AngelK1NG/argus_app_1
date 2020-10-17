@@ -10,69 +10,44 @@ class BottomNav extends StatelessWidget {
 
   const BottomNav({this.onTap, this.show, this.index});
 
+  navButton(BuildContext context, int index, IconData iconData) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        if (show) {
+          onTap(index);
+        }
+      },
+      child: Container(
+        width: 48,
+        height: 48,
+        child: Icon(
+          iconData,
+          size: 24,
+          color: Theme.of(context).primaryColor,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: show ? 80 : 0,
-      child: show
-        ? Stack(
+    return SizedBox(
+      height: 80,
+      child: AnimatedOpacity(
+        duration: cardSlideDuration,
+        curve: cardSlideCurve,
+        opacity: show ? 1 : 0,
+        child: Stack(
           children: [
             SizedBox.expand(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () => onTap(0),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      child: Icon(
-                        FeatherIcons.clock,
-                        size: 24,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () => onTap(1),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      child: Icon(
-                        FeatherIcons.list,
-                        size: 24,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () => onTap(2),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      child: Icon(
-                        FeatherIcons.percent,
-                        size: 24,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () => onTap(3),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      child: Icon(
-                        FeatherIcons.user,
-                        size: 24,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
+                  navButton(context, 0, FeatherIcons.clock),
+                  navButton(context, 1, FeatherIcons.list),
+                  navButton(context, 2, FeatherIcons.percent),
+                  navButton(context, 3, FeatherIcons.user),
                 ],
               ),
             ),
@@ -85,18 +60,26 @@ class BottomNav extends StatelessWidget {
               duration: loadingDuration,
               curve: loadingCurve,
               left: index == 0
-                ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) / 5 + 12
-                : index == 1
-                  ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) / 5 * 2 + 60
-                  : index == 2
-                    ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) / 5 * 3 + 108
-                    : (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) / 5 * 4 + 156
-              ,
+                  ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) / 5 + 12
+                  : index == 1
+                      ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) /
+                              5 *
+                              2 +
+                          60
+                      : index == 2
+                          ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) /
+                                  5 *
+                                  3 +
+                              108
+                          : (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) /
+                                  5 *
+                                  4 +
+                              156,
               bottom: 20,
             ),
           ],
-        )
-        : Container(),
+        ),
+      ),
     );
   }
 }

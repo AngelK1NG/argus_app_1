@@ -21,7 +21,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   Widget _child;
   Color _backgroundColor;
-  double _cardPosition;
+  double _cardPosition = 0;
   bool _showNav = true;
   int _selectedIndex = 0;
   bool _initialized = false;
@@ -52,41 +52,55 @@ class _HomeState extends State<Home> {
     _selectedIndex = index;
     setState(() {
       switch (index) {
-        case 0: {
-          _child = FocusPage(goToPage: goToPage, setDoingTask: setDoingTask);
-          _cardPosition = SizeConfig.safeBlockVertical * 36;
-          break;
-        }
-        case 1: {
-          _child = TasksPage(goToPage: goToPage);
-          _cardPosition = SizeConfig.safeBlockVertical * 15;
-          break;
-        }
-        case 2: {
-          _child = StatisticsPage(goToPage: goToPage);
-          _cardPosition = SizeConfig.safeBlockVertical * 15;
-          break;
-        }
-        case 3: {
-          _child = ProfilePage(goToPage: goToPage);
-          _cardPosition = SizeConfig.safeBlockVertical * 15;
-          break;
-        }
-        case 4: {
-          _child = GeneralPage(goToPage: goToPage);
-          _cardPosition = SizeConfig.safeBlockVertical * 15;
-          break;
-        }
-        case 5: {
-          _child = HelpPage(goToPage: goToPage);
-          _cardPosition = SizeConfig.safeBlockVertical * 15;
-          break;
-        }
-        case 6: {
-          _child = AboutPage(goToPage: goToPage);
-          _cardPosition = SizeConfig.safeBlockVertical * 15;
-          break;
-        }
+        case 0:
+          {
+            _child = FocusPage(goToPage: goToPage, setDoingTask: setDoingTask);
+            _cardPosition = SizeConfig.safeBlockVertical * 36;
+            setNav(true);
+            break;
+          }
+        case 1:
+          {
+            _child = TasksPage(goToPage: goToPage);
+            _cardPosition = SizeConfig.safeBlockVertical * 15;
+            setNav(true);
+            break;
+          }
+        case 2:
+          {
+            _child = StatisticsPage(goToPage: goToPage);
+            _cardPosition = SizeConfig.safeBlockVertical * 15;
+            setNav(true);
+            break;
+          }
+        case 3:
+          {
+            _child = ProfilePage(goToPage: goToPage);
+            _cardPosition = SizeConfig.safeBlockVertical * 15;
+            setNav(true);
+            break;
+          }
+        case 4:
+          {
+            _child = GeneralPage(goToPage: goToPage);
+            _cardPosition = SizeConfig.safeBlockVertical * 15;
+            setNav(true);
+            break;
+          }
+        case 5:
+          {
+            _child = HelpPage(goToPage: goToPage);
+            _cardPosition = 0;
+            setNav(false);
+            break;
+          }
+        case 6:
+          {
+            _child = AboutPage(goToPage: goToPage);
+            _cardPosition = 0;
+            setNav(false);
+            break;
+          }
       }
     });
   }
@@ -129,14 +143,14 @@ class _HomeState extends State<Home> {
             curve: cardSlideCurve,
             left: 0,
             right: 0,
-            top: _cardPosition == null
-                ? MediaQuery.of(context).size.height
-                : _cardPosition + MediaQuery.of(context).padding.top,
-            child: Container(
+            top: _cardPosition == 0 ? 0 : _cardPosition + MediaQuery.of(context).padding.top,
+            child: AnimatedContainer(
+              duration: cardSlideDuration,
+              curve: cardSlideCurve,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
+                  topLeft: _cardPosition == 0 ? Radius.zero : Radius.circular(40),
+                  topRight: _cardPosition == 0 ? Radius.zero : Radius.circular(40),
                 ),
                 color: Colors.white,
                 boxShadow: [
@@ -154,7 +168,10 @@ class _HomeState extends State<Home> {
             child: Container(
               alignment: Alignment.bottomCenter,
               child: BottomNav(
-                  onTap: goToPage, show: _showNav, index: _selectedIndex),
+                onTap: goToPage,
+                show: _showNav,
+                index: _selectedIndex,
+              ),
             ),
           ),
         ],

@@ -1,5 +1,4 @@
 import 'package:Focal/constants.dart';
-import 'package:Focal/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:package_info/package_info.dart';
@@ -64,126 +63,126 @@ class _AboutPageState extends State<AboutPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () => widget.goToPage(3),
-      child: Stack(children: <Widget>[
-        Positioned(
-          left: 25,
-          top: SizeConfig.safeBlockVertical * 5,
-          child: Text(
-            'Settings',
-            style: headerTextStyle,
-          ),
-        ),
-        AnimatedOpacity(
-          opacity: _loading ? 0 : 1,
-          duration: loadingDuration,
-          curve: loadingCurve,
-          child: Stack(
-            children: <Widget>[
-              Positioned(
-                right: 25,
-                left: 25,
-                top: SizeConfig.safeBlockVertical * 15 + 17,
-                child: Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 20),
-                      child: SizedBox(
-                        height: 40,
-                        width: MediaQuery.of(context).size.width,
-                        child: Stack(
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: GestureDetector(
-                                onTap: () => widget.goToPage(3),
-                                child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  color: Colors.white,
-                                  child: Icon(
-                                    FeatherIcons.chevronLeft,
-                                    size: 20,
-                                    color: jetBlack,
-                                  ),
+      child: AnimatedOpacity(
+        opacity: _loading ? 0 : 1,
+        duration: loadingDuration,
+        curve: loadingCurve,
+        child: Stack(
+          children: <Widget>[
+            Positioned(
+              right: 25,
+              left: 25,
+              top: 17,
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: SizedBox(
+                      height: 40,
+                      width: MediaQuery.of(context).size.width,
+                      child: Stack(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: GestureDetector(
+                              onTap: () => widget.goToPage(3),
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                color: Colors.transparent,
+                                child: Icon(
+                                  FeatherIcons.chevronLeft,
+                                  size: 20,
+                                  color: jetBlack,
                                 ),
                               ),
                             ),
-                            Center(
-                              child: Text(
-                                'About',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                          ),
+                          Center(
+                            child: Text(
+                              'About',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    Image(
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 25),
+                    child: Image(
                       image:
                           AssetImage('assets/images/logo/Focal Logo_Full.png'),
                       width: 200,
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 50),
-                      child: Text(
-                        _version,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 50),
+                    child: Text(
+                      _version,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).primaryColor,
                       ),
                     ),
-                    textButton(
-                      () {
-                        LaunchReview.launch(androidAppId: 'technology.focal.focal', iOSAppId: '1526256598');
-                      },
-                      'Rate Focal',
-                    ),
-                    textButton(
-                      () {
-                        openUrl(
-                            'https://docs.google.com/document/d/1h0fBpGKMKHna0MSA8NTt0FXAdc551ALwSkVWJkh0mbY/edit?usp=sharing');
-                      },
-                      'Terms & Conditions',
-                    ),
-                    textButton(
-                      () {
-                        openUrl(
-                            'https://docs.google.com/document/d/1eIL0fXCFXXoiIfU59qPXqnQxhKp-8VG2XTvh63O0d-o/edit?usp=sharing');
-                      },
-                      'Privacy Policy',
-                    ),
-                    textButton(
-                      () {
-                        openUrl('https://focal.technology');
-                      },
-                      'Website',
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Positioned(
-                left: 25,
-                right: 25,
-                bottom: 80,
-                child: Center(
-                  child: Text(
-                    '© 2020 Focal LLC',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).hintColor,
-                    ),
+            ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  textButton(
+                    () {
+                      LaunchReview.launch(androidAppId: 'technology.focal.focal', iOSAppId: '1526256598');
+                    },
+                    'Rate Focal',
+                  ),
+                  textButton(
+                    () {
+                      openUrl(
+                          'https://docs.google.com/document/d/1h0fBpGKMKHna0MSA8NTt0FXAdc551ALwSkVWJkh0mbY/edit?usp=sharing');
+                    },
+                    'Terms & Conditions',
+                  ),
+                  textButton(
+                    () {
+                      openUrl(
+                          'https://docs.google.com/document/d/1eIL0fXCFXXoiIfU59qPXqnQxhKp-8VG2XTvh63O0d-o/edit?usp=sharing');
+                    },
+                    'Privacy Policy',
+                  ),
+                  textButton(
+                    () {
+                      openUrl('https://focal.technology');
+                    },
+                    'Website',
+                  ),
+                ],
+              )
+            ),
+            Positioned(
+              left: 25,
+              right: 25,
+              bottom: 25,
+              child: Center(
+                child: Text(
+                  '© 2020 Focal LLC',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).hintColor,
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ]),
+      ),
     );
   }
 }
