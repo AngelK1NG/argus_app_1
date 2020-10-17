@@ -14,6 +14,7 @@ import 'package:Focal/components/sqr_button.dart';
 import 'package:Focal/components/task_item.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TasksPage extends StatefulWidget {
   final Function goToPage;
@@ -25,18 +26,20 @@ class TasksPage extends StatefulWidget {
 }
 
 class _TasksPageState extends State<TasksPage> {
+  SharedPreferences _prefs;
   FocusNode _focus = new FocusNode();
   final _formKey = GlobalKey<FormState>();
-  String _date;
+  String _date = getDateString(DateTime.now());
   FirebaseUser user;
   bool _loading = true;
+  bool _dateLoading = true;
   bool _addingTask = false;
   bool _editingTask = false;
   bool _keyboard = false;
   String _newTask = '';
   List<TaskItem> _tasks = [];
   List<TaskItem> _tmrTasks = [];
-  int _completedTasks;
+  int _completedTasks = 0;
   String _dateString = 'Today';
   String _secondaryDateString;
 
@@ -45,7 +48,7 @@ class _TasksPageState extends State<TasksPage> {
     DocumentReference dateDoc = db
         .collection('users')
         .document(user.uid)
-        .collection('tasks')
+        .collection('dates')
         .document(_date);
     dateDoc.get().then((snapshot) {
       if (snapshot.data == null) {
@@ -64,7 +67,7 @@ class _TasksPageState extends State<TasksPage> {
     db
         .collection('users')
         .document(user.uid)
-        .collection('tasks')
+        .collection('dates')
         .document(_date)
         .collection('tasks')
         .orderBy('order')
@@ -131,7 +134,7 @@ class _TasksPageState extends State<TasksPage> {
     db
         .collection('users')
         .document(user.uid)
-        .collection('tasks')
+        .collection('dates')
         .document(tomorrow)
         .collection('tasks')
         .orderBy('order')
@@ -156,7 +159,7 @@ class _TasksPageState extends State<TasksPage> {
         if (newTask.completed) {
           completedTasks++;
         }
-      }); 
+      });
       _tmrTasks.insert(_tmrTasks.length - completedTasks, task);
       _tmrTasks[_tmrTasks.length - completedTasks - 1].id =
           await firestoreProvider.addTask(task, tomorrow);
@@ -168,15 +171,14 @@ class _TasksPageState extends State<TasksPage> {
         action: SnackBarAction(
           label: 'Undo',
           onPressed: () async {
-            _tmrTasks.remove(_tmrTasks.firstWhere((tasku) => tasku.id == task.id));
+            _tmrTasks
+                .remove(_tmrTasks.firstWhere((tasku) => tasku.id == task.id));
             firestoreProvider.deleteTask(task, tomorrow);
             firestoreProvider.updateTasks(_tmrTasks, tomorrow);
             if (mounted) {
               if (date == _date) {
                 setState(() {
-                  _tasks.insert(
-                      task.order - 1,
-                      task);
+                  _tasks.insert(task.order - 1, task);
                   if (task.completed) {
                     _completedTasks++;
                   }
@@ -185,17 +187,13 @@ class _TasksPageState extends State<TasksPage> {
                 await firestoreProvider.addTask(task, _date);
                 firestoreProvider.updateTasks(_tasks, _date);
               } else {
-                tasks.insert(
-                    task.order - 1,
-                    task);
+                tasks.insert(task.order - 1, task);
                 await firestoreProvider.addTask(task, date);
                 firestoreProvider.updateTasks(tasks, date);
                 getTasks();
               }
             } else {
-              tasks.insert(
-                  task.order - 1,
-                  task);
+              tasks.insert(task.order - 1, task);
               await firestoreProvider.addTask(task, date);
               firestoreProvider.updateTasks(tasks, date);
             }
@@ -229,9 +227,7 @@ class _TasksPageState extends State<TasksPage> {
           if (mounted) {
             if (date == _date) {
               setState(() {
-                _tasks.insert(
-                    task.order - 1,
-                    task);
+                _tasks.insert(task.order - 1, task);
                 if (task.completed) {
                   _completedTasks++;
                 }
@@ -240,17 +236,13 @@ class _TasksPageState extends State<TasksPage> {
               await firestoreProvider.addTask(task, _date);
               firestoreProvider.updateTasks(_tasks, _date);
             } else {
-              tasks.insert(
-                  task.order - 1,
-                  task);
+              tasks.insert(task.order - 1, task);
               await firestoreProvider.addTask(task, date);
               firestoreProvider.updateTasks(tasks, date);
               getTasks();
             }
           } else {
-            tasks.insert(
-                task.order - 1,
-                task);
+            tasks.insert(task.order - 1, task);
             await firestoreProvider.addTask(task, date);
             firestoreProvider.updateTasks(tasks, date);
           }
@@ -376,6 +368,15 @@ class _TasksPageState extends State<TasksPage> {
     getTasks();
   }
 
+  void setToday() async {
+    _prefs = await SharedPreferences.getInstance();
+    setDate(DateTime.now().subtract(Duration(
+      hours: _prefs.getInt('dayStartHour'),
+      minutes: _prefs.getInt('dayStartMinute'),
+    )));
+    setState(() => _dateLoading = false);
+  }
+
   void updateTaskOrder() {
     for (TaskItem task in _tasks) {
       task.order = _tasks.indexOf(task) + 1;
@@ -385,7 +386,7 @@ class _TasksPageState extends State<TasksPage> {
   @override
   void initState() {
     super.initState();
-    setDate(DateTime.now());
+    setToday();
     KeyboardVisibility.onChange.listen((bool visible) {
       if (mounted) {
         setState(() {
@@ -424,142 +425,149 @@ class _TasksPageState extends State<TasksPage> {
     FirebaseUser user = Provider.of<User>(context, listen: false).user;
     FirestoreProvider firestoreProvider = FirestoreProvider(user);
     return WillPopScope(
-      onWillPop: () async => widget.goToPage(0),
+      onWillPop: () => widget.goToPage(0),
       child: Stack(children: <Widget>[
-        Positioned(
-          left: 0,
-          right: 0,
-          top: SizeConfig.safeBlockVertical * 5 - 20,
-          child: Center(
-            child: Text(
-              _secondaryDateString,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          left: 5,
-          right: 5,
-          top: SizeConfig.safeBlockVertical * 5 - 20,
-          child: GestureDetector(
-            onHorizontalDragEnd: (details) {
-              if (details.velocity.pixelsPerSecond.dx > 50) {
-                setDate(DateTime.parse(_date).add(Duration(days: -1)));
-                FocusScope.of(context).unfocus();
-              }
-              if (details.velocity.pixelsPerSecond.dx < -50) {
-                setDate(DateTime.parse(_date).add(Duration(days: 1)));
-                FocusScope.of(context).unfocus();
-              }
-            },
-            child: Container(
-              color: Colors.transparent,
-              padding: EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setDate(DateTime.parse(_date).add(Duration(days: -1)));
-                      FocusScope.of(context).unfocus();
-                    },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: (DateTime.parse(_date).year ==
-                                    DateTime.now().year &&
-                                DateTime.parse(_date).month ==
-                                    DateTime.now().month &&
-                                DateTime.parse(_date).day - 1 ==
-                                    DateTime.now().day)
-                            ? Colors.white
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: Center(
-                        child: Text(
-                            DateTime.parse(_date)
-                                .add(Duration(days: -1))
-                                .day
-                                .toString(),
-                            style: (DateTime.parse(_date).year ==
-                                        DateTime.now().year &&
-                                    DateTime.parse(_date).month ==
-                                        DateTime.now().month &&
-                                    DateTime.parse(_date).day - 1 ==
-                                        DateTime.now().day)
-                                ? todayTextStyle
-                                : dateTextStyle),
-                      ),
+        Visibility(
+          visible: !_dateLoading,
+          child: Stack(
+            children: [
+              Positioned(
+                left: 0,
+                right: 0,
+                top: SizeConfig.safeBlockVertical * 5 - 20,
+                child: Center(
+                  child: Text(
+                    _secondaryDateString == null ? '' : _secondaryDateString,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.white,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
+                ),
+              ),
+              Positioned(
+                left: 5,
+                right: 5,
+                top: SizeConfig.safeBlockVertical * 5 - 20,
+                child: GestureDetector(
+                  onHorizontalDragEnd: (details) {
+                    if (details.velocity.pixelsPerSecond.dx > 50) {
+                      setDate(DateTime.parse(_date).add(Duration(days: -1)));
                       FocusScope.of(context).unfocus();
-                      showDatePicker(
-                        context: context,
-                        initialDate: DateTime.parse(_date),
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2120),
-                      ).then((date) {
-                        if (date != null) {
-                          setDate(date);
-                        }
-                      });
-                    },
-                    child: Column(
+                    }
+                    if (details.velocity.pixelsPerSecond.dx < -50) {
+                      setDate(DateTime.parse(_date).add(Duration(days: 1)));
+                      FocusScope.of(context).unfocus();
+                    }
+                  },
+                  child: Container(
+                    color: Colors.transparent,
+                    padding: EdgeInsets.all(20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          _dateString,
-                          style: headerTextStyle,
+                        GestureDetector(
+                          onTap: () {
+                            setDate(DateTime.parse(_date).add(Duration(days: -1)));
+                            FocusScope.of(context).unfocus();
+                          },
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: (DateTime.parse(_date).year ==
+                                          DateTime.now().year &&
+                                      DateTime.parse(_date).month ==
+                                          DateTime.now().month &&
+                                      DateTime.parse(_date).day - 1 ==
+                                          DateTime.now().day)
+                                  ? Colors.white
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                            ),
+                            child: Center(
+                              child: Text(
+                                  DateTime.parse(_date)
+                                      .add(Duration(days: -1))
+                                      .day
+                                      .toString(),
+                                  style: (DateTime.parse(_date).year ==
+                                              DateTime.now().year &&
+                                          DateTime.parse(_date).month ==
+                                              DateTime.now().month &&
+                                          DateTime.parse(_date).day - 1 ==
+                                              DateTime.now().day)
+                                      ? todayTextStyle
+                                      : dateTextStyle),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            FocusScope.of(context).unfocus();
+                            showDatePicker(
+                              context: context,
+                              initialDate: DateTime.parse(_date),
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime(2120),
+                            ).then((date) {
+                              if (date != null) {
+                                setDate(date);
+                              }
+                            });
+                          },
+                          child: Column(
+                            children: [
+                              Text(
+                                _dateString,
+                                style: headerTextStyle,
+                              ),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setDate(DateTime.parse(_date).add(Duration(days: 1)));
+                            FocusScope.of(context).unfocus();
+                          },
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: (DateTime.parse(_date).year ==
+                                          DateTime.now().year &&
+                                      DateTime.parse(_date).month ==
+                                          DateTime.now().month &&
+                                      DateTime.parse(_date).day + 1 ==
+                                          DateTime.now().day)
+                                  ? Colors.white
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                            ),
+                            child: Center(
+                              child: Text(
+                                  DateTime.parse(_date)
+                                      .add(Duration(days: 1))
+                                      .day
+                                      .toString(),
+                                  style: (DateTime.parse(_date).year ==
+                                              DateTime.now().year &&
+                                          DateTime.parse(_date).month ==
+                                              DateTime.now().month &&
+                                          DateTime.parse(_date).day + 1 ==
+                                              DateTime.now().day)
+                                      ? todayTextStyle
+                                      : dateTextStyle),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      setDate(DateTime.parse(_date).add(Duration(days: 1)));
-                      FocusScope.of(context).unfocus();
-                    },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: (DateTime.parse(_date).year ==
-                                    DateTime.now().year &&
-                                DateTime.parse(_date).month ==
-                                    DateTime.now().month &&
-                                DateTime.parse(_date).day + 1 ==
-                                    DateTime.now().day)
-                            ? Colors.white
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: Center(
-                        child: Text(
-                            DateTime.parse(_date)
-                                .add(Duration(days: 1))
-                                .day
-                                .toString(),
-                            style: (DateTime.parse(_date).year ==
-                                        DateTime.now().year &&
-                                    DateTime.parse(_date).month ==
-                                        DateTime.now().month &&
-                                    DateTime.parse(_date).day + 1 ==
-                                        DateTime.now().day)
-                                ? todayTextStyle
-                                : dateTextStyle),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
         AnimatedOpacity(
@@ -581,9 +589,11 @@ class _TasksPageState extends State<TasksPage> {
                       alignment: Alignment.center,
                       child: Text(
                         ((_tasks.length == null || _tasks.length == 0)
-                            ? '0'
-                            : (_completedTasks / _tasks.length * 100).round().toString())
-                        + '% completed',
+                                ? '0'
+                                : (_completedTasks / _tasks.length * 100)
+                                    .round()
+                                    .toString()) +
+                            '% completed',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
@@ -740,7 +750,8 @@ class _TasksPageState extends State<TasksPage> {
                                         completed: false,
                                         paused: false,
                                         key: UniqueKey(),
-                                        order: _tasks.length - _completedTasks + 1,
+                                        order:
+                                            _tasks.length - _completedTasks + 1,
                                         date: _date,
                                       );
                                       newTask.onDismissed = (direction) {
@@ -762,10 +773,14 @@ class _TasksPageState extends State<TasksPage> {
                                             _tasks.length - _completedTasks,
                                             newTask);
                                       });
-                                      _tasks[_tasks.length - _completedTasks - 1].id =
+                                      _tasks[_tasks.length -
+                                                  _completedTasks -
+                                                  1]
+                                              .id =
                                           await firestoreProvider.addTask(
                                               newTask, _date);
-                                      firestoreProvider.updateTasks(_tasks, _date);
+                                      firestoreProvider.updateTasks(
+                                          _tasks, _date);
                                       _formKey.currentState.reset();
                                       setState(() {
                                         _newTask = '';
@@ -805,7 +820,10 @@ class _TasksPageState extends State<TasksPage> {
                           FocusScope.of(context).requestFocus(_focus);
                         },
                         gradient: LinearGradient(
-                          colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+                          colors: [
+                            Theme.of(context).primaryColor,
+                            Theme.of(context).accentColor
+                          ],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
                         ),

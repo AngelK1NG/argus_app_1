@@ -37,6 +37,7 @@ class FocusPage extends StatefulWidget {
 class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   static const screenChannel = const MethodChannel("plugins.flutter.io/screen");
 
+  SharedPreferences _prefs;
   Timer _timer;
   DateTime _startFocused = DateTime.now();
   DateTime _startDistracted = DateTime.now();
@@ -50,7 +51,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   AnalyticsProvider _analyticsProvider = AnalyticsProvider();
   List<TaskItem> _tasks = [];
   LocalNotifications localNotifications;
-  SharedPreferences _prefs;
   bool _loading = true;
   bool _saving = false;
   bool _screenOn = true;
@@ -118,17 +118,17 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                 _seconds =
                     (DateTime.now().difference(_startFocused).inSeconds) +
                         initSeconds;
-                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, '0') +
                     ":" +
-                    (_seconds % 60).toString().padLeft(2, "0");
+                    (_seconds % 60).toString().padLeft(2, '0');
               }));
       setState(() {
         _startFocused = DateTime.now();
         _seconds =
             (DateTime.now().difference(_startFocused).inSeconds) + initSeconds;
-        _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+        _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, '0') +
             ":" +
-            (_seconds % 60).toString().padLeft(2, "0");
+            (_seconds % 60).toString().padLeft(2, '0');
         _doingTask = true;
       });
 
@@ -158,6 +158,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _message = messages[_random.nextInt(messages.length)];
       _distractionTracking = true;
       _distractionTrackingNotice = false;
+      _date = getDateString(DateTime.now().subtract(Duration(hours: _prefs.getInt('dayStartHour'), minutes: _prefs.getInt('dayStartMinute'))));
     });
     if (Platform.isAndroid) {
       setDnd(false);
@@ -179,7 +180,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       DocumentReference dateDoc = db
           .collection('users')
           .document(user.uid)
-          .collection('tasks')
+          .collection('dates')
           .document(_date);
       dateDoc.get().then((snapshot) {
         if (snapshot.data == null) {
@@ -231,7 +232,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       DocumentReference dateDoc = db
           .collection('users')
           .document(user.uid)
-          .collection('tasks')
+          .collection('dates')
           .document(_date);
       dateDoc.get().then((snapshot) {
         if (snapshot.data == null) {
@@ -291,11 +292,18 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     if (_prefs.getBool('focusDnd') == null) {
       _prefs.setBool('focusDnd', true);
     }
+    if (_prefs.getInt('dayStartHour') == null) {
+      _prefs.setInt('dayStartHour', 0);
+    }
+    if (_prefs.getInt('dayStartMinute') == null) {
+      _prefs.setInt('dayStartMinute', 0);
+    }
+    _date = getDateString(DateTime.now().subtract(Duration(hours: _prefs.getInt('dayStartHour'), minutes: _prefs.getInt('dayStartMinute'))));
     if (_prefs.getBool('doingTask') == true) {
       db
           .collection('users')
           .document(_user.uid)
-          .collection('tasks')
+          .collection('dates')
           .document(_date)
           .collection('tasks')
           .where('order', isEqualTo: 1)
@@ -383,13 +391,13 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             child: ListBody(
               children: <Widget>[
                 Text(
-                    'This will help maintain your focus while you are doing your task. Clicking Ok will redirect you to Settings.'),
+                    'This will help maintain your focus while you are doing your task. Clicking ALLOW will redirect you to Settings.'),
               ],
             ),
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('Turn off',
+              child: Text('CANCEL',
                   style: TextStyle(
                     color: Colors.red,
                   )),
@@ -399,7 +407,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               },
             ),
             FlatButton(
-              child: Text('Ok'),
+              child: Text('ALLOW'),
               onPressed: () {
                 Navigator.of(context).pop();
                 FlutterDnd.gotoPolicySettings();
@@ -443,7 +451,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     setState(() {
       _quote = quotes[_random.nextInt(quotes.length)];
       _message = messages[_random.nextInt(messages.length)];
-      _date = getDateString(DateTime.now());
       _user = Provider.of<User>(context, listen: false).user;
       _firestoreProvider = FirestoreProvider(_user);
       DocumentReference userDoc = db.collection('users').document(_user.uid);
@@ -458,7 +465,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       DocumentReference dateDoc = db
           .collection('users')
           .document(_user.uid)
-          .collection('tasks')
+          .collection('dates')
           .document(_date);
       dateDoc.get().then((snapshot) {
         if (snapshot.data == null) {
@@ -592,7 +599,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                 stream: db
                     .collection('users')
                     .document(_user.uid)
-                    .collection('tasks')
+                    .collection('dates')
                     .document(_date)
                     .collection('tasks')
                     .orderBy('order')

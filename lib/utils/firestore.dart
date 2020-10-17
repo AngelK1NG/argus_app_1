@@ -47,7 +47,7 @@ class FirestoreProvider {
       db
           .collection('users')
           .document(userId)
-          .collection('tasks')
+          .collection('dates')
           .document(date)
           .collection('tasks')
           .document(task.id)
@@ -69,7 +69,7 @@ class FirestoreProvider {
     db
         .collection('users')
         .document(userId)
-        .collection('tasks')
+        .collection('dates')
         .document(date)
         .updateData({
       'completedTasks': completedTasks,
@@ -83,7 +83,7 @@ class FirestoreProvider {
     db
         .collection('users')
         .document(userId)
-        .collection('tasks')
+        .collection('dates')
         .document(date)
         .collection('tasks')
         .document(taskId)
@@ -99,7 +99,7 @@ class FirestoreProvider {
     DocumentReference dateDoc = db
         .collection('users')
         .document(user.uid)
-        .collection('tasks')
+        .collection('dates')
         .document(date);
     DocumentSnapshot snapshot = await dateDoc.get();
     if (snapshot.data == null) {
@@ -117,7 +117,7 @@ class FirestoreProvider {
       await db
           .collection('users')
           .document(userId)
-          .collection('tasks')
+          .collection('dates')
           .document(date)
           .collection('tasks')
           .document(task.id)
@@ -135,7 +135,7 @@ class FirestoreProvider {
       await db
           .collection('users')
           .document(userId)
-          .collection('tasks')
+          .collection('dates')
           .document(date)
           .collection('tasks')
           .add({
@@ -160,7 +160,7 @@ class FirestoreProvider {
     db
         .collection('users')
         .document(userId)
-        .collection('tasks')
+        .collection('dates')
         .document(date)
         .collection('tasks')
         .document(task.id)

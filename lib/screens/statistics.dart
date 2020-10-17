@@ -32,7 +32,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
     await db
         .collection('users')
         .document(user.uid)
-        .collection('tasks')
+        .collection('dates')
         .document(getDateString(DateTime.now()))
         .collection('tasks')
         .orderBy('order')
@@ -43,7 +43,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
     await db
         .collection('users')
         .document(user.uid)
-        .collection('tasks')
+        .collection('dates')
         .document(getDateString(DateTime.now()))
         .get()
         .then((snapshot) {
@@ -68,7 +68,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
       await db
           .collection('users')
           .document(_user.uid)
-          .collection('tasks')
+          .collection('dates')
           .document(day)
           .get()
           .then((snapshot) {
@@ -104,7 +104,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => widget.goToPage(0),
+      onWillPop: () => widget.goToPage(0),
       child: Stack(
         children: <Widget>[
           Positioned(

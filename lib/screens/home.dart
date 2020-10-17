@@ -7,6 +7,7 @@ import 'focus.dart';
 import 'tasks.dart';
 import 'statistics.dart';
 import 'profile.dart';
+import 'settings/general.dart';
 
 class Home extends StatefulWidget {
   const Home();
@@ -66,6 +67,11 @@ class _HomeState extends State<Home> {
         }
         case 3: {
           _child = ProfilePage(goToPage: goToPage);
+          _cardPosition = SizeConfig.safeBlockVertical * 15;
+          break;
+        }
+        case 4: {
+          _child = GeneralSettings(goToPage: goToPage);
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
         }
