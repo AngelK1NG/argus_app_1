@@ -40,6 +40,7 @@ class _LoginPageState extends State<LoginPage> {
           });
         }
         Navigator.popUntil(context, (route) => route.isFirst);
+        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
       } else {
         FirestoreProvider(user).userDocumentExists().then((exists) {
           if (mounted) {
@@ -74,7 +75,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     return Stack(
       children: <Widget>[
         Container(
