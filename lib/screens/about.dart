@@ -128,7 +128,7 @@ class _AboutPageState extends State<AboutPage> {
                       width: 200,
                     ),
                     Padding(
-                      padding: EdgeInsets.only(bottom: 25),
+                      padding: EdgeInsets.only(bottom: 50),
                       child: Text(
                         _version,
                         style: TextStyle(

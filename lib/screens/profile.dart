@@ -253,7 +253,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 25),
+                      padding: EdgeInsets.only(top: 50),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
