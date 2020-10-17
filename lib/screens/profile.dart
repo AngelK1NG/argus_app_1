@@ -272,18 +272,18 @@ class _ProfilePageState extends State<ProfilePage> {
                             onTap: () => widget.goToPage(4),
                           ),
                           SettingsTile(
-                            iconData: FeatherIcons.helpCircle,
-                            text: 'Help',
-                            chevron: true,
-                            divider: true,
-                            onTap: () => widget.goToPage(5),
-                          ),
-                          SettingsTile(
                             iconData: FeatherIcons.archive,
                             text: 'Feedback',
                             chevron: true,
                             divider: true,
                             onTap: () => openFeedbackForm(),
+                          ),
+                          SettingsTile(
+                            iconData: FeatherIcons.helpCircle,
+                            text: 'Help',
+                            chevron: true,
+                            divider: true,
+                            onTap: () => widget.goToPage(5),
                           ),
                           SettingsTile(
                             iconData: FeatherIcons.info,
