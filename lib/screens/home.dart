@@ -7,7 +7,9 @@ import 'focus.dart';
 import 'tasks.dart';
 import 'statistics.dart';
 import 'profile.dart';
-import 'settings/general.dart';
+import 'general.dart';
+import 'help.dart';
+import 'about.dart';
 
 class Home extends StatefulWidget {
   const Home();
@@ -71,7 +73,17 @@ class _HomeState extends State<Home> {
           break;
         }
         case 4: {
-          _child = GeneralSettings(goToPage: goToPage);
+          _child = GeneralPage(goToPage: goToPage);
+          _cardPosition = SizeConfig.safeBlockVertical * 15;
+          break;
+        }
+        case 5: {
+          _child = HelpPage(goToPage: goToPage);
+          _cardPosition = SizeConfig.safeBlockVertical * 15;
+          break;
+        }
+        case 6: {
+          _child = AboutPage(goToPage: goToPage);
           _cardPosition = SizeConfig.safeBlockVertical * 15;
           break;
         }

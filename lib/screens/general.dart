@@ -7,16 +7,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'dart:io' show Platform;
 
-class GeneralSettings extends StatefulWidget {
+class GeneralPage extends StatefulWidget {
   final Function goToPage;
 
-  GeneralSettings({@required this.goToPage, Key key}) : super(key: key);
+  GeneralPage({@required this.goToPage, Key key}) : super(key: key);
 
   @override
-  _GeneralSettingsState createState() => _GeneralSettingsState();
+  _GeneralPageState createState() => _GeneralPageState();
 }
 
-class _GeneralSettingsState extends State<GeneralSettings> {
+class _GeneralPageState extends State<GeneralPage> {
   SharedPreferences _prefs;
   bool _loading = true;
   bool _distractedNotification = true;
@@ -100,7 +100,7 @@ class _GeneralSettingsState extends State<GeneralSettings> {
               Positioned(
                 right: 25,
                 left: 25,
-                top: SizeConfig.safeBlockVertical * 15 + 25,
+                top: SizeConfig.safeBlockVertical * 15 + 17,
                 child: Column(
                   children: <Widget>[
                     Padding(

@@ -170,7 +170,8 @@ class _LoginPageState extends State<LoginPage> {
               alignment: Alignment.center,
               color: Colors.white,
               child: Image(
-                  image: AssetImage('assets/images/logo/Focal Logo_Full.png')),
+                image: AssetImage('assets/images/logo/Focal Logo_Full.png'),
+              ),
             ),
           ),
         ),

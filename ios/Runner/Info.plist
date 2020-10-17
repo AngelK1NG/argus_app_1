@@ -51,6 +51,10 @@
 	<string>1597319037142790</string>
 	<key>FacebookDisplayName</key>
 	<string>Focal</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>itms</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

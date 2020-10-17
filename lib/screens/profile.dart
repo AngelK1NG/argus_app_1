@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:Focal/components/settings_tile.dart';
 import 'package:Focal/utils/analytics.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -26,6 +27,15 @@ class _ProfilePageState extends State<ProfilePage> {
   Duration _avgFocused = Duration();
   int _totalTasks = 0;
   int _avgTasks = 0;
+
+  void openFeedbackForm() async {
+    const URL = 'https://google.com';
+    if (await canLaunch(URL)) {
+      await launch(URL);
+    } else {
+      print('Couldn\'t find url');
+    }
+  }
 
   @override
   void initState() {
@@ -266,21 +276,21 @@ class _ProfilePageState extends State<ProfilePage> {
                             text: 'Help',
                             chevron: true,
                             divider: true,
-                            onTap: () => widget.goToPage(0),
+                            onTap: () => widget.goToPage(5),
                           ),
                           SettingsTile(
                             iconData: FeatherIcons.archive,
                             text: 'Feedback',
                             chevron: true,
                             divider: true,
-                            onTap: () => widget.goToPage(0),
+                            onTap: () => openFeedbackForm(),
                           ),
                           SettingsTile(
                             iconData: FeatherIcons.info,
                             text: 'About',
                             chevron: true,
                             divider: true,
-                            onTap: () => widget.goToPage(0),
+                            onTap: () => widget.goToPage(6),
                           ),
                           SettingsTile(
                             iconData: FeatherIcons.logOut,
