@@ -85,7 +85,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       .difference(
                           DateTime.parse(snapshot.data['volts']['dateTime']))
                       .inSeconds),
-                  voltsDelta: _voltsDelta,
                   completedTasks: _completedTasks,
                   totalTasks: _totalTasks,
                 ));

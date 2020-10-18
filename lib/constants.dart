@@ -56,10 +56,9 @@ num voltsIncrement({
 
 num voltsDecay({
   @required int seconds,
-  @required num voltsDelta,
   @required int completedTasks,
   @required int totalTasks,
 }) {
   return 0.005 *
-      (seconds + voltsDelta + 100 * (totalTasks - completedTasks) / totalTasks);
+      (seconds + 100 * (totalTasks - completedTasks) / totalTasks);
 }

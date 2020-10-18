@@ -139,7 +139,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             val: _volts.val -
                 voltsDecay(
                   seconds: DateTime.now().difference(_volts.dateTime).inSeconds,
-                  voltsDelta: _todayVolts.length == 0 ? 0 : _volts.val - _todayVolts.first.val,
                   completedTasks: _completedTasks,
                   totalTasks: _totalTasks,
                 ),
