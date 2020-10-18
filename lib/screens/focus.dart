@@ -136,10 +136,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         _todayVolts.add(Volts(
             dateTime: DateTime.now(),
             val: _volts.val -
-                0.05 *
-                    (DateTime.now()
-                        .difference(_volts.dateTime)
-                        .inSeconds)));
+                0.02 * (DateTime.now().difference(_volts.dateTime).inSeconds)));
         _volts = _todayVolts.last;
       });
 
@@ -151,7 +148,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _prefs.setInt('startFocused', _startFocused.millisecondsSinceEpoch);
       _prefs.setString('taskId', _tasks[0].id);
       _prefs.setBool('doingTask', true);
-      _prefs.setString('lastVoltsDateTime', getDateTimeString(_todayVolts.last.dateTime));
+      _prefs.setString(
+          'lastVoltsDateTime', getDateTimeString(_todayVolts.last.dateTime));
       _prefs.setString('lastVoltsVal', _todayVolts.last.val.toString());
 
       if (Platform.isAndroid) {
@@ -195,7 +193,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               0.05 *
                   (_seconds -
                       _secondsDistracted -
-                      pow(_secondsDistracted, 1.2)) *
+                      _initSecondsFocused -
+                      pow(_secondsDistracted - _initSecondsDistracted, 1.2)) *
                   pow(_tasks[0].numPaused, 0.5)));
       _volts = _todayVolts.last;
       List<Map> newVolts = [];
@@ -255,7 +254,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               0.05 *
                   (_seconds -
                       _secondsDistracted -
-                      pow(_secondsDistracted, 1.2)) *
+                      _initSecondsFocused -
+                      pow(_secondsDistracted - _initSecondsDistracted, 1.2)) *
                   pow(task.numPaused, 0.5)));
       _volts = _todayVolts.last;
       List<Map> newVolts = [];
@@ -338,7 +338,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         });
       }
       if (snapshot.data != null) {
-        _volts = Volts(dateTime: DateTime.parse(snapshot.data['volts']['dateTime']), val: snapshot.data['volts']['val']);
+        _volts = Volts(
+            dateTime: DateTime.parse(snapshot.data['volts']['dateTime']),
+            val: snapshot.data['volts']['val']);
       } else {
         _volts = Volts(dateTime: DateTime.now(), val: 1000);
       }
@@ -430,7 +432,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                 ":" +
                 (_seconds % 60).toString().padLeft(2, "0");
             _doingTask = true;
-            _todayVolts.add(Volts(dateTime: DateTime.parse(_prefs.getString('lastVoltsDateTime')), val: num.parse(_prefs.getString('lastVoltsVal'))));
+            _todayVolts.add(Volts(
+                dateTime: DateTime.parse(_prefs.getString('lastVoltsDateTime')),
+                val: num.parse(_prefs.getString('lastVoltsVal'))));
             _volts = _todayVolts.last;
           });
           if (_prefs.getBool('distracted')) {

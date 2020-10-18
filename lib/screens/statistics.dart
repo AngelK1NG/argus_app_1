@@ -42,7 +42,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
       _volts = Volts(
           dateTime: DateTime.now(),
           val: snapshot.data['volts']['val'] -
-              0.05 *
+              0.02 *
                   (DateTime.now()
                       .difference(
                           DateTime.parse(snapshot.data['volts']['dateTime']))
@@ -342,7 +342,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           duration: loadingDuration,
                           curve: loadingCurve,
                           left: _index == 0
-                              ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) /
+                              ? (SizeConfig.safeBlockHorizontal * 100 -
+                                          4 * 48) /
                                       5 +
                                   12
                               : _index == 1
