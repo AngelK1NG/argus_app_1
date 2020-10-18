@@ -69,8 +69,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   Random _random = Random();
   String _quote;
   String _message;
-  List<Volts> _volts = [];
-  Volts _lastVolts;
+  List<Volts> _todayVolts = [];
+  Volts _volts;
 
   final quotes = [
     '''“You can waste your lives drawing lines. Or you can live your life crossing them.”''',
@@ -93,7 +93,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   ];
 
   void startTask() async {
-    print(_lastVolts.val);
     if (!_saving) {
       HapticFeedback.heavyImpact();
       _secondsDistracted =
@@ -134,14 +133,14 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             ":" +
             (_seconds % 60).toString().padLeft(2, '0');
         _doingTask = true;
-        _volts.add(Volts(
+        _todayVolts.add(Volts(
             dateTime: DateTime.now(),
-            val: _lastVolts.val -
+            val: _volts.val -
                 0.05 *
                     (DateTime.now()
-                        .difference(_lastVolts.dateTime)
+                        .difference(_volts.dateTime)
                         .inSeconds)));
-        _lastVolts = _volts.last;
+        _volts = _todayVolts.last;
       });
 
       _prefs.setInt('secondsDistracted', _secondsDistracted);
@@ -152,8 +151,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _prefs.setInt('startFocused', _startFocused.millisecondsSinceEpoch);
       _prefs.setString('taskId', _tasks[0].id);
       _prefs.setBool('doingTask', true);
-      _prefs.setString('lastVoltsDateTime', getDateTimeString(_volts.last.dateTime));
-      _prefs.setString('lastVoltsVal', _volts.last.val.toString());
+      _prefs.setString('lastVoltsDateTime', getDateTimeString(_todayVolts.last.dateTime));
+      _prefs.setString('lastVoltsVal', _todayVolts.last.val.toString());
 
       if (Platform.isAndroid) {
         setDnd(true);
@@ -180,7 +179,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     widget.setDoingTask(false);
   }
 
-  void pauseTask(FirebaseUser user) {
+  void pauseTask() {
     if (_doingTask) {
       stopTask();
       _tasks[0].secondsFocused = _seconds - _secondsDistracted;
@@ -190,23 +189,23 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _tasks[0].numDistracted = _numDistracted;
       _tasks[0].paused = true;
       _firestoreProvider.updateTasks(_tasks, _date);
-      _volts.add(Volts(
+      _todayVolts.add(Volts(
           dateTime: DateTime.now(),
-          val: _volts.last.val +
+          val: _todayVolts.last.val +
               0.05 *
                   (_seconds -
                       _secondsDistracted -
                       pow(_secondsDistracted, 1.2)) *
                   pow(_tasks[0].numPaused, 0.5)));
-      _lastVolts = _volts.last;
+      _volts = _todayVolts.last;
       List<Map> newVolts = [];
-      _volts.forEach((volts) {
+      _todayVolts.forEach((volts) {
         newVolts.add(
             {'dateTime': getDateTimeString(volts.dateTime), 'val': volts.val});
       });
       DocumentReference dateDoc = db
           .collection('users')
-          .document(user.uid)
+          .document(_user.uid)
           .collection('dates')
           .document(_date);
       dateDoc.get().then((snapshot) {
@@ -220,7 +219,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           'numPaused': FieldValue.increment(1),
           'volts': newVolts,
         }).then((_) {
-          db.collection('users').document(user.uid).updateData({
+          db.collection('users').document(_user.uid).updateData({
             'secondsFocused': FieldValue.increment(
                 _seconds - _secondsDistracted - _initSecondsFocused),
             'volts': newVolts.last,
@@ -239,7 +238,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     }
   }
 
-  void completeTask(FirebaseUser user) {
+  void completeTask() {
     if (_doingTask) {
       stopTask();
       TaskItem task = _tasks.removeAt(0);
@@ -250,23 +249,23 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       task.completed = true;
       _tasks.add(task);
       _firestoreProvider.updateTasks(_tasks, _date);
-      _volts.add(Volts(
+      _todayVolts.add(Volts(
           dateTime: DateTime.now(),
-          val: _volts.last.val +
+          val: _todayVolts.last.val +
               0.05 *
                   (_seconds -
                       _secondsDistracted -
                       pow(_secondsDistracted, 1.2)) *
                   pow(task.numPaused, 0.5)));
-      _lastVolts = _volts.last;
+      _volts = _todayVolts.last;
       List<Map> newVolts = [];
-      _volts.forEach((volts) {
+      _todayVolts.forEach((volts) {
         newVolts.add(
             {'dateTime': getDateTimeString(volts.dateTime), 'val': volts.val});
       });
       DocumentReference dateDoc = db
           .collection('users')
-          .document(user.uid)
+          .document(_user.uid)
           .collection('dates')
           .document(_date);
       dateDoc.get().then((snapshot) {
@@ -279,7 +278,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               FieldValue.increment(_numDistracted - _initNumDistracted),
           'volts': newVolts,
         }).then((_) {
-          db.collection('users').document(user.uid).updateData({
+          db.collection('users').document(_user.uid).updateData({
             'secondsFocused': FieldValue.increment(
                 _seconds - _secondsDistracted - _initSecondsFocused),
             'completedTasks': FieldValue.increment(1),
@@ -339,9 +338,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         });
       }
       if (snapshot.data != null) {
-        _lastVolts = Volts(dateTime: DateTime.parse(snapshot.data['volts']['dateTime']), val: snapshot.data['volts']['val']);
+        _volts = Volts(dateTime: DateTime.parse(snapshot.data['volts']['dateTime']), val: snapshot.data['volts']['val']);
       } else {
-        _lastVolts = Volts(dateTime: DateTime.now(), val: 1000);
+        _volts = Volts(dateTime: DateTime.now(), val: 1000);
       }
     });
     DocumentReference dateDoc = db
@@ -351,7 +350,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         .document(_date);
     dateDoc.get().then((snapshot) {
       if (snapshot.data == null) {
-        print(_date);
         dateDoc.setData({
           'completedTasks': 0,
           'totalTasks': 0,
@@ -371,13 +369,11 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           });
         });
       } else {
-        dateDoc.get().then((snapshot) {
-          snapshot.data['volts'].forEach((volts) {
-            setState(() {
-              _volts.add(Volts(
-                  dateTime: DateTime.parse(volts['dateTime']),
-                  val: volts['val']));
-            });
+        snapshot.data['volts'].forEach((volts) {
+          setState(() {
+            _todayVolts.add(Volts(
+                dateTime: DateTime.parse(volts['dateTime']),
+                val: volts['val']));
           });
         });
         dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
@@ -434,8 +430,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                 ":" +
                 (_seconds % 60).toString().padLeft(2, "0");
             _doingTask = true;
-            _volts.add(Volts(dateTime: DateTime.parse(_prefs.getString('lastVoltsDateTime')), val: num.parse(_prefs.getString('lastVoltsVal'))));
-            _lastVolts = _volts.last;
+            _todayVolts.add(Volts(dateTime: DateTime.parse(_prefs.getString('lastVoltsDateTime')), val: num.parse(_prefs.getString('lastVoltsVal'))));
+            _volts = _todayVolts.last;
           });
           if (_prefs.getBool('distracted')) {
             _startDistracted = DateTime.fromMillisecondsSinceEpoch(
@@ -766,7 +762,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                               opacity: !_doingTask ? 0 : 1,
                               child: Center(
                                 child: SqrButton(
-                                  onTap: () => pauseTask(_user),
+                                  onTap: () => pauseTask(),
                                   icon: Icon(
                                     Icons.pause,
                                     color: Colors.white,
@@ -965,7 +961,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                               opacity: _doingTask ? 1 : 0,
                               child: Center(
                                 child: SqrButton(
-                                  onTap: () => pauseTask(_user),
+                                  onTap: () => pauseTask(),
                                   icon: Icon(
                                     Icons.pause,
                                     color: Colors.white,
@@ -1018,7 +1014,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                     ? RctButton(
                                         onTap: () {
                                           if (_distractionTracking) {
-                                            completeTask(_user);
+                                            completeTask();
                                           } else {
                                             setState(() {
                                               _distractionTracking = true;

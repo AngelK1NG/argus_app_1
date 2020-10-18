@@ -73,11 +73,11 @@ class _ProfilePageState extends State<ProfilePage> {
       fontWeight: FontWeight.w600,
     );
     TextStyle blueStatDescriptionTextStyle = TextStyle(
-      fontSize: 12,
+      fontSize: 14,
       color: Theme.of(context).primaryColor,
     );
     TextStyle redStatDescriptionTextStyle = TextStyle(
-      fontSize: 12,
+      fontSize: 14,
       color: Colors.red,
     );
 
@@ -140,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   Text(
                                     _email == null ? '' : _email,
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 14,
                                       color: Theme.of(context).hintColor,
                                     ),
                                   ),
@@ -151,103 +151,64 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 100,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              SizedBox(
-                                height: 45,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _totalFocused.inHours.toString() +
-                                          'h ' +
-                                          _totalFocused.inMinutes.toString() +
-                                          'm',
-                                      style: statTextStyle,
-                                    ),
-                                    Text(
-                                      'Total Focused',
-                                      style: blueStatDescriptionTextStyle,
-                                    ),
-                                  ],
-                                ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              _totalFocused.inHours.toString() +
+                                  'h ' +
+                                  _totalFocused.inMinutes.toString() +
+                                  'm',
+                              style: statTextStyle,
+                            ),
+                            Text(
+                              'Total Focused',
+                              style: blueStatDescriptionTextStyle,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 10),
+                              child: Text(
+                                _avgFocused.inHours.toString() +
+                                    'h ' +
+                                    _avgFocused.inMinutes.toString() +
+                                    'm',
+                                style: statTextStyle,
                               ),
-                              SizedBox(
-                                height: 45,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _avgFocused.inHours.toString() +
-                                          'h ' +
-                                          _avgFocused.inMinutes.toString() +
-                                          'm',
-                                      style: statTextStyle,
-                                    ),
-                                    Text(
-                                      'Avg. Focused',
-                                      style: redStatDescriptionTextStyle,
-                                    ),
-                                  ],
-                                ),
+                            ),
+                            Text(
+                              'Avg. Focused',
+                              style: redStatDescriptionTextStyle,
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Text(
+                              _totalTasks.toString(),
+                              style: statTextStyle,
+                            ),
+                            Text(
+                              'Total Tasks Completed',
+                              style: blueStatDescriptionTextStyle,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 10),
+                              child: Text(
+                                _avgTasks.toString(),
+                                style: statTextStyle,
                               ),
-                            ],
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: <Widget>[
-                              SizedBox(
-                                height: 45,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      _totalTasks.toString(),
-                                      style: statTextStyle,
-                                    ),
-                                    Text(
-                                      'Total Tasks Completed',
-                                      style: blueStatDescriptionTextStyle,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                height: 45,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      _avgTasks.toString(),
-                                      style: statTextStyle,
-                                    ),
-                                    Text(
-                                      'Avg. Tasks Completed',
-                                      style: redStatDescriptionTextStyle,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                            Text(
+                              'Avg. Tasks Completed',
+                              style: redStatDescriptionTextStyle,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                     Padding(
                       padding: EdgeInsets.only(top: 50),

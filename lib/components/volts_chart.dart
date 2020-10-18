@@ -2,10 +2,10 @@ import 'package:Focal/components/volts.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
-class WeeklyChart extends StatelessWidget {
+class VoltsChart extends StatelessWidget {
   final List<Volts> data;
   final String id;
-  const WeeklyChart({@required this.data, @required this.id, Key key}) : super(key: key);
+  const VoltsChart({@required this.data, @required this.id, Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +35,12 @@ class WeeklyChart extends StatelessWidget {
         renderSpec: new charts.NoneRenderSpec(),
         tickProviderSpec:
             new charts.BasicNumericTickProviderSpec(zeroBound: false),
+      ),
+      layoutConfig: charts.LayoutConfig(
+        leftMarginSpec: charts.MarginSpec.fixedPixel(0),
+        topMarginSpec: charts.MarginSpec.fixedPixel(0),
+        rightMarginSpec: charts.MarginSpec.fixedPixel(0),
+        bottomMarginSpec:charts.MarginSpec.fixedPixel(0),
       ),
     );
   }

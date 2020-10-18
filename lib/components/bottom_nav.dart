@@ -10,7 +10,7 @@ class BottomNav extends StatelessWidget {
 
   const BottomNav({this.onTap, this.show, this.index});
 
-  navButton(BuildContext context, int index, IconData iconData) {
+  Widget navButton(BuildContext context, int index, IconData iconData) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {

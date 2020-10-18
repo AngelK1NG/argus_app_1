@@ -125,7 +125,7 @@ class _AboutPageState extends State<AboutPage> {
                     child: Text(
                       _version,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 14,
                         color: Theme.of(context).primaryColor,
                       ),
                     ),
@@ -174,7 +174,7 @@ class _AboutPageState extends State<AboutPage> {
                 child: Text(
                   '© 2020 Focal LLC',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 14,
                     color: Theme.of(context).hintColor,
                   ),
                 ),
