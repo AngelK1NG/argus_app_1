@@ -32,8 +32,45 @@ class _StatisticsPageState extends State<StatisticsPage> {
   String _date;
   List<Volts> _todayVolts = [];
   List<TaskItem> _tasks = [];
+  num _voltsDelta = 0;
   Duration _timeFocused = Duration.zero;
-  NumberFormat voltsFormat = NumberFormat('###,###.00');
+  NumberFormat voltsFormat = NumberFormat('###,##0.00');
+  int _completedTasks = 0;
+  int _totalTasks = 0;
+
+  Future<void> getTasks() async {
+      QuerySnapshot snapshot = await db
+          .collection('users')
+          .document(_user.uid)
+          .collection('dates')
+          .document(_date)
+          .collection('tasks')
+          .orderBy('order')
+          .getDocuments();
+      if (mounted) {
+        snapshot.documents.forEach((task) {
+          String name = task.data['name'];
+          TaskItem newTask = TaskItem(
+            name: name,
+            id: task.documentID,
+            completed: task.data['completed'],
+            paused: task.data['paused'],
+            order: task.data['order'],
+            secondsFocused: task.data['secondsFocused'],
+            secondsDistracted: task.data['secondsDistracted'],
+            key: UniqueKey(),
+            date: _date,
+          );
+          setState(() {
+            _tasks.add(newTask);
+            _totalTasks++;
+            if (task.data['completed']) {
+              _completedTasks++;
+            }
+          });
+        });
+      }
+    }
 
   Future<void> getVolts() async {
     DocumentSnapshot snapshot =
@@ -43,11 +80,15 @@ class _StatisticsPageState extends State<StatisticsPage> {
         _volts = Volts(
             dateTime: DateTime.now(),
             val: snapshot.data['volts']['val'] -
-                0.02 *
-                    (DateTime.now()
-                        .difference(
-                            DateTime.parse(snapshot.data['volts']['dateTime']))
-                        .inSeconds));
+                voltsDecay(
+                  seconds: (DateTime.now()
+                      .difference(
+                          DateTime.parse(snapshot.data['volts']['dateTime']))
+                      .inSeconds),
+                  voltsDelta: _voltsDelta,
+                  completedTasks: _completedTasks,
+                  totalTasks: _totalTasks,
+                ));
       });
     }
   }
@@ -81,40 +122,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
           _todayVolts.add(_volts);
           setState(() {
             _timeFocused = Duration(seconds: snapshot.data['secondsFocused']);
+            _voltsDelta = _volts.val - _todayVolts.first.val;
           });
         }
       }
     });
-  }
-
-  Future<void> getTasks() async {
-    QuerySnapshot snapshot = await db
-        .collection('users')
-        .document(_user.uid)
-        .collection('dates')
-        .document(_date)
-        .collection('tasks')
-        .orderBy('order')
-        .getDocuments();
-    if (mounted) {
-      snapshot.documents.forEach((task) {
-        String name = task.data['name'];
-        TaskItem newTask = TaskItem(
-          name: name,
-          id: task.documentID,
-          completed: task.data['completed'],
-          paused: task.data['paused'],
-          order: task.data['order'],
-          secondsFocused: task.data['secondsFocused'],
-          secondsDistracted: task.data['secondsDistracted'],
-          key: UniqueKey(),
-          date: _date,
-        );
-        setState(() {
-          _tasks.add(newTask);
-        });
-      });
-    }
   }
 
   void getData() async {
@@ -122,9 +134,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
     _date = getDateString(DateTime.now().subtract(Duration(
         hours: _prefs.getInt('dayStartHour'),
         minutes: _prefs.getInt('dayStartMinute'))));
+    await getTasks();
     await getVolts();
     await getTodayVolts();
-    await getTasks();
     if (mounted) {
       setState(() {
         _loading = false;
@@ -147,7 +159,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return Column(children: taskTiles);
   }
 
-  Widget textButton(BuildContext context, int index, String text) {
+  Widget textButton(BuildContext context,
+      {@required int index, @required String text}) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
@@ -244,7 +257,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                       : Colors.red,
                                 ),
                                 Text(
-                                  '${voltsFormat.format(_volts.val - _todayVolts.first.val)} (${voltsFormat.format((_volts.val - _todayVolts.first.val) / _todayVolts.first.val * 100)}%)',
+                                  '${voltsFormat.format(_voltsDelta)} (${voltsFormat.format(_voltsDelta / _todayVolts.first.val * 100)}%)',
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -285,7 +298,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                             ),
                           ),
                     Padding(
-                      padding: EdgeInsets.only(top: 25),
+                      padding: EdgeInsets.only(top: 50),
                       child: SizedBox(
                         height: 150,
                         child: _todayVolts.length == 0
@@ -325,10 +338,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
-                              textButton(context, 0, 'Today'),
-                              textButton(context, 1, 'Week'),
-                              textButton(context, 2, 'Month'),
-                              textButton(context, 3, 'All'),
+                              textButton(context, index: 0, text: 'Today'),
+                              textButton(context, index: 1, text: 'Week'),
+                              textButton(context, index: 2, text: 'Month'),
+                              textButton(context, index: 3, text: 'All'),
                             ],
                           ),
                         ),

@@ -133,10 +133,18 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             ":" +
             (_seconds % 60).toString().padLeft(2, '0');
         _doingTask = true;
-        _todayVolts.add(Volts(
+        _todayVolts.add(
+          Volts(
             dateTime: DateTime.now(),
             val: _volts.val -
-                0.02 * (DateTime.now().difference(_volts.dateTime).inSeconds)));
+                voltsDecay(
+                  seconds: DateTime.now().difference(_volts.dateTime).inSeconds,
+                  voltsDelta: _todayVolts.length == 0 ? 0 : _volts.val - _todayVolts.first.val,
+                  completedTasks: _completedTasks,
+                  totalTasks: _totalTasks,
+                ),
+          ),
+        );
         _volts = _todayVolts.last;
       });
 
@@ -187,15 +195,20 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _tasks[0].numDistracted = _numDistracted;
       _tasks[0].paused = true;
       _firestoreProvider.updateTasks(_tasks, _date);
-      _todayVolts.add(Volts(
+      _todayVolts.add(
+        Volts(
           dateTime: DateTime.now(),
           val: _todayVolts.last.val +
-              0.05 *
-                  (_seconds -
-                      _secondsDistracted -
-                      _initSecondsFocused -
-                      pow(_secondsDistracted - _initSecondsDistracted, 1.2)) *
-                  pow(_tasks[0].numPaused, 0.5)));
+              voltsIncrement(
+                secondsFocused:
+                    _seconds - _secondsDistracted - _initSecondsFocused,
+                secondsDistracted: _secondsDistracted - _initSecondsDistracted,
+                numPaused: _tasks[0].numPaused,
+                completedTasks: _completedTasks,
+                totalTasks: _totalTasks,
+              ),
+        ),
+      );
       _volts = _todayVolts.last;
       List<Map> newVolts = [];
       _todayVolts.forEach((volts) {
@@ -248,15 +261,20 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       task.completed = true;
       _tasks.add(task);
       _firestoreProvider.updateTasks(_tasks, _date);
-      _todayVolts.add(Volts(
+      _todayVolts.add(
+        Volts(
           dateTime: DateTime.now(),
           val: _todayVolts.last.val +
-              0.05 *
-                  (_seconds -
-                      _secondsDistracted -
-                      _initSecondsFocused -
-                      pow(_secondsDistracted - _initSecondsDistracted, 1.2)) *
-                  pow(task.numPaused, 0.5)));
+              voltsIncrement(
+                secondsFocused:
+                    _seconds - _secondsDistracted - _initSecondsFocused,
+                secondsDistracted: _secondsDistracted - _initSecondsDistracted,
+                numPaused: task.numPaused,
+                completedTasks: _completedTasks,
+                totalTasks: _totalTasks,
+              ),
+        ),
+      );
       _volts = _todayVolts.last;
       List<Map> newVolts = [];
       _todayVolts.forEach((volts) {

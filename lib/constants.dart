@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 //firebase
 final FirebaseAuth auth = FirebaseAuth.instance;
@@ -38,3 +39,27 @@ final Duration buttonDuration = Duration(milliseconds: 200);
 final Curve buttonCurve = Curves.ease;
 
 final Duration snackbarDuration = Duration(milliseconds: 2000);
+
+//algorithms
+num voltsIncrement({
+  @required int secondsFocused,
+  @required int secondsDistracted,
+  @required int numPaused,
+  @required int completedTasks,
+  @required int totalTasks,
+}) {
+  return 0.05 *
+      (secondsFocused - pow(secondsDistracted, 1.2) - numPaused) *
+      pow(100 * ((completedTasks + 1) / totalTasks), 0.1) *
+      pow(totalTasks, 0.1);
+}
+
+num voltsDecay({
+  @required int seconds,
+  @required num voltsDelta,
+  @required int completedTasks,
+  @required int totalTasks,
+}) {
+  return 0.005 *
+      (seconds + voltsDelta + 100 * (totalTasks - completedTasks) / totalTasks);
+}

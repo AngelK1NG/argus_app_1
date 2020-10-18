@@ -10,7 +10,7 @@ class BottomNav extends StatelessWidget {
 
   const BottomNav({this.onTap, this.show, this.index});
 
-  Widget navButton(BuildContext context, int index, IconData iconData) {
+  Widget navButton(context, {@required int index, @required IconData iconData}) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
@@ -44,10 +44,10 @@ class BottomNav extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  navButton(context, 0, FeatherIcons.clock),
-                  navButton(context, 1, FeatherIcons.list),
-                  navButton(context, 2, FeatherIcons.percent),
-                  navButton(context, 3, FeatherIcons.user),
+                  navButton(context, index: 0, iconData: FeatherIcons.clock),
+                  navButton(context, index: 1, iconData: FeatherIcons.list),
+                  navButton(context, index: 2, iconData: FeatherIcons.percent),
+                  navButton(context, index: 3, iconData: FeatherIcons.user),
                 ],
               ),
             ),
