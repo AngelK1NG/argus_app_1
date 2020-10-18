@@ -330,28 +330,28 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         hours: _prefs.getInt('dayStartHour'),
         minutes: _prefs.getInt('dayStartMinute'))));
     DocumentReference userDoc = db.collection('users').document(_user.uid);
-    userDoc.get().then((snapshot) {
-      if (snapshot.data != null && snapshot.data['lastActive'] != _date) {
-        userDoc.updateData({
-          'lastActive': _date,
-          'daysActive': FieldValue.increment(1),
-        });
-      }
-      if (snapshot.data != null) {
-        _volts = Volts(
-            dateTime: DateTime.parse(snapshot.data['volts']['dateTime']),
-            val: snapshot.data['volts']['val']);
-      } else {
-        _volts = Volts(dateTime: DateTime.now(), val: 1000);
-      }
-    });
+    DocumentSnapshot userSnapshot = await userDoc.get();
+    if (userSnapshot.data != null && userSnapshot.data['lastActive'] != _date) {
+      userDoc.updateData({
+        'lastActive': _date,
+        'daysActive': FieldValue.increment(1),
+      });
+    }
+    if (userSnapshot.data != null) {
+      _volts = Volts(
+          dateTime: DateTime.parse(userSnapshot.data['volts']['dateTime']),
+          val: userSnapshot.data['volts']['val']);
+    } else {
+      _volts = Volts(dateTime: DateTime.now(), val: 1000);
+    }
     DocumentReference dateDoc = db
         .collection('users')
         .document(_user.uid)
         .collection('dates')
         .document(_date);
-    dateDoc.get().then((snapshot) {
-      if (snapshot.data == null) {
+    DocumentSnapshot dateSnapshot = await dateDoc.get();
+    if (mounted) {
+      if (dateSnapshot.data == null) {
         dateDoc.setData({
           'completedTasks': 0,
           'totalTasks': 0,
@@ -371,7 +371,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           });
         });
       } else {
-        snapshot.data['volts'].forEach((volts) {
+        dateSnapshot.data['volts'].forEach((volts) {
           setState(() {
             _todayVolts.add(Volts(
                 dateTime: DateTime.parse(volts['dateTime']),
@@ -387,7 +387,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           }
         });
       }
-    });
+      setState(() {
+        _loading = false;
+      });
+    }
     if (_prefs.getBool('doingTask') == true) {
       db
           .collection('users')
@@ -398,62 +401,67 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           .where('order', isEqualTo: 1)
           .getDocuments()
           .then((snapshot) async {
-        if (snapshot == null ||
-            snapshot.documents == null ||
-            snapshot.documents.isEmpty ||
-            snapshot.documents[0].documentID != _prefs.getString('taskId')) {
-          setState(() {
-            _doingTask = false;
-          });
-          _prefs.setBool('doingTask', false);
-        } else {
-          _secondsDistracted = _prefs.getInt('secondsDistracted');
-          _initSecondsDistracted = _prefs.getInt('initSecondsDistracted');
-          _numDistracted = _prefs.getInt('numDistracted');
-          _initNumDistracted = _prefs.getInt('initNumDistracted');
-          int initSeconds = _prefs.getInt('initSeconds');
-          _timer = new Timer.periodic(
-              const Duration(seconds: 1),
-              (Timer timer) => setState(() {
-                    _seconds =
-                        (DateTime.now().difference(_startFocused).inSeconds) +
-                            initSeconds;
-                    _swatchDisplay =
-                        (_seconds ~/ 60).toString().padLeft(2, "0") +
-                            ":" +
-                            (_seconds % 60).toString().padLeft(2, "0");
-                  }));
-          setState(() {
-            _startFocused = DateTime.fromMillisecondsSinceEpoch(
-                _prefs.getInt('startFocused'));
-            _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
-                initSeconds;
-            _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
-                ":" +
-                (_seconds % 60).toString().padLeft(2, "0");
-            _doingTask = true;
-            _todayVolts.add(Volts(
-                dateTime: DateTime.parse(_prefs.getString('lastVoltsDateTime')),
-                val: num.parse(_prefs.getString('lastVoltsVal'))));
-            _volts = _todayVolts.last;
-          });
-          if (_prefs.getBool('distracted')) {
-            _startDistracted = DateTime.fromMillisecondsSinceEpoch(
-                _prefs.getInt('startDistracted'));
-            _secondsDistracted +=
-                DateTime.now().difference(_startDistracted).inSeconds;
-            _numDistracted++;
-            _prefs.setInt('secondsDistracted', _secondsDistracted);
-            _prefs.setInt('numDistracted', _numDistracted);
-            _prefs.setBool('distracted', false);
+        if (mounted) {
+          if (snapshot == null ||
+              snapshot.documents == null ||
+              snapshot.documents.isEmpty ||
+              snapshot.documents[0].documentID != _prefs.getString('taskId')) {
+            setState(() {
+              _doingTask = false;
+            });
+            _prefs.setBool('doingTask', false);
+          } else {
+            _secondsDistracted = _prefs.getInt('secondsDistracted');
+            _initSecondsDistracted = _prefs.getInt('initSecondsDistracted');
+            _numDistracted = _prefs.getInt('numDistracted');
+            _initNumDistracted = _prefs.getInt('initNumDistracted');
+            int initSeconds = _prefs.getInt('initSeconds');
+            _timer = new Timer.periodic(
+                const Duration(seconds: 1),
+                (Timer timer) => setState(() {
+                      _seconds =
+                          (DateTime.now().difference(_startFocused).inSeconds) +
+                              initSeconds;
+                      _swatchDisplay =
+                          (_seconds ~/ 60).toString().padLeft(2, "0") +
+                              ":" +
+                              (_seconds % 60).toString().padLeft(2, "0");
+                    }));
+            setState(() {
+              _startFocused = DateTime.fromMillisecondsSinceEpoch(
+                  _prefs.getInt('startFocused'));
+              _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
+                  initSeconds;
+              _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                  ":" +
+                  (_seconds % 60).toString().padLeft(2, "0");
+              _doingTask = true;
+              _todayVolts.add(Volts(
+                  dateTime:
+                      DateTime.parse(_prefs.getString('lastVoltsDateTime')),
+                  val: num.parse(_prefs.getString('lastVoltsVal'))));
+              _volts = _todayVolts.last;
+            });
+            if (_prefs.getBool('distracted')) {
+              _startDistracted = DateTime.fromMillisecondsSinceEpoch(
+                  _prefs.getInt('startDistracted'));
+              _secondsDistracted +=
+                  DateTime.now().difference(_startDistracted).inSeconds;
+              _numDistracted++;
+              _prefs.setInt('secondsDistracted', _secondsDistracted);
+              _prefs.setInt('numDistracted', _numDistracted);
+              _prefs.setBool('distracted', false);
+            }
+            widget.setDoingTask(true);
           }
-          widget.setDoingTask(true);
         }
       });
     } else {
-      setState(() {
-        _doingTask = false;
-      });
+      if (mounted) {
+        setState(() {
+          _doingTask = false;
+        });
+      }
     }
   }
 
@@ -654,13 +662,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                     .orderBy('order')
                     .snapshots(),
                 builder: (context, snapshot) {
-                  Future.delayed(cardSlideDuration, () {
-                    if (mounted) {
-                      setState(() {
-                        _loading = false;
-                      });
-                    }
-                  });
                   if (!snapshot.hasData ||
                       snapshot.data.documents == null ||
                       snapshot.data.documents.isEmpty) {

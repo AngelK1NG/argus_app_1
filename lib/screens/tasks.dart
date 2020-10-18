@@ -73,42 +73,40 @@ class _TasksPageState extends State<TasksPage> {
         .orderBy('order')
         .getDocuments()
         .then((snapshot) {
-      snapshot.documents.forEach((task) {
-        String name = task.data['name'];
-        TaskItem newTask = TaskItem(
-          name: name,
-          id: task.documentID,
-          completed: task.data['completed'],
-          paused: task.data['paused'] == null ? false : task.data['paused'],
-          order: task.data['order'],
-          secondsFocused: task.data['secondsFocused'],
-          secondsDistracted: task.data['secondsDistracted'],
-          numDistracted: task.data['numDistracted'],
-          numPaused: task.data['numPaused'],
-          key: UniqueKey(),
-          date: _date,
-        );
-        newTask.onDismissed = (direction) {
-          if (direction == DismissDirection.startToEnd) {
-            deferTask(newTask);
-            AnalyticsProvider().logDeferTask(newTask, DateTime.now());
-          } else {
-            deleteTask(newTask);
-            AnalyticsProvider().logDeleteTask(newTask, DateTime.now());
-          }
-        };
-        newTask.onUpdate = (value) => newTask.name = value;
-        setState(() {
-          _tasks.add(newTask);
-        });
-      });
-      Future.delayed(cardSlideDuration, () {
-        if (mounted) {
+      if (mounted) {
+        snapshot.documents.forEach((task) {
+          String name = task.data['name'];
+          TaskItem newTask = TaskItem(
+            name: name,
+            id: task.documentID,
+            completed: task.data['completed'],
+            paused: task.data['paused'] == null ? false : task.data['paused'],
+            order: task.data['order'],
+            secondsFocused: task.data['secondsFocused'],
+            secondsDistracted: task.data['secondsDistracted'],
+            numDistracted: task.data['numDistracted'],
+            numPaused: task.data['numPaused'],
+            key: UniqueKey(),
+            date: _date,
+          );
+          newTask.onDismissed = (direction) {
+            if (direction == DismissDirection.startToEnd) {
+              deferTask(newTask);
+              AnalyticsProvider().logDeferTask(newTask, DateTime.now());
+            } else {
+              deleteTask(newTask);
+              AnalyticsProvider().logDeleteTask(newTask, DateTime.now());
+            }
+          };
+          newTask.onUpdate = (value) => newTask.name = value;
           setState(() {
-            _loading = false;
+            _tasks.add(newTask);
           });
-        }
-      });
+        });
+        setState(() {
+          _loading = false;
+        });
+      }
     });
   }
 
@@ -469,7 +467,8 @@ class _TasksPageState extends State<TasksPage> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            setDate(DateTime.parse(_date).add(Duration(days: -1)));
+                            setDate(
+                                DateTime.parse(_date).add(Duration(days: -1)));
                             FocusScope.of(context).unfocus();
                           },
                           child: Container(
@@ -484,7 +483,8 @@ class _TasksPageState extends State<TasksPage> {
                                           DateTime.now().day)
                                   ? Colors.white
                                   : Colors.transparent,
-                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
                             ),
                             child: Center(
                               child: Text(
@@ -528,7 +528,8 @@ class _TasksPageState extends State<TasksPage> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            setDate(DateTime.parse(_date).add(Duration(days: 1)));
+                            setDate(
+                                DateTime.parse(_date).add(Duration(days: 1)));
                             FocusScope.of(context).unfocus();
                           },
                           child: Container(
@@ -543,7 +544,8 @@ class _TasksPageState extends State<TasksPage> {
                                           DateTime.now().day)
                                   ? Colors.white
                                   : Colors.transparent,
-                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
                             ),
                             child: Center(
                               child: Text(

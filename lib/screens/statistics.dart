@@ -38,16 +38,18 @@ class _StatisticsPageState extends State<StatisticsPage> {
   Future<void> getVolts() async {
     DocumentSnapshot snapshot =
         await db.collection('users').document(_user.uid).get();
-    setState(() {
-      _volts = Volts(
-          dateTime: DateTime.now(),
-          val: snapshot.data['volts']['val'] -
-              0.02 *
-                  (DateTime.now()
-                      .difference(
-                          DateTime.parse(snapshot.data['volts']['dateTime']))
-                      .inSeconds));
-    });
+    if (mounted) {
+      setState(() {
+        _volts = Volts(
+            dateTime: DateTime.now(),
+            val: snapshot.data['volts']['val'] -
+                0.02 *
+                    (DateTime.now()
+                        .difference(
+                            DateTime.parse(snapshot.data['volts']['dateTime']))
+                        .inSeconds));
+      });
+    }
   }
 
   Future<void> getTodayVolts() async {
@@ -57,28 +59,30 @@ class _StatisticsPageState extends State<StatisticsPage> {
         .collection('dates')
         .document(_date);
     dateDoc.get().then((snapshot) {
-      if (snapshot.data == null) {
-        dateDoc.setData({
-          'completedTasks': 0,
-          'totalTasks': 0,
-          'secondsFocused': 0,
-          'secondsDistracted': 0,
-          'numDistracted': 0,
-          'numPaused': 0,
-          'volts': [],
-        });
-      } else {
-        snapshot.data['volts'].forEach((volts) {
-          setState(() {
-            _todayVolts.add(Volts(
-                dateTime: DateTime.parse(volts['dateTime']),
-                val: volts['val']));
+      if (mounted) {
+        if (snapshot.data == null) {
+          dateDoc.setData({
+            'completedTasks': 0,
+            'totalTasks': 0,
+            'secondsFocused': 0,
+            'secondsDistracted': 0,
+            'numDistracted': 0,
+            'numPaused': 0,
+            'volts': [],
           });
-        });
-        _todayVolts.add(_volts);
-        setState(() {
-          _timeFocused = Duration(seconds: snapshot.data['secondsFocused']);
-        });
+        } else {
+          snapshot.data['volts'].forEach((volts) {
+            setState(() {
+              _todayVolts.add(Volts(
+                  dateTime: DateTime.parse(volts['dateTime']),
+                  val: volts['val']));
+            });
+          });
+          _todayVolts.add(_volts);
+          setState(() {
+            _timeFocused = Duration(seconds: snapshot.data['secondsFocused']);
+          });
+        }
       }
     });
   }
@@ -92,23 +96,25 @@ class _StatisticsPageState extends State<StatisticsPage> {
         .collection('tasks')
         .orderBy('order')
         .getDocuments();
-    snapshot.documents.forEach((task) {
-      String name = task.data['name'];
-      TaskItem newTask = TaskItem(
-        name: name,
-        id: task.documentID,
-        completed: task.data['completed'],
-        paused: task.data['paused'],
-        order: task.data['order'],
-        secondsFocused: task.data['secondsFocused'],
-        secondsDistracted: task.data['secondsDistracted'],
-        key: UniqueKey(),
-        date: _date,
-      );
-      setState(() {
-        _tasks.add(newTask);
+    if (mounted) {
+      snapshot.documents.forEach((task) {
+        String name = task.data['name'];
+        TaskItem newTask = TaskItem(
+          name: name,
+          id: task.documentID,
+          completed: task.data['completed'],
+          paused: task.data['paused'],
+          order: task.data['order'],
+          secondsFocused: task.data['secondsFocused'],
+          secondsDistracted: task.data['secondsDistracted'],
+          key: UniqueKey(),
+          date: _date,
+        );
+        setState(() {
+          _tasks.add(newTask);
+        });
       });
-    });
+    }
   }
 
   void getData() async {
@@ -116,17 +122,14 @@ class _StatisticsPageState extends State<StatisticsPage> {
     _date = getDateString(DateTime.now().subtract(Duration(
         hours: _prefs.getInt('dayStartHour'),
         minutes: _prefs.getInt('dayStartMinute'))));
-
     await getVolts();
     await getTodayVolts();
     await getTasks();
-    Future.delayed(cardSlideDuration, () {
-      if (mounted) {
-        setState(() {
-          _loading = false;
-        });
-      }
-    });
+    if (mounted) {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   Widget taskColumn() {

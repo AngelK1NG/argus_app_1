@@ -49,13 +49,11 @@ class _AboutPageState extends State<AboutPage> {
     super.initState();
     PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
       _version = 'Version ${packageInfo.version} (${packageInfo.buildNumber})';
-      Future.delayed(cardSlideDuration, () {
-        if (mounted) {
-          setState(() {
-            _loading = false;
-          });
-        }
-      });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     });
   }
 

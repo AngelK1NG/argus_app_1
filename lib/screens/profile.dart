@@ -48,16 +48,18 @@ class _ProfilePageState extends State<ProfilePage> {
         .document(Provider.of<User>(context, listen: false).user.uid)
         .get()
         .then((snapshot) {
-      setState(() {
-        _totalFocused = Duration(seconds: snapshot.data['secondsFocused']);
-        _avgFocused = Duration(
-            seconds:
-                snapshot.data['secondsFocused'] ~/ snapshot.data['daysActive']);
-        _totalTasks = snapshot.data['completedTasks'];
-        _avgTasks =
-            snapshot.data['completedTasks'] ~/ snapshot.data['daysActive'];
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _totalFocused = Duration(seconds: snapshot.data['secondsFocused']);
+          _avgFocused = Duration(
+              seconds: snapshot.data['secondsFocused'] ~/
+                  snapshot.data['daysActive']);
+          _totalTasks = snapshot.data['completedTasks'];
+          _avgTasks =
+              snapshot.data['completedTasks'] ~/ snapshot.data['daysActive'];
+          _loading = false;
+        });
+      }
     });
   }
 

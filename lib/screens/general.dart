@@ -53,13 +53,11 @@ class _GeneralPageState extends State<GeneralPage> {
         _dayStartMinute = _prefs.getInt('dayStartMinute');
       }
     });
-    Future.delayed(cardSlideDuration, () {
-      if (mounted) {
-        setState(() {
-          _loading = false;
-        });
-      }
-    });
+    if (mounted) {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   void setBool(String key, bool val) async {

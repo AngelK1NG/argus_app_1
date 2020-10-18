@@ -17,7 +17,7 @@ class _HelpPageState extends State<HelpPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(cardSlideDuration, () {
+    Future.delayed(Duration.zero, () {
       if (mounted) {
         setState(() {
           _loading = false;
