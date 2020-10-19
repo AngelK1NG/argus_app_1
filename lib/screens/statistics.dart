@@ -39,43 +39,50 @@ class _StatisticsPageState extends State<StatisticsPage> {
   int _totalTasks = 0;
 
   Future<void> getTasks() async {
-      QuerySnapshot snapshot = await db
-          .collection('users')
-          .document(_user.uid)
-          .collection('dates')
-          .document(_date)
-          .collection('tasks')
-          .orderBy('order')
-          .getDocuments();
-      if (mounted) {
-        snapshot.documents.forEach((task) {
-          String name = task.data['name'];
-          TaskItem newTask = TaskItem(
-            name: name,
-            id: task.documentID,
-            completed: task.data['completed'],
-            paused: task.data['paused'],
-            order: task.data['order'],
-            secondsFocused: task.data['secondsFocused'],
-            secondsDistracted: task.data['secondsDistracted'],
-            key: UniqueKey(),
-            date: _date,
-          );
-          setState(() {
-            _tasks.add(newTask);
-            _totalTasks++;
-            if (task.data['completed']) {
-              _completedTasks++;
-            }
-          });
+    QuerySnapshot snapshot = await db
+        .collection('users')
+        .document(_user.uid)
+        .collection('dates')
+        .document(_date)
+        .collection('tasks')
+        .orderBy('order')
+        .getDocuments();
+    if (mounted) {
+      snapshot.documents.forEach((task) {
+        String name = task.data['name'];
+        TaskItem newTask = TaskItem(
+          name: name,
+          id: task.documentID,
+          completed: task.data['completed'],
+          paused: task.data['paused'],
+          order: task.data['order'],
+          secondsFocused: task.data['secondsFocused'],
+          secondsDistracted: task.data['secondsDistracted'],
+          key: UniqueKey(),
+          date: _date,
+        );
+        setState(() {
+          _tasks.add(newTask);
+          _totalTasks++;
+          if (task.data['completed']) {
+            _completedTasks++;
+          }
         });
-      }
+      });
     }
+  }
 
   Future<void> getVolts() async {
     DocumentSnapshot snapshot =
         await db.collection('users').document(_user.uid).get();
     if (mounted) {
+      print(voltsDecay(
+        seconds: (DateTime.now()
+            .difference(DateTime.parse(snapshot.data['volts']['dateTime']))
+            .inSeconds),
+        completedTasks: _completedTasks,
+        totalTasks: _totalTasks,
+      ));
       setState(() {
         _volts = Volts(
             dateTime: DateTime.now(),
@@ -240,7 +247,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                         ),
                       ],
                     ),
-                    _todayVolts.length == 0
+                    _todayVolts.length <= 1
                         ? Container()
                         : Padding(
                             padding: EdgeInsets.only(left: 25, top: 15),
@@ -274,7 +281,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                               ],
                             ),
                           ),
-                    _todayVolts.length == 0
+                    _todayVolts.length <= 1
                         ? Container()
                         : Padding(
                             padding: EdgeInsets.only(left: 25, top: 5),
@@ -300,7 +307,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       padding: EdgeInsets.only(top: 50),
                       child: SizedBox(
                         height: 150,
-                        child: _todayVolts.length == 0
+                        child: _todayVolts.length <= 1
                             ? Container(
                                 padding: EdgeInsets.only(left: 80, right: 80),
                                 child: Column(
@@ -316,7 +323,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                     Padding(
                                       padding: EdgeInsets.only(top: 20),
                                       child: Text(
-                                        'Come back once you have completed some tasks.',
+                                        'Come back once you have completed at least one task.',
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w400,
@@ -348,7 +355,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           child: Container(
                             width: 24,
                             height: 2,
-                            color: _todayVolts.length == 0
+                            color: _todayVolts.length <= 1
                                 ? Theme.of(context).primaryColor
                                 : _volts.val >= _todayVolts.first.val
                                     ? Theme.of(context).primaryColor
