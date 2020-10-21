@@ -32,7 +32,7 @@ class TaskStatTile extends StatelessWidget {
                 ),
               ),
               Text(
-                '${_timeFocused.inHours}h ${_timeFocused.inMinutes}m',
+                '${_timeFocused.inHours}h ${_timeFocused.inMinutes % 60}m',
                 style: TextStyle(
                   fontSize: 14,
                   color: jetBlack,

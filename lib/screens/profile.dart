@@ -29,7 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
   int _avgTasks = 0;
 
   void openFeedbackForm() async {
-    const URL = 'https://google.com';
+    const URL = 'https://forms.gle/bjAmY4r6TGTC9ybe7';
     if (await canLaunch(URL)) {
       await launch(URL);
     } else {
@@ -162,7 +162,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             Text(
                               _totalFocused.inHours.toString() +
                                   'h ' +
-                                  _totalFocused.inMinutes.toString() +
+                                  (_totalFocused.inMinutes % 60).toString() +
                                   'm',
                               style: statTextStyle,
                             ),
@@ -175,7 +175,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: Text(
                                 _avgFocused.inHours.toString() +
                                     'h ' +
-                                    _avgFocused.inMinutes.toString() +
+                                    (_avgFocused.inMinutes % 60).toString() +
                                     'm',
                                 style: statTextStyle,
                               ),

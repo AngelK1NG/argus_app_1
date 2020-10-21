@@ -36,7 +36,6 @@ class _TasksPageState extends State<TasksPage> {
   bool _addingTask = false;
   bool _editingTask = false;
   bool _keyboard = false;
-  String _newTask = '';
   List<TaskItem> _tasks = [];
   List<TaskItem> _tmrTasks = [];
   int _completedTasks = 0;
@@ -698,9 +697,7 @@ class _TasksPageState extends State<TasksPage> {
                           BoxShadow(
                             spreadRadius: -5,
                             blurRadius: 15,
-                            color: _newTask == ''
-                                ? jetBlack
-                                : Theme.of(context).primaryColor,
+                            color: jetBlack,
                           ),
                         ],
                       ),
@@ -739,11 +736,6 @@ class _TasksPageState extends State<TasksPage> {
                                     color: jetBlack,
                                   ),
                                   autofocus: false,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _newTask = value;
-                                    });
-                                  },
                                   onFieldSubmitted: (value) async {
                                     if (value.isNotEmpty) {
                                       HapticFeedback.heavyImpact();
@@ -784,9 +776,6 @@ class _TasksPageState extends State<TasksPage> {
                                       firestoreProvider.updateTasks(
                                           _tasks, _date);
                                       _formKey.currentState.reset();
-                                      setState(() {
-                                        _newTask = '';
-                                      });
                                       AnalyticsProvider()
                                           .logAddTask(newTask, DateTime.now());
                                     }

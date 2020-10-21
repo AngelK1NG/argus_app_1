@@ -76,13 +76,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
     DocumentSnapshot snapshot =
         await db.collection('users').document(_user.uid).get();
     if (mounted) {
-      print(voltsDecay(
-        seconds: (DateTime.now()
-            .difference(DateTime.parse(snapshot.data['volts']['dateTime']))
-            .inSeconds),
-        completedTasks: _completedTasks,
-        totalTasks: _totalTasks,
-      ));
       setState(() {
         _volts = Volts(
             dateTime: DateTime.now(),
@@ -288,7 +281,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                             child: Row(
                               children: [
                                 Text(
-                                  '${_timeFocused.inHours}h ${_timeFocused.inMinutes}m',
+                                  '${_timeFocused.inHours}h ${_timeFocused.inMinutes % 60}m',
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,

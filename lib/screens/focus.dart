@@ -369,7 +369,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     DocumentSnapshot dateSnapshot = await dateDoc.get();
     if (mounted) {
       if (dateSnapshot.data == null) {
-        dateDoc.setData({
+        await dateDoc.setData({
           'completedTasks': 0,
           'totalTasks': 0,
           'secondsFocused': 0,
@@ -377,15 +377,14 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           'numDistracted': 0,
           'numPaused': 0,
           'volts': [],
-        }).then((_) {
-          dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
-            if (mounted) {
-              setState(() {
-                _totalTasks = snapshot.data['totalTasks'];
-                _completedTasks = snapshot.data['completedTasks'];
-              });
-            }
-          });
+        });
+        dateDoc.snapshots().listen((DocumentSnapshot snapshot) {
+          if (mounted) {
+            setState(() {
+              _totalTasks = snapshot.data['totalTasks'];
+              _completedTasks = snapshot.data['completedTasks'];
+            });
+          }
         });
       } else {
         dateSnapshot.data['volts'].forEach((volts) {
@@ -404,9 +403,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           }
         });
       }
-      setState(() {
-        _loading = false;
-      });
     }
     if (_prefs.getBool('doingTask') == true) {
       db
@@ -459,7 +455,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                   val: num.parse(_prefs.getString('lastVoltsVal'))));
               _volts = _todayVolts.last;
             });
-            if (_prefs.getBool('distracted')) {
+            if (_prefs.getBool('distracted') == true) {
               _startDistracted = DateTime.fromMillisecondsSinceEpoch(
                   _prefs.getInt('startDistracted'));
               _secondsDistracted +=
@@ -471,12 +467,16 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             }
             widget.setDoingTask(true);
           }
+          setState(() {
+            _loading = false;
+          });
         }
       });
     } else {
       if (mounted) {
         setState(() {
           _doingTask = false;
+          _loading = false;
         });
       }
     }
@@ -509,13 +509,13 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             child: ListBody(
               children: <Widget>[
                 Text(
-                    'This will help maintain your focus while you are doing your task. Clicking ALLOW will redirect you to Settings.'),
+                    'This will help maintain your focus while you are doing your task. Clicking Allow will redirect you to Settings.'),
               ],
             ),
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('CANCEL',
+              child: Text('Cancel',
                   style: TextStyle(
                     color: Colors.red,
                   )),
@@ -525,7 +525,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               },
             ),
             FlatButton(
-              child: Text('ALLOW'),
+              child: Text('Allow'),
               onPressed: () {
                 Navigator.of(context).pop();
                 FlutterDnd.gotoPolicySettings();
