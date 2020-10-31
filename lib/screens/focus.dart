@@ -141,6 +141,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                   seconds: DateTime.now().difference(_volts.dateTime).inSeconds,
                   completedTasks: _completedTasks,
                   totalTasks: _totalTasks,
+                  volts: _volts.val,
                 ),
           ),
         );

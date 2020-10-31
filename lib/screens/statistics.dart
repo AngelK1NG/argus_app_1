@@ -87,6 +87,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       .inSeconds),
                   completedTasks: _completedTasks,
                   totalTasks: _totalTasks,
+                  volts: snapshot.data['volts']['val'],
                 ));
       });
     }
@@ -155,7 +156,16 @@ class _StatisticsPageState extends State<StatisticsPage> {
         taskTiles.add(TaskStatTile(task: task));
       }
     });
-    return Column(children: taskTiles);
+    if (taskTiles.isEmpty) {
+      return Text(
+        'Completed and paused tasks will show up here.',
+        style: TextStyle(
+          fontSize: 14,
+        ),
+      );
+    } else {
+      return Column(children: taskTiles);
+    }
   }
 
   Widget textButton(BuildContext context,
@@ -394,7 +404,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                     Padding(
                       padding: EdgeInsets.only(left: 25, top: 50, bottom: 10),
                       child: Text(
-                        'Tasks',
+                        'Today\'s Tasks',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w600,

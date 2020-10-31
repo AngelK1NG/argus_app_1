@@ -58,10 +58,17 @@ num voltsDecay({
   @required int seconds,
   @required int completedTasks,
   @required int totalTasks,
+  @required num volts,
 }) {
+  num decay = 0;
   if (totalTasks == 0) {
-    return 0.005 * seconds;
+    decay = 0.001 * seconds;
   } else {
-    return 0.005 * (seconds + 100 * (totalTasks - completedTasks) / totalTasks);
+    decay = 0.005 * (seconds + 100 * (totalTasks - completedTasks) / totalTasks);
+  }
+  if (decay < volts) {
+    return decay;
+  } else {
+    return volts;
   }
 }
