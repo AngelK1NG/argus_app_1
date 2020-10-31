@@ -114,6 +114,7 @@ class FirestoreProvider {
         'numPaused': 0,
         'completedTasks': 0,
         'totalTasks': 0,
+        'volts': [],
       });
     }
     if (task.id != null) {
