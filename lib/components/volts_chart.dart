@@ -28,6 +28,9 @@ class VoltsChart extends StatelessWidget {
     return charts.TimeSeriesChart(
       series,
       animate: false,
+      defaultRenderer: new charts.LineRendererConfig(
+        smoothLine: true,
+      ),
       domainAxis: new charts.DateTimeAxisSpec(
         renderSpec: new charts.NoneRenderSpec(),
       ),

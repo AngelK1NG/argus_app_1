@@ -24,11 +24,14 @@ class TaskStatTile extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text(
-                task.name,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: task.completed ? jetBlack : Theme.of(context).primaryColor,
+              SizedBox(
+                width: MediaQuery.of(context).size.width - 125,
+                child: Text(
+                  task.name,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: task.completed ? jetBlack : Theme.of(context).primaryColor,
+                  ),
                 ),
               ),
               Text(
