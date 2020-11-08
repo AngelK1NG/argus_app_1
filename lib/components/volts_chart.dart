@@ -5,7 +5,8 @@ import 'package:charts_flutter/flutter.dart' as charts;
 class VoltsChart extends StatelessWidget {
   final List<Volts> data;
   final String id;
-  const VoltsChart({@required this.data, @required this.id, Key key}) : super(key: key);
+  const VoltsChart({@required this.data, @required this.id, Key key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +44,11 @@ class VoltsChart extends StatelessWidget {
         leftMarginSpec: charts.MarginSpec.fixedPixel(0),
         topMarginSpec: charts.MarginSpec.fixedPixel(0),
         rightMarginSpec: charts.MarginSpec.fixedPixel(0),
-        bottomMarginSpec:charts.MarginSpec.fixedPixel(0),
+        bottomMarginSpec: charts.MarginSpec.fixedPixel(0),
       ),
+      behaviors: [
+        new charts.SelectNearest(eventTrigger: null),
+      ],
     );
   }
 }
