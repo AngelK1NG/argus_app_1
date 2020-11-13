@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:Focal/components/task_item.dart';
 import 'package:Focal/components/task_stat_tile.dart';
+import 'dart:async';
 
 class StatisticsPage extends StatefulWidget {
   final Function goToPage;
@@ -28,6 +29,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
   FirebaseUser _user;
   bool _loading = true;
   int _index = 0;
+  Volts _initVolts;
   Volts _volts = Volts(dateTime: DateTime.now(), val: 0);
   String _date;
   List<Volts> _todayVolts = [];
@@ -36,9 +38,14 @@ class _StatisticsPageState extends State<StatisticsPage> {
   Duration _timeFocused = Duration.zero;
   NumberFormat voltsFormat = NumberFormat('###,##0.00');
   int _completedTasks = 0;
+  int _startedTasks = 0;
   int _totalTasks = 0;
 
   Future<void> getTasks() async {
+    List<TaskItem> newTasks = [];
+    int completedTasks = 0;
+    int startedTasks = 0;
+    int totalTasks = 0;
     QuerySnapshot snapshot = await db
         .collection('users')
         .document(_user.uid)
@@ -61,13 +68,20 @@ class _StatisticsPageState extends State<StatisticsPage> {
           key: UniqueKey(),
           date: _date,
         );
-        setState(() {
-          _tasks.add(newTask);
-          _totalTasks++;
-          if (task.data['completed']) {
-            _completedTasks++;
-          }
-        });
+        newTasks.add(newTask);
+        totalTasks++;
+        if (task.data['completed']) {
+          completedTasks++;
+          startedTasks++;
+        } else if (task.data['paused']) {
+          startedTasks++;
+        }
+      });
+      setState(() {
+        _tasks = newTasks;
+        _completedTasks = completedTasks;
+        _startedTasks = startedTasks;
+        _totalTasks = totalTasks;
       });
     }
   }
@@ -77,23 +91,30 @@ class _StatisticsPageState extends State<StatisticsPage> {
         await db.collection('users').document(_user.uid).get();
     if (mounted) {
       setState(() {
+        _initVolts = Volts(
+          dateTime: DateTime.parse(snapshot.data['volts']['dateTime']),
+          val: snapshot.data['volts']['val'],
+        );
         _volts = Volts(
-            dateTime: DateTime.now(),
-            val: snapshot.data['volts']['val'] -
-                voltsDecay(
-                  seconds: (DateTime.now()
-                      .difference(
-                          DateTime.parse(snapshot.data['volts']['dateTime']))
-                      .inSeconds),
-                  completedTasks: _completedTasks,
-                  totalTasks: _totalTasks,
-                  volts: snapshot.data['volts']['val'],
-                ));
+          dateTime: DateTime.now(),
+          val: snapshot.data['volts']['val'] -
+              voltsDecay(
+                seconds: (DateTime.now()
+                    .difference(
+                        DateTime.parse(snapshot.data['volts']['dateTime']))
+                    .inSeconds),
+                completedTasks: _completedTasks,
+                startedTasks: _startedTasks,
+                totalTasks: _totalTasks,
+                volts: snapshot.data['volts']['val'],
+              ),
+        );
       });
     }
   }
 
   Future<void> getTodayVolts() async {
+    List<Volts> newTodayVolts = [];
     DocumentReference dateDoc = db
         .collection('users')
         .document(_user.uid)
@@ -114,15 +135,16 @@ class _StatisticsPageState extends State<StatisticsPage> {
         } else {
           snapshot.data['volts'].forEach((volts) {
             setState(() {
-              _todayVolts.add(Volts(
+              newTodayVolts.add(Volts(
                   dateTime: DateTime.parse(volts['dateTime']),
                   val: volts['val']));
             });
           });
-          _todayVolts.add(_volts);
+          newTodayVolts.add(_volts);
           setState(() {
             _timeFocused = Duration(seconds: snapshot.data['secondsFocused']);
-            _voltsDelta = _volts.val - _todayVolts.first.val;
+            _voltsDelta = _volts.val - newTodayVolts.first.val;
+            _todayVolts = newTodayVolts;
           });
         }
       }
@@ -136,7 +158,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
         minutes: _prefs.getInt('dayStartMinute'))));
     await getTasks();
     await getVolts();
-    await getTodayVolts();
+    switch (_index) {
+      case 0:
+        {
+          await getTodayVolts();
+        }
+    }
     if (mounted) {
       setState(() {
         _loading = false;
@@ -144,15 +171,31 @@ class _StatisticsPageState extends State<StatisticsPage> {
     }
   }
 
+  void updateVolts() {
+    if (mounted) {
+      setState(() {
+        _volts = Volts(
+          dateTime: DateTime.now(),
+          val: _initVolts.val -
+              voltsDecay(
+                seconds:
+                    (DateTime.now().difference(_initVolts.dateTime).inSeconds),
+                completedTasks: _completedTasks,
+                startedTasks: _startedTasks,
+                totalTasks: _totalTasks,
+                volts: _initVolts.val,
+              ),
+        );
+        _voltsDelta = _volts.val - _todayVolts.first.val;
+        _todayVolts.last = _volts;
+      });
+    }
+  }
+
   Widget taskColumn() {
     List<TaskStatTile> taskTiles = [];
     _tasks.forEach((task) {
-      if (task.completed) {
-        taskTiles.add(TaskStatTile(task: task));
-      }
-    });
-    _tasks.forEach((task) {
-      if (task.paused && !task.completed) {
+      if (task.completed || task.paused) {
         taskTiles.add(TaskStatTile(task: task));
       }
     });
@@ -160,7 +203,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
       return Text(
         'Completed and paused tasks will show up here.',
         style: TextStyle(
-          fontSize: 14,
+          fontSize: 16,
         ),
       );
     } else {
@@ -202,6 +245,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
     super.initState();
     _user = Provider.of<User>(context, listen: false).user;
     getData();
+    new Timer.periodic(
+      const Duration(seconds: 1),
+      (Timer timer) {
+        updateVolts();
+      },
+    );
   }
 
   @override

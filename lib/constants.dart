@@ -47,24 +47,33 @@ num voltsIncrement({
   @required int numPaused,
   @required int completedTasks,
   @required int totalTasks,
+  @required num volts,
 }) {
-  return 0.05 *
-      (secondsFocused - pow(secondsDistracted, 1.2) - numPaused) *
+  num increment = 0;
+  increment = 0.02 *
+      (secondsFocused - secondsDistracted) *
       pow(100 * ((completedTasks + 1) / totalTasks), 0.1) *
-      pow(totalTasks, 0.1);
+      pow(totalTasks, 0.1) /
+      pow(numPaused, 0.1);
+  if (-increment < volts) {
+    return increment;
+  } else {
+    return -volts;
+  }
 }
 
 num voltsDecay({
   @required int seconds,
   @required int completedTasks,
+  @required int startedTasks,
   @required int totalTasks,
   @required num volts,
 }) {
   num decay = 0;
-  if (totalTasks == 0) {
-    decay = 0.001 * seconds;
+  if (startedTasks == 0 || completedTasks == totalTasks) {
+    decay = 0.002 * seconds;
   } else {
-    decay = 0.005 * (seconds + 100 * (totalTasks - completedTasks) / totalTasks);
+    decay = 0.002 * seconds * pow(100 * startedTasks / totalTasks, 0.3);
   }
   if (decay < volts) {
     return decay;

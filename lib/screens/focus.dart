@@ -44,6 +44,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   DateTime _startDistracted = DateTime.now();
   String _swatchDisplay = "00:00";
   int _completedTasks;
+  int _startedTasks;
   int _totalTasks;
   bool _doingTask = false;
   String _date;
@@ -52,7 +53,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   AnalyticsProvider _analyticsProvider = AnalyticsProvider();
   List<TaskItem> _tasks = [];
   LocalNotifications localNotifications;
-  bool _loading = true;
+  bool _prefsLoading = true;
+  bool _tasksLoading = true;
   bool _saving = false;
   bool _screenOn = true;
   bool _distractionTracking = true;
@@ -140,6 +142,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                 voltsDecay(
                   seconds: DateTime.now().difference(_volts.dateTime).inSeconds,
                   completedTasks: _completedTasks,
+                  startedTasks: _startedTasks,
                   totalTasks: _totalTasks,
                   volts: _volts.val,
                 ),
@@ -206,6 +209,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                 numPaused: _tasks[0].numPaused,
                 completedTasks: _completedTasks,
                 totalTasks: _totalTasks,
+                volts: _todayVolts.last.val,
               ),
         ),
       );
@@ -272,6 +276,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                 numPaused: task.numPaused,
                 completedTasks: _completedTasks,
                 totalTasks: _totalTasks,
+                volts: _todayVolts.last.val,
               ),
         ),
       );
@@ -469,7 +474,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             widget.setDoingTask(true);
           }
           setState(() {
-            _loading = false;
+            _prefsLoading = false;
           });
         }
       });
@@ -477,7 +482,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       if (mounted) {
         setState(() {
           _doingTask = false;
-          _loading = false;
+          _prefsLoading = false;
         });
       }
     }
@@ -665,7 +670,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     return WillPopScope(
       onWillPop: () async => false,
       child: AnimatedOpacity(
-        opacity: _loading ? 0 : 1,
+        opacity: _prefsLoading || _tasksLoading ? 0 : 1,
         duration: loadingDuration,
         curve: loadingCurve,
         child: Stack(
@@ -680,9 +685,11 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                     .orderBy('order')
                     .snapshots(),
                 builder: (context, snapshot) {
+                  _tasksLoading = false;
                   if (!snapshot.hasData ||
                       snapshot.data.documents == null ||
                       snapshot.data.documents.isEmpty) {
+                    _startedTasks = 0;
                     return Stack(
                       children: <Widget>[
                         Positioned(
@@ -743,6 +750,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                     );
                   } else {
                     _tasks = [];
+                    _startedTasks = 0;
                     final data = snapshot.data.documents;
                     for (var task in data) {
                       TaskItem newTask = TaskItem(
@@ -760,6 +768,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                         key: UniqueKey(),
                         date: _date,
                       );
+                      if (task.data['completed'] || task.data['paused']) {
+                        _startedTasks++;
+                      }
                       _tasks.add(newTask);
                     }
                     if (areTasksCompleted()) {
@@ -945,10 +956,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                                 style: topTextStyle,
                                               ),
                                               Text(
-                                                'Your time outside of Focal will not be counted as Distraction, but you will only receive 50% Volts until you return. Keep up the good work!',
+                                                'Your time outside of Focal will not be counted as Distraction. Keep up the good work!',
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                  fontSize: 14,
+                                                  fontSize: 16,
                                                   fontWeight: FontWeight.w400,
                                                   color: Colors.white,
                                                 ),
