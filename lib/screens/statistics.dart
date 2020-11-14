@@ -125,6 +125,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
         if (snapshot.data == null) {
           dateDoc.setData({
             'completedTasks': 0,
+            'startedTasks': 0,
             'totalTasks': 0,
             'secondsFocused': 0,
             'secondsDistracted': 0,
@@ -260,7 +261,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
       child: Stack(children: <Widget>[
         Positioned(
           left: 25,
-          top: SizeConfig.safeBlockVertical * 5,
+          top: 25,
           child: Text(
             'Statistics',
             style: headerTextStyle,
@@ -269,9 +270,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
         Positioned(
           left: 0,
           right: 0,
-          top: SizeConfig.safeBlockVertical * 15 + 25,
+          top: 105,
           child: SizedBox(
-            height: SizeConfig.safeBlockVertical * 85 - 105,
+            height: SizeConfig.safeBlockVertical * 100 - 185,
             child: AnimatedOpacity(
               opacity: _loading ? 0 : 1,
               duration: loadingDuration,
@@ -284,10 +285,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
                     Row(
                       children: [
                         Padding(
-                          padding: EdgeInsets.only(left: 25, right: 5),
+                          padding: EdgeInsets.only(left: 25),
                           child: Icon(
                             FeatherIcons.zap,
                             size: 24,
+                            color: jetBlack,
                           ),
                         ),
                         Text(
@@ -307,15 +309,25 @@ class _StatisticsPageState extends State<StatisticsPage> {
                               children: [
                                 Icon(
                                   _volts.val >= _todayVolts.first.val
-                                      ? FeatherIcons.arrowUpRight
-                                      : FeatherIcons.arrowDownRight,
+                                      ? FeatherIcons.chevronUp
+                                      : FeatherIcons.chevronDown,
                                   size: 20,
                                   color: _volts.val >= _todayVolts.first.val
                                       ? Theme.of(context).primaryColor
                                       : Colors.red,
                                 ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 0),
+                                  child: Icon(
+                                    FeatherIcons.zap,
+                                    size: 12,
+                                    color: _volts.val >= _todayVolts.first.val
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.red,
+                                  ),
+                                ),
                                 Text(
-                                  '${voltsFormat.format(_voltsDelta)} (${voltsFormat.format(_voltsDelta / _todayVolts.first.val * 100)}%)',
+                                  '${voltsFormat.format(_voltsDelta.abs())} (${voltsFormat.format(_voltsDelta.abs() / _todayVolts.first.val * 100)}%)',
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -407,11 +419,16 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           child: Container(
                             width: 24,
                             height: 2,
-                            color: _todayVolts.length <= 1
-                                ? Theme.of(context).primaryColor
-                                : _volts.val >= _todayVolts.first.val
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.red,
+                            decoration: BoxDecoration(
+                              color: _todayVolts.length <= 1
+                                  ? Theme.of(context).primaryColor
+                                  : _volts.val >= _todayVolts.first.val
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.red,
+                              borderRadius: new BorderRadius.all(
+                                Radius.circular(1),
+                              ),
+                            ),
                           ),
                           duration: loadingDuration,
                           curve: loadingCurve,

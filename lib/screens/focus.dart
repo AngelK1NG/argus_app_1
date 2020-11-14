@@ -23,6 +23,7 @@ import 'package:confetti/confetti.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:Focal/components/volts.dart';
+import 'package:intl/intl.dart';
 
 class FocusPage extends StatefulWidget {
   final Function goToPage;
@@ -72,7 +73,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   String _quote;
   String _message;
   List<Volts> _todayVolts = [];
-  Volts _volts;
+  Volts _volts = Volts(dateTime: DateTime.now(), val: 0);
+  Volts _initVolts;
+  NumberFormat voltsFormat = NumberFormat('###,##0.00');
 
   final quotes = [
     '''“You can waste your lives drawing lines. Or you can live your life crossing them.”''',
@@ -133,17 +136,18 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         _todayVolts.add(
           Volts(
             dateTime: DateTime.now(),
-            val: _volts.val -
+            val: _initVolts.val -
                 voltsDecay(
-                  seconds: DateTime.now().difference(_volts.dateTime).inSeconds,
+                  seconds:
+                      DateTime.now().difference(_initVolts.dateTime).inSeconds,
                   completedTasks: _completedTasks,
                   startedTasks: _startedTasks,
                   totalTasks: _totalTasks,
-                  volts: _volts.val,
+                  volts: _initVolts.val,
                 ),
           ),
         );
-        _volts = _todayVolts.last;
+        _initVolts = _todayVolts.last;
       });
 
       _prefs.setInt('secondsDistracted', _secondsDistracted);
@@ -208,7 +212,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               ),
         ),
       );
-      _volts = _todayVolts.last;
+      _initVolts = _todayVolts.last;
       List<Map> newVolts = [];
       _todayVolts.forEach((volts) {
         newVolts.add(
@@ -275,7 +279,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               ),
         ),
       );
-      _volts = _todayVolts.last;
+      _initVolts = _todayVolts.last;
       List<Map> newVolts = [];
       _todayVolts.forEach((volts) {
         newVolts.add(
@@ -356,11 +360,11 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       });
     }
     if (userSnapshot.data != null) {
-      _volts = Volts(
+      _initVolts = Volts(
           dateTime: DateTime.parse(userSnapshot.data['volts']['dateTime']),
           val: userSnapshot.data['volts']['val']);
     } else {
-      _volts = Volts(dateTime: DateTime.now(), val: 1000);
+      _initVolts = Volts(dateTime: DateTime.now(), val: 1000);
     }
     DocumentReference dateDoc = db
         .collection('users')
@@ -372,6 +376,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       if (dateSnapshot.data == null) {
         await dateDoc.setData({
           'completedTasks': 0,
+          'startedTasks': 0,
           'totalTasks': 0,
           'secondsFocused': 0,
           'secondsDistracted': 0,
@@ -384,8 +389,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             setState(() {
               _totalTasks = snapshot.data['totalTasks'];
               _completedTasks = snapshot.data['completedTasks'];
+              _startedTasks = snapshot.data['startedTasks'];
             });
           }
+          updateVolts();
         });
       } else {
         dateSnapshot.data['volts'].forEach((volts) {
@@ -400,8 +407,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             setState(() {
               _totalTasks = snapshot.data['totalTasks'];
               _completedTasks = snapshot.data['completedTasks'];
+              _startedTasks = snapshot.data['startedTasks'];
             });
           }
+          updateVolts();
         });
       }
     }
@@ -456,7 +465,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                   dateTime:
                       DateTime.parse(_prefs.getString('lastVoltsDateTime')),
                   val: num.parse(_prefs.getString('lastVoltsVal'))));
-              _volts = _todayVolts.last;
+              _initVolts = _todayVolts.last;
             });
             if (_prefs.getBool('distracted') == true) {
               _startDistracted = DateTime.fromMillisecondsSinceEpoch(
@@ -482,6 +491,25 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           _prefsLoading = false;
         });
       }
+    }
+  }
+
+  void updateVolts() {
+    if (mounted) {
+      setState(() {
+        _volts = Volts(
+          dateTime: DateTime.now(),
+          val: _initVolts.val -
+              voltsDecay(
+                seconds:
+                    (DateTime.now().difference(_initVolts.dateTime).inSeconds),
+                completedTasks: _completedTasks,
+                startedTasks: _startedTasks,
+                totalTasks: _totalTasks,
+                volts: _initVolts.val,
+              ),
+        );
+      });
     }
   }
 
@@ -575,6 +603,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _user = Provider.of<User>(context, listen: false).user;
       _firestoreProvider = FirestoreProvider(_user);
     });
+    new Timer.periodic(
+      const Duration(seconds: 1),
+      (Timer timer) {
+        updateVolts();
+      },
+    );
   }
 
   @override
@@ -682,10 +716,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                     .orderBy('order')
                     .snapshots(),
                 builder: (context, snapshot) {
-                  _tasksLoading = false;
                   if (!snapshot.hasData ||
                       snapshot.data.documents == null ||
                       snapshot.data.documents.isEmpty) {
+                    _tasksLoading = false;
                     _startedTasks = 0;
                     return Stack(
                       children: <Widget>[
@@ -770,6 +804,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                       }
                       _tasks.add(newTask);
                     }
+                    _tasksLoading = false;
                     if (areTasksCompleted()) {
                       return Stack(
                         children: <Widget>[
@@ -866,35 +901,40 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                           Positioned(
                             left: 20,
                             top: 20,
-                            child: Offstage(
-                              offstage: !_doingTask,
+                            child: AnimatedOpacity(
+                              opacity: _doingTask ? 1 : 0,
+                              duration: cardSlideDuration,
+                              curve: cardSlideCurve,
                               child: GestureDetector(
                                 onTap: () {
-                                  HapticFeedback.heavyImpact();
-                                  if (_distractionTracking) {
-                                    setState(() {
-                                      _distractionTracking = false;
-                                      _distractionTrackingNotice = true;
-                                      _distractionTrackingNoticeCount++;
-                                    });
-                                    final distractionTrackingNoticeCount =
-                                        _distractionTrackingNoticeCount;
-                                    Future.delayed(Duration(milliseconds: 4000),
-                                        () {
-                                      if (mounted) {
-                                        if (_distractionTrackingNoticeCount ==
-                                            distractionTrackingNoticeCount) {
-                                          setState(() {
-                                            _distractionTrackingNotice = false;
-                                          });
+                                  if (_doingTask) {
+                                    HapticFeedback.heavyImpact();
+                                    if (_distractionTracking) {
+                                      setState(() {
+                                        _distractionTracking = false;
+                                        _distractionTrackingNotice = true;
+                                        _distractionTrackingNoticeCount++;
+                                      });
+                                      final distractionTrackingNoticeCount =
+                                          _distractionTrackingNoticeCount;
+                                      Future.delayed(
+                                          Duration(milliseconds: 4000), () {
+                                        if (mounted) {
+                                          if (_distractionTrackingNoticeCount ==
+                                              distractionTrackingNoticeCount) {
+                                            setState(() {
+                                              _distractionTrackingNotice =
+                                                  false;
+                                            });
+                                          }
                                         }
-                                      }
-                                    });
-                                  } else {
-                                    setState(() {
-                                      _distractionTracking = true;
-                                      _distractionTrackingNotice = false;
-                                    });
+                                      });
+                                    } else {
+                                      setState(() {
+                                        _distractionTracking = true;
+                                        _distractionTrackingNotice = false;
+                                      });
+                                    }
                                   }
                                 },
                                 child: Container(
@@ -911,6 +951,34 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                     ),
                                   ),
                                 ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            top: 25,
+                            child: AnimatedOpacity(
+                              opacity: _doingTask ? 0 : 1,
+                              duration: cardSlideDuration,
+                              curve: cardSlideCurve,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    FeatherIcons.zap,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
+                                  Text(
+                                    voltsFormat.format(_volts.val),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),

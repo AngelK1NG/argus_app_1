@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'task_item.dart';
 import 'package:Focal/constants.dart';
+import 'package:Focal/utils/size_config.dart';
 
 class TaskStatTile extends StatelessWidget {
   final TaskItem task;
@@ -25,7 +26,7 @@ class TaskStatTile extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               SizedBox(
-                width: MediaQuery.of(context).size.width - 125,
+                width: SizeConfig.safeBlockHorizontal * 100 - 125,
                 child: Text(
                   task.name,
                   style: TextStyle(
@@ -38,7 +39,7 @@ class TaskStatTile extends StatelessWidget {
                 '${_timeFocused.inHours}h ${_timeFocused.inMinutes % 60}m',
                 style: TextStyle(
                   fontSize: 14,
-                  color: jetBlack,
+                  color: Theme.of(context).primaryColor,
                   fontWeight: FontWeight.w600,
                 ),
               ),

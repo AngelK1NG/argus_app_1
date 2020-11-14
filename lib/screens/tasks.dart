@@ -409,12 +409,12 @@ class _TasksPageState extends State<TasksPage> {
   @override
   Widget build(BuildContext context) {
     TextStyle dateTextStyle = TextStyle(
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: FontWeight.w600,
       color: Colors.white,
     );
     TextStyle todayTextStyle = TextStyle(
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: FontWeight.w600,
       color: Theme.of(context).primaryColor,
     );
@@ -431,7 +431,7 @@ class _TasksPageState extends State<TasksPage> {
               Positioned(
                 left: 0,
                 right: 0,
-                top: SizeConfig.safeBlockVertical * 5 - 20,
+                top: 10,
                 child: Center(
                   child: Text(
                     _secondaryDateString == null ? '' : _secondaryDateString,
@@ -446,7 +446,7 @@ class _TasksPageState extends State<TasksPage> {
               Positioned(
                 left: 5,
                 right: 5,
-                top: SizeConfig.safeBlockVertical * 5 - 20,
+                top: 5,
                 child: GestureDetector(
                   onHorizontalDragEnd: (details) {
                     if (details.velocity.pixelsPerSecond.dx > 50) {
@@ -582,7 +582,7 @@ class _TasksPageState extends State<TasksPage> {
                 Positioned(
                   right: 28,
                   left: 28,
-                  top: SizeConfig.safeBlockVertical * 15,
+                  top: 80,
                   child: Offstage(
                     offstage: _tasks.length == 0,
                     child: Container(
@@ -638,7 +638,7 @@ class _TasksPageState extends State<TasksPage> {
                 Positioned(
                   right: 0,
                   left: 0,
-                  top: SizeConfig.safeBlockVertical * 15 + 55,
+                  top: 135,
                   child: SizedBox(
                     height: _editingTask
                         ? SizeConfig.safeBlockVertical * 85 -
@@ -685,7 +685,7 @@ class _TasksPageState extends State<TasksPage> {
                       duration: loadingDuration,
                       curve: loadingCurve,
                       height: 75,
-                      width: MediaQuery.of(context).size.width,
+                      width: SizeConfig.safeBlockHorizontal * 100,
                       alignment: Alignment.centerLeft,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.only(
@@ -713,7 +713,7 @@ class _TasksPageState extends State<TasksPage> {
                           ),
                           Container(
                             alignment: Alignment.center,
-                            width: MediaQuery.of(context).size.width - 75,
+                            width: SizeConfig.safeBlockHorizontal * 100 - 75,
                             child: Focus(
                               onFocusChange: (focus) {
                                 if (!focus) {

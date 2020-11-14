@@ -192,7 +192,7 @@ class _TaskItemState extends State<TaskItem> {
                 ],
               ),
               height: 55,
-              width: MediaQuery.of(context).size.width,
+              width: SizeConfig.safeBlockHorizontal * 100,
               alignment: Alignment.centerLeft,
             ),
           ),

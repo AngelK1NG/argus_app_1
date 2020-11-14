@@ -47,6 +47,7 @@ class FirestoreProvider {
     String userId = user.uid;
     int totalTasks = 0;
     int completedTasks = 0;
+    int startedTasks = 0;
     for (TaskItem task in tasks) {
       db
           .collection('users')
@@ -68,6 +69,9 @@ class FirestoreProvider {
       totalTasks++;
       if (task.completed) {
         completedTasks++;
+        startedTasks++;
+      } else if (task.paused) {
+        startedTasks++;
       }
     }
     db
@@ -77,6 +81,7 @@ class FirestoreProvider {
         .document(date)
         .updateData({
       'completedTasks': completedTasks,
+      'startedTasks': startedTasks,
       'totalTasks': totalTasks,
     });
   }
@@ -113,6 +118,7 @@ class FirestoreProvider {
         'numDistracted': 0,
         'numPaused': 0,
         'completedTasks': 0,
+        'startedTasks': 0,
         'totalTasks': 0,
         'volts': [],
       });

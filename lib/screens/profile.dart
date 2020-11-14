@@ -88,18 +88,18 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Stack(children: <Widget>[
         Positioned(
           left: 25,
-          top: SizeConfig.safeBlockVertical * 5,
+          top: 25,
           child: Text(
             'Profile',
             style: headerTextStyle,
           ),
         ),
         Positioned(
-          top: SizeConfig.safeBlockVertical * 15 + 25,
+          top: 105,
           left: 25,
           right: 25,
           child: SizedBox(
-            height: SizeConfig.safeBlockVertical * 85 - 105,
+            height: SizeConfig.safeBlockVertical * 100 - 185,
             child: AnimatedOpacity(
               opacity: _loading ? 0 : 1,
               duration: loadingDuration,
@@ -238,13 +238,13 @@ class _ProfilePageState extends State<ProfilePage> {
                             divider: true,
                             onTap: () => openFeedbackForm(),
                           ),
-                          SettingsTile(
-                            iconData: FeatherIcons.helpCircle,
-                            text: 'Help',
-                            chevron: true,
-                            divider: true,
-                            onTap: () => widget.goToPage(5),
-                          ),
+                          // SettingsTile(
+                          //   iconData: FeatherIcons.helpCircle,
+                          //   text: 'Help',
+                          //   chevron: true,
+                          //   divider: true,
+                          //   onTap: () => widget.goToPage(5),
+                          // ),
                           SettingsTile(
                             iconData: FeatherIcons.info,
                             text: 'About',

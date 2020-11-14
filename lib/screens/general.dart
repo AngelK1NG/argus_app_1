@@ -1,7 +1,7 @@
 import 'package:Focal/constants.dart';
+import 'package:Focal/utils/size_config.dart';
 import 'package:Focal/components/settings_switch_tile.dart';
 import 'package:Focal/components/settings_tile.dart';
-import 'package:Focal/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
@@ -83,7 +83,7 @@ class _GeneralPageState extends State<GeneralPage> {
       child: Stack(children: <Widget>[
         Positioned(
           left: 25,
-          top: SizeConfig.safeBlockVertical * 5,
+          top: 25,
           child: Text(
             'Settings',
             style: headerTextStyle,
@@ -98,14 +98,14 @@ class _GeneralPageState extends State<GeneralPage> {
               Positioned(
                 right: 25,
                 left: 25,
-                top: SizeConfig.safeBlockVertical * 15 + 17,
+                top: 97,
                 child: Column(
                   children: <Widget>[
                     Padding(
                       padding: EdgeInsets.only(bottom: 20),
                       child: SizedBox(
                         height: 40,
-                        width: MediaQuery.of(context).size.width,
+                        width: SizeConfig.safeBlockHorizontal * 100,
                         child: Stack(
                           children: [
                             Align(

@@ -10,7 +10,11 @@ class BottomNav extends StatelessWidget {
 
   const BottomNav({this.onTap, this.show, this.index});
 
-  Widget navButton(context, {@required int index, @required IconData iconData}) {
+  Widget navButton(
+    context, {
+    @required int index,
+    @required IconData iconData,
+  }) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
@@ -55,7 +59,12 @@ class BottomNav extends StatelessWidget {
               child: Container(
                 width: 24,
                 height: 2,
-                color: Theme.of(context).primaryColor,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: new BorderRadius.all(
+                    Radius.circular(1),
+                  ),
+                ),
               ),
               duration: loadingDuration,
               curve: loadingCurve,

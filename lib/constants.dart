@@ -20,7 +20,7 @@ final Color darkRed = Color(0xffd54321);
 
 //styles
 final TextStyle headerTextStyle = TextStyle(
-  fontSize: 30,
+  fontSize: 24,
   fontWeight: FontWeight.w600,
   color: Colors.white,
 );

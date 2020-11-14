@@ -1,4 +1,5 @@
 import 'package:Focal/constants.dart';
+import 'package:Focal/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 
@@ -46,7 +47,7 @@ class _HelpPageState extends State<HelpPage> {
                     padding: EdgeInsets.only(bottom: 20),
                     child: SizedBox(
                       height: 40,
-                      width: MediaQuery.of(context).size.width,
+                      width: SizeConfig.safeBlockHorizontal * 100,
                       child: Stack(
                         children: [
                           Align(

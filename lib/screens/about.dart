@@ -4,6 +4,7 @@ import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:launch_review/launch_review.dart';
+import 'package:Focal/utils/size_config.dart';
 
 class AboutPage extends StatefulWidget {
   final Function goToPage;
@@ -77,7 +78,7 @@ class _AboutPageState extends State<AboutPage> {
                     padding: EdgeInsets.only(bottom: 20),
                     child: SizedBox(
                       height: 40,
-                      width: MediaQuery.of(context).size.width,
+                      width: SizeConfig.safeBlockVertical * 100,
                       child: Stack(
                         children: [
                           Align(

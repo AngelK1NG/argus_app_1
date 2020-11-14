@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:Focal/utils/size_config.dart';
 
 class SettingsSwitchTile extends StatelessWidget {
   final String title;
@@ -16,7 +17,7 @@ class SettingsSwitchTile extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           SizedBox(
-            width: MediaQuery.of(context).size.width - 135,
+            width: SizeConfig.safeBlockHorizontal * 100 - 135,
             child: Text(
               title,
               style: TextStyle(fontSize: 16),

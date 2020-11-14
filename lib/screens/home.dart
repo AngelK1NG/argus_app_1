@@ -64,7 +64,7 @@ class _HomeState extends State<Home> {
         case 1:
           {
             _child = TasksPage(goToPage: goToPage);
-            _cardPosition = SizeConfig.safeBlockVertical * 15;
+            _cardPosition = 80;
             setNav(true);
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
@@ -72,7 +72,7 @@ class _HomeState extends State<Home> {
         case 2:
           {
             _child = StatisticsPage(goToPage: goToPage);
-            _cardPosition = SizeConfig.safeBlockVertical * 15;
+            _cardPosition = 80;
             setNav(true);
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
@@ -80,7 +80,7 @@ class _HomeState extends State<Home> {
         case 3:
           {
             _child = ProfilePage(goToPage: goToPage);
-            _cardPosition = SizeConfig.safeBlockVertical * 15;
+            _cardPosition = 80;
             setNav(true);
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
@@ -88,7 +88,7 @@ class _HomeState extends State<Home> {
         case 4:
           {
             _child = GeneralPage(goToPage: goToPage);
-            _cardPosition = SizeConfig.safeBlockVertical * 15;
+            _cardPosition = 80;
             setNav(true);
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
