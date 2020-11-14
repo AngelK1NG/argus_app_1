@@ -52,9 +52,9 @@ num voltsIncrement({
   num increment = 0;
   increment = 0.02 *
       (secondsFocused - secondsDistracted) *
-      pow(100 * ((completedTasks + 1) / totalTasks), 0.1) *
+      pow(100 * (completedTasks + 1) / totalTasks, 0.1) *
       pow(totalTasks, 0.1) /
-      pow(numPaused, 0.1);
+      pow(numPaused + 1, 0.1);
   if (-increment < volts) {
     return increment;
   } else {

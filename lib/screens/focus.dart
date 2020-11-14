@@ -684,12 +684,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     TextStyle topTextStyle = TextStyle(
-      fontSize: 40,
+      fontSize: 36,
       color: Colors.white,
       fontWeight: FontWeight.w600,
     );
     TextStyle swatchTextStyle = TextStyle(
-      fontSize: 80,
+      fontSize: 72,
       color: Colors.white,
       fontWeight: FontWeight.w600,
     );
@@ -723,6 +723,29 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                     _startedTasks = 0;
                     return Stack(
                       children: <Widget>[
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          top: 25,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                FeatherIcons.zap,
+                                size: 16,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                voltsFormat.format(_volts.val),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                         Positioned(
                           left: 40,
                           right: 40,
@@ -808,6 +831,29 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                     if (areTasksCompleted()) {
                       return Stack(
                         children: <Widget>[
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            top: 25,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  FeatherIcons.zap,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                                Text(
+                                  voltsFormat.format(_volts.val),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                           Positioned(
                             left: 40,
                             right: 40,
