@@ -247,7 +247,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
     _user = Provider.of<User>(context, listen: false).user;
     getData();
     new Timer.periodic(
-      const Duration(seconds: 1),
+      const Duration(seconds: 2),
       (Timer timer) {
         updateVolts();
       },

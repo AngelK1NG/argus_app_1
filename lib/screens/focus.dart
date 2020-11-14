@@ -114,16 +114,16 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           _tasks[0].secondsFocused == null ? 0 : _tasks[0].secondsFocused;
 
       _timer = new Timer.periodic(
-          const Duration(seconds: 1),
-          (Timer timer) => setState(() {
-                _seconds =
-                    (DateTime.now().difference(_startFocused).inSeconds) +
-                        _initSecondsFocused +
-                        _initSecondsDistracted;
-                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, '0') +
-                    ":" +
-                    (_seconds % 60).toString().padLeft(2, '0');
-              }));
+        const Duration(seconds: 1),
+        (Timer timer) => setState(() {
+          _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
+              _initSecondsFocused +
+              _initSecondsDistracted;
+          _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, '0') +
+              ":" +
+              (_seconds % 60).toString().padLeft(2, '0');
+        }),
+      );
       setState(() {
         _startFocused = DateTime.now();
         _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
@@ -440,17 +440,17 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             _initNumDistracted = _prefs.getInt('initNumDistracted');
             _initSecondsFocused = _prefs.getInt('initSecondsFocused');
             _timer = new Timer.periodic(
-                const Duration(seconds: 1),
-                (Timer timer) => setState(() {
-                      _seconds =
-                          (DateTime.now().difference(_startFocused).inSeconds) +
-                              _initSecondsFocused +
-                              _initSecondsDistracted;
-                      _swatchDisplay =
-                          (_seconds ~/ 60).toString().padLeft(2, "0") +
-                              ":" +
-                              (_seconds % 60).toString().padLeft(2, "0");
-                    }));
+              const Duration(seconds: 1),
+              (Timer timer) => setState(() {
+                _seconds =
+                    (DateTime.now().difference(_startFocused).inSeconds) +
+                        _initSecondsFocused +
+                        _initSecondsDistracted;
+                _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
+                    ":" +
+                    (_seconds % 60).toString().padLeft(2, "0");
+              }),
+            );
             setState(() {
               _startFocused = DateTime.fromMillisecondsSinceEpoch(
                   _prefs.getInt('startFocused'));
@@ -604,7 +604,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _firestoreProvider = FirestoreProvider(_user);
     });
     new Timer.periodic(
-      const Duration(seconds: 1),
+      const Duration(seconds: 2),
       (Timer timer) {
         updateVolts();
       },
