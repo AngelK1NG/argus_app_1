@@ -34,7 +34,6 @@ class _TasksPageState extends State<TasksPage> {
   bool _loading = true;
   bool _dateLoading = true;
   bool _addingTask = false;
-  bool _editingTask = false;
   bool _keyboard = false;
   List<TaskItem> _tasks = [];
   List<TaskItem> _tmrTasks = [];
@@ -393,14 +392,7 @@ class _TasksPageState extends State<TasksPage> {
           FocusScope.of(context).unfocus();
           setState(() {
             _addingTask = false;
-            _editingTask = false;
           });
-        } else {
-          if (!_addingTask) {
-            setState(() {
-              _editingTask = true;
-            });
-          }
         }
       }
     });
@@ -640,11 +632,11 @@ class _TasksPageState extends State<TasksPage> {
                   left: 0,
                   top: 135,
                   child: SizedBox(
-                    height: _editingTask
-                        ? SizeConfig.safeBlockVertical * 85 -
+                    height: _keyboard
+                        ? SizeConfig.safeBlockVertical * 100 -
                             MediaQuery.of(context).viewInsets.bottom -
-                            55
-                        : SizeConfig.safeBlockVertical * 85 - 135,
+                            135
+                        : SizeConfig.safeBlockVertical * 100 - 215,
                     child: ReorderableListView(
                       padding: EdgeInsets.all(0),
                       onReorder: ((oldIndex, newIndex) {
