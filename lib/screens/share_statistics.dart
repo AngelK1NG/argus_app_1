@@ -222,11 +222,11 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                           ],
                         ),
                         Padding(
-                          padding: EdgeInsets.only(right: 25),
+                          padding: EdgeInsets.only(right: 10),
                           child: Image(
                             image: AssetImage(
                                 'assets/images/logo/Focal Logo_Full.png'),
-                            width: 120,
+                            width: 150,
                           ),
                         ),
                       ],
@@ -274,7 +274,7 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                           Image(
                             image: AssetImage(
                                 'assets/images/qrcode/focaltechnology.png'),
-                            width: 80,
+                            width: 69,
                           ),
                         ],
                       ),

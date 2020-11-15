@@ -71,16 +71,13 @@ num voltsDecay({
 }) {
   num decay = 0;
   if (startedTasks == 0 || completedTasks == totalTasks) {
-    decay = 0.002 *
-        seconds *
-        pow((seconds % 2) + 1, 0.069) *
-        pow((seconds % 3) + 1, 0.0420);
+    decay = 0.003 * seconds +
+        pow((seconds % 4) + 1, 0.069) * pow((seconds % 5) + 1, 0.0420) -
+        1;
   } else {
-    decay = 0.002 *
-        seconds *
-        pow((seconds % 2) + 1, 0.069) *
-        pow((seconds % 3) + 1, 0.0420) *
-        pow(100 * startedTasks / totalTasks, 0.3);
+    decay = 0.003 * seconds * pow(100 * startedTasks / totalTasks, 0.3) +
+        pow((seconds % 4) + 1, 0.069) * pow((seconds % 5) + 1, 0.0420) -
+        1;
   }
   if (decay < volts) {
     return decay;
