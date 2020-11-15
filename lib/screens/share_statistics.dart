@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/components/volts.dart';
 import 'package:Focal/components/volts_chart.dart';
@@ -60,6 +61,7 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                 ),
                 GestureDetector(
                   onTap: () async {
+                    HapticFeedback.heavyImpact();
                     final directory =
                         (await getApplicationDocumentsDirectory()).path;
                     String fileName = DateTime.now().toIso8601String();
@@ -70,7 +72,11 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                       pixelRatio: 3,
                     )
                         .then((_) {
-                      Share.shareFiles([path]);
+                      Share.shareFiles(
+                        [path],
+                        text:
+                            'Join me on Focal to get things done, one task at a time! https://focal.technology',
+                      );
                     }).catchError((onError) {
                       print(onError);
                     });
