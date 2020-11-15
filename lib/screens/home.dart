@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/utils/size_config.dart';
 import 'package:Focal/components/bottom_nav.dart';
+import 'package:Focal/components/volts.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'focus.dart';
 import 'tasks.dart';
@@ -11,6 +12,7 @@ import 'profile.dart';
 import 'general.dart';
 import 'help.dart';
 import 'about.dart';
+import 'share_statistics.dart';
 
 class Home extends StatefulWidget {
   const Home();
@@ -71,7 +73,8 @@ class _HomeState extends State<Home> {
           }
         case 2:
           {
-            _child = StatisticsPage(goToPage: goToPage);
+            _child = StatisticsPage(
+                goToPage: goToPage, shareStatistics: shareStatistics);
             _cardPosition = 80;
             setNav(true);
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
@@ -110,6 +113,26 @@ class _HomeState extends State<Home> {
             break;
           }
       }
+    });
+  }
+
+  void shareStatistics({
+    Volts volts,
+    List<Volts> voltsList,
+    num voltsDelta,
+    Duration timeFocused,
+  }) {
+    setState(() {
+      _child = ShareStatistics(
+        goToPage: goToPage,
+        volts: volts,
+        voltsList: voltsList,
+        voltsDelta: voltsDelta,
+        timeFocused: timeFocused,
+      );
+      _cardPosition = 0;
+      setNav(false);
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     });
   }
 

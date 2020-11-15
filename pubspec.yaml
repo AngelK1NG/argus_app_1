@@ -40,6 +40,9 @@ dependencies:
   flutter_keyboard_visibility: ^3.2.2
   package_info: ^0.4.3
   launch_review: ^2.0.0
+  share: ^0.6.5+4
+  screenshot: ^0.2.0
+  path_provider: ^1.6.24
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +54,7 @@ flutter:
     - assets/images/logo/
     - assets/images/icons/
     - assets/images/onboarding/
+    - assets/images/qrcode/
   fonts:
     - family: Cabin
       fonts:

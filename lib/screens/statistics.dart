@@ -17,8 +17,11 @@ import 'dart:async';
 
 class StatisticsPage extends StatefulWidget {
   final Function goToPage;
+  final Function shareStatistics;
 
-  StatisticsPage({@required this.goToPage, Key key}) : super(key: key);
+  StatisticsPage(
+      {@required this.goToPage, @required this.shareStatistics, Key key})
+      : super(key: key);
 
   @override
   _StatisticsPageState createState() => _StatisticsPageState();
@@ -283,90 +286,147 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 25),
-                          child: Icon(
-                            FeatherIcons.zap,
-                            size: 24,
-                            color: jetBlack,
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(left: 25),
+                                  child: Icon(
+                                    FeatherIcons.zap,
+                                    size: 24,
+                                    color: jetBlack,
+                                  ),
+                                ),
+                                Text(
+                                  voltsFormat.format(_volts.val),
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            _todayVolts.length <= 1
+                                ? Container()
+                                : Padding(
+                                    padding: EdgeInsets.only(left: 25, top: 15),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          _volts.val >= _todayVolts.first.val
+                                              ? FeatherIcons.chevronUp
+                                              : FeatherIcons.chevronDown,
+                                          size: 20,
+                                          color: _volts.val >=
+                                                  _todayVolts.first.val
+                                              ? Theme.of(context).primaryColor
+                                              : Colors.red,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 0),
+                                          child: Icon(
+                                            FeatherIcons.zap,
+                                            size: 12,
+                                            color: _volts.val >=
+                                                    _todayVolts.first.val
+                                                ? Theme.of(context).primaryColor
+                                                : Colors.red,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${voltsFormat.format(_voltsDelta.abs())} (${voltsFormat.format(_voltsDelta.abs() / _todayVolts.first.val * 100)}%)',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: _volts.val >=
+                                                    _todayVolts.first.val
+                                                ? Theme.of(context).primaryColor
+                                                : Colors.red,
+                                          ),
+                                        ),
+                                        Text(
+                                          ' Today',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                            _todayVolts.length <= 1
+                                ? Container()
+                                : Padding(
+                                    padding: EdgeInsets.only(left: 25, top: 5),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          '${_timeFocused.inHours}h ${_timeFocused.inMinutes % 60}m',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          ' Focused',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                          ],
                         ),
-                        Text(
-                          voltsFormat.format(_volts.val),
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w600,
+                        Padding(
+                          padding: EdgeInsets.only(right: 25),
+                          child: GestureDetector(
+                            onTap: () => widget.shareStatistics(
+                              volts: _volts,
+                              voltsList: _todayVolts,
+                              voltsDelta: _voltsDelta,
+                              timeFocused: _timeFocused,
+                            ),
+                            child: Container(
+                              width: 110,
+                              height: 36,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(18)),
+                                color: _todayVolts.length == 0
+                                    ? Theme.of(context).primaryColor
+                                    : _volts.val >= _todayVolts.first.val
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.red,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Icon(
+                                    FeatherIcons.share,
+                                    size: 14,
+                                    color: Colors.white,
+                                  ),
+                                  Text(
+                                    'Share Stats',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    _todayVolts.length <= 1
-                        ? Container()
-                        : Padding(
-                            padding: EdgeInsets.only(left: 25, top: 15),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  _volts.val >= _todayVolts.first.val
-                                      ? FeatherIcons.chevronUp
-                                      : FeatherIcons.chevronDown,
-                                  size: 20,
-                                  color: _volts.val >= _todayVolts.first.val
-                                      ? Theme.of(context).primaryColor
-                                      : Colors.red,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 0),
-                                  child: Icon(
-                                    FeatherIcons.zap,
-                                    size: 12,
-                                    color: _volts.val >= _todayVolts.first.val
-                                        ? Theme.of(context).primaryColor
-                                        : Colors.red,
-                                  ),
-                                ),
-                                Text(
-                                  '${voltsFormat.format(_voltsDelta.abs())} (${voltsFormat.format(_voltsDelta.abs() / _todayVolts.first.val * 100)}%)',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: _volts.val >= _todayVolts.first.val
-                                        ? Theme.of(context).primaryColor
-                                        : Colors.red,
-                                  ),
-                                ),
-                                Text(
-                                  ' Today',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                    _todayVolts.length <= 1
-                        ? Container()
-                        : Padding(
-                            padding: EdgeInsets.only(left: 25, top: 5),
-                            child: Row(
-                              children: [
-                                Text(
-                                  '${_timeFocused.inHours}h ${_timeFocused.inMinutes % 60}m',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text(
-                                  ' Focused',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
                     Padding(
                       padding: EdgeInsets.only(top: 50),
                       child: SizedBox(
