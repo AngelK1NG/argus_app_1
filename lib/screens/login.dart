@@ -88,8 +88,10 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Image(
-                    image:
-                        AssetImage('assets/images/logo/Focal Logo_Full.png')),
+                  image: AssetImage(
+                      'assets/images/logo/Focal Logo_Full Colored.png'),
+                  width: 300,
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 180),
                   child: Column(
@@ -173,7 +175,9 @@ class _LoginPageState extends State<LoginPage> {
             duration: Duration(milliseconds: 500),
             child: Center(
               child: Image(
-                image: AssetImage('assets/images/logo/Focal Logo_Full.png'),
+                image: AssetImage(
+                    'assets/images/logo/Focal Logo_Full Colored.png'),
+                width: 300,
               ),
             ),
           ),

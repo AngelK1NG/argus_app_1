@@ -71,11 +71,11 @@ num voltsDecay({
 }) {
   num decay = 0;
   if (startedTasks == 0 || completedTasks == totalTasks) {
-    decay = 0.003 * seconds +
+    decay = 0.002 * seconds +
         pow((seconds % 4) + 1, 0.069) * pow((seconds % 5) + 1, 0.0420) -
         1;
   } else {
-    decay = 0.003 * seconds * pow(100 * startedTasks / totalTasks, 0.3) +
+    decay = 0.002 * seconds * pow(100 * startedTasks / totalTasks, 0.4) +
         pow((seconds % 4) + 1, 0.069) * pow((seconds % 5) + 1, 0.0420) -
         1;
   }

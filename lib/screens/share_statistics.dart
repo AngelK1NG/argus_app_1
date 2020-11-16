@@ -172,16 +172,13 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                                               ? Theme.of(context).primaryColor
                                               : Colors.red,
                                         ),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 0),
-                                          child: Icon(
-                                            FeatherIcons.zap,
-                                            size: 12,
-                                            color: widget.volts.val >=
-                                                    widget.voltsList.first.val
-                                                ? Theme.of(context).primaryColor
-                                                : Colors.red,
-                                          ),
+                                        Icon(
+                                          FeatherIcons.zap,
+                                          size: 12,
+                                          color: widget.volts.val >=
+                                                  widget.voltsList.first.val
+                                              ? Theme.of(context).primaryColor
+                                              : Colors.red,
                                         ),
                                         Text(
                                           '${voltsFormat.format(widget.voltsDelta.abs())} (${voltsFormat.format(widget.voltsDelta.abs() / widget.voltsList.first.val * 100)}%)',
@@ -228,11 +225,11 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                           ],
                         ),
                         Padding(
-                          padding: EdgeInsets.only(right: 10),
+                          padding: EdgeInsets.only(right: 25),
                           child: Image(
                             image: AssetImage(
-                                'assets/images/logo/Focal Logo_Full.png'),
-                            width: 150,
+                                'assets/images/logo/Focal Logo_Full Colored.png'),
+                            width: 120,
                           ),
                         ),
                       ],

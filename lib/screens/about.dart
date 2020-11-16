@@ -75,7 +75,7 @@ class _AboutPageState extends State<AboutPage> {
               child: Column(
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.only(bottom: 20),
+                    padding: EdgeInsets.only(bottom: 40),
                     child: SizedBox(
                       height: 40,
                       width: SizeConfig.safeBlockVertical * 100,
@@ -112,59 +112,57 @@ class _AboutPageState extends State<AboutPage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 25),
+                    padding: EdgeInsets.only(bottom: 15),
                     child: Image(
-                      image:
-                          AssetImage('assets/images/logo/Focal Logo_Full.png'),
-                      width: 200,
+                      image: AssetImage(
+                          'assets/images/logo/Focal Logo_Full Colored.png'),
+                      width: 150,
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 50),
-                    child: Text(
-                      _version,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).primaryColor,
-                      ),
+                  Text(
+                    _version,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).primaryColor,
                     ),
                   ),
                 ],
               ),
             ),
             Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  textButton(
-                    () {
-                      LaunchReview.launch(androidAppId: 'technology.focal.focal', iOSAppId: '1526256598');
-                    },
-                    'Rate Focal',
-                  ),
-                  textButton(
-                    () {
-                      openUrl(
-                          'https://docs.google.com/document/d/1h0fBpGKMKHna0MSA8NTt0FXAdc551ALwSkVWJkh0mbY/edit?usp=sharing');
-                    },
-                    'Terms & Conditions',
-                  ),
-                  textButton(
-                    () {
-                      openUrl(
-                          'https://docs.google.com/document/d/1eIL0fXCFXXoiIfU59qPXqnQxhKp-8VG2XTvh63O0d-o/edit?usp=sharing');
-                    },
-                    'Privacy Policy',
-                  ),
-                  textButton(
-                    () {
-                      openUrl('https://focal.technology');
-                    },
-                    'Website',
-                  ),
-                ],
-              )
-            ),
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                textButton(
+                  () {
+                    LaunchReview.launch(
+                        androidAppId: 'technology.focal.focal',
+                        iOSAppId: '1526256598');
+                  },
+                  'Rate Focal',
+                ),
+                textButton(
+                  () {
+                    openUrl(
+                        'https://docs.google.com/document/d/1h0fBpGKMKHna0MSA8NTt0FXAdc551ALwSkVWJkh0mbY/edit?usp=sharing');
+                  },
+                  'Terms & Conditions',
+                ),
+                textButton(
+                  () {
+                    openUrl(
+                        'https://docs.google.com/document/d/1eIL0fXCFXXoiIfU59qPXqnQxhKp-8VG2XTvh63O0d-o/edit?usp=sharing');
+                  },
+                  'Privacy Policy',
+                ),
+                textButton(
+                  () {
+                    openUrl('https://focal.technology');
+                  },
+                  'Website',
+                ),
+              ],
+            )),
             Positioned(
               left: 25,
               right: 25,
