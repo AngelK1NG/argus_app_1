@@ -26,6 +26,7 @@ class _HomeState extends State<Home> {
   Color _backgroundColor;
   double _cardPosition = 0;
   bool _showNav = true;
+  bool _keyboard = false;
   int _selectedIndex = 0;
   bool _initialized = false;
 
@@ -141,7 +142,9 @@ class _HomeState extends State<Home> {
     super.initState();
     KeyboardVisibility.onChange.listen((bool visible) {
       if (mounted) {
-        setNav(!visible);
+        setState(() {
+          _keyboard = visible;
+        });
       }
     });
   }
@@ -204,7 +207,7 @@ class _HomeState extends State<Home> {
               alignment: Alignment.bottomCenter,
               child: BottomNav(
                 onTap: goToPage,
-                show: _showNav,
+                show: _showNav && !_keyboard,
                 index: _selectedIndex,
               ),
             ),
