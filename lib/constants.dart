@@ -50,11 +50,11 @@ num voltsIncrement({
   @required num volts,
 }) {
   num increment = 0;
-  increment = 0.02 *
+  increment = 0.002 *
       (secondsFocused - secondsDistracted) *
       pow(100 * (completedTasks + 1) / totalTasks, 0.1) *
       pow(totalTasks, 0.1) /
-      pow(numPaused + 1, 0.1);
+      pow(numPaused + 1, 0.2);
   if (-increment < volts) {
     return increment;
   } else {
@@ -70,14 +70,13 @@ num voltsDecay({
   @required num volts,
 }) {
   num decay = 0;
-  if (startedTasks == 0 || completedTasks == totalTasks) {
-    decay = 0.002 * seconds +
-        pow((seconds % 4) + 1, 0.069) * pow((seconds % 5) + 1, 0.0420) -
-        1;
-  } else {
-    decay = 0.002 * seconds * pow(100 * startedTasks / totalTasks, 0.4) +
-        pow((seconds % 4) + 1, 0.069) * pow((seconds % 5) + 1, 0.0420) -
-        1;
+  if (startedTasks != 0 && completedTasks != totalTasks) {
+    decay = 0.15 *
+            pow(seconds, 0.5) *
+            pow(100 * startedTasks / totalTasks, 0.1) *
+            pow(totalTasks, 0.1) +
+        pow((seconds % 4) + 1, 0.03) * pow((seconds % 5) + 1, 0.03) -
+        2;
   }
   if (decay < volts) {
     return decay;
