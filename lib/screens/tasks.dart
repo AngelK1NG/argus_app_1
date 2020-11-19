@@ -26,10 +26,10 @@ class TasksPage extends StatefulWidget {
 }
 
 class _TasksPageState extends State<TasksPage> {
-  SharedPreferences _prefs;
-  FocusNode _focus = new FocusNode();
   final _formKey = GlobalKey<FormState>();
-  String _date = getDateString(DateTime.now());
+  SharedPreferences _prefs;
+  FocusNode _focus = FocusNode();
+  DateTime _date = DateTime.now();
   FirebaseUser user;
   bool _loading = true;
   bool _dateLoading = true;
@@ -40,6 +40,12 @@ class _TasksPageState extends State<TasksPage> {
   int _completedTasks = 0;
   String _dateString = 'Today';
   String _secondaryDateString;
+  DateTime today =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  DateTime yesterday = DateTime(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day - 1);
+  DateTime tomorrow = DateTime(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day + 1);
 
   void getCompletedTasks() {
     FirebaseUser user = context.read<User>().user;
@@ -47,7 +53,7 @@ class _TasksPageState extends State<TasksPage> {
         .collection('users')
         .document(user.uid)
         .collection('dates')
-        .document(_date);
+        .document(getDateString(_date));
     dateDoc.get().then((snapshot) {
       if (snapshot.data == null) {
         _completedTasks = 0;
@@ -66,7 +72,7 @@ class _TasksPageState extends State<TasksPage> {
         .collection('users')
         .document(user.uid)
         .collection('dates')
-        .document(_date)
+        .document(getDateString(_date))
         .collection('tasks')
         .orderBy('order')
         .getDocuments()
@@ -85,7 +91,7 @@ class _TasksPageState extends State<TasksPage> {
             numDistracted: task.data['numDistracted'],
             numPaused: task.data['numPaused'],
             key: UniqueKey(),
-            date: _date,
+            date: getDateString(_date),
           );
           newTask.onDismissed = (direction) {
             if (direction == DismissDirection.startToEnd) {
@@ -120,10 +126,9 @@ class _TasksPageState extends State<TasksPage> {
       }
     });
     updateTaskOrder();
-    firestoreProvider.deleteTask(task, _date);
-    firestoreProvider.updateTasks(_tasks, _date);
-    String tomorrow =
-        getDateString(DateTime.parse(_date).add(Duration(days: 1)));
+    firestoreProvider.deleteTask(task, getDateString(_date));
+    firestoreProvider.updateTasks(_tasks, getDateString(_date));
+    DateTime tomorrow = _date.add(Duration(days: 1));
     _tmrTasks = [];
     int completedTasks = 0;
     FirebaseUser user = context.read<User>().user;
@@ -131,7 +136,7 @@ class _TasksPageState extends State<TasksPage> {
         .collection('users')
         .document(user.uid)
         .collection('dates')
-        .document(tomorrow)
+        .document(getDateString(tomorrow))
         .collection('tasks')
         .orderBy('order')
         .getDocuments()
@@ -149,7 +154,7 @@ class _TasksPageState extends State<TasksPage> {
           numDistracted: task.data['numDistracted'],
           numPaused: task.data['numPaused'],
           key: UniqueKey(),
-          date: tomorrow,
+          date: getDateString(tomorrow),
         );
         _tmrTasks.add(newTask);
         if (newTask.completed) {
@@ -158,8 +163,8 @@ class _TasksPageState extends State<TasksPage> {
       });
       _tmrTasks.insert(_tmrTasks.length - completedTasks, task);
       _tmrTasks[_tmrTasks.length - completedTasks - 1].id =
-          await firestoreProvider.addTask(task, tomorrow);
-      firestoreProvider.updateTasks(_tmrTasks, tomorrow);
+          await firestoreProvider.addTask(task, getDateString(tomorrow));
+      firestoreProvider.updateTasks(_tmrTasks, getDateString(tomorrow));
       Scaffold.of(context).showSnackBar(SnackBar(
         padding: EdgeInsets.only(left: 16, top: 10, bottom: 10),
         content: Text(task.name + ' has been deferred to tomorrow'),
@@ -169,8 +174,8 @@ class _TasksPageState extends State<TasksPage> {
           onPressed: () async {
             _tmrTasks
                 .remove(_tmrTasks.firstWhere((tasku) => tasku.id == task.id));
-            firestoreProvider.deleteTask(task, tomorrow);
-            firestoreProvider.updateTasks(_tmrTasks, tomorrow);
+            firestoreProvider.deleteTask(task, getDateString(tomorrow));
+            firestoreProvider.updateTasks(_tmrTasks, getDateString(tomorrow));
             if (mounted) {
               if (date == _date) {
                 setState(() {
@@ -180,18 +185,18 @@ class _TasksPageState extends State<TasksPage> {
                   }
                 });
                 updateTaskOrder();
-                await firestoreProvider.addTask(task, _date);
-                firestoreProvider.updateTasks(_tasks, _date);
+                await firestoreProvider.addTask(task, getDateString(_date));
+                firestoreProvider.updateTasks(_tasks, getDateString(_date));
               } else {
                 tasks.insert(task.order - 1, task);
-                await firestoreProvider.addTask(task, date);
-                firestoreProvider.updateTasks(tasks, date);
+                await firestoreProvider.addTask(task, getDateString(date));
+                firestoreProvider.updateTasks(tasks, getDateString(date));
                 getTasks();
               }
             } else {
               tasks.insert(task.order - 1, task);
-              await firestoreProvider.addTask(task, date);
-              firestoreProvider.updateTasks(tasks, date);
+              await firestoreProvider.addTask(task, getDateString(date));
+              firestoreProvider.updateTasks(tasks, getDateString(date));
             }
           },
         ),
@@ -211,8 +216,8 @@ class _TasksPageState extends State<TasksPage> {
       }
     });
     updateTaskOrder();
-    firestoreProvider.deleteTask(task, _date);
-    firestoreProvider.updateTasks(_tasks, _date);
+    firestoreProvider.deleteTask(task, getDateString(_date));
+    firestoreProvider.updateTasks(_tasks, getDateString(_date));
     Scaffold.of(context).showSnackBar(SnackBar(
       padding: EdgeInsets.only(left: 16, top: 10, bottom: 10),
       content: Text(task.name + ' has been deleted'),
@@ -221,7 +226,7 @@ class _TasksPageState extends State<TasksPage> {
         label: 'Undo',
         onPressed: () async {
           if (mounted) {
-            if (date == _date) {
+            if (date == getDateString(_date)) {
               setState(() {
                 _tasks.insert(task.order - 1, task);
                 if (task.completed) {
@@ -229,18 +234,18 @@ class _TasksPageState extends State<TasksPage> {
                 }
               });
               updateTaskOrder();
-              await firestoreProvider.addTask(task, _date);
-              firestoreProvider.updateTasks(_tasks, _date);
+              await firestoreProvider.addTask(task, getDateString(_date));
+              firestoreProvider.updateTasks(_tasks, getDateString(_date));
             } else {
               tasks.insert(task.order - 1, task);
-              await firestoreProvider.addTask(task, date);
-              firestoreProvider.updateTasks(tasks, date);
+              await firestoreProvider.addTask(task, getDateString(date));
+              firestoreProvider.updateTasks(tasks, getDateString(date));
               getTasks();
             }
           } else {
             tasks.insert(task.order - 1, task);
-            await firestoreProvider.addTask(task, date);
-            firestoreProvider.updateTasks(tasks, date);
+            await firestoreProvider.addTask(task, getDateString(date));
+            firestoreProvider.updateTasks(tasks, getDateString(date));
           }
         },
       ),
@@ -250,18 +255,19 @@ class _TasksPageState extends State<TasksPage> {
   void setDate(DateTime date) {
     setState(() {
       _loading = true;
-      _date = getDateString(date);
-      if (date.year == DateTime.now().year &&
-          date.month == DateTime.now().month &&
-          date.day == DateTime.now().day) {
+      _date = date;
+      DateTime today = DateTime(
+          DateTime.now().year, DateTime.now().month, DateTime.now().day);
+      DateTime yesterday = DateTime(
+          DateTime.now().year, DateTime.now().month, DateTime.now().day - 1);
+      DateTime tomorrow = DateTime(
+          DateTime.now().year, DateTime.now().month, DateTime.now().day + 1);
+      final dateToCheck = DateTime(date.year, date.month, date.day);
+      if (dateToCheck == today) {
         _dateString = 'Today';
-      } else if (date.year == DateTime.now().year &&
-          date.month == DateTime.now().month &&
-          date.day == DateTime.now().day - 1) {
+      } else if (dateToCheck == yesterday) {
         _dateString = 'Yesterday';
-      } else if (date.year == DateTime.now().year &&
-          date.month == DateTime.now().month &&
-          date.day == DateTime.now().day + 1) {
+      } else if (dateToCheck == tomorrow) {
         _dateString = 'Tomorrow';
       } else {
         switch (date.weekday) {
@@ -302,15 +308,9 @@ class _TasksPageState extends State<TasksPage> {
             }
         }
       }
-      if ((date.year == DateTime.now().year &&
-              date.month == DateTime.now().month &&
-              date.day == DateTime.now().day) ||
-          (date.year == DateTime.now().year &&
-              date.month == DateTime.now().month &&
-              date.day == DateTime.now().day - 1) ||
-          (date.year == DateTime.now().year &&
-              date.month == DateTime.now().month &&
-              date.day == DateTime.now().day + 1)) {
+      if ((dateToCheck == today) ||
+          (dateToCheck == yesterday) ||
+          (dateToCheck == tomorrow)) {
         switch (date.weekday) {
           case 1:
             {
@@ -442,11 +442,11 @@ class _TasksPageState extends State<TasksPage> {
                 child: GestureDetector(
                   onHorizontalDragEnd: (details) {
                     if (details.velocity.pixelsPerSecond.dx > 50) {
-                      setDate(DateTime.parse(_date).add(Duration(days: -1)));
+                      setDate(_date.add(Duration(days: -1)));
                       FocusScope.of(context).unfocus();
                     }
                     if (details.velocity.pixelsPerSecond.dx < -50) {
-                      setDate(DateTime.parse(_date).add(Duration(days: 1)));
+                      setDate(_date.add(Duration(days: 1)));
                       FocusScope.of(context).unfocus();
                     }
                   },
@@ -458,20 +458,16 @@ class _TasksPageState extends State<TasksPage> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            setDate(
-                                DateTime.parse(_date).add(Duration(days: -1)));
+                            setDate(_date.add(Duration(days: -1)));
                             FocusScope.of(context).unfocus();
                           },
                           child: Container(
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                              color: (DateTime.parse(_date).year ==
-                                          DateTime.now().year &&
-                                      DateTime.parse(_date).month ==
-                                          DateTime.now().month &&
-                                      DateTime.parse(_date).day - 1 ==
-                                          DateTime.now().day)
+                              color: (DateTime(
+                                          _date.year, _date.month, _date.day) ==
+                                      tomorrow)
                                   ? Colors.white
                                   : Colors.transparent,
                               borderRadius:
@@ -479,16 +475,10 @@ class _TasksPageState extends State<TasksPage> {
                             ),
                             child: Center(
                               child: Text(
-                                  DateTime.parse(_date)
-                                      .add(Duration(days: -1))
-                                      .day
-                                      .toString(),
-                                  style: (DateTime.parse(_date).year ==
-                                              DateTime.now().year &&
-                                          DateTime.parse(_date).month ==
-                                              DateTime.now().month &&
-                                          DateTime.parse(_date).day - 1 ==
-                                              DateTime.now().day)
+                                  _date.add(Duration(days: -1)).day.toString(),
+                                  style: (DateTime(_date.year, _date.month,
+                                              _date.day) ==
+                                          tomorrow)
                                       ? todayTextStyle
                                       : dateTextStyle),
                             ),
@@ -499,7 +489,7 @@ class _TasksPageState extends State<TasksPage> {
                             FocusScope.of(context).unfocus();
                             showDatePicker(
                               context: context,
-                              initialDate: DateTime.parse(_date),
+                              initialDate: _date,
                               firstDate: DateTime(2020),
                               lastDate: DateTime(2120),
                             ).then((date) {
@@ -519,20 +509,16 @@ class _TasksPageState extends State<TasksPage> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            setDate(
-                                DateTime.parse(_date).add(Duration(days: 1)));
+                            setDate(_date.add(Duration(days: 1)));
                             FocusScope.of(context).unfocus();
                           },
                           child: Container(
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                              color: (DateTime.parse(_date).year ==
-                                          DateTime.now().year &&
-                                      DateTime.parse(_date).month ==
-                                          DateTime.now().month &&
-                                      DateTime.parse(_date).day + 1 ==
-                                          DateTime.now().day)
+                              color: (DateTime(
+                                          _date.year, _date.month, _date.day) ==
+                                      yesterday)
                                   ? Colors.white
                                   : Colors.transparent,
                               borderRadius:
@@ -540,16 +526,10 @@ class _TasksPageState extends State<TasksPage> {
                             ),
                             child: Center(
                               child: Text(
-                                  DateTime.parse(_date)
-                                      .add(Duration(days: 1))
-                                      .day
-                                      .toString(),
-                                  style: (DateTime.parse(_date).year ==
-                                              DateTime.now().year &&
-                                          DateTime.parse(_date).month ==
-                                              DateTime.now().month &&
-                                          DateTime.parse(_date).day + 1 ==
-                                              DateTime.now().day)
+                                  _date.add(Duration(days: 1)).day.toString(),
+                                  style: (DateTime(_date.year, _date.month,
+                                              _date.day) ==
+                                          yesterday)
                                       ? todayTextStyle
                                       : dateTextStyle),
                             ),
@@ -651,10 +631,12 @@ class _TasksPageState extends State<TasksPage> {
                             tasks.insert(
                                 newIndex - (_completedTasks - distanceFromEnd),
                                 task);
-                            firestoreProvider.updateTasks(tasks, _date);
+                            firestoreProvider.updateTasks(
+                                tasks, getDateString(_date));
                           } else {
                             tasks.insert(newIndex, task);
-                            firestoreProvider.updateTasks(tasks, _date);
+                            firestoreProvider.updateTasks(
+                                tasks, getDateString(_date));
                           }
                           updateTaskOrder();
                         }
@@ -738,7 +720,7 @@ class _TasksPageState extends State<TasksPage> {
                                         key: UniqueKey(),
                                         order:
                                             _tasks.length - _completedTasks + 1,
-                                        date: _date,
+                                        date: getDateString(_date),
                                       );
                                       newTask.onDismissed = (direction) {
                                         if (direction ==
@@ -764,9 +746,9 @@ class _TasksPageState extends State<TasksPage> {
                                                   1]
                                               .id =
                                           await firestoreProvider.addTask(
-                                              newTask, _date);
+                                              newTask, getDateString(_date));
                                       firestoreProvider.updateTasks(
-                                          _tasks, _date);
+                                          _tasks, getDateString(_date));
                                       _formKey.currentState.reset();
                                       AnalyticsProvider()
                                           .logAddTask(newTask, DateTime.now());
