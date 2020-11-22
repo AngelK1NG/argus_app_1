@@ -109,7 +109,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   children: <Widget>[
                     Offstage(
-                      offstage: _name == null,
+                      offstage:
+                          _photoUrl == null || _name == null || _email == null,
                       child: Padding(
                         padding: EdgeInsets.only(bottom: 25),
                         child: SizedBox(
@@ -117,16 +118,12 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              _photoUrl == null
-                                  ? Icon(
-                                      FeatherIcons.user,
-                                      color: jetBlack,
-                                      size: 60,
-                                    )
-                                  : CircleAvatar(
-                                      radius: 30,
-                                      backgroundImage: NetworkImage(_photoUrl),
-                                    ),
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundImage: _photoUrl == null
+                                    ? null
+                                    : NetworkImage(_photoUrl),
+                              ),
                               Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,

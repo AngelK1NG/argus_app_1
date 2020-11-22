@@ -78,7 +78,6 @@ num voltsDecay({
         pow((seconds % 4) + 1, 0.03) * pow((seconds % 5) + 1, 0.03) -
         1;
   }
-  print(decay);
   if (decay < volts) {
     return decay;
   } else {

@@ -60,13 +60,16 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   bool _screenOn = true;
   bool _distractionTracking = true;
   bool _distractionTrackingNotice = false;
+  bool _voltsIncrementNotice = false;
   int _distractionTrackingNoticeCount = 0;
+  int _voltsIncrementNoticeCount = 0;
   int _seconds = 0;
   int _secondsDistracted = 0;
   int _numDistracted = 0;
   int _initSecondsFocused = 0;
   int _initSecondsDistracted = 0;
   int _initNumDistracted = 0;
+  num _voltsIncrement = 0;
   ConfettiController _confettiController =
       ConfettiController(duration: Duration(seconds: 1));
   Random _random = Random();
@@ -179,6 +182,18 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _message = messages[_random.nextInt(messages.length)];
       _distractionTracking = true;
       _distractionTrackingNotice = false;
+      _voltsIncrementNotice = true;
+      _voltsIncrementNoticeCount++;
+    });
+    final voltsIncrementNoticeCount = _voltsIncrementNoticeCount;
+    Future.delayed(Duration(milliseconds: 4000), () {
+      if (mounted) {
+        if (_voltsIncrementNoticeCount == voltsIncrementNoticeCount) {
+          setState(() {
+            _voltsIncrementNotice = false;
+          });
+        }
+      }
     });
     if (Platform.isAndroid) {
       setDnd(false);
@@ -197,22 +212,23 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _tasks[0].numDistracted = _numDistracted;
       _tasks[0].paused = true;
       _firestoreProvider.updateTasks(_tasks, _date);
-      _todayVolts.add(
-        Volts(
-          dateTime: DateTime.now(),
-          val: _todayVolts.last.val +
-              voltsIncrement(
-                secondsFocused:
-                    _seconds - _secondsDistracted - _initSecondsFocused,
-                secondsDistracted: _secondsDistracted - _initSecondsDistracted,
-                numPaused: _tasks[0].numPaused,
-                completedTasks: _completedTasks,
-                totalTasks: _totalTasks,
-                volts: _todayVolts.last.val,
-              ),
-        ),
-      );
-      _initVolts = _todayVolts.last;
+      setState(() {
+        _voltsIncrement = voltsIncrement(
+          secondsFocused: _seconds - _secondsDistracted - _initSecondsFocused,
+          secondsDistracted: _secondsDistracted - _initSecondsDistracted,
+          numPaused: _tasks[0].numPaused,
+          completedTasks: _completedTasks,
+          totalTasks: _totalTasks,
+          volts: _todayVolts.last.val,
+        );
+        _todayVolts.add(
+          Volts(
+            dateTime: DateTime.now(),
+            val: _todayVolts.last.val + _voltsIncrement,
+          ),
+        );
+        _initVolts = _todayVolts.last;
+      });
       List<Map> newVolts = [];
       _todayVolts.forEach((volts) {
         newVolts.add(
@@ -264,22 +280,23 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       task.completed = true;
       _tasks.add(task);
       _firestoreProvider.updateTasks(_tasks, _date);
-      _todayVolts.add(
-        Volts(
-          dateTime: DateTime.now(),
-          val: _todayVolts.last.val +
-              voltsIncrement(
-                secondsFocused:
-                    _seconds - _secondsDistracted - _initSecondsFocused,
-                secondsDistracted: _secondsDistracted - _initSecondsDistracted,
-                numPaused: task.numPaused,
-                completedTasks: _completedTasks,
-                totalTasks: _totalTasks,
-                volts: _todayVolts.last.val,
-              ),
-        ),
-      );
-      _initVolts = _todayVolts.last;
+      setState(() {
+        _voltsIncrement = voltsIncrement(
+          secondsFocused: _seconds - _secondsDistracted - _initSecondsFocused,
+          secondsDistracted: _secondsDistracted - _initSecondsDistracted,
+          numPaused: _tasks[0].numPaused,
+          completedTasks: _completedTasks,
+          totalTasks: _totalTasks,
+          volts: _todayVolts.last.val,
+        );
+        _todayVolts.add(
+          Volts(
+            dateTime: DateTime.now(),
+            val: _todayVolts.last.val + _voltsIncrement,
+          ),
+        );
+        _initVolts = _todayVolts.last;
+      });
       List<Map> newVolts = [];
       _todayVolts.forEach((volts) {
         newVolts.add(
@@ -683,6 +700,16 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle voltsTextStyle = TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      color: Colors.white,
+    );
+    TextStyle voltsIncrementTextStyle = TextStyle(
+      fontSize: 36,
+      color: Colors.white,
+      fontWeight: FontWeight.w600,
+    );
     TextStyle topTextStyle = TextStyle(
       fontSize: 36,
       color: Colors.white,
@@ -732,16 +759,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             children: [
                               Icon(
                                 FeatherIcons.zap,
-                                size: 16,
+                                size: 14,
                                 color: Colors.white,
                               ),
                               Text(
                                 voltsFormat.format(_volts.val),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
+                                style: voltsTextStyle,
                               ),
                             ],
                           ),
@@ -840,16 +863,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                               children: [
                                 Icon(
                                   FeatherIcons.zap,
-                                  size: 16,
+                                  size: 14,
                                   color: Colors.white,
                                 ),
                                 Text(
                                   voltsFormat.format(_volts.val),
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
+                                  style: voltsTextStyle,
                                 ),
                               ],
                             ),
@@ -1013,16 +1032,12 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                 children: [
                                   Icon(
                                     FeatherIcons.zap,
-                                    size: 16,
+                                    size: 14,
                                     color: Colors.white,
                                   ),
                                   Text(
                                     voltsFormat.format(_volts.val),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
+                                    style: voltsTextStyle,
                                   ),
                                 ],
                               ),
@@ -1081,19 +1096,62 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                       ),
                                     ],
                                   )
-                                : Container(
-                                    alignment: Alignment.center,
-                                    height: SizeConfig.safeBlockVertical * 15,
-                                    child: AutoSizeText(
-                                      _totalTasks != null &&
-                                              _completedTasks != null &&
-                                              _totalTasks - _completedTasks == 1
-                                          ? 'Almost there! Keep pushing 👊'
-                                          : _message,
-                                      textAlign: TextAlign.center,
-                                      style: topTextStyle,
-                                      maxLines: 2,
-                                    ),
+                                : Stack(
+                                    children: [
+                                      AnimatedOpacity(
+                                        opacity: _voltsIncrementNotice ? 0 : 1,
+                                        duration: loadingDuration,
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          height:
+                                              SizeConfig.safeBlockVertical * 15,
+                                          child: AutoSizeText(
+                                            _totalTasks != null &&
+                                                    _completedTasks != null &&
+                                                    _totalTasks -
+                                                            _completedTasks ==
+                                                        1
+                                                ? 'Almost there! Keep pushing 👊'
+                                                : _message,
+                                            textAlign: TextAlign.center,
+                                            style: topTextStyle,
+                                            maxLines: 2,
+                                          ),
+                                        ),
+                                      ),
+                                      AnimatedOpacity(
+                                        opacity: _voltsIncrementNotice ? 1 : 0,
+                                        duration: loadingDuration,
+                                        curve: loadingCurve,
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          height:
+                                              SizeConfig.safeBlockVertical * 15,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                _voltsIncrement >= 0
+                                                    ? '+'
+                                                    : '-',
+                                                style: voltsIncrementTextStyle,
+                                              ),
+                                              Icon(
+                                                FeatherIcons.zap,
+                                                size: 30,
+                                                color: Colors.white,
+                                              ),
+                                              Text(
+                                                voltsFormat
+                                                    .format(_voltsIncrement),
+                                                style: voltsIncrementTextStyle,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                           ),
                           Positioned(
