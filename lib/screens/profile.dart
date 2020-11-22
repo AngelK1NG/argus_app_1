@@ -225,35 +225,30 @@ class _ProfilePageState extends State<ProfilePage> {
                             iconData: FeatherIcons.settings,
                             text: 'General',
                             chevron: true,
-                            divider: true,
                             onTap: () => widget.goToPage(4),
                           ),
                           SettingsTile(
                             iconData: FeatherIcons.archive,
                             text: 'Feedback',
                             chevron: true,
-                            divider: true,
                             onTap: () => openFeedbackForm(),
                           ),
                           // SettingsTile(
                           //   iconData: FeatherIcons.helpCircle,
                           //   text: 'Help',
                           //   chevron: true,
-                          //   divider: true,
                           //   onTap: () => widget.goToPage(5),
                           // ),
                           SettingsTile(
                             iconData: FeatherIcons.info,
                             text: 'About',
                             chevron: true,
-                            divider: true,
                             onTap: () => widget.goToPage(6),
                           ),
                           SettingsTile(
                             iconData: FeatherIcons.logOut,
                             text: 'Sign Out',
                             chevron: false,
-                            divider: false,
                             onTap: () {
                               HapticFeedback.heavyImpact();
                               auth.signOut();

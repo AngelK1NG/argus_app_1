@@ -159,17 +159,9 @@ class _GeneralPageState extends State<GeneralPage> {
                               setBool('focusDnd', value);
                             })
                         : Container(),
-                    Container(
-                        alignment: Alignment.center,
-                        height: 25,
-                        child: Container(
-                          height: 1,
-                          color: Theme.of(context).dividerColor,
-                        )),
                     SettingsTile(
-                      text: 'Day start time',
+                      text: 'Extend day to',
                       chevron: true,
-                      divider: false,
                       secondaryText: _dayStartHour == 0
                           ? '12:' +
                               _dayStartMinute.toString().padLeft(2, '0') +
@@ -209,6 +201,16 @@ class _GeneralPageState extends State<GeneralPage> {
                           }
                         });
                       },
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 15),
+                      child: Text(
+                        'Extend the day so you can complete yesterday\'s tasks past midnight. This setting also affects daily statistics.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).hintColor,
+                        ),
+                      ),
                     ),
                   ],
                 ),

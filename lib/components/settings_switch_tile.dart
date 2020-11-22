@@ -11,29 +11,39 @@ class SettingsSwitchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 55,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          SizedBox(
-            width: SizeConfig.safeBlockHorizontal * 100 - 135,
-            child: Text(
-              title,
-              style: TextStyle(fontSize: 16),
-            ),
+    return Stack(
+      children: [
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(height: 1, color: Theme.of(context).dividerColor),
+        ),
+        Container(
+          height: 55,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              SizedBox(
+                width: SizeConfig.safeBlockHorizontal * 100 - 135,
+                child: Text(
+                  title,
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+              CupertinoSwitch(
+                activeColor: Theme.of(context).primaryColor,
+                trackColor: Colors.grey,
+                value: toggle,
+                onChanged: (value) {
+                  HapticFeedback.heavyImpact();
+                  onChanged(value);
+                },
+              ),
+            ],
           ),
-          CupertinoSwitch(
-            activeColor: Theme.of(context).primaryColor,
-            trackColor: Colors.grey,
-            value: toggle,
-            onChanged: (value) {
-              HapticFeedback.heavyImpact();
-              onChanged(value);
-            },
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

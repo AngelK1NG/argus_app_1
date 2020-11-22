@@ -7,7 +7,6 @@ class SettingsTile extends StatelessWidget {
   final String text;
   final String secondaryText;
   final bool chevron;
-  final bool divider;
   final VoidCallback onTap;
 
   SettingsTile(
@@ -15,7 +14,6 @@ class SettingsTile extends StatelessWidget {
       @required this.text,
       this.secondaryText,
       @required this.chevron,
-      @required this.divider,
       @required this.onTap});
 
   @override
@@ -24,11 +22,9 @@ class SettingsTile extends StatelessWidget {
       children: [
         Positioned(
           bottom: 0,
-          left: 35,
+          left: iconData == null ? 0 : 0,
           right: 0,
-          child: divider
-              ? Container(height: 1, color: Theme.of(context).dividerColor)
-              : Container(),
+          child: Container(height: 1, color: Theme.of(context).dividerColor),
         ),
         GestureDetector(
           onTap: onTap,
@@ -61,15 +57,15 @@ class SettingsTile extends StatelessWidget {
                   children: [
                     secondaryText != null
                         ? Padding(
-                          padding: EdgeInsets.only(right: 5),
-                          child: Text(
+                            padding: EdgeInsets.only(right: 5),
+                            child: Text(
                               secondaryText,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Theme.of(context).hintColor,
                               ),
                             ),
-                        )
+                          )
                         : Container(),
                     chevron
                         ? Icon(FeatherIcons.chevronRight,

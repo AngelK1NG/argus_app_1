@@ -59,7 +59,7 @@ class _TaskItemState extends State<TaskItem> {
       children: <Widget>[
         Positioned(
           bottom: 0,
-          left: 50,
+          left: 25,
           right: 25,
           child: Container(height: 1, color: Theme.of(context).dividerColor),
         ),
