@@ -82,10 +82,10 @@ class _LoginPageState extends State<LoginPage> {
         ),
         Visibility(
           visible: _isLogin,
-          child: Center(
-            child: ModalProgressHUD(
-              color: Theme.of(context).primaryColor,
-              inAsyncCall: _loginLoading,
+          child: ModalProgressHUD(
+            color: Theme.of(context).primaryColor,
+            inAsyncCall: _loginLoading,
+            child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
