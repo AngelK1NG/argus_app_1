@@ -87,6 +87,7 @@ class _LoginPageState extends State<LoginPage> {
             inAsyncCall: _loginLoading,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Image(
                   image: AssetImage(
@@ -95,76 +96,71 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 180),
-                  child: Column(
-                    children: <Widget>[
-                      RctButton(
-                        onTap: () async {
-                          setState(() {
-                            _loginLoading = true;
-                          });
-                          dynamic result = await AuthProvider().googleSignIn();
-                          if (result == null) {
-                            setState(() {
-                              _loginLoading = false;
-                            });
-                          } else {
-                            AnalyticsProvider().logGoogleSignIn();
-                          }
-                        },
-                        buttonWidth: 300,
-                        gradient: LinearGradient(
-                          colors: [
-                            Theme.of(context).primaryColor,
-                            Theme.of(context).accentColor
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                        buttonText: "Sign in with Google",
-                        textSize: 24,
-                        icon: FaIcon(
-                          FontAwesomeIcons.google,
-                          color: Colors.white,
-                          size: 30,
-                        ),
-                        vibrate: true,
-                      ),
-                      Platform.isIOS
-                          ? Padding(
-                              padding: EdgeInsets.only(top: 15),
-                              child: RctButton(
-                                onTap: () async {
-                                  setState(() {
-                                    _loginLoading = true;
-                                  });
-                                  dynamic result =
-                                      await AuthProvider().appleSignIn();
-                                  if (result == null) {
-                                    setState(() {
-                                      _loginLoading = false;
-                                    });
-                                  } else {
-                                    AnalyticsProvider().logAppleSignIn();
-                                  }
-                                },
-                                buttonWidth: 300,
-                                gradient: LinearGradient(
-                                  colors: [jetBlack, jetBlack],
-                                ),
-                                buttonText: "Sign in with Apple",
-                                textSize: 24,
-                                icon: FaIcon(
-                                  FontAwesomeIcons.apple,
-                                  color: Colors.white,
-                                  size: 35,
-                                ),
-                                vibrate: true,
-                              ),
-                            )
-                          : Container()
-                    ],
+                  child: RctButton(
+                    onTap: () async {
+                      setState(() {
+                        _loginLoading = true;
+                      });
+                      dynamic result = await AuthProvider().googleSignIn();
+                      if (result == null) {
+                        setState(() {
+                          _loginLoading = false;
+                        });
+                      } else {
+                        AnalyticsProvider().logGoogleSignIn();
+                      }
+                    },
+                    buttonWidth: 300,
+                    gradient: LinearGradient(
+                      colors: [
+                        Theme.of(context).primaryColor,
+                        Theme.of(context).accentColor
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    buttonText: "Sign in with Google",
+                    textSize: 24,
+                    icon: FaIcon(
+                      FontAwesomeIcons.google,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                    vibrate: true,
                   ),
                 ),
+                Platform.isIOS
+                    ? Padding(
+                        padding: EdgeInsets.only(top: 15),
+                        child: RctButton(
+                          onTap: () async {
+                            setState(() {
+                              _loginLoading = true;
+                            });
+                            dynamic result = await AuthProvider().appleSignIn();
+                            if (result == null) {
+                              setState(() {
+                                _loginLoading = false;
+                              });
+                            } else {
+                              AnalyticsProvider().logAppleSignIn();
+                            }
+                          },
+                          buttonWidth: 300,
+                          gradient: LinearGradient(
+                            colors: [jetBlack, jetBlack],
+                          ),
+                          buttonText: "Sign in with Apple",
+                          textSize: 24,
+                          icon: FaIcon(
+                            FontAwesomeIcons.apple,
+                            color: Colors.white,
+                            size: 35,
+                          ),
+                          vibrate: true,
+                        ),
+                      )
+                    : Container()
               ],
             ),
           ),
