@@ -4,7 +4,7 @@ import 'package:Focal/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
-import 'package:Focal/components/settings_tile.dart';
+import 'package:Focal/components/settings_item.dart';
 import 'package:Focal/utils/analytics.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
@@ -221,13 +221,13 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: statTextStyle,
                             ),
                           ),
-                          SettingsTile(
+                          SettingsItem(
                             iconData: FeatherIcons.settings,
                             text: 'General',
                             chevron: true,
                             onTap: () => widget.goToPage(4),
                           ),
-                          SettingsTile(
+                          SettingsItem(
                             iconData: FeatherIcons.archive,
                             text: 'Feedback',
                             chevron: true,
@@ -239,13 +239,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           //   chevron: true,
                           //   onTap: () => widget.goToPage(5),
                           // ),
-                          SettingsTile(
+                          SettingsItem(
                             iconData: FeatherIcons.info,
                             text: 'About',
                             chevron: true,
                             onTap: () => widget.goToPage(6),
                           ),
-                          SettingsTile(
+                          SettingsItem(
                             iconData: FeatherIcons.logOut,
                             text: 'Sign Out',
                             chevron: false,

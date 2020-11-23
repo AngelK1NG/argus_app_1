@@ -142,7 +142,7 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                                   padding: EdgeInsets.only(left: 25),
                                   child: Icon(
                                     FeatherIcons.zap,
-                                    size: 24,
+                                    size: 30,
                                     color: jetBlack,
                                   ),
                                 ),
@@ -166,7 +166,7 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                                                   widget.voltsList.first.val
                                               ? FeatherIcons.chevronUp
                                               : FeatherIcons.chevronDown,
-                                          size: 20,
+                                          size: 14,
                                           color: widget.volts.val >=
                                                   widget.voltsList.first.val
                                               ? Theme.of(context).primaryColor
@@ -174,7 +174,7 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                                         ),
                                         Icon(
                                           FeatherIcons.zap,
-                                          size: 12,
+                                          size: 14,
                                           color: widget.volts.val >=
                                                   widget.voltsList.first.val
                                               ? Theme.of(context).primaryColor

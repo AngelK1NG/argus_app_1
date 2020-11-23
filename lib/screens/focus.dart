@@ -174,6 +174,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   }
 
   void stopTask() {
+    HapticFeedback.heavyImpact();
     setState(() {
       _timer.cancel();
       _saving = true;
@@ -203,15 +204,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   }
 
   void pauseTask() {
-    if (_doingTask) {
-      stopTask();
-      _tasks[0].secondsFocused = _seconds - _secondsDistracted;
-      _tasks[0].secondsDistracted = _secondsDistracted;
-      _tasks[0].numPaused =
-          _tasks[0].numPaused == null ? 1 : _tasks[0].numPaused + 1;
-      _tasks[0].numDistracted = _numDistracted;
-      _tasks[0].paused = true;
-      _firestoreProvider.updateTasks(_tasks, _date);
+    if (_doingTask && _seconds > 1) {
       setState(() {
         _voltsIncrement = voltsIncrement(
           secondsFocused: _seconds - _secondsDistracted - _initSecondsFocused,
@@ -229,6 +222,14 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         );
         _initVolts = _todayVolts.last;
       });
+      stopTask();
+      _tasks[0].secondsFocused = _seconds - _secondsDistracted;
+      _tasks[0].secondsDistracted = _secondsDistracted;
+      _tasks[0].numPaused++;
+      _tasks[0].numDistracted = _numDistracted;
+      _tasks[0].paused = true;
+      _tasks[0].voltsIncrement += _voltsIncrement;
+      _firestoreProvider.updateTasks(_tasks, _date);
       List<Map> newVolts = [];
       _todayVolts.forEach((volts) {
         newVolts.add(
@@ -270,16 +271,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   }
 
   void completeTask() {
-    if (_doingTask) {
-      stopTask();
-      TaskItem task = _tasks.removeAt(0);
-      task.secondsFocused = _seconds - _secondsDistracted;
-      task.secondsDistracted = _secondsDistracted;
-      task.numDistracted = _numDistracted;
-      task.numPaused = task.numPaused == null ? 0 : task.numPaused;
-      task.completed = true;
-      _tasks.add(task);
-      _firestoreProvider.updateTasks(_tasks, _date);
+    if (_doingTask && _seconds > 1) {
       setState(() {
         _voltsIncrement = voltsIncrement(
           secondsFocused: _seconds - _secondsDistracted - _initSecondsFocused,
@@ -297,6 +289,15 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         );
         _initVolts = _todayVolts.last;
       });
+      stopTask();
+      TaskItem task = _tasks.removeAt(0);
+      task.secondsFocused = _seconds - _secondsDistracted;
+      task.secondsDistracted = _secondsDistracted;
+      task.numDistracted = _numDistracted;
+      task.completed = true;
+      task.voltsIncrement += _voltsIncrement;
+      _tasks.add(task);
+      _firestoreProvider.updateTasks(_tasks, _date);
       List<Map> newVolts = [];
       _todayVolts.forEach((volts) {
         newVolts.add(
@@ -759,7 +760,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             children: [
                               Icon(
                                 FeatherIcons.zap,
-                                size: 14,
+                                size: 16,
                                 color: Colors.white,
                               ),
                               Text(
@@ -838,12 +839,13 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             ? false
                             : task.data['paused'],
                         order: task.data['order'],
+                        date: _date,
                         secondsFocused: task.data['secondsFocused'],
                         secondsDistracted: task.data['secondsDistracted'],
                         numDistracted: task.data['numDistracted'],
                         numPaused: task.data['numPaused'],
+                        voltsIncrement: task.data['voltsIncrement'],
                         key: UniqueKey(),
-                        date: _date,
                       );
                       if (task.data['completed'] || task.data['paused']) {
                         _startedTasks++;
@@ -863,7 +865,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                               children: [
                                 Icon(
                                   FeatherIcons.zap,
-                                  size: 14,
+                                  size: 16,
                                   color: Colors.white,
                                 ),
                                 Text(
@@ -1032,7 +1034,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                 children: [
                                   Icon(
                                     FeatherIcons.zap,
-                                    size: 14,
+                                    size: 16,
                                     color: Colors.white,
                                   ),
                                   Text(
@@ -1131,20 +1133,21 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: [
-                                              Text(
+                                              Icon(
                                                 _voltsIncrement >= 0
-                                                    ? '+'
-                                                    : '-',
-                                                style: voltsIncrementTextStyle,
+                                                    ? FeatherIcons.chevronUp
+                                                    : FeatherIcons.chevronDown,
+                                                size: 36,
+                                                color: Colors.white,
                                               ),
                                               Icon(
                                                 FeatherIcons.zap,
-                                                size: 30,
+                                                size: 36,
                                                 color: Colors.white,
                                               ),
                                               Text(
-                                                voltsFormat
-                                                    .format(_voltsIncrement),
+                                                voltsFormat.format(
+                                                    _voltsIncrement.abs()),
                                                 style: voltsIncrementTextStyle,
                                               ),
                                             ],
@@ -1180,7 +1183,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                     begin: Alignment.centerLeft,
                                     end: Alignment.centerRight,
                                   ),
-                                  vibrate: true,
+                                  vibrate: false,
                                 ),
                               ),
                             ),
@@ -1242,7 +1245,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                             ? 'Done'
                                             : 'Cancel',
                                         textSize: 32,
-                                        vibrate: true,
+                                        vibrate: false,
                                       )
                                     : RctButton(
                                         onTap: () {

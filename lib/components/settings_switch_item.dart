@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:Focal/utils/size_config.dart';
 
-class SettingsSwitchTile extends StatelessWidget {
+class SettingsSwitchItem extends StatelessWidget {
   final String title;
   final bool toggle;
   final Function onChanged;
-  SettingsSwitchTile({this.title, this.toggle, this.onChanged});
+  SettingsSwitchItem({this.title, this.toggle, this.onChanged});
 
   @override
   Widget build(BuildContext context) {

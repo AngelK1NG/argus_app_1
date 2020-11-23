@@ -86,12 +86,13 @@ class _TasksPageState extends State<TasksPage> {
             completed: task.data['completed'],
             paused: task.data['paused'] == null ? false : task.data['paused'],
             order: task.data['order'],
+            date: getDateString(_date),
             secondsFocused: task.data['secondsFocused'],
             secondsDistracted: task.data['secondsDistracted'],
             numDistracted: task.data['numDistracted'],
             numPaused: task.data['numPaused'],
+            voltsIncrement: task.data['voltsIncrement'],
             key: UniqueKey(),
-            date: getDateString(_date),
           );
           newTask.onDismissed = (direction) {
             if (direction == DismissDirection.startToEnd) {
@@ -153,6 +154,7 @@ class _TasksPageState extends State<TasksPage> {
           secondsDistracted: task.data['secondsDistracted'],
           numDistracted: task.data['numDistracted'],
           numPaused: task.data['numPaused'],
+          voltsIncrement: task.data['voltsIncrement'],
           key: UniqueKey(),
           date: getDateString(tomorrow),
         );
@@ -717,10 +719,15 @@ class _TasksPageState extends State<TasksPage> {
                                         name: value,
                                         completed: false,
                                         paused: false,
-                                        key: UniqueKey(),
                                         order:
                                             _tasks.length - _completedTasks + 1,
                                         date: getDateString(_date),
+                                        secondsFocused: 0,
+                                        secondsDistracted: 0,
+                                        numPaused: 0,
+                                        numDistracted: 0,
+                                        voltsIncrement: 0,
+                                        key: UniqueKey(),
                                       );
                                       newTask.onDismissed = (direction) {
                                         if (direction ==

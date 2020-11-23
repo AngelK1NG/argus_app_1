@@ -1,7 +1,7 @@
 import 'package:Focal/constants.dart';
 import 'package:Focal/utils/size_config.dart';
-import 'package:Focal/components/settings_switch_tile.dart';
-import 'package:Focal/components/settings_tile.dart';
+import 'package:Focal/components/settings_switch_item.dart';
+import 'package:Focal/components/settings_item.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
@@ -138,7 +138,7 @@ class _GeneralPageState extends State<GeneralPage> {
                         ),
                       ),
                     ),
-                    SettingsSwitchTile(
+                    SettingsSwitchItem(
                       title: 'Repeatedly notify when Distracted',
                       toggle: _distractedNotification,
                       onChanged: (value) {
@@ -149,7 +149,7 @@ class _GeneralPageState extends State<GeneralPage> {
                       },
                     ),
                     Platform.isAndroid
-                        ? SettingsSwitchTile(
+                        ? SettingsSwitchItem(
                             title: 'Turn on Do Not Disturb when Focused',
                             toggle: _focusDnd,
                             onChanged: (value) {
@@ -159,7 +159,7 @@ class _GeneralPageState extends State<GeneralPage> {
                               setBool('focusDnd', value);
                             })
                         : Container(),
-                    SettingsTile(
+                    SettingsItem(
                       text: 'Extend day to',
                       chevron: true,
                       secondaryText: _dayStartHour == 0
@@ -205,7 +205,7 @@ class _GeneralPageState extends State<GeneralPage> {
                     Padding(
                       padding: EdgeInsets.only(top: 15),
                       child: Text(
-                        'Extend the day so you can complete yesterday\'s tasks past midnight. This setting also affects daily statistics.',
+                        'Extend the day to complete yesterday\'s tasks past midnight. This setting also affects daily statistics.',
                         style: TextStyle(
                           fontSize: 14,
                           color: Theme.of(context).hintColor,

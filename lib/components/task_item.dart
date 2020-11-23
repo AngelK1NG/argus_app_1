@@ -9,33 +9,35 @@ import 'package:Focal/constants.dart';
 // ignore: must_be_immutable
 class TaskItem extends StatefulWidget {
   String name;
-  String id;
   bool completed;
   bool paused;
   int order;
-  Function onDismissed;
-  Function onUpdate;
   String date;
   int secondsFocused;
   int secondsDistracted;
   int numPaused;
   int numDistracted;
+  num voltsIncrement;
+  String id;
+  Function onDismissed;
+  Function onUpdate;
 
-  TaskItem(
-      {@required this.name,
-      this.id,
-      @required this.completed,
-      this.paused,
-      this.order,
-      this.onDismissed,
-      this.onUpdate,
-      @required this.date,
-      this.secondsFocused,
-      this.secondsDistracted,
-      this.numPaused,
-      this.numDistracted,
-      Key key})
-      : super(key: key);
+  TaskItem({
+    @required this.name,
+    @required this.completed,
+    @required this.paused,
+    @required this.order,
+    @required this.date,
+    @required this.secondsFocused,
+    @required this.secondsDistracted,
+    @required this.numPaused,
+    @required this.numDistracted,
+    @required this.voltsIncrement,
+    this.id,
+    this.onDismissed,
+    this.onUpdate,
+    Key key,
+  }) : super(key: key);
 
   @override
   _TaskItemState createState() => _TaskItemState();

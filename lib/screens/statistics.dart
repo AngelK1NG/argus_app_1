@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:Focal/components/task_item.dart';
-import 'package:Focal/components/task_stat_tile.dart';
+import 'package:Focal/components/stats_task_item.dart';
 import 'dart:async';
 
 class StatisticsPage extends StatefulWidget {
@@ -68,6 +68,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
           order: task.data['order'],
           secondsFocused: task.data['secondsFocused'],
           secondsDistracted: task.data['secondsDistracted'],
+          numPaused: task.data['numPaused'],
+          numDistracted: task.data['numDistracted'],
+          voltsIncrement: task.data['voltsIncrement'],
           key: UniqueKey(),
           date: _date,
         );
@@ -197,21 +200,36 @@ class _StatisticsPageState extends State<StatisticsPage> {
   }
 
   Widget taskColumn() {
-    List<TaskStatTile> taskTiles = [];
+    List<StatsTaskItem> taskTiles = [];
     _tasks.forEach((task) {
       if (task.completed || task.paused) {
-        taskTiles.add(TaskStatTile(task: task));
+        taskTiles.add(StatsTaskItem(task: task));
       }
     });
     if (taskTiles.isEmpty) {
-      return Text(
-        'Completed and paused tasks will show up here.',
-        style: TextStyle(
-          fontSize: 16,
+      return Container();
+    } else {
+      return Padding(
+        padding: EdgeInsets.only(left: 25, right: 25, top: 50),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(bottom: 10),
+              child: Text(
+                'Tasks',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Column(
+              children: taskTiles,
+            ),
+          ],
         ),
       );
-    } else {
-      return Column(children: taskTiles);
     }
   }
 
@@ -298,7 +316,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                   padding: EdgeInsets.only(left: 25),
                                   child: Icon(
                                     FeatherIcons.zap,
-                                    size: 24,
+                                    size: 30,
                                     color: jetBlack,
                                   ),
                                 ),
@@ -321,22 +339,19 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                           _volts.val >= _todayVolts.first.val
                                               ? FeatherIcons.chevronUp
                                               : FeatherIcons.chevronDown,
-                                          size: 20,
+                                          size: 14,
                                           color: _volts.val >=
                                                   _todayVolts.first.val
                                               ? Theme.of(context).primaryColor
                                               : Colors.red,
                                         ),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 0),
-                                          child: Icon(
-                                            FeatherIcons.zap,
-                                            size: 12,
-                                            color: _volts.val >=
-                                                    _todayVolts.first.val
-                                                ? Theme.of(context).primaryColor
-                                                : Colors.red,
-                                          ),
+                                        Icon(
+                                          FeatherIcons.zap,
+                                          size: 14,
+                                          color: _volts.val >=
+                                                  _todayVolts.first.val
+                                              ? Theme.of(context).primaryColor
+                                              : Colors.red,
                                         ),
                                         Text(
                                           '${voltsFormat.format(_voltsDelta.abs())} (${voltsFormat.format(_voltsDelta.abs() / _todayVolts.first.val * 100)}%)',
@@ -438,7 +453,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                 child: Column(
                                   children: [
                                     Text(
-                                      'You haven\'t done any tasks yet.',
+                                      'Complete a task to update your Volts.',
                                       style: TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.w600,
@@ -448,7 +463,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                     Padding(
                                       padding: EdgeInsets.only(top: 20),
                                       child: Text(
-                                        'Come back once you have completed at least one task.',
+                                        'Statistics will be calculated once you complete a task.',
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w400,
@@ -528,20 +543,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 25, top: 50, bottom: 10),
-                      child: Text(
-                        'Today\'s Tasks',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 25, right: 25),
-                      child: taskColumn(),
-                    ),
+                    taskColumn(),
                   ],
                 ),
               ),

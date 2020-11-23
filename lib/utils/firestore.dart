@@ -22,7 +22,7 @@ class FirestoreProvider {
     return docExists;
   }
 
-  // create user document in firestore when signed in with google
+  // create user document in firestore when logged in
   void createUserDocument() async {
     await db.collection('users').document(user.uid).get().then((doc) {
       if (!doc.exists) {
@@ -58,13 +58,14 @@ class FirestoreProvider {
           .document(task.id)
           .updateData({
         'name': task.name,
+        'completed': task.completed,
+        'paused': task.paused,
         'order': tasks.indexOf(task) + 1,
         'secondsFocused': task.secondsFocused,
         'secondsDistracted': task.secondsDistracted,
         'numDistracted': task.numDistracted,
         'numPaused': task.numPaused,
-        'completed': task.completed,
-        'paused': task.paused,
+        'voltsIncrement': task.voltsIncrement,
       });
       totalTasks++;
       if (task.completed) {
@@ -134,13 +135,14 @@ class FirestoreProvider {
           .document(task.id)
           .setData({
         'name': task.name,
+        'completed': task.completed,
+        'paused': task.paused,
         'order': task.order,
         'secondsFocused': task.secondsFocused,
         'secondsDistracted': task.secondsDistracted,
         'numDistracted': task.numDistracted,
         'numPaused': task.numPaused,
-        'completed': task.completed,
-        'paused': task.paused,
+        'voltsIncrement': task.voltsIncrement,
       });
     } else {
       await db
@@ -151,13 +153,14 @@ class FirestoreProvider {
           .collection('tasks')
           .add({
         'name': task.name,
+        'completed': task.completed,
+        'paused': task.paused,
         'order': task.order,
         'secondsFocused': task.secondsFocused,
         'secondsDistracted': task.secondsDistracted,
         'numDistracted': task.numDistracted,
         'numPaused': task.numPaused,
-        'completed': task.completed,
-        'paused': task.paused,
+        'voltsIncrement': task.voltsIncrement,
       }).then((doc) {
         taskId = doc.documentID;
       });

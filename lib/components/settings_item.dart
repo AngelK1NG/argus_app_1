@@ -2,14 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 
-class SettingsTile extends StatelessWidget {
+class SettingsItem extends StatelessWidget {
   final IconData iconData;
   final String text;
   final String secondaryText;
   final bool chevron;
   final VoidCallback onTap;
 
-  SettingsTile(
+  SettingsItem(
       {this.iconData,
       @required this.text,
       this.secondaryText,
