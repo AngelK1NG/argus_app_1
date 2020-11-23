@@ -82,86 +82,89 @@ class _LoginPageState extends State<LoginPage> {
         ),
         Visibility(
           visible: _isLogin,
-          child: ModalProgressHUD(
-            color: Theme.of(context).primaryColor,
-            inAsyncCall: _loginLoading,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Image(
-                  image: AssetImage(
-                      'assets/images/logo/Focal Logo_Full Colored.png'),
-                  width: 300,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 180),
-                  child: RctButton(
-                    onTap: () async {
-                      setState(() {
-                        _loginLoading = true;
-                      });
-                      dynamic result = await AuthProvider().googleSignIn();
-                      if (result == null) {
-                        setState(() {
-                          _loginLoading = false;
-                        });
-                      } else {
-                        AnalyticsProvider().logGoogleSignIn();
-                      }
-                    },
-                    buttonWidth: 300,
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).primaryColor,
-                        Theme.of(context).accentColor
-                      ],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    buttonText: "Sign in with Google",
-                    textSize: 24,
-                    icon: FaIcon(
-                      FontAwesomeIcons.google,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                    vibrate: true,
+          child: Center(
+            child: ModalProgressHUD(
+              color: Theme.of(context).primaryColor,
+              inAsyncCall: _loginLoading,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Image(
+                    image: AssetImage(
+                        'assets/images/logo/Focal Logo_Full Colored.png'),
+                    width: 300,
                   ),
-                ),
-                Platform.isIOS
-                    ? Padding(
-                        padding: EdgeInsets.only(top: 15),
-                        child: RctButton(
-                          onTap: () async {
-                            setState(() {
-                              _loginLoading = true;
-                            });
-                            dynamic result = await AuthProvider().appleSignIn();
-                            if (result == null) {
+                  Padding(
+                    padding: const EdgeInsets.only(top: 180),
+                    child: RctButton(
+                      onTap: () async {
+                        setState(() {
+                          _loginLoading = true;
+                        });
+                        dynamic result = await AuthProvider().googleSignIn();
+                        if (result == null) {
+                          setState(() {
+                            _loginLoading = false;
+                          });
+                        } else {
+                          AnalyticsProvider().logGoogleSignIn();
+                        }
+                      },
+                      buttonWidth: 300,
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).primaryColor,
+                          Theme.of(context).accentColor
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
+                      buttonText: "Sign in with Google",
+                      textSize: 24,
+                      icon: FaIcon(
+                        FontAwesomeIcons.google,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                      vibrate: true,
+                    ),
+                  ),
+                  Platform.isIOS
+                      ? Padding(
+                          padding: EdgeInsets.only(top: 15),
+                          child: RctButton(
+                            onTap: () async {
                               setState(() {
-                                _loginLoading = false;
+                                _loginLoading = true;
                               });
-                            } else {
-                              AnalyticsProvider().logAppleSignIn();
-                            }
-                          },
-                          buttonWidth: 300,
-                          gradient: LinearGradient(
-                            colors: [jetBlack, jetBlack],
+                              dynamic result =
+                                  await AuthProvider().appleSignIn();
+                              if (result == null) {
+                                setState(() {
+                                  _loginLoading = false;
+                                });
+                              } else {
+                                AnalyticsProvider().logAppleSignIn();
+                              }
+                            },
+                            buttonWidth: 300,
+                            gradient: LinearGradient(
+                              colors: [jetBlack, jetBlack],
+                            ),
+                            buttonText: "Sign in with Apple",
+                            textSize: 24,
+                            icon: FaIcon(
+                              FontAwesomeIcons.apple,
+                              color: Colors.white,
+                              size: 35,
+                            ),
+                            vibrate: true,
                           ),
-                          buttonText: "Sign in with Apple",
-                          textSize: 24,
-                          icon: FaIcon(
-                            FontAwesomeIcons.apple,
-                            color: Colors.white,
-                            size: 35,
-                          ),
-                          vibrate: true,
-                        ),
-                      )
-                    : Container()
-              ],
+                        )
+                      : Container()
+                ],
+              ),
             ),
           ),
         ),
