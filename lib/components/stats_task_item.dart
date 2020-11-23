@@ -12,7 +12,6 @@ class StatsTaskItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Duration timeFocused = Duration(seconds: task.secondsFocused);
-    Duration timeDistracted = Duration(seconds: task.secondsDistracted);
     NumberFormat voltsFormat = NumberFormat('###,##0.00');
 
     return Stack(
@@ -74,7 +73,7 @@ class StatsTaskItem extends StatelessWidget {
                     ],
                   ),
                   Text(
-                    '${(timeFocused + timeDistracted).inHours}h ${(timeFocused + timeDistracted).inMinutes % 60}m',
+                    '${timeFocused.inHours}h ${timeFocused.inMinutes % 60}m',
                     style: TextStyle(
                       fontSize: 14,
                       color: jetBlack,
