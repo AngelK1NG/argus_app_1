@@ -102,8 +102,8 @@ class _ProfilePageState extends State<ProfilePage> {
             height: SizeConfig.safeBlockVertical * 100 - 185,
             child: AnimatedOpacity(
               opacity: _loading ? 0 : 1,
-              duration: loadingDuration,
-              curve: loadingCurve,
+              duration: cardDuration,
+              curve: cardCurve,
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: Column(

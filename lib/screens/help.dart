@@ -33,8 +33,8 @@ class _HelpPageState extends State<HelpPage> {
       onWillPop: () => widget.goToPage(3),
       child: AnimatedOpacity(
         opacity: _loading ? 0 : 1,
-        duration: loadingDuration,
-        curve: loadingCurve,
+        duration: cardDuration,
+        curve: cardCurve,
         child: Stack(
           children: [
             Positioned(

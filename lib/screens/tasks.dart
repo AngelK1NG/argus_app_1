@@ -529,8 +529,8 @@ class _TasksPageState extends State<TasksPage> {
         ),
         AnimatedOpacity(
           opacity: _loading ? 0 : 1,
-          duration: loadingDuration,
-          curve: loadingCurve,
+          duration: cardDuration,
+          curve: cardCurve,
           child: Opacity(
             opacity: _loading ? 0 : 1,
             child: Stack(
@@ -640,8 +640,8 @@ class _TasksPageState extends State<TasksPage> {
                   child: Offstage(
                     offstage: !_addingTask,
                     child: AnimatedContainer(
-                      duration: loadingDuration,
-                      curve: loadingCurve,
+                      duration: cardDuration,
+                      curve: cardCurve,
                       height: 75,
                       width: SizeConfig.safeBlockHorizontal * 100,
                       alignment: Alignment.centerLeft,

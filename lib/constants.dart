@@ -25,12 +25,12 @@ final TextStyle headerTextStyle = TextStyle(
   color: Colors.white,
 );
 
-//animation transitions
-final Duration loadingDuration = Duration(milliseconds: 200);
-final Curve loadingCurve = Curves.ease;
+//loading delay
+final Duration loadingDelay = Duration(milliseconds: 4000);
 
-final Duration cardSlideDuration = Duration(milliseconds: 200);
-final Curve cardSlideCurve = Curves.ease;
+//animation transitions
+final Duration cardDuration = Duration(milliseconds: 200);
+final Curve cardCurve = Curves.ease;
 
 final Duration keyboardDuration = Duration(milliseconds: 600);
 final Curve keyboardCurve = Cubic(0.380, 0.700, 0.125, 1.000);
@@ -39,6 +39,7 @@ final Duration buttonDuration = Duration(milliseconds: 200);
 final Curve buttonCurve = Curves.ease;
 
 final Duration snackbarDuration = Duration(milliseconds: 2000);
+final Duration focusNoticeDuration = Duration(milliseconds: 4000);
 
 //algorithms
 num voltsIncrement({

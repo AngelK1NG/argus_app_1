@@ -27,9 +27,16 @@ import 'package:intl/intl.dart';
 
 class FocusPage extends StatefulWidget {
   final Function goToPage;
+  final Function setLoading;
+  final Function setNav;
   final Function setDoingTask;
 
-  FocusPage({@required this.goToPage, @required this.setDoingTask, Key key})
+  FocusPage(
+      {@required this.goToPage,
+      @required this.setLoading,
+      @required this.setNav,
+      @required this.setDoingTask,
+      Key key})
       : super(key: key);
 
   @override
@@ -149,6 +156,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         setDnd(true);
       }
       _analyticsProvider.logStartTask(_tasks[0], DateTime.now());
+      widget.setNav(false);
       widget.setDoingTask(true);
     }
   }
@@ -166,7 +174,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _voltsIncrementNoticeCount++;
     });
     final voltsIncrementNoticeCount = _voltsIncrementNoticeCount;
-    Future.delayed(Duration(milliseconds: 4000), () {
+    Future.delayed(focusNoticeDuration, () {
       if (mounted) {
         if (_voltsIncrementNoticeCount == voltsIncrementNoticeCount) {
           setState(() {
@@ -179,6 +187,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       setDnd(false);
     }
     _prefs.setBool('doingTask', false);
+    widget.setLoading(true);
     widget.setDoingTask(false);
   }
 
@@ -243,6 +252,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             _initSecondsDistracted = 0;
             _initNumDistracted = 0;
             _saving = false;
+            widget.setLoading(false);
+            widget.setNav(true);
           });
         });
       });
@@ -311,11 +322,13 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             _initSecondsDistracted = 0;
             _initNumDistracted = 0;
             _saving = false;
+            widget.setLoading(false);
+            widget.setNav(true);
           });
         });
       });
       if (areTasksCompleted()) {
-        Future.delayed(cardSlideDuration, () {
+        Future.delayed(cardDuration, () {
           _confettiController.play();
         });
       }
@@ -474,6 +487,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               _prefs.setInt('numDistracted', _numDistracted);
               _prefs.setBool('distracted', false);
             }
+            widget.setNav(false);
             widget.setDoingTask(true);
           }
           setState(() {
@@ -734,8 +748,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       onWillPop: () async => false,
       child: AnimatedOpacity(
         opacity: _prefsLoading || _tasksLoading ? 0 : 1,
-        duration: loadingDuration,
-        curve: loadingCurve,
+        duration: cardDuration,
+        curve: cardCurve,
         child: Stack(
           children: <Widget>[
             StreamBuilder<QuerySnapshot>(
@@ -894,8 +908,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             right: 0,
                             top: SizeConfig.safeBlockVertical * 50 - 30,
                             child: AnimatedOpacity(
-                              duration: cardSlideDuration,
-                              curve: cardSlideCurve,
+                              duration: cardDuration,
+                              curve: cardCurve,
                               opacity: !_doingTask ? 0 : 1,
                               child: Center(
                                 child: SqrButton(
@@ -919,8 +933,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             ),
                           ),
                           AnimatedPositioned(
-                            duration: cardSlideDuration,
-                            curve: cardSlideCurve,
+                            duration: cardDuration,
+                            curve: cardCurve,
                             left: 40,
                             right: 40,
                             top: !_doingTask
@@ -937,8 +951,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             ),
                           ),
                           AnimatedPositioned(
-                            duration: cardSlideDuration,
-                            curve: cardSlideCurve,
+                            duration: cardDuration,
+                            curve: cardCurve,
                             left: 0,
                             right: 0,
                             top: !_doingTask
@@ -974,8 +988,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             top: 20,
                             child: AnimatedOpacity(
                               opacity: _doingTask ? 1 : 0,
-                              duration: cardSlideDuration,
-                              curve: cardSlideCurve,
+                              duration: cardDuration,
+                              curve: cardCurve,
                               child: GestureDetector(
                                 onTap: () {
                                   if (_doingTask) {
@@ -988,8 +1002,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                       });
                                       final distractionTrackingNoticeCount =
                                           _distractionTrackingNoticeCount;
-                                      Future.delayed(
-                                          Duration(milliseconds: 4000), () {
+                                      Future.delayed(focusNoticeDuration, () {
                                         if (mounted) {
                                           if (_distractionTrackingNoticeCount ==
                                               distractionTrackingNoticeCount) {
@@ -1031,8 +1044,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             top: 25,
                             child: AnimatedOpacity(
                               opacity: _doingTask ? 0 : 1,
-                              duration: cardSlideDuration,
-                              curve: cardSlideCurve,
+                              duration: cardDuration,
+                              curve: cardCurve,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -1059,8 +1072,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                       AnimatedOpacity(
                                         opacity:
                                             _distractionTrackingNotice ? 0 : 1,
-                                        duration: loadingDuration,
-                                        curve: loadingCurve,
+                                        duration: cardDuration,
+                                        curve: cardCurve,
                                         child: Center(
                                           child: Text(
                                             _swatchDisplay,
@@ -1072,8 +1085,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                       AnimatedOpacity(
                                         opacity:
                                             _distractionTrackingNotice ? 1 : 0,
-                                        duration: loadingDuration,
-                                        curve: loadingCurve,
+                                        duration: cardDuration,
+                                        curve: cardCurve,
                                         child: Container(
                                           alignment: Alignment.center,
                                           height:
@@ -1106,7 +1119,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                     children: [
                                       AnimatedOpacity(
                                         opacity: _voltsIncrementNotice ? 0 : 1,
-                                        duration: loadingDuration,
+                                        duration: cardDuration,
                                         child: Container(
                                           alignment: Alignment.center,
                                           height:
@@ -1127,8 +1140,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                       ),
                                       AnimatedOpacity(
                                         opacity: _voltsIncrementNotice ? 1 : 0,
-                                        duration: loadingDuration,
-                                        curve: loadingCurve,
+                                        duration: cardDuration,
+                                        curve: cardCurve,
                                         child: Container(
                                           alignment: Alignment.center,
                                           height:
@@ -1166,8 +1179,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             right: 0,
                             top: SizeConfig.safeBlockVertical * 50 - 30,
                             child: AnimatedOpacity(
-                              duration: cardSlideDuration,
-                              curve: cardSlideCurve,
+                              duration: cardDuration,
+                              curve: cardCurve,
                               opacity: _doingTask ? 1 : 0,
                               child: Center(
                                 child: SqrButton(
@@ -1193,8 +1206,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             ),
                           ),
                           AnimatedPositioned(
-                            duration: cardSlideDuration,
-                            curve: cardSlideCurve,
+                            duration: cardDuration,
+                            curve: cardCurve,
                             left: 40,
                             right: 40,
                             top: !_doingTask
@@ -1212,8 +1225,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             ),
                           ),
                           AnimatedPositioned(
-                            duration: cardSlideDuration,
-                            curve: cardSlideCurve,
+                            duration: cardDuration,
+                            curve: cardCurve,
                             left: 0,
                             right: 0,
                             top: !_doingTask

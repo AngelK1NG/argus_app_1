@@ -29,28 +29,7 @@ class _HomeState extends State<Home> {
   bool _keyboard = false;
   int _selectedIndex = 0;
   bool _initialized = false;
-
-  void setDoingTask(doingTask) {
-    if (doingTask) {
-      setState(() {
-        _cardPosition = SizeConfig.safeBlockVertical * 50;
-        _backgroundColor = jetBlack;
-        _showNav = false;
-      });
-    } else {
-      setState(() {
-        _cardPosition = SizeConfig.safeBlockVertical * 36;
-        _backgroundColor = Theme.of(context).primaryColor;
-        _showNav = true;
-      });
-    }
-  }
-
-  void setNav(visible) {
-    setState(() {
-      _showNav = visible;
-    });
-  }
+  bool _loading = false;
 
   void goToPage(int index) {
     _selectedIndex = index;
@@ -58,7 +37,12 @@ class _HomeState extends State<Home> {
       switch (index) {
         case 0:
           {
-            _child = FocusPage(goToPage: goToPage, setDoingTask: setDoingTask);
+            _child = FocusPage(
+              goToPage: goToPage,
+              setLoading: setLoading,
+              setNav: setNav,
+              setDoingTask: setDoingTask,
+            );
             _cardPosition = SizeConfig.safeBlockVertical * 36;
             setNav(true);
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
@@ -117,6 +101,33 @@ class _HomeState extends State<Home> {
     });
   }
 
+  void setLoading(bool loading) {
+    setState(() {
+      _loading = loading;
+    });
+  }
+
+  void setNav(bool visible) {
+    setState(() {
+      _showNav = visible;
+    });
+  }
+
+  void setDoingTask(bool doingTask) {
+    if (doingTask) {
+      setState(() {
+        _cardPosition = SizeConfig.safeBlockVertical * 50;
+        _backgroundColor = jetBlack;
+        _showNav = false;
+      });
+    } else {
+      setState(() {
+        _cardPosition = SizeConfig.safeBlockVertical * 36;
+        _backgroundColor = Theme.of(context).primaryColor;
+      });
+    }
+  }
+
   void shareStatistics({
     Volts volts,
     List<Volts> voltsList,
@@ -173,16 +184,16 @@ class _HomeState extends State<Home> {
             color: _backgroundColor,
           ),
           AnimatedPositioned(
-            duration: cardSlideDuration,
-            curve: cardSlideCurve,
+            duration: cardDuration,
+            curve: cardCurve,
             left: 0,
             right: 0,
             top: _cardPosition == 0
                 ? 0
                 : _cardPosition + MediaQuery.of(context).padding.top,
             child: AnimatedContainer(
-              duration: cardSlideDuration,
-              curve: cardSlideCurve,
+              duration: cardDuration,
+              curve: cardCurve,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                   topLeft:
@@ -210,6 +221,15 @@ class _HomeState extends State<Home> {
                 show: _showNav && !_keyboard,
                 index: _selectedIndex,
               ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: AnimatedOpacity(
+              opacity: _loading ? 1 : 0,
+              duration: cardDuration,
+              curve: cardCurve,
+              child: LinearProgressIndicator(minHeight: 2),
             ),
           ),
         ],

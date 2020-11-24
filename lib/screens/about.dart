@@ -64,8 +64,8 @@ class _AboutPageState extends State<AboutPage> {
       onWillPop: () => widget.goToPage(3),
       child: AnimatedOpacity(
         opacity: _loading ? 0 : 1,
-        duration: loadingDuration,
-        curve: loadingCurve,
+        duration: cardDuration,
+        curve: cardCurve,
         child: Stack(
           children: <Widget>[
             Positioned(

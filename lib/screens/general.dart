@@ -91,8 +91,8 @@ class _GeneralPageState extends State<GeneralPage> {
         ),
         AnimatedOpacity(
           opacity: _loading ? 0 : 1,
-          duration: loadingDuration,
-          curve: loadingCurve,
+          duration: cardDuration,
+          curve: cardCurve,
           child: Stack(
             children: <Widget>[
               Positioned(

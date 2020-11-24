@@ -39,8 +39,8 @@ class BottomNav extends StatelessWidget {
     return SizedBox(
       height: 80,
       child: AnimatedOpacity(
-        duration: cardSlideDuration,
-        curve: cardSlideCurve,
+        duration: cardDuration,
+        curve: cardCurve,
         opacity: show ? 1 : 0,
         child: Stack(
           children: [
@@ -70,8 +70,8 @@ class BottomNav extends StatelessWidget {
                   ),
                 ),
               ),
-              duration: loadingDuration,
-              curve: loadingCurve,
+              duration: cardDuration,
+              curve: cardCurve,
               left: index == 0
                   ? 43
                   : index == 1
