@@ -1091,29 +1091,36 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                             _distractionTrackingNotice ? 1 : 0,
                                         duration: cardDuration,
                                         curve: cardCurve,
-                                        child: Container(
-                                          alignment: Alignment.center,
-                                          height:
-                                              SizeConfig.safeBlockVertical * 25,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: <Widget>[
-                                              Text(
-                                                'You can now leave Focal.',
-                                                textAlign: TextAlign.center,
-                                                style: topTextStyle,
-                                              ),
-                                              Text(
-                                                'Your time outside of Focal will not be counted as Distraction. Keep up the good work!',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Colors.white,
+                                        child: Opacity(
+                                          opacity: _distractionTrackingNotice
+                                              ? 1
+                                              : 0,
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            height:
+                                                SizeConfig.safeBlockVertical *
+                                                    25,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: <Widget>[
+                                                Text(
+                                                  'You can now leave Focal.',
+                                                  textAlign: TextAlign.center,
+                                                  style: topTextStyle,
                                                 ),
-                                              )
-                                            ],
+                                                Text(
+                                                  'Your time outside of Focal will not be counted as Distraction. Keep up the good work!',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Colors.white,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -1124,21 +1131,26 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                       AnimatedOpacity(
                                         opacity: _voltsIncrementNotice ? 0 : 1,
                                         duration: cardDuration,
-                                        child: Container(
-                                          alignment: Alignment.center,
-                                          height:
-                                              SizeConfig.safeBlockVertical * 15,
-                                          child: AutoSizeText(
-                                            _totalTasks != null &&
-                                                    _completedTasks != null &&
-                                                    _totalTasks -
-                                                            _completedTasks ==
-                                                        1
-                                                ? 'Almost there! Keep pushing 👊'
-                                                : _message,
-                                            textAlign: TextAlign.center,
-                                            style: topTextStyle,
-                                            maxLines: 2,
+                                        child: Opacity(
+                                          opacity:
+                                              _voltsIncrementNotice ? 0 : 1,
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            height:
+                                                SizeConfig.safeBlockVertical *
+                                                    15,
+                                            child: AutoSizeText(
+                                              _totalTasks != null &&
+                                                      _completedTasks != null &&
+                                                      _totalTasks -
+                                                              _completedTasks ==
+                                                          1
+                                                  ? 'Almost there! Keep pushing 👊'
+                                                  : _message,
+                                              textAlign: TextAlign.center,
+                                              style: topTextStyle,
+                                              maxLines: 2,
+                                            ),
                                           ),
                                         ),
                                       ),
