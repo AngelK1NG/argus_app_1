@@ -411,9 +411,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: _todayVolts.length == 0
+            color: _voltsList[_index] == null
                 ? Theme.of(context).primaryColor
-                : _volts.val >= _todayVolts.first.val
+                : _volts.val >= _voltsList[_index].first.val
                     ? Theme.of(context).primaryColor
                     : Colors.red,
           ),
