@@ -13,15 +13,15 @@ class ShareStatistics extends StatefulWidget {
   final Function goToPage;
   final Volts volts;
   final List<Volts> voltsList;
-  final num voltsDelta;
   final Duration timeFocused;
+  final int index;
 
   const ShareStatistics({
     @required this.goToPage,
     @required this.volts,
     @required this.voltsList,
-    @required this.voltsDelta,
     @required this.timeFocused,
+    @required this.index,
   });
 
   @override
@@ -181,7 +181,7 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                                               : Colors.red,
                                         ),
                                         Text(
-                                          '${voltsFormat.format(widget.voltsDelta.abs())} (${voltsFormat.format(widget.voltsDelta.abs() / widget.voltsList.first.val * 100)}%)',
+                                          '${voltsFormat.format((widget.volts.val - widget.voltsList.first.val).abs())} (${voltsFormat.format((widget.volts.val - widget.voltsList.first.val).abs() / widget.voltsList.first.val * 100)}%)',
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
@@ -192,7 +192,13 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                                           ),
                                         ),
                                         Text(
-                                          ' Today',
+                                          widget.index == 0
+                                              ? ' Today'
+                                              : widget.index == 1
+                                                  ? ' This Week'
+                                                  : widget.index == 2
+                                                      ? ' This Month'
+                                                      : ' All Time',
                                           style: TextStyle(
                                             fontSize: 14,
                                           ),

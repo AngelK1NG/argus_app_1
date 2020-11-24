@@ -142,14 +142,15 @@ class _HomeState extends State<Home> {
     List<Volts> voltsList,
     num voltsDelta,
     Duration timeFocused,
+    int index,
   }) {
     setState(() {
       _child = ShareStatistics(
         goToPage: goToPage,
         volts: volts,
         voltsList: voltsList,
-        voltsDelta: voltsDelta,
         timeFocused: timeFocused,
+        index: index,
       );
       _cardPosition = 0;
       setNav(false);
@@ -238,7 +239,7 @@ class _HomeState extends State<Home> {
               opacity: _loading ? 1 : 0,
               duration: cardDuration,
               curve: cardCurve,
-              child: LinearProgressIndicator(minHeight: 2),
+              child: LinearProgressIndicator(),
             ),
           ),
         ],
