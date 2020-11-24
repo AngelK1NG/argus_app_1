@@ -80,26 +80,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   Volts _initVolts;
   NumberFormat voltsFormat = NumberFormat('###,##0.00');
 
-  final quotes = [
-    '''“You can waste your lives drawing lines. Or you can live your life crossing them.”''',
-    '''“Everything comes to him who hustles while he waits.”''',
-    '''"The only difference between ordinary and extraordinary is that little extra."''',
-    '''"The secret of getting ahead is getting started."''',
-    '''"The way to get started is to quit talking and begin doing."''',
-    '''"Don't ask. Act! Action will delineate and define you."''',
-    '''“It’s not knowing what to do; it’s doing what you know.”''',
-    '''“The big secret in life is that there is no big secret. Whatever your goal, you can get there if you’re willing to work.”''',
-    '''“Action is the foundational key to all success.”''',
-    '''“Amateurs sit and wait for inspiration, the rest of us just get up and go to work.”''',
-  ];
-  final messages = [
-    'Keep up the good work! 🙌',
-    'You got this! 👊',
-    'You can do it! 💪',
-    'Don\'t forget to hydrate! 💦',
-    'Need a break? Take one! 😌'
-  ];
-
   void startTask() async {
     if (!_saving) {
       HapticFeedback.heavyImpact();
@@ -179,8 +159,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _timer.cancel();
       _saving = true;
       _doingTask = false;
-      _quote = quotes[_random.nextInt(quotes.length)];
-      _message = messages[_random.nextInt(messages.length)];
+      setText();
       _distractionTracking = true;
       _distractionTrackingNotice = false;
       _voltsIncrementNotice = true;
@@ -204,7 +183,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   }
 
   void pauseTask() {
-    if (_doingTask && _seconds > 1) {
+    if (_doingTask && _seconds > 0) {
       setState(() {
         _voltsIncrement = voltsIncrement(
           secondsFocused: _seconds - _secondsDistracted - _initSecondsFocused,
@@ -512,6 +491,34 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     }
   }
 
+  void setText() {
+    final quotes = [
+      '''“You can waste your lives drawing lines. Or you can live your life crossing them.”''',
+      '''“Everything comes to him who hustles while he waits.”''',
+      '''"The only difference between ordinary and extraordinary is that little extra."''',
+      '''"The secret of getting ahead is getting started."''',
+      '''"The way to get started is to quit talking and begin doing."''',
+      '''"Don't ask. Act! Action will delineate and define you."''',
+      '''“It’s not knowing what to do; it’s doing what you know.”''',
+      '''“The big secret in life is that there is no big secret. Whatever your goal, you can get there if you’re willing to work.”''',
+      '''“Action is the foundational key to all success.”''',
+      '''“Amateurs sit and wait for inspiration, the rest of us just get up and go to work.”''',
+    ];
+    final messages = [
+      'Keep up the good work! 🙌',
+      'You got this! 👊',
+      'You can do it! 💪',
+      'Don\'t forget to hydrate! 💦',
+      'Need a break? Take one! 😌'
+    ];
+    if (mounted) {
+      setState(() {
+        _quote = quotes[_random.nextInt(quotes.length)];
+        _message = messages[_random.nextInt(messages.length)];
+      });
+    }
+  }
+
   void updateVolts() {
     if (mounted) {
       setState(() {
@@ -564,7 +571,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('Cancel',
+              child: Text('CANCEL',
                   style: TextStyle(
                     color: Colors.red,
                   )),
@@ -574,7 +581,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
               },
             ),
             FlatButton(
-              child: Text('Allow'),
+              child: Text('ALLOW'),
               onPressed: () {
                 Navigator.of(context).pop();
                 FlutterDnd.gotoPolicySettings();
@@ -611,16 +618,13 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     getPrefs();
+    setText();
     checkIfDndOn();
     localNotifications = LocalNotifications();
     localNotifications.initialize();
     localNotifications.cancelDistractedNotification();
-    setState(() {
-      _quote = quotes[_random.nextInt(quotes.length)];
-      _message = messages[_random.nextInt(messages.length)];
-      _user = Provider.of<User>(context, listen: false).user;
-      _firestoreProvider = FirestoreProvider(_user);
-    });
+    _user = Provider.of<User>(context, listen: false).user;
+    _firestoreProvider = FirestoreProvider(_user);
     new Timer.periodic(
       const Duration(seconds: 2),
       (Timer timer) {

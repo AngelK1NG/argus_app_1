@@ -23,8 +23,8 @@ class BottomNav extends StatelessWidget {
         }
       },
       child: Container(
-        width: 48,
-        height: 48,
+        width: 60,
+        height: 60,
         child: Icon(
           iconData,
           size: 24,
@@ -44,9 +44,13 @@ class BottomNav extends StatelessWidget {
         opacity: show ? 1 : 0,
         child: Stack(
           children: [
-            SizedBox.expand(
+            Positioned(
+              left: 25,
+              right: 25,
+              top: 0,
+              bottom: 0,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   navButton(context, index: 0, iconData: FeatherIcons.clock),
                   navButton(context, index: 1, iconData: FeatherIcons.list),
@@ -69,21 +73,15 @@ class BottomNav extends StatelessWidget {
               duration: loadingDuration,
               curve: loadingCurve,
               left: index == 0
-                  ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) / 5 + 12
+                  ? 43
                   : index == 1
-                      ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) /
-                              5 *
-                              2 +
-                          60
+                      ? (SizeConfig.safeBlockHorizontal * 100 - 290) / 3 + 103
                       : index == 2
-                          ? (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) /
-                                  5 *
-                                  3 +
-                              108
-                          : (SizeConfig.safeBlockHorizontal * 100 - 4 * 48) /
-                                  5 *
-                                  4 +
-                              156,
+                          ? (SizeConfig.safeBlockHorizontal * 100 - 290) /
+                                  3 *
+                                  2 +
+                              163
+                          : (SizeConfig.safeBlockHorizontal * 100 - 290) + 223,
               bottom: 20,
             ),
           ],

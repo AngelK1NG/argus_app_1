@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:Focal/utils/analytics.dart';
 import 'package:flutter/services.dart';
@@ -40,33 +39,13 @@ class _TasksPageState extends State<TasksPage> {
   int _completedTasks = 0;
   String _dateString = 'Today';
   String _secondaryDateString;
-  DateTime today =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-  DateTime yesterday = DateTime(
-      DateTime.now().year, DateTime.now().month, DateTime.now().day - 1);
-  DateTime tomorrow = DateTime(
-      DateTime.now().year, DateTime.now().month, DateTime.now().day + 1);
-
-  void getCompletedTasks() {
-    FirebaseUser user = context.read<User>().user;
-    DocumentReference dateDoc = db
-        .collection('users')
-        .document(user.uid)
-        .collection('dates')
-        .document(getDateString(_date));
-    dateDoc.get().then((snapshot) {
-      if (snapshot.data == null) {
-        _completedTasks = 0;
-      } else {
-        setState(() {
-          _completedTasks = snapshot.data['completedTasks'];
-        });
-      }
-    });
-  }
+  DateTime _today;
+  DateTime _yesterday;
+  DateTime _tomorrow;
 
   void getTasks() {
     _tasks = [];
+    _completedTasks = 0;
     FirebaseUser user = context.read<User>().user;
     db
         .collection('users')
@@ -106,6 +85,9 @@ class _TasksPageState extends State<TasksPage> {
           newTask.onUpdate = (value) => newTask.name = value;
           setState(() {
             _tasks.add(newTask);
+            if (newTask.completed) {
+              _completedTasks++;
+            }
           });
         });
         setState(() {
@@ -258,18 +240,19 @@ class _TasksPageState extends State<TasksPage> {
     setState(() {
       _loading = true;
       _date = date;
-      DateTime today = DateTime(
-          DateTime.now().year, DateTime.now().month, DateTime.now().day);
-      DateTime yesterday = DateTime(
-          DateTime.now().year, DateTime.now().month, DateTime.now().day - 1);
-      DateTime tomorrow = DateTime(
-          DateTime.now().year, DateTime.now().month, DateTime.now().day + 1);
+      DateTime today = DateTime.now().subtract(Duration(
+        hours: _prefs.getInt('dayStartHour'),
+        minutes: _prefs.getInt('dayStartMinute'),
+      ));
+      _today = DateTime(today.year, today.month, today.day);
+      _yesterday = DateTime(today.year, today.month, today.day - 1);
+      _tomorrow = DateTime(today.year, today.month, today.day + 1);
       final dateToCheck = DateTime(date.year, date.month, date.day);
-      if (dateToCheck == today) {
+      if (dateToCheck == _today) {
         _dateString = 'Today';
-      } else if (dateToCheck == yesterday) {
+      } else if (dateToCheck == _yesterday) {
         _dateString = 'Yesterday';
-      } else if (dateToCheck == tomorrow) {
+      } else if (dateToCheck == _tomorrow) {
         _dateString = 'Tomorrow';
       } else {
         switch (date.weekday) {
@@ -310,9 +293,9 @@ class _TasksPageState extends State<TasksPage> {
             }
         }
       }
-      if ((dateToCheck == today) ||
-          (dateToCheck == yesterday) ||
-          (dateToCheck == tomorrow)) {
+      if ((dateToCheck == _today) ||
+          (dateToCheck == _yesterday) ||
+          (dateToCheck == _tomorrow)) {
         switch (date.weekday) {
           case 1:
             {
@@ -362,7 +345,6 @@ class _TasksPageState extends State<TasksPage> {
             date.month.toString() + '/' + date.day.toString();
       }
     });
-    getCompletedTasks();
     getTasks();
   }
 
@@ -469,7 +451,7 @@ class _TasksPageState extends State<TasksPage> {
                             decoration: BoxDecoration(
                               color: (DateTime(
                                           _date.year, _date.month, _date.day) ==
-                                      tomorrow)
+                                      _tomorrow)
                                   ? Colors.white
                                   : Colors.transparent,
                               borderRadius:
@@ -480,7 +462,7 @@ class _TasksPageState extends State<TasksPage> {
                                   _date.add(Duration(days: -1)).day.toString(),
                                   style: (DateTime(_date.year, _date.month,
                                               _date.day) ==
-                                          tomorrow)
+                                          _tomorrow)
                                       ? todayTextStyle
                                       : dateTextStyle),
                             ),
@@ -520,7 +502,7 @@ class _TasksPageState extends State<TasksPage> {
                             decoration: BoxDecoration(
                               color: (DateTime(
                                           _date.year, _date.month, _date.day) ==
-                                      yesterday)
+                                      _yesterday)
                                   ? Colors.white
                                   : Colors.transparent,
                               borderRadius:
@@ -531,7 +513,7 @@ class _TasksPageState extends State<TasksPage> {
                                   _date.add(Duration(days: 1)).day.toString(),
                                   style: (DateTime(_date.year, _date.month,
                                               _date.day) ==
-                                          yesterday)
+                                          _yesterday)
                                       ? todayTextStyle
                                       : dateTextStyle),
                             ),
