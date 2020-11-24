@@ -31,13 +31,13 @@ class FocusPage extends StatefulWidget {
   final Function setNav;
   final Function setDoingTask;
 
-  FocusPage(
-      {@required this.goToPage,
-      @required this.setLoading,
-      @required this.setNav,
-      @required this.setDoingTask,
-      Key key})
-      : super(key: key);
+  FocusPage({
+    @required this.goToPage,
+    @required this.setLoading,
+    @required this.setNav,
+    @required this.setDoingTask,
+    Key key,
+  }) : super(key: key);
 
   @override
   _FocusPageState createState() => _FocusPageState();
@@ -61,8 +61,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   AnalyticsProvider _analyticsProvider = AnalyticsProvider();
   List<TaskItem> _tasks = [];
   LocalNotifications localNotifications;
-  bool _prefsLoading = true;
-  bool _tasksLoading = true;
+  bool _loading = true;
   bool _saving = false;
   bool _screenOn = true;
   bool _distractionTracking = true;
@@ -491,16 +490,18 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             widget.setDoingTask(true);
           }
           setState(() {
-            _prefsLoading = false;
+            _loading = false;
           });
+          widget.setLoading(false);
         }
       });
     } else {
       if (mounted) {
         setState(() {
           _doingTask = false;
-          _prefsLoading = false;
+          _loading = false;
         });
+        widget.setLoading(false);
       }
     }
   }
@@ -631,6 +632,11 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    Future.delayed(loadingDelay, () {
+      if (_loading && mounted) {
+        widget.setLoading(true);
+      }
+    });
     getPrefs();
     setText();
     checkIfDndOn();
@@ -747,7 +753,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     return WillPopScope(
       onWillPop: () async => false,
       child: AnimatedOpacity(
-        opacity: _prefsLoading || _tasksLoading ? 0 : 1,
+        opacity: _loading ? 0 : 1,
         duration: cardDuration,
         curve: cardCurve,
         child: Stack(
@@ -765,7 +771,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                   if (!snapshot.hasData ||
                       snapshot.data.documents == null ||
                       snapshot.data.documents.isEmpty) {
-                    _tasksLoading = false;
                     _startedTasks = 0;
                     return Stack(
                       children: <Widget>[
@@ -870,7 +875,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                       }
                       _tasks.add(newTask);
                     }
-                    _tasksLoading = false;
                     if (areTasksCompleted()) {
                       return Stack(
                         children: <Widget>[

@@ -26,7 +26,7 @@ final TextStyle headerTextStyle = TextStyle(
 );
 
 //loading delay
-final Duration loadingDelay = Duration(milliseconds: 4000);
+final Duration loadingDelay = Duration(milliseconds: 2000);
 
 //animation transitions
 final Duration cardDuration = Duration(milliseconds: 200);

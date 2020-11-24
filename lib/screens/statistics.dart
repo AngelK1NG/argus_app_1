@@ -18,11 +18,15 @@ import 'dart:math';
 
 class StatisticsPage extends StatefulWidget {
   final Function goToPage;
+  final Function setLoading;
   final Function shareStatistics;
 
-  StatisticsPage(
-      {@required this.goToPage, @required this.shareStatistics, Key key})
-      : super(key: key);
+  StatisticsPage({
+    @required this.goToPage,
+    @required this.setLoading,
+    @required this.shareStatistics,
+    Key key,
+  }) : super(key: key);
 
   @override
   _StatisticsPageState createState() => _StatisticsPageState();
@@ -38,6 +42,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
   String _date;
   String _text = '';
   List<Volts> _todayVolts = [];
+  List<Volts> _weekVolts = [];
+  List<Volts> _monthVolts = [];
+  List<Volts> _allVolts = [];
   List<TaskItem> _tasks = [];
   num _voltsDelta = 0;
   Duration _timeFocused = Duration.zero;
@@ -110,68 +117,208 @@ class _StatisticsPageState extends State<StatisticsPage> {
     }
   }
 
-  Future<void> getVolts() async {
-    DocumentSnapshot snapshot =
-        await db.collection('users').document(_user.uid).get();
+  Future<void> getVoltsList() async {
+    List<Volts> tempVolts = [];
+    int decrement;
+    QuerySnapshot snapshot;
+    DocumentSnapshot userSnapshot;
+    final index = _index;
+    switch (index) {
+      case 0:
+        {
+          if (_todayVolts.isNotEmpty) {
+            return;
+          } else {
+            decrement = 0;
+          }
+          break;
+        }
+      case 1:
+        {
+          if (_weekVolts.isNotEmpty) {
+            return;
+          } else {
+            decrement = 6;
+          }
+          break;
+        }
+      case 2:
+        {
+          if (_monthVolts.isNotEmpty) {
+            return;
+          } else {
+            decrement = 29;
+          }
+          break;
+        }
+      case 3:
+        {
+          if (_allVolts.isNotEmpty) {
+            return;
+          } else {
+            snapshot = await db
+                .collection('users')
+                .document(_user.uid)
+                .collection('dates')
+                .where(FieldPath.documentId, isLessThanOrEqualTo: _date)
+                .getDocuments();
+            snapshot.documents.forEach((DocumentSnapshot document) {
+              if (mounted) {
+                if (document.data != null) {
+                  document.data['volts'].forEach((volts) {
+                    setState(() {
+                      tempVolts.add(Volts(
+                          dateTime: DateTime.parse(volts['dateTime']),
+                          val: volts['val']));
+                    });
+                  });
+                }
+              }
+            });
+            userSnapshot =
+                await db.collection('users').document(_user.uid).get();
+            if (mounted) {
+              setState(() {
+                _initVolts = Volts(
+                  dateTime:
+                      DateTime.parse(userSnapshot.data['volts']['dateTime']),
+                  val: userSnapshot.data['volts']['val'],
+                );
+                _volts = Volts(
+                  dateTime: DateTime.now(),
+                  val: _initVolts.val -
+                      voltsDecay(
+                        seconds: (DateTime.now()
+                            .difference(_initVolts.dateTime)
+                            .inSeconds),
+                        completedTasks: _completedTasks,
+                        startedTasks: _startedTasks,
+                        totalTasks: _totalTasks,
+                        volts: _initVolts.val,
+                      ),
+                );
+                tempVolts.add(_volts);
+                _allVolts = tempVolts;
+              });
+            }
+          }
+          return;
+        }
+    }
+
+    snapshot = await db
+        .collection('users')
+        .document(_user.uid)
+        .collection('dates')
+        .where(FieldPath.documentId,
+            isGreaterThanOrEqualTo: getDateString(
+                DateTime.parse(_date).subtract(Duration(days: decrement))))
+        .where(FieldPath.documentId, isLessThanOrEqualTo: _date)
+        .getDocuments();
+    snapshot.documents.forEach((DocumentSnapshot document) {
+      if (mounted) {
+        if (document.data != null) {
+          document.data['volts'].forEach((volts) {
+            setState(() {
+              tempVolts.add(Volts(
+                  dateTime: DateTime.parse(volts['dateTime']),
+                  val: volts['val']));
+            });
+          });
+        }
+      }
+    });
+    userSnapshot = await db.collection('users').document(_user.uid).get();
     if (mounted) {
       setState(() {
         _initVolts = Volts(
-          dateTime: DateTime.parse(snapshot.data['volts']['dateTime']),
-          val: snapshot.data['volts']['val'],
+          dateTime: DateTime.parse(userSnapshot.data['volts']['dateTime']),
+          val: userSnapshot.data['volts']['val'],
         );
         _volts = Volts(
           dateTime: DateTime.now(),
-          val: snapshot.data['volts']['val'] -
+          val: _initVolts.val -
               voltsDecay(
-                seconds: (DateTime.now()
-                    .difference(
-                        DateTime.parse(snapshot.data['volts']['dateTime']))
-                    .inSeconds),
+                seconds:
+                    (DateTime.now().difference(_initVolts.dateTime).inSeconds),
                 completedTasks: _completedTasks,
                 startedTasks: _startedTasks,
                 totalTasks: _totalTasks,
-                volts: snapshot.data['volts']['val'],
+                volts: _initVolts.val,
               ),
         );
+        tempVolts.add(_volts);
+        switch (index) {
+          case 0:
+            {
+              _todayVolts = tempVolts;
+              break;
+            }
+          case 1:
+            {
+              _weekVolts = tempVolts;
+              break;
+            }
+          case 2:
+            {
+              _monthVolts = tempVolts;
+              break;
+            }
+        }
       });
     }
   }
 
-  Future<void> getTodayVolts() async {
-    List<Volts> newTodayVolts = [];
-    DocumentReference dateDoc = db
-        .collection('users')
-        .document(_user.uid)
-        .collection('dates')
-        .document(_date);
-    DocumentSnapshot snapshot = await dateDoc.get();
+  void updateVolts() {
     if (mounted) {
-      if (snapshot.data == null) {
-        dateDoc.setData({
-          'completedTasks': 0,
-          'startedTasks': 0,
-          'totalTasks': 0,
-          'secondsFocused': 0,
-          'secondsDistracted': 0,
-          'numDistracted': 0,
-          'numPaused': 0,
-          'volts': [],
-        });
-      } else {
-        snapshot.data['volts'].forEach((volts) {
-          setState(() {
-            newTodayVolts.add(Volts(
-                dateTime: DateTime.parse(volts['dateTime']),
-                val: volts['val']));
-          });
-        });
-        newTodayVolts.add(_volts);
-        setState(() {
-          _timeFocused = Duration(seconds: snapshot.data['secondsFocused']);
-          _voltsDelta = _volts.val - newTodayVolts.first.val;
-          _todayVolts = newTodayVolts;
-        });
-      }
+      setState(() {
+        _volts = Volts(
+          dateTime: DateTime.now(),
+          val: _initVolts.val -
+              voltsDecay(
+                seconds:
+                    (DateTime.now().difference(_initVolts.dateTime).inSeconds),
+                completedTasks: _completedTasks,
+                startedTasks: _startedTasks,
+                totalTasks: _totalTasks,
+                volts: _initVolts.val,
+              ),
+        );
+        switch (_index) {
+          case 0:
+            {
+              if (_todayVolts.isNotEmpty) {
+                _voltsDelta = _volts.val - _todayVolts.first.val;
+                _todayVolts.last = _volts;
+              }
+              break;
+            }
+          case 1:
+            {
+              if (_weekVolts.isNotEmpty) {
+                _voltsDelta = _volts.val - _weekVolts.first.val;
+                _weekVolts.last = _volts;
+              }
+              break;
+            }
+          case 2:
+            {
+              if (_monthVolts.isNotEmpty) {
+                _voltsDelta = _volts.val - _monthVolts.first.val;
+                _monthVolts.last = _volts;
+              }
+              break;
+            }
+          case 3:
+            {
+              if (_allVolts.isNotEmpty) {
+                _voltsDelta = _volts.val - _allVolts.first.val;
+                _allVolts.last = _volts;
+              }
+              break;
+            }
+        }
+      });
     }
   }
 
@@ -250,35 +397,15 @@ class _StatisticsPageState extends State<StatisticsPage> {
         hours: _prefs.getInt('dayStartHour'),
         minutes: _prefs.getInt('dayStartMinute'))));
     await getTasks();
-    await getVolts();
-    await getTodayVolts();
+    await getVoltsList();
+    updateVolts();
     await getOtherStats();
     setText();
     if (mounted) {
       setState(() {
         _loading = false;
       });
-    }
-  }
-
-  void updateVolts() {
-    if (mounted) {
-      setState(() {
-        _volts = Volts(
-          dateTime: DateTime.now(),
-          val: _initVolts.val -
-              voltsDecay(
-                seconds:
-                    (DateTime.now().difference(_initVolts.dateTime).inSeconds),
-                completedTasks: _completedTasks,
-                startedTasks: _startedTasks,
-                totalTasks: _totalTasks,
-                volts: _initVolts.val,
-              ),
-        );
-        _voltsDelta = _volts.val - _todayVolts.first.val;
-        _todayVolts.last = _volts;
-      });
+      widget.setLoading(false);
     }
   }
 
@@ -320,10 +447,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
       {@required int index, @required String text}) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTap: () {
+      onTap: () async {
         setState(() {
           _index = index;
         });
+        await getVoltsList();
+        updateVolts();
       },
       child: Container(
         width: 60,
@@ -348,6 +477,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   void initState() {
     super.initState();
+    Future.delayed(loadingDelay, () {
+      if (_loading && mounted) {
+        widget.setLoading(true);
+      }
+    });
     _user = Provider.of<User>(context, listen: false).user;
     getData();
     new Timer.periodic(
@@ -448,7 +582,13 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                           ),
                                         ),
                                         Text(
-                                          ' Today',
+                                          _index == 0
+                                              ? ' Today'
+                                              : _index == 1
+                                                  ? ' This Week'
+                                                  : _index == 2
+                                                      ? ' This Month'
+                                                      : ' All Time',
                                           style: TextStyle(
                                             fontSize: 14,
                                           ),
@@ -557,7 +697,15 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                   ],
                                 ),
                               )
-                            : VoltsChart(data: _todayVolts, id: 'todayVolts'),
+                            : VoltsChart(
+                                data: _index == 0
+                                    ? _todayVolts
+                                    : _index == 1
+                                        ? _weekVolts
+                                        : _index == 2
+                                            ? _monthVolts
+                                            : _allVolts,
+                                id: 'volts'),
                       ),
                     ),
                     SizedBox(

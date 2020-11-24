@@ -17,8 +17,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class TasksPage extends StatefulWidget {
   final Function goToPage;
+  final Function setLoading;
 
-  TasksPage({@required this.goToPage, Key key}) : super(key: key);
+  TasksPage({
+    @required this.goToPage,
+    @required this.setLoading,
+    Key key,
+  }) : super(key: key);
 
   @override
   _TasksPageState createState() => _TasksPageState();
@@ -93,6 +98,7 @@ class _TasksPageState extends State<TasksPage> {
         setState(() {
           _loading = false;
         });
+        widget.setLoading(false);
       }
     });
   }
@@ -366,6 +372,11 @@ class _TasksPageState extends State<TasksPage> {
   @override
   void initState() {
     super.initState();
+    Future.delayed(loadingDelay, () {
+      if (_loading && mounted) {
+        widget.setLoading(true);
+      }
+    });
     setToday();
     KeyboardVisibility.onChange.listen((bool visible) {
       if (mounted) {

@@ -11,8 +11,13 @@ import 'package:flutter/services.dart';
 
 class ProfilePage extends StatefulWidget {
   final Function goToPage;
+  final Function setLoading;
 
-  ProfilePage({@required this.goToPage, Key key}) : super(key: key);
+  ProfilePage({
+    @required this.goToPage,
+    @required this.setLoading,
+    Key key,
+  }) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -40,6 +45,11 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    Future.delayed(loadingDelay, () {
+      if (_loading && mounted) {
+        widget.setLoading(true);
+      }
+    });
     _name = Provider.of<User>(context, listen: false).user.displayName;
     _email = Provider.of<User>(context, listen: false).user.email;
     _photoUrl = Provider.of<User>(context, listen: false).user.photoUrl;
@@ -59,6 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
               snapshot.data['completedTasks'] ~/ snapshot.data['daysActive'];
           _loading = false;
         });
+        widget.setLoading(false);
       }
     });
   }
