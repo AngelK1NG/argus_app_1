@@ -180,9 +180,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   void pauseTask() {
     if (_doingTask &&
         _seconds - _initSecondsFocused - _initSecondsDistracted > 0) {
-      print(_secondsDistracted);
-      print(_initSecondsDistracted);
-      print(_seconds - _secondsDistracted - _initSecondsFocused);
       setState(() {
         _voltsIncrement = voltsIncrement(
           secondsFocused: _seconds - _secondsDistracted - _initSecondsFocused,
@@ -455,7 +452,9 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             setState(() {
               _startFocused = DateTime.fromMillisecondsSinceEpoch(
                   _prefs.getInt('startFocused'));
-              _seconds = _initSecondsFocused + _initSecondsDistracted;
+              _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
+                  _initSecondsFocused +
+                  _initSecondsDistracted;
               _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
                   ":" +
                   (_seconds % 60).toString().padLeft(2, "0");
