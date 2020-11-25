@@ -31,6 +31,17 @@ class ShareStatistics extends StatefulWidget {
 class _ShareStatisticsState extends State<ShareStatistics> {
   ScreenshotController _screenshotController = ScreenshotController();
   NumberFormat voltsFormat = NumberFormat('###,##0.00');
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      setState(() {
+        _loading = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,174 +133,187 @@ class _ShareStatisticsState extends State<ShareStatistics> {
             right: 0,
             child: Screenshot(
               controller: _screenshotController,
-              child: Container(
-                padding: EdgeInsets.only(top: 25),
-                color: Colors.white,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: AnimatedOpacity(
+                      opacity: _loading ? 0 : 1,
+                      duration: cardDuration,
+                      curve: cardCurve,
+                      child: Container(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 25),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 25),
+                                      child: Icon(
+                                        FeatherIcons.zap,
+                                        size: 30,
+                                        color: jetBlack,
+                                      ),
+                                    ),
+                                    Text(
+                                      voltsFormat.format(widget.volts.val),
+                                      style: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                                 Padding(
-                                  padding: EdgeInsets.only(left: 25),
-                                  child: Icon(
-                                    FeatherIcons.zap,
-                                    size: 30,
-                                    color: jetBlack,
+                                  padding: EdgeInsets.only(left: 25, top: 15),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        widget.volts.val >=
+                                                widget.voltsList.first.val
+                                            ? FeatherIcons.chevronUp
+                                            : FeatherIcons.chevronDown,
+                                        size: 14,
+                                        color: widget.volts.val >=
+                                                widget.voltsList.first.val
+                                            ? Theme.of(context).primaryColor
+                                            : Colors.red,
+                                      ),
+                                      Icon(
+                                        FeatherIcons.zap,
+                                        size: 14,
+                                        color: widget.volts.val >=
+                                                widget.voltsList.first.val
+                                            ? Theme.of(context).primaryColor
+                                            : Colors.red,
+                                      ),
+                                      Text(
+                                        '${voltsFormat.format((widget.volts.val - widget.voltsList.first.val).abs())} (${voltsFormat.format((widget.volts.val - widget.voltsList.first.val).abs() / widget.voltsList.first.val * 100)}%)',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: widget.volts.val >=
+                                                  widget.voltsList.first.val
+                                              ? Theme.of(context).primaryColor
+                                              : Colors.red,
+                                        ),
+                                      ),
+                                      Text(
+                                        widget.index == 0
+                                            ? ' Today'
+                                            : widget.index == 1
+                                                ? ' This Week'
+                                                : widget.index == 2
+                                                    ? ' This Month'
+                                                    : ' All Time',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
-                                Text(
-                                  voltsFormat.format(widget.volts.val),
-                                  style: TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w600,
+                                Padding(
+                                  padding: EdgeInsets.only(left: 25, top: 5),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        '${widget.timeFocused.inHours}h ${widget.timeFocused.inMinutes % 60}m',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        ' Focused',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
-                            widget.voltsList.length <= 1
-                                ? Container()
-                                : Padding(
-                                    padding: EdgeInsets.only(left: 25, top: 15),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          widget.volts.val >=
-                                                  widget.voltsList.first.val
-                                              ? FeatherIcons.chevronUp
-                                              : FeatherIcons.chevronDown,
-                                          size: 14,
-                                          color: widget.volts.val >=
-                                                  widget.voltsList.first.val
-                                              ? Theme.of(context).primaryColor
-                                              : Colors.red,
-                                        ),
-                                        Icon(
-                                          FeatherIcons.zap,
-                                          size: 14,
-                                          color: widget.volts.val >=
-                                                  widget.voltsList.first.val
-                                              ? Theme.of(context).primaryColor
-                                              : Colors.red,
-                                        ),
-                                        Text(
-                                          '${voltsFormat.format((widget.volts.val - widget.voltsList.first.val).abs())} (${voltsFormat.format((widget.volts.val - widget.voltsList.first.val).abs() / widget.voltsList.first.val * 100)}%)',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: widget.volts.val >=
-                                                    widget.voltsList.first.val
-                                                ? Theme.of(context).primaryColor
-                                                : Colors.red,
-                                          ),
-                                        ),
-                                        Text(
-                                          widget.index == 0
-                                              ? ' Today'
-                                              : widget.index == 1
-                                                  ? ' This Week'
-                                                  : widget.index == 2
-                                                      ? ' This Month'
-                                                      : ' All Time',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                            widget.voltsList.length <= 1
-                                ? Container()
-                                : Padding(
-                                    padding: EdgeInsets.only(left: 25, top: 5),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          '${widget.timeFocused.inHours}h ${widget.timeFocused.inMinutes % 60}m',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        Text(
-                                          ' Focused',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
+                            Padding(
+                              padding: EdgeInsets.only(right: 25),
+                              child: Image(
+                                image: AssetImage(
+                                    'assets/images/logo/Focal Logo_Full Colored.png'),
+                                width: 120,
+                              ),
+                            ),
                           ],
                         ),
+                        widget.voltsList == null || widget.voltsList.length <= 1
+                            ? Container()
+                            : Padding(
+                                padding: EdgeInsets.only(top: 50),
+                                child: SizedBox(
+                                  height: 150,
+                                  child: VoltsChart(
+                                      data: widget.voltsList, id: 'volts'),
+                                ),
+                              ),
                         Padding(
-                          padding: EdgeInsets.only(right: 25),
-                          child: Image(
-                            image: AssetImage(
-                                'assets/images/logo/Focal Logo_Full Colored.png'),
-                            width: 120,
+                          padding: EdgeInsets.only(
+                            top: 50,
+                            left: 25,
+                            right: 25,
+                            bottom: 25,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    DateFormat.yMMMd('en_US')
+                                        .format(DateTime.now()),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    'https://focal.technology',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Theme.of(context).hintColor,
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Image(
+                                image: AssetImage(
+                                    'assets/images/qrcode/focaltechnology.png'),
+                                width: 69,
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 50),
-                      child: SizedBox(
-                        height: 150,
-                        child: widget.voltsList.length <= 1
-                            ? Container()
-                            : VoltsChart(
-                                data: widget.voltsList, id: 'todayVolts'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        top: 50,
-                        left: 25,
-                        right: 25,
-                        bottom: 25,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                DateFormat.yMMMd('en_US')
-                                    .format(DateTime.now()),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Text(
-                                'https://focal.technology',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).hintColor,
-                                ),
-                              )
-                            ],
-                          ),
-                          Image(
-                            image: AssetImage(
-                                'assets/images/qrcode/focaltechnology.png'),
-                            width: 69,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

@@ -41,6 +41,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
   Volts _volts = Volts(dateTime: DateTime.now(), val: 0);
   String _date;
   String _text = '';
+  String _emoji = '';
   List<List<Volts>> _voltsList = List.filled(4, null);
   List<Volts> _todayVolts = [];
   List<Volts> _weekVolts = [];
@@ -55,19 +56,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
   int _totalTasks = 0;
   int _avgTasks;
   Random _random = Random();
-
-  final quotes = [
-    '''“You can waste your lives drawing lines. Or you can live your life crossing them.”''',
-    '''“Everything comes to him who hustles while he waits.”''',
-    '''"The only difference between ordinary and extraordinary is that little extra."''',
-    '''"The secret of getting ahead is getting started."''',
-    '''"The way to get started is to quit talking and begin doing."''',
-    '''"Don't ask. Act! Action will delineate and define you."''',
-    '''“It’s not knowing what to do; it’s doing what you know.”''',
-    '''“The big secret in life is that there is no big secret. Whatever your goal, you can get there if you’re willing to work.”''',
-    '''“Action is the foundational key to all success.”''',
-    '''“Amateurs sit and wait for inspiration, the rest of us just get up and go to work.”''',
-  ];
 
   Future<void> getTasks() async {
     List<TaskItem> newTasks = [];
@@ -201,28 +189,15 @@ class _StatisticsPageState extends State<StatisticsPage> {
       }
     });
     if (mounted) {
-      if (decrement != null) {
+      tempVolts.add(_volts);
+      if (decrement != null && decrement > 0) {
         Volts firstVolts;
-        if (decrement == 0) {
-          firstVolts = Volts(
-            dateTime: DateTime(
-              DateTime.parse(_date).year,
-              DateTime.parse(_date).month,
-              DateTime.parse(_date).day,
-              _prefs.getInt('dayStartHour'),
-              _prefs.getInt('dayStartMinute'),
-            ),
-            val: tempVolts.first.val,
-          );
-        } else {
-          firstVolts = Volts(
-            dateTime: DateTime.parse(_date).subtract(Duration(days: decrement)),
-            val: tempVolts.first.val,
-          );
-        }
+        firstVolts = Volts(
+          dateTime: DateTime.parse(_date).subtract(Duration(days: decrement)),
+          val: tempVolts.first.val,
+        );
         tempVolts.insert(0, firstVolts);
       }
-      tempVolts.add(_volts);
       setState(() {
         _timeFocused[index] = Duration(seconds: secondsFocused);
         _voltsList[index] = tempVolts;
@@ -288,36 +263,40 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   void setText() {
     final quotes = [
-      '''“You can waste your lives drawing lines. Or you can live your life crossing them.”''',
-      '''“Everything comes to him who hustles while he waits.”''',
-      '''"The only difference between ordinary and extraordinary is that little extra."''',
-      '''"The secret of getting ahead is getting started."''',
-      '''"The way to get started is to quit talking and begin doing."''',
-      '''"Don't ask. Act! Action will delineate and define you."''',
-      '''“It’s not knowing what to do; it’s doing what you know.”''',
-      '''“The big secret in life is that there is no big secret. Whatever your goal, you can get there if you’re willing to work.”''',
-      '''“Action is the foundational key to all success.”''',
-      '''“Amateurs sit and wait for inspiration, the rest of us just get up and go to work.”''',
+      '''“You can waste your lives drawing lines. Or you can live your life crossing them.” - Shonda Rhimes''',
+      '''“Everything comes to him who hustles while he waits.” - Thomas Edison''',
+      '''"The only difference between ordinary and extraordinary is that little extra." - Jimmy Johnson''',
+      '''"The secret of getting ahead is getting started." - Mark Twain''',
+      '''"The way to get started is to quit talking and begin doing." - Walt Disney''',
+      '''"Do you want to know who you are? Don't ask. Act! Action will delineate and define you." - Thomas Jefferson''',
+      '''“It’s not knowing what to do, it’s doing what you know.” - Tony Robbins''',
+      '''“The big secret in life is that there is no big secret. Whatever your goal, you can get there if you’re willing to work.” - Oprah Winfrey''',
+      '''“Action is the foundational key to all success.” - Pablo Picasso''',
+      '''“Amateurs sit and wait for inspiration, the rest of us just get up and go to work.” - Stephen King''',
     ];
     if (mounted) {
       setState(() {
         if (_totalTasks == 0) {
           _text = quotes[_random.nextInt(quotes.length)];
+          _emoji = '🤟';
         } else if (_completedTasks == 0) {
           _text =
-              'You have ${_totalTasks.toString() + (_totalTasks == 1 ? ' task' : ' tasks')} today. You got this! 👊';
+              'You have ${_totalTasks.toString() + (_totalTasks == 1 ? ' task' : ' tasks')} today. You got this!';
+          _emoji = '👊';
         } else if (_completedTasks != _totalTasks) {
           switch (_random.nextInt(2)) {
             case 0:
               {
                 _text =
-                    'You have done ${_completedTasks.toString() + (_completedTasks == 1 ? ' task' : ' tasks')} today. You can do it! 💪';
+                    'You have done ${_completedTasks.toString() + (_completedTasks == 1 ? ' task' : ' tasks')} today. You can do it!';
+                _emoji = '💪';
                 break;
               }
             case 1:
               {
                 _text =
-                    '${(_completedTasks / _tasks.length * 100).round()}% done. Keep up the good work! 🙌';
+                    '${(_completedTasks / _tasks.length * 100).round()}% done. Keep up the good work!';
+                _emoji = '🙌';
                 break;
               }
           }
@@ -336,6 +315,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 break;
               }
           }
+          _emoji = '🙌';
         }
       });
     }
@@ -669,8 +649,35 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           padding: EdgeInsets.only(top: 50, bottom: 25),
                           child: SizedBox(
                             height: 150,
-                            child: _voltsList[_index] == null
-                                ? Container()
+                            child: _voltsList[_index] == null ||
+                                    _voltsList[_index].length <= 1
+                                ? Container(
+                                    padding:
+                                        EdgeInsets.only(left: 80, right: 80),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          'Complete a task to update your Volts.',
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 20),
+                                          child: Text(
+                                            'Statistics will be calculated once you complete a task.',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
                                 : VoltsChart(
                                     data: _voltsList[_index], id: 'volts'),
                           ),
@@ -738,11 +745,25 @@ class _StatisticsPageState extends State<StatisticsPage> {
                     Padding(
                       padding: EdgeInsets.only(
                           top: 50, bottom: 50, left: 25, right: 25),
-                      child: Text(
-                        _text,
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _emoji,
+                            style: TextStyle(
+                              fontSize: 36,
+                            ),
+                          ),
+                          SizedBox(
+                            width: SizeConfig.safeBlockHorizontal * 100 - 120,
+                            child: Text(
+                              _text,
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     taskColumn(),
