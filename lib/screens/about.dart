@@ -157,7 +157,7 @@ class _AboutPageState extends State<AboutPage> {
                 ),
                 textButton(
                   () {
-                    openUrl('https://focal.technology');
+                    openUrl('https://getfocal.app');
                   },
                   'Website',
                 ),

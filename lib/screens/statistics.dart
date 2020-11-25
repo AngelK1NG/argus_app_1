@@ -652,30 +652,16 @@ class _StatisticsPageState extends State<StatisticsPage> {
                             child: _voltsList[_index] == null ||
                                     _voltsList[_index].length <= 1
                                 ? Container(
+                                    alignment: Alignment.center,
                                     padding:
                                         EdgeInsets.only(left: 80, right: 80),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'Complete a task to update your Volts.',
-                                          style: TextStyle(
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 20),
-                                          child: Text(
-                                            'Statistics will be calculated once you complete a task.',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w400,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      ],
+                                    child: Text(
+                                      'Complete a task to update your Volts.',
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
                                   )
                                 : VoltsChart(

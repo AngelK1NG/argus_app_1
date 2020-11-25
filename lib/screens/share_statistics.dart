@@ -86,7 +86,7 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                       Share.shareFiles(
                         [path],
                         text:
-                            'Join me on Focal to get things done, one task at a time! https://focal.technology',
+                            'Join me on Focal to get things done, one task at a time! https://getfocal.app',
                       );
                     }).catchError((onError) {
                       print(onError);
@@ -294,7 +294,7 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                                     ),
                                   ),
                                   Text(
-                                    'https://focal.technology',
+                                    'https://getfocal.app',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Theme.of(context).hintColor,
@@ -304,7 +304,7 @@ class _ShareStatisticsState extends State<ShareStatistics> {
                               ),
                               Image(
                                 image: AssetImage(
-                                    'assets/images/qrcode/focaltechnology.png'),
+                                    'assets/images/qrcode/getfocalapp.png'),
                                 width: 69,
                               ),
                             ],
