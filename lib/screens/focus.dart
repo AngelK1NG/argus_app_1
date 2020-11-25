@@ -89,18 +89,13 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   void startTask() async {
     if (!_saving) {
       HapticFeedback.heavyImpact();
-      _secondsDistracted =
-          _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
-      _initSecondsDistracted =
-          _tasks[0].secondsDistracted == null ? 0 : _tasks[0].secondsDistracted;
+      _secondsDistracted = _tasks[0].secondsDistracted;
+      _initSecondsDistracted = _tasks[0].secondsDistracted;
 
-      _numDistracted =
-          _tasks[0].numDistracted == null ? 0 : _tasks[0].numDistracted;
-      _initNumDistracted =
-          _tasks[0].numDistracted == null ? 0 : _tasks[0].numDistracted;
+      _numDistracted = _tasks[0].numDistracted;
+      _initNumDistracted = _tasks[0].numDistracted;
 
-      _initSecondsFocused =
-          _tasks[0].secondsFocused == null ? 0 : _tasks[0].secondsFocused;
+      _initSecondsFocused = _tasks[0].secondsFocused;
 
       _timer = new Timer.periodic(
         const Duration(seconds: 1),
@@ -115,9 +110,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       );
       setState(() {
         _startFocused = DateTime.now();
-        _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
-            _initSecondsFocused +
-            _initSecondsDistracted;
+        _seconds = _initSecondsFocused + _initSecondsDistracted;
         _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, '0') +
             ":" +
             (_seconds % 60).toString().padLeft(2, '0');
@@ -136,7 +129,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                 ),
           ),
         );
-        _initVolts = _todayVolts.last;
       });
 
       _prefs.setInt('secondsDistracted', _secondsDistracted);
@@ -150,10 +142,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _prefs.setString(
           'lastVoltsDateTime', getDateTimeString(_todayVolts.last.dateTime));
       _prefs.setString('lastVoltsVal', _todayVolts.last.val.toString());
-
-      if (Platform.isAndroid) {
-        setDnd(true);
-      }
+      setDnd(true);
       _analyticsProvider.logStartTask(_tasks[0], DateTime.now());
       widget.setNav(false);
       widget.setDoingTask(true);
@@ -182,16 +171,18 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         }
       }
     });
-    if (Platform.isAndroid) {
-      setDnd(false);
-    }
+    setDnd(false);
     _prefs.setBool('doingTask', false);
     widget.setLoading(true);
     widget.setDoingTask(false);
   }
 
   void pauseTask() {
-    if (_doingTask && _seconds > 0) {
+    if (_doingTask &&
+        _seconds - _initSecondsFocused - _initSecondsDistracted > 0) {
+      print(_secondsDistracted);
+      print(_initSecondsDistracted);
+      print(_seconds - _secondsDistracted - _initSecondsFocused);
       setState(() {
         _voltsIncrement = voltsIncrement(
           secondsFocused: _seconds - _secondsDistracted - _initSecondsFocused,
@@ -260,7 +251,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   }
 
   void completeTask() {
-    if (_doingTask && _seconds > 1) {
+    if (_doingTask &&
+        _seconds - _initSecondsFocused - _initSecondsDistracted > 0) {
       setState(() {
         _voltsIncrement = voltsIncrement(
           secondsFocused: _seconds - _secondsDistracted - _initSecondsFocused,
@@ -463,9 +455,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             setState(() {
               _startFocused = DateTime.fromMillisecondsSinceEpoch(
                   _prefs.getInt('startFocused'));
-              _seconds = (DateTime.now().difference(_startFocused).inSeconds) +
-                  _initSecondsFocused +
-                  _initSecondsDistracted;
+              _seconds = _initSecondsFocused + _initSecondsDistracted;
               _swatchDisplay = (_seconds ~/ 60).toString().padLeft(2, "0") +
                   ":" +
                   (_seconds % 60).toString().padLeft(2, "0");
@@ -474,7 +464,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                   dateTime:
                       DateTime.parse(_prefs.getString('lastVoltsDateTime')),
                   val: num.parse(_prefs.getString('lastVoltsVal'))));
-              _initVolts = _todayVolts.last;
             });
             if (_prefs.getBool('distracted') == true) {
               _startDistracted = DateTime.fromMillisecondsSinceEpoch(
@@ -554,7 +543,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   }
 
   void setDnd(bool on) async {
-    if (_prefs.getBool('focusDnd')) {
+    if (_prefs.getBool('focusDnd') && Platform.isAndroid) {
       if (on) {
         if (await FlutterDnd.isNotificationPolicyAccessGranted) {
           await FlutterDnd.setInterruptionFilter(
@@ -618,12 +607,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     }
   }
 
-  Future<bool> iosScreenOn() async {
-    var value = await screenChannel.invokeMethod("isScreenOn");
-    return value;
-  }
-
-  Future<bool> androidScreenOn() async {
+  Future<bool> isScreenOn() async {
     var value = await screenChannel.invokeMethod("isScreenOn");
     return value;
   }
@@ -665,32 +649,19 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       case AppLifecycleState.paused:
         {
           if (_doingTask && _distractionTracking) {
-            if (Platform.isAndroid) {
-              androidScreenOn().then((value) {
-                if (value) {
-                  _startDistracted = DateTime.now();
-                  _prefs.setInt('startDistracted',
-                      _startDistracted.millisecondsSinceEpoch);
-                  _prefs.setBool('distracted', true);
-                  _screenOn = true;
-                  localNotifications.distractedNotification();
-                  setDnd(false);
-                } else {
-                  _screenOn = false;
-                }
-              });
-            } else if (Platform.isIOS) {
-              iosScreenOn().then((value) {
-                if (value) {
-                  _startDistracted = DateTime.now();
-                  _prefs.setBool('distracted', true);
-                  localNotifications.distractedNotification();
-                  _screenOn = true;
-                } else {
-                  _screenOn = false;
-                }
-              });
-            }
+            isScreenOn().then((value) {
+              if (value) {
+                _startDistracted = DateTime.now();
+                _prefs.setInt(
+                    'startDistracted', _startDistracted.millisecondsSinceEpoch);
+                _prefs.setBool('distracted', true);
+                localNotifications.distractedNotification();
+                _screenOn = true;
+                setDnd(false);
+              } else {
+                _screenOn = false;
+              }
+            });
           }
           break;
         }
@@ -703,8 +674,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             _prefs.setInt('secondsDistracted', _secondsDistracted);
             _prefs.setInt('numDistracted', _numDistracted);
             _prefs.setBool('distracted', false);
-            setDnd(true);
             localNotifications.cancelDistractedNotification();
+            setDnd(true);
           } else if (_distractionTracking == false) {
             setState(() {
               _distractionTracking = true;
