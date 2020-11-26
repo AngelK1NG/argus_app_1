@@ -39,7 +39,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
   int _index = 0;
   Volts _initVolts;
   Volts _volts = Volts(dateTime: DateTime.now(), val: 0);
-  String _date;
+  DateTime _date;
   String _text = '';
   String _emoji = '';
   List<List<Volts>> _voltsList = List.filled(4, null);
@@ -50,11 +50,13 @@ class _StatisticsPageState extends State<StatisticsPage> {
   List<TaskItem> _tasks = [];
   List<Duration> _timeFocused = List.filled(4, null);
   Duration _avgFocused;
-  NumberFormat voltsFormat = NumberFormat('###,##0.00');
+  Duration _yesterdayFocused;
   int _completedTasks = 0;
   int _startedTasks = 0;
   int _totalTasks = 0;
   int _avgTasks;
+  int _yesterdayTasks;
+  NumberFormat voltsFormat = NumberFormat('###,##0.00');
   Random _random = Random();
 
   Future<void> getTasks() async {
@@ -66,7 +68,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
         .collection('users')
         .document(_user.uid)
         .collection('dates')
-        .document(_date)
+        .document(getDateString(_date))
         .collection('tasks')
         .orderBy('order')
         .getDocuments();
@@ -85,7 +87,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
           numDistracted: task.data['numDistracted'],
           voltsIncrement: task.data['voltsIncrement'],
           key: UniqueKey(),
-          date: _date,
+          date: getDateString(_date),
         );
         newTasks.add(newTask);
         totalTasks++;
@@ -175,9 +177,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
         .where(FieldPath.documentId,
             isGreaterThanOrEqualTo: decrement == null
                 ? '0'
-                : getDateString(
-                    DateTime.parse(_date).subtract(Duration(days: decrement))))
-        .where(FieldPath.documentId, isLessThanOrEqualTo: _date)
+                : getDateString(_date.subtract(Duration(days: decrement))))
+        .where(FieldPath.documentId, isLessThanOrEqualTo: getDateString(_date))
         .getDocuments();
     snapshot.documents.forEach((DocumentSnapshot document) {
       if (document.data != null) {
@@ -190,13 +191,14 @@ class _StatisticsPageState extends State<StatisticsPage> {
     });
     if (mounted) {
       tempVolts.add(_volts);
-      if (decrement != null && decrement > 0) {
-        Volts firstVolts;
-        firstVolts = Volts(
-          dateTime: DateTime.parse(_date).subtract(Duration(days: decrement)),
-          val: tempVolts.first.val,
+      if (decrement != null && decrement > 0 && tempVolts.length > 1) {
+        tempVolts.insert(
+          0,
+          Volts(
+            dateTime: _date.subtract(Duration(days: decrement)),
+            val: tempVolts.first.val,
+          ),
         );
-        tempVolts.insert(0, firstVolts);
       }
       setState(() {
         _timeFocused[index] = Duration(seconds: secondsFocused);
@@ -250,6 +252,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
   Future<void> getOtherStats() async {
     DocumentSnapshot snapshot =
         await db.collection('users').document(_user.uid).get();
+    DocumentSnapshot yesterdaySnapshot = await db
+        .collection('users')
+        .document(_user.uid)
+        .collection('dates')
+        .document(getDateString(_date.subtract(Duration(days: 1))))
+        .get();
     if (mounted) {
       setState(() {
         _avgFocused = Duration(
@@ -257,6 +265,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 snapshot.data['secondsFocused'] ~/ snapshot.data['daysActive']);
         _avgTasks =
             snapshot.data['completedTasks'] ~/ snapshot.data['daysActive'];
+        if (yesterdaySnapshot.data != null) {
+          _yesterdayFocused =
+              Duration(seconds: yesterdaySnapshot.data['secondsFocused']);
+          _yesterdayTasks = yesterdaySnapshot.data['completedTasks'];
+        }
       });
     }
   }
@@ -277,7 +290,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
     if (mounted) {
       setState(() {
         if (_totalTasks == 0) {
-          _text = quotes[_random.nextInt(quotes.length)];
+          if (_yesterdayFocused != null && _yesterdayTasks != null) {
+            _text =
+                'You were focused for ${_yesterdayFocused.inHours}h ${_yesterdayFocused.inMinutes % 60}m and completed ${_yesterdayTasks} tasks yesterday.';
+          } else {
+            _text = quotes[_random.nextInt(quotes.length)];
+          }
           _emoji = '🤟';
         } else if (_completedTasks == 0) {
           _text =
@@ -305,13 +323,13 @@ class _StatisticsPageState extends State<StatisticsPage> {
             case 0:
               {
                 _text =
-                    'You completed ${_completedTasks.toString() + (_completedTasks == 1 ? ' task' : ' tasks')} today. That\'s ${_completedTasks == _avgTasks ? 'the same as' : (_completedTasks - _avgTasks).abs().toString() + ((_completedTasks > _avgTasks) ? ' more' : ' less') + ' than'} your daily average!';
+                    'You completed ${_completedTasks.toString() + (_completedTasks == 1 ? ' task' : ' tasks')} today. That\'s ${_completedTasks == _avgTasks ? 'the same as' : (_completedTasks - _avgTasks).abs().toString() + ((_completedTasks > _avgTasks) ? ' more' : ' less') + ' than'} your daily average${_yesterdayTasks == null ? '' : ' and ' + (_completedTasks == _yesterdayTasks ? 'the same as' : (_completedTasks - _yesterdayTasks).abs().toString() + ((_completedTasks > _yesterdayTasks) ? ' more' : ' less') + ' than') + ' yesterday'}!';
                 break;
               }
             case 1:
               {
                 _text =
-                    'You were Focused for ${_timeFocused[0].inHours}h ${_timeFocused[0].inMinutes % 60}m today. That\'s ${_timeFocused[0].inMinutes == _avgFocused.inMinutes ? 'the same as' : (_timeFocused[0].inMinutes - _avgFocused.inMinutes).abs().toString() + ((_timeFocused[0].inMinutes > _avgFocused.inMinutes) ? 'm more' : 'm less') + ' than'} your daily average!';
+                    'You were Focused for ${_timeFocused[0].inHours}h ${_timeFocused[0].inMinutes % 60}m today. That\'s ${_timeFocused[0].inMinutes == _avgFocused.inMinutes ? 'the same as' : (_timeFocused[0].inMinutes - _avgFocused.inMinutes).abs().toString() + ((_timeFocused[0].inMinutes > _avgFocused.inMinutes) ? 'm more' : 'm less') + ' than'} your daily average${_yesterdayTasks == null ? '' : ' and ' + (_timeFocused[0].inMinutes == _yesterdayFocused.inMinutes ? 'the same as' : (_timeFocused[0].inMinutes - _yesterdayFocused.inMinutes).abs().toString() + ((_timeFocused[0].inMinutes > _yesterdayFocused.inMinutes) ? 'm more' : 'm less') + ' than') + ' yesterday'}!';
                 break;
               }
           }
@@ -323,9 +341,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   void getData() async {
     _prefs = await SharedPreferences.getInstance();
-    _date = getDateString(DateTime.now().subtract(Duration(
-        hours: _prefs.getInt('dayStartHour'),
-        minutes: _prefs.getInt('dayStartMinute'))));
+    _date = DateTime.now().subtract(Duration(
+      hours: _prefs.getInt('dayStartHour'),
+      minutes: _prefs.getInt('dayStartMinute'),
+    ));
     await getTasks();
     await getVolts();
     await getOtherStats();
@@ -734,12 +753,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            _emoji,
-                            style: TextStyle(
-                              fontSize: 36,
-                            ),
-                          ),
                           SizedBox(
                             width: SizeConfig.safeBlockHorizontal * 100 - 120,
                             child: Text(
@@ -747,6 +760,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
                               style: TextStyle(
                                 fontSize: 16,
                               ),
+                            ),
+                          ),
+                          Text(
+                            _emoji,
+                            style: TextStyle(
+                              fontSize: 36,
                             ),
                           ),
                         ],
