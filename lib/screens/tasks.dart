@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Focal/utils/firestore.dart';
 import 'package:Focal/utils/analytics.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +15,7 @@ import 'package:Focal/components/task_item.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:Focal/components/volts.dart';
 
 class TasksPage extends StatefulWidget {
   final Function goToPage;
@@ -34,7 +36,8 @@ class _TasksPageState extends State<TasksPage> {
   SharedPreferences _prefs;
   FocusNode _focus = FocusNode();
   DateTime _date = DateTime.now();
-  FirebaseUser user;
+  FirebaseUser _user;
+  FirestoreProvider _firestoreProvider;
   bool _loading = true;
   bool _dateLoading = true;
   bool _addingTask = false;
@@ -42,11 +45,15 @@ class _TasksPageState extends State<TasksPage> {
   List<TaskItem> _tasks = [];
   List<TaskItem> _tmrTasks = [];
   int _completedTasks = 0;
+  int _todayStartedTasks = 0;
+  int _todayTotalTasks = 0;
   String _dateString = 'Today';
   String _secondaryDateString;
   DateTime _today;
   DateTime _yesterday;
   DateTime _tomorrow;
+  Volts _initVolts;
+  List<Volts> _todayVolts = [];
 
   void getTasks() {
     _tasks = [];
@@ -108,6 +115,7 @@ class _TasksPageState extends State<TasksPage> {
     final tasks = _tasks;
     FirestoreProvider firestoreProvider =
         FirestoreProvider(Provider.of<User>(context, listen: false).user);
+    setVolts();
     setState(() {
       _tasks.remove(_tasks.firstWhere((tasku) => tasku.id == task.id));
       if (task.completed) {
@@ -157,11 +165,12 @@ class _TasksPageState extends State<TasksPage> {
       firestoreProvider.updateTasks(_tmrTasks, getDateString(tomorrow));
       Scaffold.of(context).showSnackBar(SnackBar(
         padding: EdgeInsets.only(left: 16, top: 10, bottom: 10),
-        content: Text(task.name + ' has been deferred to tomorrow'),
+        content: Text('Deferred "' + task.name + '" to tomorrow'),
         duration: snackbarDuration,
         action: SnackBarAction(
           label: 'Undo',
           onPressed: () async {
+            setVolts();
             _tmrTasks
                 .remove(_tmrTasks.firstWhere((tasku) => tasku.id == task.id));
             firestoreProvider.deleteTask(task, getDateString(tomorrow));
@@ -199,6 +208,7 @@ class _TasksPageState extends State<TasksPage> {
     final tasks = _tasks;
     FirestoreProvider firestoreProvider =
         FirestoreProvider(Provider.of<User>(context, listen: false).user);
+    setVolts();
     setState(() {
       _tasks.remove(_tasks.firstWhere((tasku) => tasku.id == task.id));
       if (task.completed) {
@@ -210,11 +220,12 @@ class _TasksPageState extends State<TasksPage> {
     firestoreProvider.updateTasks(_tasks, getDateString(_date));
     Scaffold.of(context).showSnackBar(SnackBar(
       padding: EdgeInsets.only(left: 16, top: 10, bottom: 10),
-      content: Text(task.name + ' has been deleted'),
+      content: Text('Deleted "' + task.name + '"'),
       duration: snackbarDuration,
       action: SnackBarAction(
         label: 'Undo',
         onPressed: () async {
+          setVolts();
           if (mounted) {
             if (date == getDateString(_date)) {
               setState(() {
@@ -354,6 +365,64 @@ class _TasksPageState extends State<TasksPage> {
     getTasks();
   }
 
+  void setVolts() async {
+    final dateToCheck = DateTime(_date.year, _date.month, _date.day);
+    if (dateToCheck == _today && _todayVolts.isNotEmpty) {
+      _todayVolts.add(Volts(
+        dateTime: DateTime.now(),
+        val: _initVolts.val -
+            voltsDecay(
+              seconds: DateTime.now().difference(_initVolts.dateTime).inSeconds,
+              completedTasks: _completedTasks,
+              startedTasks: _todayStartedTasks,
+              totalTasks: _todayTotalTasks,
+              volts: _initVolts.val,
+            ),
+      ));
+      _initVolts = _todayVolts.last;
+      List<Map> newVolts = [];
+      _todayVolts.forEach((volts) {
+        newVolts.add(
+            {'dateTime': getDateTimeString(volts.dateTime), 'val': volts.val});
+      });
+      db.collection('users').document(_user.uid).updateData({
+        'volts': newVolts.last,
+      });
+      db
+          .collection('users')
+          .document(_user.uid)
+          .collection('dates')
+          .document(getDateString(_date))
+          .updateData({
+        'volts': newVolts,
+      });
+    }
+  }
+
+  Future<void> getVolts() async {
+    DocumentReference userDoc = db.collection('users').document(_user.uid);
+    DocumentSnapshot userSnapshot = await userDoc.get();
+    if (userSnapshot.data != null) {
+      _initVolts = Volts(
+          dateTime: DateTime.parse(userSnapshot.data['volts']['dateTime']),
+          val: userSnapshot.data['volts']['val']);
+    }
+    DocumentReference dateDoc = db
+        .collection('users')
+        .document(_user.uid)
+        .collection('dates')
+        .document(getDateString(_date));
+    DocumentSnapshot dateSnapshot = await dateDoc.get();
+    if (dateSnapshot.data != null) {
+      dateSnapshot.data['volts'].forEach((volts) {
+        _todayVolts.add(Volts(
+            dateTime: DateTime.parse(volts['dateTime']), val: volts['val']));
+      });
+      _todayStartedTasks = dateSnapshot.data['startedTasks'];
+      _todayTotalTasks = dateSnapshot.data['totalTasks'];
+    }
+  }
+
   void setToday() async {
     _prefs = await SharedPreferences.getInstance();
     setDate(DateTime.now().subtract(Duration(
@@ -361,6 +430,13 @@ class _TasksPageState extends State<TasksPage> {
       minutes: _prefs.getInt('dayStartMinute'),
     )));
     setState(() => _dateLoading = false);
+  }
+
+  void getData() async {
+    _user = Provider.of<User>(context, listen: false).user;
+    _firestoreProvider = FirestoreProvider(_user);
+    await getVolts();
+    setToday();
   }
 
   void updateTaskOrder() {
@@ -377,7 +453,7 @@ class _TasksPageState extends State<TasksPage> {
         widget.setLoading(true);
       }
     });
-    setToday();
+    getData();
     KeyboardVisibility.onChange.listen((bool visible) {
       if (mounted) {
         setState(() {
@@ -405,9 +481,6 @@ class _TasksPageState extends State<TasksPage> {
       fontWeight: FontWeight.w600,
       color: Theme.of(context).primaryColor,
     );
-
-    FirebaseUser user = Provider.of<User>(context, listen: false).user;
-    FirestoreProvider firestoreProvider = FirestoreProvider(user);
     return WillPopScope(
       onWillPop: () => widget.goToPage(0),
       child: Stack(children: <Widget>[
@@ -626,11 +699,11 @@ class _TasksPageState extends State<TasksPage> {
                             tasks.insert(
                                 newIndex - (_completedTasks - distanceFromEnd),
                                 task);
-                            firestoreProvider.updateTasks(
+                            _firestoreProvider.updateTasks(
                                 tasks, getDateString(_date));
                           } else {
                             tasks.insert(newIndex, task);
-                            firestoreProvider.updateTasks(
+                            _firestoreProvider.updateTasks(
                                 tasks, getDateString(_date));
                           }
                           updateTaskOrder();
@@ -708,6 +781,7 @@ class _TasksPageState extends State<TasksPage> {
                                   onFieldSubmitted: (value) async {
                                     if (value.isNotEmpty) {
                                       HapticFeedback.heavyImpact();
+                                      setVolts();
                                       TaskItem newTask = TaskItem(
                                         name: value,
                                         completed: false,
@@ -745,9 +819,9 @@ class _TasksPageState extends State<TasksPage> {
                                                   _completedTasks -
                                                   1]
                                               .id =
-                                          await firestoreProvider.addTask(
+                                          await _firestoreProvider.addTask(
                                               newTask, getDateString(_date));
-                                      firestoreProvider.updateTasks(
+                                      _firestoreProvider.updateTasks(
                                           _tasks, getDateString(_date));
                                       _formKey.currentState.reset();
                                       AnalyticsProvider()

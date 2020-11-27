@@ -79,8 +79,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   ConfettiController _confettiController =
       ConfettiController(duration: Duration(seconds: 1));
   Random _random = Random();
-  String _quote;
-  String _message;
+  String _quote = '';
+  String _text = '';
   List<Volts> _todayVolts = [];
   Volts _volts = Volts(dateTime: DateTime.now(), val: 0);
   Volts _initVolts;
@@ -155,7 +155,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       _timer.cancel();
       _saving = true;
       _doingTask = false;
-      setText();
       _distractionTracking = true;
       _distractionTrackingNotice = false;
       _voltsIncrementNotice = true;
@@ -391,6 +390,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             });
           }
           updateVolts();
+          setText();
         });
       } else {
         dateSnapshot.data['volts'].forEach((volts) {
@@ -409,6 +409,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
             });
           }
           updateVolts();
+          setText();
         });
       }
     }
@@ -507,17 +508,41 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       '''“Action is the foundational key to all success.”''',
       '''“Amateurs sit and wait for inspiration, the rest of us just get up and go to work.”''',
     ];
-    final messages = [
-      'Keep up the good work! 🙌',
-      'You got this! 👊',
-      'You can do it! 💪',
-      'Don\'t forget to hydrate! 💦',
-      'Need a break? Take one! 😌'
-    ];
     if (mounted) {
       setState(() {
         _quote = quotes[_random.nextInt(quotes.length)];
-        _message = messages[_random.nextInt(messages.length)];
+        if (_totalTasks == 0) {
+          _text = TimeOfDay.now().hour < 13
+              ? 'Good Morning!'
+              : TimeOfDay.now().hour < 18
+                  ? 'Good Afternoon!'
+                  : 'Good Evening!';
+        } else if (_completedTasks == 0) {
+          _text =
+              'You have ${_totalTasks.toString() + (_totalTasks == 1 ? ' task' : ' tasks')} today. You got this!';
+        } else if (_completedTasks != _totalTasks) {
+          if (_totalTasks - _completedTasks == 1) {
+            _text = 'Almost there. Keep pushing!';
+          } else {
+            switch (_random.nextInt(2)) {
+              case 0:
+                {
+                  _text =
+                      'You have done ${_completedTasks.toString() + (_completedTasks == 1 ? ' task' : ' tasks')} today. You can do it!';
+                  break;
+                }
+              case 1:
+                {
+                  _text =
+                      '${(_completedTasks / _totalTasks * 100).round()}% done. Keep up the good work!';
+                  break;
+                }
+            }
+          }
+        } else {
+          _text =
+              'You completed ${_completedTasks.toString() + (_completedTasks == 1 ? ' task' : ' tasks')} today. Great job!';
+        }
       });
     }
   }
@@ -621,7 +646,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
       }
     });
     getPrefs();
-    setText();
     checkIfDndOn();
     localNotifications = LocalNotifications();
     localNotifications.initialize();
@@ -766,15 +790,16 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                         Positioned(
                           left: 40,
                           right: 40,
-                          top: SizeConfig.safeBlockVertical * 15,
-                          child: Text(
-                            TimeOfDay.now().hour < 13
-                                ? 'Good Morning!'
-                                : TimeOfDay.now().hour < 18
-                                    ? 'Good Afternoon!'
-                                    : 'Good Evening!',
-                            textAlign: TextAlign.center,
-                            style: topTextStyle,
+                          top: SizeConfig.safeBlockVertical * 12,
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: SizeConfig.safeBlockVertical * 15,
+                            child: AutoSizeText(
+                              _text,
+                              textAlign: TextAlign.center,
+                              style: topTextStyle,
+                              maxLines: 2,
+                            ),
                           ),
                         ),
                         Positioned(
@@ -870,11 +895,16 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                           Positioned(
                             left: 40,
                             right: 40,
-                            top: SizeConfig.safeBlockVertical * 15,
-                            child: Text(
-                              'Congrats! 🎉',
-                              textAlign: TextAlign.center,
-                              style: topTextStyle,
+                            top: SizeConfig.safeBlockVertical * 12,
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: SizeConfig.safeBlockVertical * 15,
+                              child: AutoSizeText(
+                                _text,
+                                textAlign: TextAlign.center,
+                                style: topTextStyle,
+                                maxLines: 2,
+                              ),
                             ),
                           ),
                           Positioned(
@@ -935,7 +965,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                             child: Center(
                               child: RctButton(
                                 onTap: () {
-                                  widget.goToPage(2);
+                                  if (!_saving) {
+                                    HapticFeedback.heavyImpact();
+                                    widget.goToPage(2);
+                                  }
                                 },
                                 buttonWidth: 220,
                                 gradient: LinearGradient(
@@ -948,7 +981,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                 ),
                                 buttonText: 'Statistics',
                                 textSize: 32,
-                                vibrate: true,
+                                vibrate: false,
                               ),
                             ),
                           ),
@@ -1110,13 +1143,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                                 SizeConfig.safeBlockVertical *
                                                     15,
                                             child: AutoSizeText(
-                                              _totalTasks != null &&
-                                                      _completedTasks != null &&
-                                                      _totalTasks -
-                                                              _completedTasks ==
-                                                          1
-                                                  ? 'Almost there! Keep pushing 👊'
-                                                  : _message,
+                                              _text,
                                               textAlign: TextAlign.center,
                                               style: topTextStyle,
                                               maxLines: 2,
