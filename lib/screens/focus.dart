@@ -513,35 +513,35 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
         _quote = quotes[_random.nextInt(quotes.length)];
         if (_totalTasks == 0) {
           _text = TimeOfDay.now().hour < 13
-              ? 'Good Morning!'
+              ? 'Good Morning! 🤟'
               : TimeOfDay.now().hour < 18
-                  ? 'Good Afternoon!'
-                  : 'Good Evening!';
+                  ? 'Good Afternoon! 🤟'
+                  : 'Good Evening! 🤟';
         } else if (_completedTasks == 0) {
           _text =
-              'You have ${_totalTasks.toString() + (_totalTasks == 1 ? ' task' : ' tasks')} today. You got this!';
+              'You have ${_totalTasks.toString() + (_totalTasks == 1 ? ' task' : ' tasks')} today. You got this! 👊';
         } else if (_completedTasks != _totalTasks) {
           if (_totalTasks - _completedTasks == 1) {
-            _text = 'Almost there. Keep pushing!';
+            _text = 'Almost there. Keep pushing! 💪';
           } else {
             switch (_random.nextInt(2)) {
               case 0:
                 {
                   _text =
-                      'You have done ${_completedTasks.toString() + (_completedTasks == 1 ? ' task' : ' tasks')} today. You can do it!';
+                      'You have done ${_completedTasks.toString() + (_completedTasks == 1 ? ' task' : ' tasks')} today. You can do it! 💪';
                   break;
                 }
               case 1:
                 {
                   _text =
-                      '${(_completedTasks / _totalTasks * 100).round()}% done. Keep up the good work!';
+                      '${(_completedTasks / _totalTasks * 100).round()}% done. Keep up the good work! 💪';
                   break;
                 }
             }
           }
         } else {
           _text =
-              'You completed ${_completedTasks.toString() + (_completedTasks == 1 ? ' task' : ' tasks')} today. Great job!';
+              'You completed ${_completedTasks.toString() + (_completedTasks == 1 ? ' task' : ' tasks')} today. Great job! 🎉';
         }
       });
     }

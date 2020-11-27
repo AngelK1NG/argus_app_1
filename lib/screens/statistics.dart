@@ -307,17 +307,17 @@ class _StatisticsPageState extends State<StatisticsPage> {
               {
                 _text =
                     'You have done ${_completedTasks.toString() + (_completedTasks == 1 ? ' task' : ' tasks')} today. You can do it!';
-                _emoji = '💪';
+
                 break;
               }
             case 1:
               {
                 _text =
                     '${(_completedTasks / _tasks.length * 100).round()}% done. Keep up the good work!';
-                _emoji = '🙌';
                 break;
               }
           }
+          _emoji = '💪';
         } else {
           switch (_random.nextInt(2)) {
             case 0:
