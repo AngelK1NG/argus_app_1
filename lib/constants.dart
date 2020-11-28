@@ -51,7 +51,7 @@ num voltsIncrement({
   @required num volts,
 }) {
   num increment = 0;
-  increment = 0.002 *
+  increment = 0.01 *
       (secondsFocused - secondsDistracted) *
       pow(100 * (completedTasks + 1) / totalTasks, 0.1) *
       pow(totalTasks, 0.1) /
@@ -72,8 +72,8 @@ num voltsDecay({
 }) {
   num decay = 0;
   if (startedTasks != 0 && completedTasks != totalTasks) {
-    decay = 0.3 *
-            pow(seconds, 0.3) *
+    decay = 0.1 *
+            pow(seconds, 0.5) *
             pow(100 * startedTasks / totalTasks, 0.1) *
             pow(totalTasks, 0.1) +
         pow((seconds % 4) + 1, 0.03) * pow((seconds % 5) + 1, 0.03) -

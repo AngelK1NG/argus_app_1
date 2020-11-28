@@ -27,7 +27,7 @@ class StatsTaskItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               SizedBox(
-                width: SizeConfig.safeBlockHorizontal * 100 - 125,
+                width: SizeConfig.safeBlockHorizontal * 100 - 150,
                 child: Text(
                   task.name,
                   style: TextStyle(
