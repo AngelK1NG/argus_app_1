@@ -65,7 +65,7 @@ class OnboardingPage extends StatelessWidget {
               FirestoreProvider(user).createUserDocument();
               Navigator.pushReplacementNamed(context, '/home');
             },
-            buttonWidth: 200,
+            buttonWidth: 220,
             gradient: LinearGradient(
               colors: [
                 Theme.of(context).primaryColor,

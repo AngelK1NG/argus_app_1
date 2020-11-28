@@ -48,8 +48,23 @@ class FirestoreProvider {
         'Swipe and tap on the date to schedule tasks',
         'Tap the + button to add another task',
       ];
+      db
+          .collection('users')
+          .document(user.uid)
+          .collection('dates')
+          .document(getDateString(DateTime.now()))
+          .setData({
+        'completedTasks': 0,
+        'startedTasks': 0,
+        'totalTasks': taskNames.length,
+        'secondsFocused': 0,
+        'secondsDistracted': 0,
+        'numDistracted': 0,
+        'numPaused': 0,
+        'volts': [],
+      });
       for (var i = 0; i < taskNames.length; i++) {
-        await addTask(
+        addTask(
           TaskItem(
             name: taskNames[i],
             completed: false,
