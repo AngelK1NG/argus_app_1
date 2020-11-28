@@ -55,61 +55,6 @@ class _TasksPageState extends State<TasksPage> {
   Volts _initVolts;
   List<Volts> _todayVolts = [];
 
-  void getTasks() {
-    _tasks = [];
-    _completedTasks = 0;
-    FirebaseUser user = context.read<User>().user;
-    db
-        .collection('users')
-        .document(user.uid)
-        .collection('dates')
-        .document(getDateString(_date))
-        .collection('tasks')
-        .orderBy('order')
-        .getDocuments()
-        .then((snapshot) {
-      if (mounted) {
-        snapshot.documents.forEach((task) {
-          String name = task.data['name'];
-          TaskItem newTask = TaskItem(
-            name: name,
-            id: task.documentID,
-            completed: task.data['completed'],
-            paused: task.data['paused'] == null ? false : task.data['paused'],
-            order: task.data['order'],
-            date: getDateString(_date),
-            secondsFocused: task.data['secondsFocused'],
-            secondsDistracted: task.data['secondsDistracted'],
-            numDistracted: task.data['numDistracted'],
-            numPaused: task.data['numPaused'],
-            voltsIncrement: task.data['voltsIncrement'],
-            key: UniqueKey(),
-          );
-          newTask.onDismissed = (direction) {
-            if (direction == DismissDirection.startToEnd) {
-              deferTask(newTask);
-              AnalyticsProvider().logDeferTask(newTask, DateTime.now());
-            } else {
-              deleteTask(newTask);
-              AnalyticsProvider().logDeleteTask(newTask, DateTime.now());
-            }
-          };
-          newTask.onUpdate = (value) => newTask.name = value;
-          setState(() {
-            _tasks.add(newTask);
-            if (newTask.completed) {
-              _completedTasks++;
-            }
-          });
-        });
-        setState(() {
-          _loading = false;
-        });
-        widget.setLoading(false);
-      }
-    });
-  }
-
   void deferTask(TaskItem task) {
     final date = _date;
     final tasks = _tasks;
@@ -253,7 +198,114 @@ class _TasksPageState extends State<TasksPage> {
     ));
   }
 
-  void setDate(DateTime date) {
+  void setVolts() async {
+    final dateToCheck = DateTime(_date.year, _date.month, _date.day);
+    if (dateToCheck == _today && _todayVolts.isNotEmpty) {
+      _todayVolts.add(Volts(
+        dateTime: DateTime.now(),
+        val: _initVolts.val -
+            voltsDecay(
+              seconds: DateTime.now().difference(_initVolts.dateTime).inSeconds,
+              completedTasks: _completedTasks,
+              startedTasks: _todayStartedTasks,
+              totalTasks: _todayTotalTasks,
+              volts: _initVolts.val,
+            ),
+      ));
+      _initVolts = _todayVolts.last;
+      List<Map> newVolts = [];
+      _todayVolts.forEach((volts) {
+        newVolts.add(
+            {'dateTime': getDateTimeString(volts.dateTime), 'val': volts.val});
+      });
+      db.collection('users').document(_user.uid).updateData({
+        'volts': newVolts.last,
+      });
+      db
+          .collection('users')
+          .document(_user.uid)
+          .collection('dates')
+          .document(getDateString(_date))
+          .updateData({
+        'volts': newVolts,
+      });
+    }
+  }
+
+  Future<void> getTasks() async {
+    _tasks = [];
+    _completedTasks = 0;
+    FirebaseUser user = context.read<User>().user;
+    QuerySnapshot snapshot = await db
+        .collection('users')
+        .document(user.uid)
+        .collection('dates')
+        .document(getDateString(_date))
+        .collection('tasks')
+        .orderBy('order')
+        .getDocuments();
+    if (mounted) {
+      snapshot.documents.forEach((task) {
+        String name = task.data['name'];
+        TaskItem newTask = TaskItem(
+          name: name,
+          id: task.documentID,
+          completed: task.data['completed'],
+          paused: task.data['paused'] == null ? false : task.data['paused'],
+          order: task.data['order'],
+          date: getDateString(_date),
+          secondsFocused: task.data['secondsFocused'],
+          secondsDistracted: task.data['secondsDistracted'],
+          numDistracted: task.data['numDistracted'],
+          numPaused: task.data['numPaused'],
+          voltsIncrement: task.data['voltsIncrement'],
+          key: UniqueKey(),
+        );
+        newTask.onDismissed = (direction) {
+          if (direction == DismissDirection.startToEnd) {
+            deferTask(newTask);
+            AnalyticsProvider().logDeferTask(newTask, DateTime.now());
+          } else {
+            deleteTask(newTask);
+            AnalyticsProvider().logDeleteTask(newTask, DateTime.now());
+          }
+        };
+        newTask.onUpdate = (value) => newTask.name = value;
+        setState(() {
+          _tasks.add(newTask);
+          if (newTask.completed) {
+            _completedTasks++;
+          }
+        });
+      });
+    }
+  }
+
+  Future<void> getVolts() async {
+    DocumentReference userDoc = db.collection('users').document(_user.uid);
+    DocumentSnapshot userSnapshot = await userDoc.get();
+    if (userSnapshot.data != null) {
+      _initVolts = Volts(
+          dateTime: DateTime.parse(userSnapshot.data['volts']['dateTime']),
+          val: userSnapshot.data['volts']['val']);
+    }
+    DocumentReference dateDoc = db
+        .collection('users')
+        .document(_user.uid)
+        .collection('dates')
+        .document(getDateString(_date));
+    DocumentSnapshot dateSnapshot = await dateDoc.get();
+    if (dateSnapshot.data != null) {
+      dateSnapshot.data['volts'].forEach((volts) {
+        _todayVolts.add(Volts(
+            dateTime: DateTime.parse(volts['dateTime']), val: volts['val']));
+      });
+      _todayStartedTasks = dateSnapshot.data['startedTasks'];
+      _todayTotalTasks = dateSnapshot.data['totalTasks'];
+    }
+  }
+
+  void setDate(DateTime date) async {
     setState(() {
       _loading = true;
       _date = date;
@@ -362,64 +414,13 @@ class _TasksPageState extends State<TasksPage> {
             date.month.toString() + '/' + date.day.toString();
       }
     });
-    getTasks();
-  }
-
-  void setVolts() async {
-    final dateToCheck = DateTime(_date.year, _date.month, _date.day);
-    if (dateToCheck == _today && _todayVolts.isNotEmpty) {
-      _todayVolts.add(Volts(
-        dateTime: DateTime.now(),
-        val: _initVolts.val -
-            voltsDecay(
-              seconds: DateTime.now().difference(_initVolts.dateTime).inSeconds,
-              completedTasks: _completedTasks,
-              startedTasks: _todayStartedTasks,
-              totalTasks: _todayTotalTasks,
-              volts: _initVolts.val,
-            ),
-      ));
-      _initVolts = _todayVolts.last;
-      List<Map> newVolts = [];
-      _todayVolts.forEach((volts) {
-        newVolts.add(
-            {'dateTime': getDateTimeString(volts.dateTime), 'val': volts.val});
+    await getTasks();
+    await getVolts();
+    if (mounted) {
+      setState(() {
+        _loading = false;
       });
-      db.collection('users').document(_user.uid).updateData({
-        'volts': newVolts.last,
-      });
-      db
-          .collection('users')
-          .document(_user.uid)
-          .collection('dates')
-          .document(getDateString(_date))
-          .updateData({
-        'volts': newVolts,
-      });
-    }
-  }
-
-  Future<void> getVolts() async {
-    DocumentReference userDoc = db.collection('users').document(_user.uid);
-    DocumentSnapshot userSnapshot = await userDoc.get();
-    if (userSnapshot.data != null) {
-      _initVolts = Volts(
-          dateTime: DateTime.parse(userSnapshot.data['volts']['dateTime']),
-          val: userSnapshot.data['volts']['val']);
-    }
-    DocumentReference dateDoc = db
-        .collection('users')
-        .document(_user.uid)
-        .collection('dates')
-        .document(getDateString(_date));
-    DocumentSnapshot dateSnapshot = await dateDoc.get();
-    if (dateSnapshot.data != null) {
-      dateSnapshot.data['volts'].forEach((volts) {
-        _todayVolts.add(Volts(
-            dateTime: DateTime.parse(volts['dateTime']), val: volts['val']));
-      });
-      _todayStartedTasks = dateSnapshot.data['startedTasks'];
-      _todayTotalTasks = dateSnapshot.data['totalTasks'];
+      widget.setLoading(false);
     }
   }
 
@@ -430,13 +431,6 @@ class _TasksPageState extends State<TasksPage> {
       minutes: _prefs.getInt('dayStartMinute'),
     )));
     setState(() => _dateLoading = false);
-  }
-
-  void getData() async {
-    _user = Provider.of<User>(context, listen: false).user;
-    _firestoreProvider = FirestoreProvider(_user);
-    await getVolts();
-    setToday();
   }
 
   void updateTaskOrder() {
@@ -453,7 +447,9 @@ class _TasksPageState extends State<TasksPage> {
         widget.setLoading(true);
       }
     });
-    getData();
+    _user = Provider.of<User>(context, listen: false).user;
+    _firestoreProvider = FirestoreProvider(_user);
+    setToday();
     KeyboardVisibility.onChange.listen((bool visible) {
       if (mounted) {
         setState(() {
