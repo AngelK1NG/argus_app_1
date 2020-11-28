@@ -24,22 +24,48 @@ class FirestoreProvider {
 
   // create user document in firestore when logged in
   void createUserDocument() async {
-    await db.collection('users').document(user.uid).get().then((doc) {
-      if (!doc.exists) {
-        db.collection('users').document(user.uid).setData({
-          'name': user.displayName,
-          'email': user.email,
-          'daysActive': 1,
-          'lastActive': getDateString(DateTime.now()),
-          'secondsFocused': 0,
-          'completedTasks': 0,
-          'volts': {
-            'dateTime': getDateTimeString(DateTime.now()),
-            'val': 1000,
-          }
-        });
+    DocumentSnapshot doc =
+        await db.collection('users').document(user.uid).get();
+    if (!doc.exists) {
+      db.collection('users').document(user.uid).setData({
+        'name': user.displayName,
+        'email': user.email,
+        'daysActive': 1,
+        'lastActive': getDateString(DateTime.now()),
+        'secondsFocused': 0,
+        'completedTasks': 0,
+        'volts': {
+          'dateTime': getDateTimeString(DateTime.now()),
+          'val': 1000,
+        }
+      });
+      List taskNames = [
+        'Welcome to Focal!',
+        'Tap to edit this task ✏️',
+        'Hold and drag to reorder 🔃',
+        'Swipe right to defer this task 📅',
+        'Swipe left to delete this task 🗑️',
+        'Swipe and tap on the date to schedule tasks',
+        'Tap the + button to add another task',
+      ];
+      for (var i = 0; i < taskNames.length; i++) {
+        await addTask(
+          TaskItem(
+            name: taskNames[i],
+            completed: false,
+            paused: false,
+            order: i + 1,
+            date: getDateString(DateTime.now()),
+            secondsFocused: 0,
+            secondsDistracted: 0,
+            numPaused: 0,
+            numDistracted: 0,
+            voltsIncrement: 0,
+          ),
+          getDateString(DateTime.now()),
+        );
       }
-    });
+    }
   }
 
   // update tasks

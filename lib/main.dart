@@ -51,9 +51,10 @@ class MyApp extends StatelessWidget {
                   splashColor: Colors.transparent,
                   textSelectionColor: const Color(0xffddddff),
                   textTheme: Theme.of(context).textTheme.apply(
-                      bodyColor: jetBlack,
-                      displayColor: jetBlack,
-                      fontFamily: 'Cabin'),
+                        bodyColor: jetBlack,
+                        displayColor: jetBlack,
+                        fontFamily: 'Cabin',
+                      ),
                 ),
                 navigatorObservers: [
                   FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),

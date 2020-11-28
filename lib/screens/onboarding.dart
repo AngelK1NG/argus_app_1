@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:Focal/components/onboarding_page.dart';
+import 'package:Focal/constants.dart';
+import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 
 class Onboarding extends StatefulWidget {
   const Onboarding({Key key}) : super(key: key);
@@ -14,7 +16,7 @@ class _OnboardingState extends State<Onboarding> {
     initialPage: 0,
   );
   double _index = 0;
-  
+
   @override
   void initState() {
     super.initState();
@@ -36,162 +38,167 @@ class _OnboardingState extends State<Onboarding> {
   @override
   Widget build(BuildContext context) {
     TextStyle descriptionStyle = TextStyle(
-      fontSize: 20,
-      fontWeight: FontWeight.w300,
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
     );
 
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Stack(
-        children: <Widget>[
-          PageView(
-            controller: _controller,
-            children: <Widget>[
-              OnboardingPage(
-                title: 'Focus',
-                text: Text.rich(
-                  TextSpan(
-                    style: descriptionStyle,
-                    children: <TextSpan>[
-                      TextSpan(
-                        text: 'This is where you will focus! Tap ',
-                      ),
-                      TextSpan(
-                        text: 'Start',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).primaryColor,
+    return Scaffold(
+      body: WillPopScope(
+        onWillPop: () async {
+          if (_index > 0) {
+            _index--;
+            _controller.animateToPage(
+              _index.round(),
+              duration: cardDuration,
+              curve: cardCurve,
+            );
+          }
+          return false;
+        },
+        child: Container(
+          color: Colors.white,
+          child: SafeArea(
+            child: Stack(
+              children: <Widget>[
+                PageView(
+                  controller: _controller,
+                  children: <Widget>[
+                    OnboardingPage(
+                      iconData: FeatherIcons.list,
+                      title: 'Tasks',
+                      text: Text.rich(
+                        TextSpan(
+                          style: descriptionStyle,
+                          children: <TextSpan>[
+                            TextSpan(
+                              text:
+                                  'Focal streamlines your workflow. Simply add and order your tasks based on priority and get ',
+                            ),
+                            TextSpan(
+                              text: 'Focused',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            TextSpan(
+                              text:
+                                  ' immediately, or schedule tasks due in the future.',
+                            ),
+                          ],
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                      TextSpan(
-                        text: ' to begin the stopwatch for the current task. Tap ',
-                      ),
-                      TextSpan(
-                        text: 'Done',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).primaryColor,
+                      end: false,
+                    ),
+                    OnboardingPage(
+                      iconData: FeatherIcons.clock,
+                      title: 'Focus',
+                      text: Text.rich(
+                        TextSpan(
+                          style: descriptionStyle,
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: 'Focus',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            TextSpan(
+                              text:
+                                  ' on the task at hand by staying on Focal. When you leave the app while completing a task, Focal will notify you to return and track your time as ',
+                            ),
+                            TextSpan(
+                              text: 'Distracted',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
+                            TextSpan(
+                              text: '.',
+                            ),
+                          ],
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                      TextSpan(
-                        text: ' when you’re done, the ',
-                      ),
-                      TextSpan(
-                        text: 'Pause Button',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).primaryColor,
+                      end: false,
+                    ),
+                    OnboardingPage(
+                      iconData: FeatherIcons.percent,
+                      title: 'Statistics',
+                      text: Text.rich(
+                        TextSpan(
+                          style: descriptionStyle,
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: 'Volts',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            TextSpan(
+                              text:
+                                  ', Focal\'s score system, are a reflection of your productivity over time. To maximize your ',
+                            ),
+                            TextSpan(
+                              text: 'Volts',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ' avoid getting ',
+                            ),
+                            TextSpan(
+                              text: 'Distracted',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
+                            TextSpan(
+                              text: '. ',
+                            ),
+                            TextSpan(
+                              text: 'Volts',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            TextSpan(
+                              text:
+                                  ' will decay over time until completion of every task.',
+                            ),
+                          ],
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                      TextSpan(
-                        text: ' to pause, or ',
-                      ),
-                      TextSpan(
-                        text: 'Save for later',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).hintColor,
-                        ),
-                      ),
-                      TextSpan(
-                        text: ' to defer the task.',
-                      ),
-                    ],
+                      end: false,
+                    ),
+                    OnboardingPage(
+                      title: 'Ready?',
+                      end: true,
+                    ),
+                  ],
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 20,
+                  child: DotsIndicator(
+                    dotsCount: 4,
+                    position: _index,
+                    decorator: DotsDecorator(
+                      color: Colors.transparent,
+                      activeColor: Theme.of(context).primaryColor,
+                      shape: CircleBorder(
+                          side: BorderSide(
+                              color: Theme.of(context).primaryColor, width: 2)),
+                    ),
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                button: false,
-              ),
-              OnboardingPage(
-                title: 'Prioritize',
-                text: Text(
-                  'Start the day by ordering your tasks based on what you need to get done first. You can hold to reorder or swipe to remove any task.',
-                  textAlign: TextAlign.center,
-                  style: descriptionStyle,
-                ),
-                button: false,
-              ),
-              OnboardingPage(
-                title: 'Statistics',
-                text: Text.rich(
-                  TextSpan(
-                    style: descriptionStyle,
-                    children: <TextSpan>[
-                      TextSpan(
-                        text: 'Discover how much time you spent being productive with statistics. When you leave the app while ',
-                      ),
-                      TextSpan(
-                        text: 'Focused',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                      TextSpan(
-                        text: ', you become ',
-                      ),
-                      TextSpan(
-                        text: 'Distracted',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.red,
-                        ),
-                      ),
-                      TextSpan(
-                        text: '. Otherwise, tap the ',
-                      ),
-                      TextSpan(
-                        text: 'Pause Button',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                      TextSpan(
-                        text: ' to become ',
-                      ),
-                      TextSpan(
-                        text: 'Paused',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).hintColor,
-                        ),
-                      ),
-                      TextSpan(
-                        text: '.',
-                      ),
-                    ],
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                button: false,
-              ),
-              OnboardingPage(
-                title: 'Ready up',
-                text: Text(
-                  'Let\'s get focused! 🚀',
-                  textAlign: TextAlign.center,
-                  style: descriptionStyle,
-                ),
-                button: true,
-              ),
-            ],
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 20,
-            child: DotsIndicator(
-              dotsCount: 4,
-              position: _index,
-              decorator: DotsDecorator(
-                color: Colors.transparent,
-                activeColor: Theme.of(context).primaryColor,
-                shape: CircleBorder(side: BorderSide(color: Theme.of(context).primaryColor, width: 2)),
-              ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

@@ -6,14 +6,16 @@ import 'package:Focal/utils/firestore.dart';
 import 'package:Focal/utils/user.dart';
 
 class OnboardingPage extends StatelessWidget {
+  final IconData iconData;
   final String title;
   final Text text;
-  final bool button;
+  final bool end;
 
   const OnboardingPage({
+    this.iconData,
     @required this.title,
-    @required this.text,
-    this.button,
+    this.text,
+    this.end,
   });
 
   @override
@@ -21,19 +23,27 @@ class OnboardingPage extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Image(
-            image: AssetImage('assets/images/onboarding/' + title + '.png'),
-            height: 250),
+        end
+            ? Image(
+                image: AssetImage(
+                    'assets/images/logo/Focal Logo_Full Colored.png'),
+                width: 300,
+              )
+            : Icon(
+                iconData,
+                color: Theme.of(context).primaryColor,
+                size: 150,
+              ),
         Padding(
           padding: const EdgeInsets.only(
-            top: 50,
-            bottom: 25,
+            top: 100,
+            bottom: 50,
           ),
           child: Text(
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 48,
+              fontSize: 36,
               color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.w600,
             ),
@@ -47,7 +57,7 @@ class OnboardingPage extends StatelessWidget {
           child: text,
         ),
         Offstage(
-          offstage: !button,
+          offstage: !end,
           child: RctButton(
             onTap: () {
               FirebaseUser user =
@@ -55,9 +65,12 @@ class OnboardingPage extends StatelessWidget {
               FirestoreProvider(user).createUserDocument();
               Navigator.pushReplacementNamed(context, '/home');
             },
-            buttonWidth: 220,
+            buttonWidth: 200,
             gradient: LinearGradient(
-              colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor],
+              colors: [
+                Theme.of(context).primaryColor,
+                Theme.of(context).accentColor
+              ],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
