@@ -1114,7 +1114,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                                   style: topTextStyle,
                                                 ),
                                                 Text(
-                                                  'Your time outside of Focal will not be counted as Distraction. Keep up the good work!',
+                                                  'You will remain Focused outside of Focal. Keep up the good work!',
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     fontSize: 16,
