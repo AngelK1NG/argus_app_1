@@ -257,6 +257,7 @@ class _OnboardingFocusState extends State<OnboardingFocus> {
                       child: GestureDetector(
                         onTap: () {
                           if (_index > 0) {
+                            HapticFeedback.heavyImpact();
                             setState(() {
                               _index--;
                             });
@@ -416,7 +417,7 @@ class _OnboardingFocusState extends State<OnboardingFocus> {
                                 ? 'Done'
                                 : 'Next',
                         textSize: 32,
-                        vibrate: false,
+                        vibrate: true,
                       ),
                     ),
                   ),
