@@ -1252,6 +1252,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                                           if (_distractionTracking) {
                                             completeTask();
                                           } else {
+                                            HapticFeedback.heavyImpact();
                                             setState(() {
                                               _distractionTracking = true;
                                               _distractionTrackingNotice =
