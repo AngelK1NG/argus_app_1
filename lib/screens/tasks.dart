@@ -717,7 +717,7 @@ class _TasksPageState extends State<TasksPage> {
                   duration: keyboardDuration,
                   curve: keyboardCurve,
                   bottom: _addingTask
-                      ? MediaQuery.of(context).viewInsets.bottom
+                      ? MediaQuery.of(context).viewInsets.bottom - 75
                       : -150,
                   left: 0,
                   right: 0,
@@ -726,9 +726,9 @@ class _TasksPageState extends State<TasksPage> {
                     child: AnimatedContainer(
                       duration: cardDuration,
                       curve: cardCurve,
-                      height: 75,
+                      height: 150,
                       width: SizeConfig.safeBlockHorizontal * 100,
-                      alignment: Alignment.centerLeft,
+                      alignment: Alignment.topLeft,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(40),
@@ -743,96 +743,101 @@ class _TasksPageState extends State<TasksPage> {
                           ),
                         ],
                       ),
-                      child: Row(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.only(left: 21, right: 11),
-                            child: Icon(
-                              FeatherIcons.plus,
-                              size: 18,
-                              color: Theme.of(context).hintColor,
+                      child: SizedBox(
+                        height: 75,
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 21, right: 11),
+                              child: Icon(
+                                FeatherIcons.plus,
+                                size: 18,
+                                color: Theme.of(context).hintColor,
+                              ),
                             ),
-                          ),
-                          Container(
-                            alignment: Alignment.center,
-                            width: SizeConfig.safeBlockHorizontal * 100 - 75,
-                            child: Focus(
-                              onFocusChange: (focus) {
-                                if (!focus) {
-                                  setState(() {
-                                    _addingTask = false;
-                                  });
-                                }
-                              },
-                              child: Form(
-                                key: _formKey,
-                                child: TextFormField(
-                                  focusNode: _focus,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: "Add task...",
+                            Container(
+                              alignment: Alignment.center,
+                              width: SizeConfig.safeBlockHorizontal * 100 - 75,
+                              child: Focus(
+                                onFocusChange: (focus) {
+                                  if (!focus) {
+                                    setState(() {
+                                      _addingTask = false;
+                                    });
+                                  }
+                                },
+                                child: Form(
+                                  key: _formKey,
+                                  child: TextFormField(
+                                    focusNode: _focus,
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: "Add task...",
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                      color: jetBlack,
+                                    ),
+                                    autofocus: false,
+                                    onFieldSubmitted: (value) async {
+                                      if (value.isNotEmpty) {
+                                        HapticFeedback.heavyImpact();
+                                        setVolts();
+                                        TaskItem newTask = TaskItem(
+                                          name: value,
+                                          completed: false,
+                                          paused: false,
+                                          order: _tasks.length -
+                                              _completedTasks +
+                                              1,
+                                          date: getDateString(_date),
+                                          secondsFocused: 0,
+                                          secondsDistracted: 0,
+                                          numPaused: 0,
+                                          numDistracted: 0,
+                                          voltsIncrement: 0,
+                                          key: UniqueKey(),
+                                        );
+                                        newTask.onDismissed = (direction) {
+                                          if (direction ==
+                                              DismissDirection.startToEnd) {
+                                            deferTask(newTask);
+                                            AnalyticsProvider().logDeferTask(
+                                                newTask, DateTime.now());
+                                          } else {
+                                            deleteTask(newTask);
+                                            AnalyticsProvider().logDeleteTask(
+                                                newTask, DateTime.now());
+                                          }
+                                        };
+                                        newTask.onUpdate =
+                                            (value) => newTask.name = value;
+                                        setState(() {
+                                          _tasks.insert(
+                                              _tasks.length - _completedTasks,
+                                              newTask);
+                                        });
+                                        _tasks[_tasks.length -
+                                                    _completedTasks -
+                                                    1]
+                                                .id =
+                                            await _firestoreProvider.addTask(
+                                                newTask, getDateString(_date));
+                                        _firestoreProvider.updateTasks(
+                                            _tasks, getDateString(_date));
+                                        _formKey.currentState.reset();
+                                        AnalyticsProvider().logAddTask(
+                                            newTask, DateTime.now());
+                                      }
+                                    },
                                   ),
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: jetBlack,
-                                  ),
-                                  autofocus: false,
-                                  onFieldSubmitted: (value) async {
-                                    if (value.isNotEmpty) {
-                                      HapticFeedback.heavyImpact();
-                                      setVolts();
-                                      TaskItem newTask = TaskItem(
-                                        name: value,
-                                        completed: false,
-                                        paused: false,
-                                        order:
-                                            _tasks.length - _completedTasks + 1,
-                                        date: getDateString(_date),
-                                        secondsFocused: 0,
-                                        secondsDistracted: 0,
-                                        numPaused: 0,
-                                        numDistracted: 0,
-                                        voltsIncrement: 0,
-                                        key: UniqueKey(),
-                                      );
-                                      newTask.onDismissed = (direction) {
-                                        if (direction ==
-                                            DismissDirection.startToEnd) {
-                                          deferTask(newTask);
-                                          AnalyticsProvider().logDeferTask(
-                                              newTask, DateTime.now());
-                                        } else {
-                                          deleteTask(newTask);
-                                          AnalyticsProvider().logDeleteTask(
-                                              newTask, DateTime.now());
-                                        }
-                                      };
-                                      newTask.onUpdate =
-                                          (value) => newTask.name = value;
-                                      setState(() {
-                                        _tasks.insert(
-                                            _tasks.length - _completedTasks,
-                                            newTask);
-                                      });
-                                      _tasks[_tasks.length -
-                                                  _completedTasks -
-                                                  1]
-                                              .id =
-                                          await _firestoreProvider.addTask(
-                                              newTask, getDateString(_date));
-                                      _firestoreProvider.updateTasks(
-                                          _tasks, getDateString(_date));
-                                      _formKey.currentState.reset();
-                                      AnalyticsProvider()
-                                          .logAddTask(newTask, DateTime.now());
-                                    }
-                                  },
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
