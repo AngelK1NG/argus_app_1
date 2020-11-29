@@ -60,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
               if (exists) {
                 Navigator.pushNamed(context, '/home');
               } else {
-                Navigator.pushNamed(context, '/onboarding');
+                Navigator.pushNamed(context, '/onboardingIntro');
               }
             } else {
               Future.delayed(Duration(milliseconds: 500), () {
@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                   if (exists) {
                     Navigator.pushNamed(context, '/home');
                   } else {
-                    Navigator.pushNamed(context, '/onboarding');
+                    Navigator.pushNamed(context, '/onboardingIntro');
                   }
                 });
               });
@@ -85,11 +85,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         children: <Widget>[
-          Container(
-            color: Colors.white,
-          ),
           SafeArea(
             child: Stack(
               children: [

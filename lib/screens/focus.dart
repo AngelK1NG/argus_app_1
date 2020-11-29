@@ -991,8 +991,8 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
                       return Stack(
                         children: <Widget>[
                           Positioned(
-                            left: 20,
-                            top: 20,
+                            right: 17,
+                            top: 17,
                             child: AnimatedOpacity(
                               opacity: _doingTask ? 1 : 0,
                               duration: cardDuration,

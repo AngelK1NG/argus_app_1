@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Focal/components/rct_button.dart';
-import 'package:Focal/utils/firestore.dart';
-import 'package:Focal/utils/user.dart';
 
 class OnboardingPage extends StatelessWidget {
   final IconData iconData;
@@ -60,10 +56,7 @@ class OnboardingPage extends StatelessWidget {
           offstage: !end,
           child: RctButton(
             onTap: () {
-              FirebaseUser user =
-                  Provider.of<User>(context, listen: false).user;
-              FirestoreProvider(user).createUserDocument();
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushReplacementNamed(context, '/onboardingFocus');
             },
             buttonWidth: 220,
             gradient: LinearGradient(

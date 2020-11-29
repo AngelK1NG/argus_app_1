@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/components/task_item.dart';
 import 'package:Focal/utils/date.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FirestoreProvider {
   FirebaseUser user;
@@ -12,17 +13,17 @@ class FirestoreProvider {
   // check if user document exists in firestore
   Future<bool> userDocumentExists() async {
     bool docExists = false;
-    await db.collection('users').document(user.uid).get().then((doc) {
-      if (!doc.exists) {
-        docExists = false;
-      } else {
-        docExists = true;
-      }
-    });
+    DocumentSnapshot doc =
+        await db.collection('users').document(user.uid).get();
+    if (!doc.exists) {
+      docExists = false;
+    } else {
+      docExists = true;
+    }
     return docExists;
   }
 
-  // create user document in firestore when logged in
+  // create user document in firestore when new user logs in
   void createUserDocument() async {
     DocumentSnapshot doc =
         await db.collection('users').document(user.uid).get();
@@ -39,47 +40,53 @@ class FirestoreProvider {
           'val': 1000,
         }
       });
-      List taskNames = [
-        'Welcome to Focal!',
-        'Tap to edit this task ✏️',
-        'Hold and drag to reorder 🔃',
-        'Swipe right to defer this task 📅',
-        'Swipe left to delete this task 🗑️',
-        'Swipe and tap on the date to schedule tasks',
-        'Tap the + button to add another task',
-      ];
-      db
-          .collection('users')
-          .document(user.uid)
-          .collection('dates')
-          .document(getDateString(DateTime.now()))
-          .setData({
-        'completedTasks': 0,
-        'startedTasks': 0,
-        'totalTasks': taskNames.length,
-        'secondsFocused': 0,
-        'secondsDistracted': 0,
-        'numDistracted': 0,
-        'numPaused': 0,
-        'volts': [],
+      SharedPreferences.getInstance().then((prefs) {
+        prefs.setBool('newUser', true);
       });
-      for (var i = 0; i < taskNames.length; i++) {
-        addTask(
-          TaskItem(
-            name: taskNames[i],
-            completed: false,
-            paused: false,
-            order: i + 1,
-            date: getDateString(DateTime.now()),
-            secondsFocused: 0,
-            secondsDistracted: 0,
-            numPaused: 0,
-            numDistracted: 0,
-            voltsIncrement: 0,
-          ),
-          getDateString(DateTime.now()),
-        );
-      }
+    }
+  }
+
+  // add default tasks for new user
+  Future<void> addDefaultTasks() async {
+    List taskNames = [
+      'Tap to edit this task ✏️',
+      'Hold and drag to reorder 🔃',
+      'Swipe right to defer this task 📅',
+      'Swipe left to delete this task 🗑️',
+      'Swipe and tap on the date to schedule tasks',
+      'Tap the + button to add another task',
+    ];
+    await db
+        .collection('users')
+        .document(user.uid)
+        .collection('dates')
+        .document(getDateString(DateTime.now()))
+        .setData({
+      'completedTasks': 0,
+      'startedTasks': 0,
+      'totalTasks': taskNames.length,
+      'secondsFocused': 0,
+      'secondsDistracted': 0,
+      'numDistracted': 0,
+      'numPaused': 0,
+      'volts': [],
+    });
+    for (var i = 0; i < taskNames.length; i++) {
+      await addTask(
+        TaskItem(
+          name: taskNames[i],
+          completed: false,
+          paused: false,
+          order: i + 1,
+          date: getDateString(DateTime.now()),
+          secondsFocused: 0,
+          secondsDistracted: 0,
+          numPaused: 0,
+          numDistracted: 0,
+          voltsIncrement: 0,
+        ),
+        getDateString(DateTime.now()),
+      );
     }
   }
 

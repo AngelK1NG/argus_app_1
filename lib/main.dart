@@ -8,7 +8,8 @@ import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'screens/home.dart';
 import 'screens/login.dart';
-import 'screens/onboarding.dart';
+import 'screens/onboarding_intro.dart';
+import 'screens/onboarding_focus.dart';
 import 'constants.dart';
 
 void main() {
@@ -68,11 +69,18 @@ class MyApp extends StatelessWidget {
                           pageBuilder: (_, a1, a2) => Home(),
                         );
                       }
-                    case '/onboarding':
+                    case '/onboardingIntro':
                       {
                         return PageRouteBuilder(
                           settings: RouteSettings(name: routeSettings.name),
-                          pageBuilder: (_, a1, a2) => Onboarding(),
+                          pageBuilder: (_, a1, a2) => OnboardingIntro(),
+                        );
+                      }
+                    case '/onboardingFocus':
+                      {
+                        return PageRouteBuilder(
+                          settings: RouteSettings(name: routeSettings.name),
+                          pageBuilder: (_, a1, a2) => OnboardingFocus(),
                         );
                       }
                     default:

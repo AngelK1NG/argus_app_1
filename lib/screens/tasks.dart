@@ -426,6 +426,10 @@ class _TasksPageState extends State<TasksPage> {
 
   void setToday() async {
     _prefs = await SharedPreferences.getInstance();
+    if (_prefs.getBool('newUser') == true) {
+      await _firestoreProvider.addDefaultTasks();
+      _prefs.setBool('newUser', false);
+    }
     setDate(DateTime.now().subtract(Duration(
       hours: _prefs.getInt('dayStartHour'),
       minutes: _prefs.getInt('dayStartMinute'),
