@@ -32,7 +32,7 @@ final Duration loadingDelay = Duration(milliseconds: 2000);
 final Duration cardDuration = Duration(milliseconds: 200);
 final Curve cardCurve = Curves.ease;
 
-final Duration keyboardDuration = Duration(milliseconds: 600);
+final Duration keyboardDuration = Duration(milliseconds: 400);
 final Curve keyboardCurve = Cubic(0.380, 0.700, 0.125, 1.000);
 
 final Duration buttonDuration = Duration(milliseconds: 200);
