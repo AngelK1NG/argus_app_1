@@ -51,7 +51,7 @@ num voltsIncrement({
   @required num volts,
 }) {
   num increment = 0;
-  increment = 0.01 *
+  increment = 0.005 *
       (secondsFocused - secondsDistracted) *
       pow(100 * (completedTasks + 1) / totalTasks, 0.1) *
       pow(totalTasks, 0.1) /
