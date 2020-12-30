@@ -1,74 +1,45 @@
-import 'package:Focal/utils/user.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:Focal/utils/firestore.dart';
 import 'package:Focal/utils/size_config.dart';
-import 'package:provider/provider.dart';
 import 'package:Focal/constants.dart';
 
 // ignore: must_be_immutable
-class TaskItem extends StatefulWidget {
+class TaskItem extends StatelessWidget {
   String name;
+  int index;
   bool completed;
   bool paused;
-  int order;
-  String date;
-  int secondsFocused;
-  int secondsDistracted;
-  int numPaused;
-  int numDistracted;
-  num voltsIncrement;
+  int seconds;
   String id;
   Function onDismissed;
-  Function onUpdate;
+  Function onTap;
 
   TaskItem({
     @required this.name,
+    @required this.index,
     @required this.completed,
-    @required this.paused,
-    @required this.order,
-    @required this.date,
-    @required this.secondsFocused,
-    @required this.secondsDistracted,
-    @required this.numPaused,
-    @required this.numDistracted,
-    @required this.voltsIncrement,
+    this.paused,
+    this.seconds,
     this.id,
     this.onDismissed,
-    this.onUpdate,
+    this.onTap,
     Key key,
   }) : super(key: key);
 
   @override
-  _TaskItemState createState() => _TaskItemState();
-}
-
-class _TaskItemState extends State<TaskItem> {
-  bool _active = false;
-  FocusNode _focus = new FocusNode();
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    FirestoreProvider firestoreProvider =
-        FirestoreProvider(Provider.of<User>(context, listen: false).user);
     return Stack(
       children: <Widget>[
         Positioned(
           bottom: 0,
-          left: 25,
-          right: 25,
+          left: 20,
+          right: 20,
           child: Container(height: 1, color: Theme.of(context).dividerColor),
         ),
         Dismissible(
           background: Container(
             color: Theme.of(context).primaryColor,
-            padding: EdgeInsets.only(left: 25),
+            padding: EdgeInsets.only(left: 20),
             alignment: AlignmentDirectional.centerStart,
             child: Icon(
               FeatherIcons.sunrise,
@@ -78,7 +49,7 @@ class _TaskItemState extends State<TaskItem> {
           ),
           secondaryBackground: Container(
             color: Colors.red,
-            padding: EdgeInsets.only(right: 25),
+            padding: EdgeInsets.only(right: 20),
             alignment: AlignmentDirectional.centerEnd,
             child: Icon(
               FeatherIcons.trash,
@@ -87,114 +58,57 @@ class _TaskItemState extends State<TaskItem> {
             ),
           ),
           key: UniqueKey(),
-          direction: widget.completed
+          direction: this.completed
               ? DismissDirection.endToStart
               : DismissDirection.horizontal,
-          onDismissed: widget.onDismissed,
+          onDismissed: this.onDismissed,
           child: GestureDetector(
-            onTap: () {
-              setState(() {
-                if (!widget.completed) {
-                  _active = true;
-                  Future.delayed(Duration(milliseconds: 50), () {
-                    FocusScope.of(context).requestFocus(_focus);
-                  });
-                }
-              });
-            },
+            onTap: () {},
             behavior: HitTestBehavior.deferToChild,
             child: Container(
               child: Row(
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(left: 25, right: 15),
-                    child: widget.completed
+                    padding: const EdgeInsets.only(left: 20, right: 15),
+                    child: this.completed
                         ? Image(
                             image: AssetImage(
                                 'assets/images/icons/Task Icon_Filled.png'),
                             width: 10,
                             height: 10,
                           )
-                        : widget.order <= 3
-                            ? Container(
-                                alignment: Alignment.center,
-                                width: 10,
-                                child: Text(
-                                  widget.order.toString(),
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                              )
-                            : Image(
-                                image: AssetImage(
-                                    'assets/images/icons/Task Icon_Unfilled.png'),
-                                width: 10,
-                                height: 10,
-                              ),
+                        : Image(
+                            image: AssetImage(
+                                'assets/images/icons/Task Icon_Unfilled.png'),
+                            width: 10,
+                            height: 10,
+                          ),
                   ),
                   SizedBox(
-                    height: 55,
-                    width: SizeConfig.safeBlockHorizontal * 100 - 75,
+                    width: SizeConfig.safeWidth - 65,
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Focus(
-                        onFocusChange: (focus) {
-                          if (!focus && _formKey.currentState.validate()) {
-                            setState(() {
-                              _active = false;
-                            });
-                          }
-                          if (!_formKey.currentState.validate()) {
-                            _focus.requestFocus();
-                          }
-                        },
-                        child: Form(
-                          key: _formKey,
-                          child: TextFormField(
-                            focusNode: _focus,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                            ),
-                            style: widget.completed
-                                ? TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    decoration: TextDecoration.lineThrough,
-                                    color: Theme.of(context).hintColor)
-                                : TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: widget.paused
-                                        ? Theme.of(context).primaryColor
-                                        : jetBlack),
-                            initialValue: widget.name,
-                            autofocus: true,
-                            enabled: _active,
-                            onChanged: (value) {
-                              Future.delayed(Duration.zero, () {
-                                if (_formKey.currentState.validate()) {
-                                  widget.onUpdate(value);
-                                  firestoreProvider.updateTaskName(
-                                      value, widget.id, widget.date);
-                                }
-                              });
-                            },
-                            validator: (value) {
-                              return value.isEmpty
-                                  ? 'A task cannot be empty'
-                                  : null;
-                            },
-                          ),
-                        ),
+                      child: Text(
+                        this.name,
+                        style: this.completed
+                            ? TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                decoration: TextDecoration.lineThrough,
+                                color: Theme.of(context).hintColor)
+                            : TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: this.paused != null && this.paused
+                                    ? Theme.of(context).primaryColor
+                                    : black),
                       ),
                     ),
                   ),
                 ],
               ),
-              height: 55,
-              width: SizeConfig.safeBlockHorizontal * 100,
+              height: 50,
+              width: SizeConfig.safeWidth,
               alignment: Alignment.centerLeft,
             ),
           ),

@@ -4,13 +4,14 @@ import 'package:apple_sign_in/apple_sign_in.dart';
 
 class AuthProvider {
   FirebaseAuth _auth = FirebaseAuth.instance;
-  GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  Future<FirebaseUser> getUser() async => _auth.currentUser();
+  Stream<FirebaseUser> get onAuthStateChanged {
+    return _auth.onAuthStateChanged;
+  }
 
   Future<FirebaseUser> googleSignIn() async {
     try {
-      GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
+      GoogleSignInAccount googleSignInAccount = await GoogleSignIn().signIn();
       GoogleSignInAuthentication googleAuth =
           await googleSignInAccount.authentication;
 

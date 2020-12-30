@@ -6,15 +6,14 @@ class SettingsItem extends StatelessWidget {
   final IconData iconData;
   final String text;
   final String secondaryText;
-  final bool chevron;
   final VoidCallback onTap;
 
-  SettingsItem(
-      {this.iconData,
-      @required this.text,
-      this.secondaryText,
-      @required this.chevron,
-      @required this.onTap});
+  SettingsItem({
+    this.iconData,
+    @required this.text,
+    this.secondaryText,
+    @required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +28,7 @@ class SettingsItem extends StatelessWidget {
         GestureDetector(
           onTap: onTap,
           child: Container(
-            height: 55,
+            height: 50,
             color: Colors.transparent,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -67,10 +66,8 @@ class SettingsItem extends StatelessWidget {
                             ),
                           )
                         : Container(),
-                    chevron
-                        ? Icon(FeatherIcons.chevronRight,
-                            size: 20, color: Theme.of(context).hintColor)
-                        : Container(),
+                    Icon(FeatherIcons.chevronRight,
+                        size: 20, color: Theme.of(context).hintColor),
                   ],
                 )
               ],

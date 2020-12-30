@@ -7,8 +7,8 @@ class SizeConfig {
 
   static double _safeAreaHorizontal;
   static double _safeAreaVertical;
-  static double safeBlockHorizontal;
-  static double safeBlockVertical;
+  static double safeWidth;
+  static double safeHeight;
 
   void init(BuildContext context) {
     _mediaQueryData = MediaQuery.of(context);
@@ -19,7 +19,8 @@ class SizeConfig {
         _mediaQueryData.padding.left + _mediaQueryData.padding.right;
     _safeAreaVertical =
         _mediaQueryData.padding.top + _mediaQueryData.padding.bottom;
-    safeBlockHorizontal = (screenWidth - _safeAreaHorizontal) / 100;
-    safeBlockVertical = (screenHeight - _safeAreaVertical) / 100;
+
+    safeWidth = screenWidth - _safeAreaHorizontal;
+    safeHeight = screenHeight - _safeAreaVertical;
   }
 }

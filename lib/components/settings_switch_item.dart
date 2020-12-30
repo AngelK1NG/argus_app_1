@@ -20,12 +20,12 @@ class SettingsSwitchItem extends StatelessWidget {
           child: Container(height: 1, color: Theme.of(context).dividerColor),
         ),
         Container(
-          height: 55,
+          height: 50,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               SizedBox(
-                width: SizeConfig.safeBlockHorizontal * 100 - 135,
+                width: SizeConfig.safeWidth - 135,
                 child: Text(
                   title,
                   style: TextStyle(fontSize: 16),

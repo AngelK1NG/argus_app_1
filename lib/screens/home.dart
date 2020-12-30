@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/utils/size_config.dart';
-import 'package:Focal/components/bottom_nav.dart';
-import 'package:Focal/components/volts.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'focus.dart';
 import 'tasks.dart';
 import 'statistics.dart';
-import 'profile.dart';
+import 'settings.dart';
 import 'general.dart';
 import 'help.dart';
 import 'about.dart';
-import 'share_statistics.dart';
 
 class Home extends StatefulWidget {
   const Home();
@@ -37,20 +34,18 @@ class _HomeState extends State<Home> {
       switch (index) {
         case 0:
           {
-            _child = FocusPage(
+            _child = TasksPage(
               goToPage: goToPage,
               setLoading: setLoading,
-              setNav: setNav,
-              setDoingTask: setDoingTask,
             );
-            _cardPosition = SizeConfig.safeBlockVertical * 36;
+            _cardPosition = 50;
             setNav(true);
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
           }
         case 1:
           {
-            _child = TasksPage(
+            _child = StatisticsPage(
               goToPage: goToPage,
               setLoading: setLoading,
             );
@@ -59,33 +54,35 @@ class _HomeState extends State<Home> {
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
           }
+
         case 2:
           {
-            _child = StatisticsPage(
+            _child = SettingsPage(
               goToPage: goToPage,
               setLoading: setLoading,
-              shareStatistics: shareStatistics,
             );
-            _cardPosition = 80;
+            _cardPosition = 50;
             setNav(true);
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
           }
         case 3:
           {
-            _child = ProfilePage(
+            _child = FocusPage(
               goToPage: goToPage,
               setLoading: setLoading,
+              setNav: setNav,
             );
-            _cardPosition = 80;
+            _cardPosition = SizeConfig.safeHeight;
             setNav(true);
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
           }
+
         case 4:
           {
             _child = GeneralPage(goToPage: goToPage);
-            _cardPosition = 80;
+            _cardPosition = 50;
             setNav(true);
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
             break;
@@ -101,7 +98,7 @@ class _HomeState extends State<Home> {
         case 6:
           {
             _child = AboutPage(goToPage: goToPage);
-            _cardPosition = 0;
+            _cardPosition = -25;
             setNav(false);
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
             break;
@@ -119,42 +116,6 @@ class _HomeState extends State<Home> {
   void setNav(bool visible) {
     setState(() {
       _showNav = visible;
-    });
-  }
-
-  void setDoingTask(bool doingTask) {
-    if (doingTask) {
-      setState(() {
-        _cardPosition = SizeConfig.safeBlockVertical * 50;
-        _backgroundColor = jetBlack;
-        _showNav = false;
-      });
-    } else {
-      setState(() {
-        _cardPosition = SizeConfig.safeBlockVertical * 36;
-        _backgroundColor = Theme.of(context).primaryColor;
-      });
-    }
-  }
-
-  void shareStatistics({
-    Volts volts,
-    List<Volts> voltsList,
-    num voltsDelta,
-    Duration timeFocused,
-    int index,
-  }) {
-    setState(() {
-      _child = ShareStatistics(
-        goToPage: goToPage,
-        volts: volts,
-        voltsList: voltsList,
-        timeFocused: timeFocused,
-        index: index,
-      );
-      _cardPosition = 0;
-      setNav(false);
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     });
   }
 
@@ -206,10 +167,8 @@ class _HomeState extends State<Home> {
               curve: cardCurve,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
-                  topLeft:
-                      _cardPosition == 0 ? Radius.zero : Radius.circular(40),
-                  topRight:
-                      _cardPosition == 0 ? Radius.zero : Radius.circular(40),
+                  topLeft: Radius.circular(25),
+                  topRight: Radius.circular(25),
                 ),
                 color: Colors.white,
                 boxShadow: [
@@ -222,17 +181,7 @@ class _HomeState extends State<Home> {
               height: MediaQuery.of(context).size.height,
             ),
           ),
-          SafeArea(child: _child),
-          SafeArea(
-            child: Container(
-              alignment: Alignment.bottomCenter,
-              child: BottomNav(
-                onTap: goToPage,
-                show: _showNav && !_keyboard,
-                index: _selectedIndex,
-              ),
-            ),
-          ),
+          SafeArea(child: SizedBox.expand(child: _child)),
           Align(
             alignment: Alignment.bottomCenter,
             child: AnimatedOpacity(

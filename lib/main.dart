@@ -6,10 +6,7 @@ import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'screens/home.dart';
 import 'screens/login.dart';
-import 'screens/onboarding_intro.dart';
-import 'screens/onboarding_focus.dart';
 import 'constants.dart';
 
 void main() {
@@ -40,20 +37,31 @@ class MyApp extends StatelessWidget {
             child: MaterialApp(
                 navigatorKey: navigatorKey,
                 theme: ThemeData(
-                  buttonTheme: ButtonThemeData(
-                    height: 60,
-                    minWidth: 60,
+                  elevatedButtonTheme: ElevatedButtonThemeData(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),
+                      minimumSize: MaterialStateProperty.all(
+                        Size(50, 50),
+                      ),
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      animationDuration: cardDuration,
+                    ),
                   ),
-                  primarySwatch: focalBlue,
-                  primaryColor: const Color(0xff3c25d7),
-                  accentColor: const Color(0xff7c4efd),
-                  hintColor: const Color(0xffb0b0b0),
-                  dividerColor: const Color(0xffe5e5e5),
+                  primarySwatch: materialBlue,
+                  primaryColor: blue,
+                  accentColor: purple,
+                  dividerColor: dividerColor,
+                  hintColor: hintColor,
                   splashColor: Colors.transparent,
-                  textSelectionColor: const Color(0xffddddff),
+                  shadowColor: shadowColor,
+                  textSelectionColor: textSelectionColor,
                   textTheme: Theme.of(context).textTheme.apply(
-                        bodyColor: jetBlack,
-                        displayColor: jetBlack,
+                        bodyColor: black,
+                        displayColor: black,
                         fontFamily: 'Cabin',
                       ),
                 ),
@@ -62,27 +70,6 @@ class MyApp extends StatelessWidget {
                 ],
                 onGenerateRoute: (routeSettings) {
                   switch (routeSettings.name) {
-                    case '/home':
-                      {
-                        return PageRouteBuilder(
-                          settings: RouteSettings(name: routeSettings.name),
-                          pageBuilder: (_, a1, a2) => Home(),
-                        );
-                      }
-                    case '/onboardingIntro':
-                      {
-                        return PageRouteBuilder(
-                          settings: RouteSettings(name: routeSettings.name),
-                          pageBuilder: (_, a1, a2) => OnboardingIntro(),
-                        );
-                      }
-                    case '/onboardingFocus':
-                      {
-                        return PageRouteBuilder(
-                          settings: RouteSettings(name: routeSettings.name),
-                          pageBuilder: (_, a1, a2) => OnboardingFocus(),
-                        );
-                      }
                     default:
                       {
                         return PageRouteBuilder(
@@ -99,7 +86,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-const MaterialColor focalBlue =
+const MaterialColor materialBlue =
     const MaterialColor(0xff3c25d7, const <int, Color>{
   50: const Color(0xff3c25d7),
   100: const Color(0xff3c25d7),

@@ -2,41 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:Focal/constants.dart';
 
-class SqrButton extends StatelessWidget {
+class Button extends StatelessWidget {
   final VoidCallback onTap;
-  final dynamic icon;
+  final double width;
+  final Row row;
   final LinearGradient gradient;
   final bool vibrate;
 
-  const SqrButton({
-    @required this.onTap,
-    @required this.icon,
+  const Button({
+    this.onTap,
+    @required this.width,
+    @required this.row,
     @required this.gradient,
     @required this.vibrate,
   });
 
   @override
   Widget build(BuildContext context) {
-    return RaisedButton(
+    return ElevatedButton(
       onPressed: () {
         if (vibrate) {
           HapticFeedback.heavyImpact();
         }
         onTap();
       },
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-      padding: const EdgeInsets.all(0.0),
       child: AnimatedContainer(
         duration: buttonDuration,
         curve: buttonCurve,
-        width: 60,
-        height: 60,
+        width: width,
+        height: 50,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           gradient: gradient,
-          borderRadius: BorderRadius.all(Radius.circular(30)),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
         ),
-        child: icon,
+        child: Center(
+          child: row,
+        ),
       ),
     );
   }

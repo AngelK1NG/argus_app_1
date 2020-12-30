@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:Focal/components/rct_button.dart';
+import 'package:Focal/components/button.dart';
+import 'package:Focal/utils/size_config.dart';
+import 'package:Focal/constants.dart';
 
 class OnboardingPage extends StatelessWidget {
   final IconData iconData;
@@ -54,11 +56,11 @@ class OnboardingPage extends StatelessWidget {
         ),
         Offstage(
           offstage: !end,
-          child: RctButton(
+          child: Button(
             onTap: () {
-              Navigator.pushReplacementNamed(context, '/onboardingFocus');
+              Navigator.pushReplacementNamed(context, '/home');
             },
-            buttonWidth: 220,
+            width: SizeConfig.safeWidth - 100,
             gradient: LinearGradient(
               colors: [
                 Theme.of(context).primaryColor,
@@ -67,8 +69,14 @@ class OnboardingPage extends StatelessWidget {
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
-            buttonText: 'Let\'s go!',
-            textSize: 28,
+            row: Row(
+              children: [
+                Text(
+                  'Let\'s go!',
+                  style: buttonTextStyle,
+                )
+              ],
+            ),
             vibrate: true,
           ),
         ),

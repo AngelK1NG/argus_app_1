@@ -4,7 +4,7 @@ import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:launch_review/launch_review.dart';
-import 'package:Focal/utils/size_config.dart';
+import 'package:Focal/components/nav_button.dart';
 
 class AboutPage extends StatefulWidget {
   final Function goToPage;
@@ -27,11 +27,11 @@ class _AboutPageState extends State<AboutPage> {
     }
   }
 
-  textButton(VoidCallback onTap, String text) {
+  Widget textButton({@required VoidCallback onTap, @required String text}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 55,
+        height: 50,
         width: 150,
         alignment: Alignment.center,
         color: Colors.transparent,
@@ -61,56 +61,38 @@ class _AboutPageState extends State<AboutPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () => widget.goToPage(3),
+      onWillPop: () => widget.goToPage(2),
       child: AnimatedOpacity(
         opacity: _loading ? 0 : 1,
         duration: cardDuration,
         curve: cardCurve,
         child: Stack(
           children: <Widget>[
+            Container(
+              alignment: Alignment.center,
+              height: 50,
+              child: Text(
+                'About',
+                style: blackHeaderTextStyle,
+              ),
+            ),
             Positioned(
-              right: 25,
-              left: 25,
-              top: 17,
+              left: 5,
+              top: 0,
+              child: NavButton(
+                onTap: () {
+                  widget.goToPage(2);
+                },
+                iconData: FeatherIcons.chevronLeft,
+                color: black,
+              ),
+            ),
+            Positioned(
+              right: 0,
+              left: 0,
+              top: 100,
               child: Column(
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 40),
-                    child: SizedBox(
-                      height: 40,
-                      width: SizeConfig.safeBlockVertical * 100,
-                      child: Stack(
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: GestureDetector(
-                              onTap: () => widget.goToPage(3),
-                              child: Container(
-                                width: 40,
-                                height: 40,
-                                color: Colors.transparent,
-                                child: Icon(
-                                  FeatherIcons.chevronLeft,
-                                  size: 20,
-                                  color: jetBlack,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Center(
-                            child: Text(
-                              'About',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                   Padding(
                     padding: EdgeInsets.only(bottom: 15),
                     child: Image(
@@ -134,39 +116,37 @@ class _AboutPageState extends State<AboutPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 textButton(
-                  () {
+                  onTap: () {
                     LaunchReview.launch(
                         androidAppId: 'technology.focal.focal',
                         iOSAppId: '1526256598');
                   },
-                  'Rate Focal',
+                  text: 'Rate Focal',
                 ),
                 textButton(
-                  () {
-                    openUrl(
-                        'https://docs.google.com/document/d/1h0fBpGKMKHna0MSA8NTt0FXAdc551ALwSkVWJkh0mbY/edit?usp=sharing');
+                  onTap: () {
+                    openUrl('https://getfocal.app/terms');
                   },
-                  'Terms & Conditions',
+                  text: 'Terms and Conditions',
                 ),
                 textButton(
-                  () {
-                    openUrl(
-                        'https://docs.google.com/document/d/1eIL0fXCFXXoiIfU59qPXqnQxhKp-8VG2XTvh63O0d-o/edit?usp=sharing');
+                  onTap: () {
+                    openUrl('https://getfocal.app/privacy');
                   },
-                  'Privacy Policy',
+                  text: 'Privacy Policy',
                 ),
                 textButton(
-                  () {
+                  onTap: () {
                     openUrl('https://getfocal.app');
                   },
-                  'Website',
+                  text: 'Website',
                 ),
               ],
             )),
             Positioned(
-              left: 25,
-              right: 25,
-              bottom: 25,
+              left: 0,
+              right: 0,
+              bottom: 20,
               child: Center(
                 child: Text(
                   '© 2020 Focal LLC',

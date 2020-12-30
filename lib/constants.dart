@@ -10,17 +10,36 @@ final FirebaseAuth auth = FirebaseAuth.instance;
 final Firestore db = Firestore.instance;
 final FirebaseAnalytics analytics = FirebaseAnalytics();
 
-// local notifications
+//local notifications
 final FlutterLocalNotificationsPlugin notificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-//colors
-final Color jetBlack = Color(0xff2b2b2b);
-final Color darkRed = Color(0xffd54321);
+//main colors
+final Color black = Color(0xff111111);
+final Color white = Color(0xffffffff);
+final Color blue = Color(0xff3c25d7);
+final Color purple = Color(0xff7c4efd);
+final Color red = Color(0xfff44236);
 
-//styles
-final TextStyle headerTextStyle = TextStyle(
-  fontSize: 24,
+//utility colors
+final Color hintColor = Color(0xffb0b0b0);
+final Color shadowColor = Color(0x40111111);
+final Color dividerColor = Color(0xffe5e5e5);
+final Color textSelectionColor = Color(0xffddddff);
+
+//text styles
+final TextStyle whiteHeaderTextStyle = TextStyle(
+  fontSize: 20,
+  fontWeight: FontWeight.w600,
+  color: Colors.white,
+);
+final TextStyle blackHeaderTextStyle = TextStyle(
+  fontSize: 20,
+  fontWeight: FontWeight.w600,
+  color: Colors.black,
+);
+final TextStyle buttonTextStyle = TextStyle(
+  fontSize: 20,
   fontWeight: FontWeight.w600,
   color: Colors.white,
 );
@@ -31,6 +50,9 @@ final Duration loadingDelay = Duration(milliseconds: 2000);
 //animation transitions
 final Duration cardDuration = Duration(milliseconds: 200);
 final Curve cardCurve = Curves.ease;
+
+final Duration loginDuration = Duration(milliseconds: 800);
+final Curve loginCurve = Curves.ease;
 
 final Duration keyboardDuration = Duration(milliseconds: 500);
 final Curve keyboardCurve = Cubic(0.380, 0.700, 0.125, 1.000);

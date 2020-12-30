@@ -1,7 +1,7 @@
 name: Focal
 description: A new Flutter project.
 
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.1.0+12
 
@@ -42,6 +42,7 @@ dependencies:
   share: ^0.6.5+4
   screenshot: ^0.2.0
   path_provider: ^1.6.24
+  drag_and_drop_lists: ^0.2.9+2
 
 dev_dependencies:
   flutter_test:

@@ -30,7 +30,7 @@ class _HelpPageState extends State<HelpPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () => widget.goToPage(3),
+      onWillPop: () => widget.goToPage(2),
       child: AnimatedOpacity(
         opacity: _loading ? 0 : 1,
         duration: cardDuration,
@@ -47,13 +47,13 @@ class _HelpPageState extends State<HelpPage> {
                     padding: EdgeInsets.only(bottom: 20),
                     child: SizedBox(
                       height: 40,
-                      width: SizeConfig.safeBlockHorizontal * 100,
+                      width: SizeConfig.safeWidth,
                       child: Stack(
                         children: [
                           Align(
                             alignment: Alignment.centerLeft,
                             child: GestureDetector(
-                              onTap: () => widget.goToPage(3),
+                              onTap: () => widget.goToPage(2),
                               child: Container(
                                 width: 40,
                                 height: 40,
@@ -61,7 +61,7 @@ class _HelpPageState extends State<HelpPage> {
                                 child: Icon(
                                   FeatherIcons.chevronLeft,
                                   size: 20,
-                                  color: jetBlack,
+                                  color: black,
                                 ),
                               ),
                             ),
