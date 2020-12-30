@@ -23,7 +23,7 @@ final Color red = Color(0xfff44236);
 
 //utility colors
 final Color hintColor = Color(0xffb0b0b0);
-final Color shadowColor = Color(0x40111111);
+final Color shadowColor = black.withOpacity(0.2);
 final Color dividerColor = Color(0xffe5e5e5);
 final Color textSelectionColor = Color(0xffddddff);
 

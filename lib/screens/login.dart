@@ -209,7 +209,10 @@ class _LoginPageState extends State<LoginPage> {
                                         },
                                         width: SizeConfig.safeWidth - 100,
                                         gradient: LinearGradient(
-                                          colors: [blue, purple],
+                                          colors: [
+                                            Theme.of(context).primaryColor,
+                                            Theme.of(context).primaryColorLight,
+                                          ],
                                           begin: Alignment.centerLeft,
                                           end: Alignment.centerRight,
                                         ),

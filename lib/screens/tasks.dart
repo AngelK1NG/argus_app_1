@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:Focal/utils/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -122,6 +120,7 @@ class _TasksPageState extends State<TasksPage> {
             .document(_user.uid)
             .collection('completed')
             .orderBy('date', descending: true)
+            .orderBy('index', descending: true)
             .limit(5)
             .snapshots(),
         builder: (context, completedSnapshot) {
@@ -131,6 +130,7 @@ class _TasksPageState extends State<TasksPage> {
                   .document(_user.uid)
                   .collection('uncompleted')
                   .orderBy('date')
+                  .orderBy('index')
                   .snapshots(),
               builder: (context, uncompletedSnapshot) {
                 Map<String, List<TaskItem>> newTaskMap = {};
@@ -142,7 +142,6 @@ class _TasksPageState extends State<TasksPage> {
                     }
                     newTaskMap[task.data['date']].add(TaskItem(
                       name: task.data['name'],
-                      index: task.data['index'],
                       completed: false,
                       paused: task.data['paused'],
                     ));
@@ -156,7 +155,6 @@ class _TasksPageState extends State<TasksPage> {
                     }
                     newTaskMap['Completed'].add(TaskItem(
                       name: task.data['name'],
-                      index: task.data['index'],
                       completed: true,
                     ));
                   }
@@ -206,18 +204,22 @@ class _TasksPageState extends State<TasksPage> {
                                     : SizeConfig.safeHeight - 65,
                                 child: DragAndDropLists(
                                   itemDecorationWhileDragging: BoxDecoration(
-                                    color: Colors.white,
+                                    color: white.withOpacity(0.8),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: black.withOpacity(0.2),
+                                        color: blue.withOpacity(0.2),
                                         spreadRadius: 0,
-                                        blurRadius: 8,
-                                        offset: Offset(
-                                            0, 0), // changes position of shadow
+                                        blurRadius:
+                                            20, // changes position of shadow
                                       ),
                                     ],
                                   ),
-                                  itemGhostOpacity: 0,
+                                  itemGhostOpacity: 1,
+                                  itemGhost: Container(
+                                    height: 50,
+                                    width: SizeConfig.safeWidth,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
                                   listGhostOpacity: 0,
                                   lastListTargetSize: 0,
                                   lastItemTargetHeight: 15,
@@ -338,7 +340,10 @@ class _TasksPageState extends State<TasksPage> {
                                       ],
                                     ),
                                     gradient: LinearGradient(
-                                      colors: [blue, purple],
+                                      colors: [
+                                        Theme.of(context).primaryColor,
+                                        Theme.of(context).primaryColorLight
+                                      ],
                                       begin: Alignment.centerLeft,
                                       end: Alignment.centerRight,
                                     ),

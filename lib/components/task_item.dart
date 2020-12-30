@@ -6,7 +6,6 @@ import 'package:Focal/constants.dart';
 // ignore: must_be_immutable
 class TaskItem extends StatelessWidget {
   String name;
-  int index;
   bool completed;
   bool paused;
   int seconds;
@@ -16,7 +15,6 @@ class TaskItem extends StatelessWidget {
 
   TaskItem({
     @required this.name,
-    @required this.index,
     @required this.completed,
     this.paused,
     this.seconds,
@@ -34,7 +32,10 @@ class TaskItem extends StatelessWidget {
           bottom: 0,
           left: 20,
           right: 20,
-          child: Container(height: 1, color: Theme.of(context).dividerColor),
+          child: Divider(
+            height: 0,
+            thickness: 1,
+          ),
         ),
         Dismissible(
           background: Container(
@@ -71,21 +72,19 @@ class TaskItem extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 20, right: 15),
                     child: this.completed
-                        ? Image(
-                            image: AssetImage(
-                                'assets/images/icons/Task Icon_Filled.png'),
-                            width: 10,
-                            height: 10,
+                        ? Icon(
+                            FeatherIcons.checkCircle,
+                            size: 20,
+                            color: Theme.of(context).hintColor,
                           )
-                        : Image(
-                            image: AssetImage(
-                                'assets/images/icons/Task Icon_Unfilled.png'),
-                            width: 10,
-                            height: 10,
+                        : Icon(
+                            FeatherIcons.circle,
+                            size: 20,
+                            color: Theme.of(context).primaryColor,
                           ),
                   ),
                   SizedBox(
-                    width: SizeConfig.safeWidth - 65,
+                    width: SizeConfig.safeWidth - 75,
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -94,14 +93,15 @@ class TaskItem extends StatelessWidget {
                             ? TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
-                                decoration: TextDecoration.lineThrough,
-                                color: Theme.of(context).hintColor)
+                                color: Theme.of(context).hintColor,
+                              )
                             : TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
                                 color: this.paused != null && this.paused
                                     ? Theme.of(context).primaryColor
-                                    : black),
+                                    : black,
+                              ),
                       ),
                     ),
                   ),
