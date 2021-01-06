@@ -133,6 +133,7 @@ class _HomeState extends State<Home> {
       } else {
         setState(() {
           _loginLoading = false;
+          _loading = false;
         });
       }
     }
