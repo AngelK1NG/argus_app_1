@@ -60,8 +60,6 @@ final Curve buttonCurve = Curves.ease;
 final Duration snackbarDuration = Duration(milliseconds: 2000);
 final Duration focusNoticeDuration = Duration(milliseconds: 4000);
 
-final Duration loadingDelay = Duration(milliseconds: 2000);
-
 //algorithms
 num voltsIncrement({
   @required int secondsFocused,

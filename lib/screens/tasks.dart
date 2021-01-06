@@ -32,27 +32,27 @@ class _TasksPageState extends State<TasksPage> {
   List<DragAndDropList> _dragAndDropList = [];
   void deleteTask(Task task) {}
 
-  void setTasks(UncompletedTasks uncompleted, CompletedTasks completed) {
+  void setTasks(List<Task> uncompleted, List<Task> completed) {
     Map taskMap = {};
     List<DragAndDropList> newList = [];
-    if (uncompleted != null && uncompleted.tasks.isNotEmpty) {
-      _uncompletedTasks = uncompleted.tasks;
-      for (var task in uncompleted.tasks) {
+    if (uncompleted != null && uncompleted.isNotEmpty) {
+      _uncompletedTasks = uncompleted;
+      for (var task in uncompleted) {
         if (taskMap[task.date] == null) {
           taskMap[task.date] = [];
         }
         taskMap[task.date].add(task);
       }
     }
-    if (completed != null && completed.tasks.isNotEmpty) {
-      _completedTasks = completed.tasks;
+    if (completed != null && completed.isNotEmpty) {
+      _completedTasks = completed;
       taskMap['Completed'] = [];
-      for (var task in completed.tasks) {
+      for (var task in completed) {
         taskMap['Completed'].add(task);
       }
     }
-    if ((uncompleted != null && uncompleted.tasks.isNotEmpty) ||
-        (completed != null && completed.tasks.isNotEmpty)) {
+    if ((uncompleted != null && uncompleted.isNotEmpty) ||
+        (completed != null && completed.isNotEmpty)) {
       taskMap.forEach((date, tasks) {
         List<DragAndDropItem> newTasks = [];
         for (var task in tasks) {
@@ -119,8 +119,8 @@ class _TasksPageState extends State<TasksPage> {
 
   @override
   Widget build(BuildContext context) {
-    setTasks(Provider.of<UncompletedTasks>(context),
-        Provider.of<CompletedTasks>(context));
+    setTasks(Provider.of<UncompletedTasks>(context).tasks,
+        Provider.of<CompletedTasks>(context).tasks);
     return WillPopScope(
       onWillPop: () async => false,
       child: Stack(children: <Widget>[

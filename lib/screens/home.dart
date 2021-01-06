@@ -28,24 +28,9 @@ class _HomeState extends State<Home> {
   Widget _child;
   Color _backgroundColor;
   double _cardPosition = 0;
-  bool _loading = true;
   bool _loginLoading = false;
-  String _quote = '';
-  Random _random = Random();
   AuthProvider auth = AuthProvider();
   DatabaseProvider db = DatabaseProvider();
-  final _quotes = [
-    '''“You can waste your lives drawing lines. Or you can live your life crossing them.” - Shonda Rhimes''',
-    '''“Everything comes to him who hustles while he waits.” - Thomas Edison''',
-    '''"The only difference between ordinary and extraordinary is that little extra." - Jimmy Johnson''',
-    '''"The secret of getting ahead is getting started." - Mark Twain''',
-    '''"The way to get started is to quit talking and begin doing." - Walt Disney''',
-    '''"Do you want to know who you are? Don't ask. Act! Action will delineate and define you." - Thomas Jefferson''',
-    '''“It’s not knowing what to do, it’s doing what you know.” - Tony Robbins''',
-    '''“The big secret in life is that there is no big secret. Whatever your goal, you can get there if you’re willing to work.” - Oprah Winfrey''',
-    '''“Action is the foundational key to all success.” - Pablo Picasso''',
-    '''“Amateurs sit and wait for inspiration, the rest of us just get up and go to work.” - Stephen King''',
-  ];
 
   void goToPage(int index) {
     setState(() {
@@ -117,41 +102,21 @@ class _HomeState extends State<Home> {
     if (loading) {
       setState(() {
         _loginLoading = true;
-        _loading = true;
-        _quote = _quotes[_random.nextInt(_quotes.length)];
       });
     } else {
-      if (success) {
-        setState(() {
-          _loginLoading = false;
-        });
-        Future.delayed(loadingDelay, () {
-          setState(() {
-            _loading = false;
-          });
-        });
-      } else {
-        setState(() {
-          _loginLoading = false;
-          _loading = false;
-        });
-      }
+      setState(() {
+        _loginLoading = false;
+      });
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _quote = _quotes[_random.nextInt(_quotes.length)];
     Future.delayed(Duration.zero, () {
       goToPage(0);
       setState(() {
         _backgroundColor = Theme.of(context).primaryColor;
-      });
-    });
-    Future.delayed(loadingDelay, () {
-      setState(() {
-        _loading = false;
       });
     });
   }
@@ -161,8 +126,10 @@ class _HomeState extends State<Home> {
     SizeConfig().init(context);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     var user = Provider.of<User>(context);
-    var uncompletedTasks = Provider.of<UncompletedTasks>(context);
-    var completedTasks = Provider.of<CompletedTasks>(context);
+    var uncompletedTasks = Provider.of<UncompletedTasks>(context).tasks;
+    var completedTasks = Provider.of<CompletedTasks>(context).tasks;
+    print((user != null && user.signedIn == true) &&
+        (uncompletedTasks == null || completedTasks == null));
     return KeyboardVisibilityProvider(
       child: KeyboardDismissOnTap(
         child: NotificationListener<OverscrollIndicatorNotification>(
@@ -176,10 +143,10 @@ class _HomeState extends State<Home> {
             body: Stack(
               children: <Widget>[
                 AnimatedOpacity(
-                  opacity: ((user == null) ||
-                          (uncompletedTasks == null) ||
-                          (completedTasks == null) ||
-                          _loading)
+                  opacity: user == null ||
+                          ((user != null && user.signedIn == true) &&
+                              (uncompletedTasks == null ||
+                                  completedTasks == null))
                       ? 0
                       : 1,
                   duration: generalDuration,
@@ -192,7 +159,9 @@ class _HomeState extends State<Home> {
                       left: 0,
                       right: 0,
                       top: _cardPosition == 0 ||
-                              (user != null && !user.signedIn)
+                              (user != null && !user.signedIn ||
+                                  uncompletedTasks == null ||
+                                  completedTasks == null)
                           ? 0
                           : _cardPosition + MediaQuery.of(context).padding.top,
                       child: Container(
@@ -214,7 +183,10 @@ class _HomeState extends State<Home> {
                     ),
                     SafeArea(
                       child: SizedBox.expand(
-                        child: (user != null && user.signedIn)
+                        child: (user != null &&
+                                user.signedIn &&
+                                uncompletedTasks != null &&
+                                completedTasks != null)
                             ? _child
                             : LoginPage(
                                 goToPage: goToPage,
@@ -225,33 +197,11 @@ class _HomeState extends State<Home> {
                   ]),
                 ),
                 AnimatedOpacity(
-                  opacity: ((user == null) ||
-                          (uncompletedTasks == null) ||
-                          (completedTasks == null) ||
-                          _loading && !_loginLoading)
-                      ? 1
-                      : 0,
-                  duration: generalDuration,
-                  curve: generalCurve,
-                  child: Container(
-                    padding: EdgeInsets.all(50),
-                    alignment: Alignment.center,
-                    child: Text(
-                      _quote,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                AnimatedOpacity(
-                  opacity: ((user == null) ||
-                          (uncompletedTasks == null) ||
-                          (completedTasks == null) ||
-                          _loading ||
-                          _loginLoading)
+                  opacity: user == null ||
+                          ((user != null && user.signedIn == true) &&
+                              (uncompletedTasks == null ||
+                                  completedTasks == null)) ||
+                          _loginLoading
                       ? 1
                       : 0,
                   duration: generalDuration,

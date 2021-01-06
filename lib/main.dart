@@ -70,10 +70,12 @@ class MyApp extends StatelessWidget {
           StreamProvider<UncompletedTasks>.value(
             value: DatabaseProvider()
                 .streamUncompleted(Provider.of<User>(context)),
+            initialData: UncompletedTasks(null),
           ),
           StreamProvider<CompletedTasks>.value(
             value:
                 DatabaseProvider().streamCompleted(Provider.of<User>(context)),
+            initialData: CompletedTasks(null),
           ),
         ],
         child: Home(),

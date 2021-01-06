@@ -7,7 +7,7 @@ class DatabaseProvider {
 
   Stream<UncompletedTasks> streamUncompleted(User user) {
     if (user == null || !user.signedIn) {
-      return Stream<UncompletedTasks>.value(UncompletedTasks([]));
+      return Stream<UncompletedTasks>.value(UncompletedTasks(null));
     } else {
       return _db
           .collection('users')
@@ -28,7 +28,7 @@ class DatabaseProvider {
 
   Stream<CompletedTasks> streamCompleted(User user) {
     if (user == null || !user.signedIn) {
-      return Stream<CompletedTasks>.value(CompletedTasks([]));
+      return Stream<CompletedTasks>.value(CompletedTasks(null));
     } else {
       return _db
           .collection('users')
