@@ -128,8 +128,6 @@ class _HomeState extends State<Home> {
     var user = Provider.of<User>(context);
     var uncompletedTasks = Provider.of<UncompletedTasks>(context).tasks;
     var completedTasks = Provider.of<CompletedTasks>(context).tasks;
-    print((user != null && user.signedIn == true) &&
-        (uncompletedTasks == null || completedTasks == null));
     return KeyboardVisibilityProvider(
       child: KeyboardDismissOnTap(
         child: NotificationListener<OverscrollIndicatorNotification>(
