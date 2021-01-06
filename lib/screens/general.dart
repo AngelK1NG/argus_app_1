@@ -17,7 +17,6 @@ class GeneralPage extends StatefulWidget {
 
 class _GeneralPageState extends State<GeneralPage> {
   SharedPreferences _prefs;
-  bool _loading = true;
   bool _distractedNotification = true;
   bool _focusDnd = true;
 
@@ -38,11 +37,6 @@ class _GeneralPageState extends State<GeneralPage> {
         _focusDnd = _prefs.getBool('focusDnd');
       }
     });
-    if (mounted) {
-      setState(() {
-        _loading = false;
-      });
-    }
   }
 
   void setBool(String key, bool val) async {
@@ -88,35 +82,30 @@ class _GeneralPageState extends State<GeneralPage> {
           top: 50,
           left: 20,
           right: 20,
-          child: AnimatedOpacity(
-            opacity: _loading ? 0 : 1,
-            duration: cardDuration,
-            curve: cardCurve,
-            child: Column(
-              children: <Widget>[
-                SettingsSwitchItem(
-                  title: 'Repeatedly notify when Distracted',
-                  toggle: _distractedNotification,
-                  onChanged: (value) {
-                    setState(() {
-                      _distractedNotification = value;
-                    });
-                    setBool('repeatDistractedNotification', value);
-                  },
-                ),
-                Platform.isAndroid
-                    ? SettingsSwitchItem(
-                        title: 'Turn on Do Not Disturb when Focused',
-                        toggle: _focusDnd,
-                        onChanged: (value) {
-                          setState(() {
-                            _focusDnd = value;
-                          });
-                          setBool('focusDnd', value);
-                        })
-                    : Container(),
-              ],
-            ),
+          child: Column(
+            children: <Widget>[
+              SettingsSwitchItem(
+                title: 'Repeatedly notify when Distracted',
+                toggle: _distractedNotification,
+                onChanged: (value) {
+                  setState(() {
+                    _distractedNotification = value;
+                  });
+                  setBool('repeatDistractedNotification', value);
+                },
+              ),
+              Platform.isAndroid
+                  ? SettingsSwitchItem(
+                      title: 'Turn on Do Not Disturb when Focused',
+                      toggle: _focusDnd,
+                      onChanged: (value) {
+                        setState(() {
+                          _focusDnd = value;
+                        });
+                        setBool('focusDnd', value);
+                      })
+                  : Container(),
+            ],
           ),
         ),
       ]),

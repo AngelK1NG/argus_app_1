@@ -3,11 +3,9 @@ import 'package:Focal/constants.dart';
 
 class StatisticsPage extends StatefulWidget {
   final Function goToPage;
-  final Function setLoading;
 
   StatisticsPage({
     @required this.goToPage,
-    @required this.setLoading,
     Key key,
   }) : super(key: key);
 

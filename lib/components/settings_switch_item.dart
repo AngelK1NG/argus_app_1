@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:Focal/utils/size_config.dart';
+import 'package:Focal/utils/size.dart';
 
 class SettingsSwitchItem extends StatelessWidget {
   final String title;

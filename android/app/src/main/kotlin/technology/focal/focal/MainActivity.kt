@@ -16,6 +16,9 @@ import android.hardware.display.DisplayManager
 import android.view.Display
 import android.os.PowerManager
 
+import android.os.Build
+import android.view.ViewTreeObserver
+import android.view.WindowManager
 class MainActivity: FlutterActivity() {
     private val CHANNEL = "plugins.flutter.io/screen"
 

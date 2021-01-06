@@ -16,7 +16,6 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
-  bool _loading = true;
   String _version = '';
 
   void openUrl(String url) async {
@@ -49,12 +48,8 @@ class _AboutPageState extends State<AboutPage> {
   void initState() {
     super.initState();
     PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
-      _version = 'Version ${packageInfo.version} (${packageInfo.buildNumber})';
-      if (mounted) {
-        setState(() {
-          _loading = false;
-        });
-      }
+      setState(() => _version =
+          'Version ${packageInfo.version} (${packageInfo.buildNumber})');
     });
   }
 
@@ -62,103 +57,98 @@ class _AboutPageState extends State<AboutPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () => widget.goToPage(2),
-      child: AnimatedOpacity(
-        opacity: _loading ? 0 : 1,
-        duration: cardDuration,
-        curve: cardCurve,
-        child: Stack(
-          children: <Widget>[
-            Container(
-              alignment: Alignment.center,
-              height: 50,
-              child: Text(
-                'About',
-                style: blackHeaderTextStyle,
-              ),
+      child: Stack(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.center,
+            height: 50,
+            child: Text(
+              'About',
+              style: blackHeaderTextStyle,
             ),
-            Positioned(
-              left: 5,
-              top: 0,
-              child: NavButton(
-                onTap: () {
-                  widget.goToPage(2);
-                },
-                iconData: FeatherIcons.chevronLeft,
-                color: black,
-              ),
+          ),
+          Positioned(
+            left: 5,
+            top: 0,
+            child: NavButton(
+              onTap: () {
+                widget.goToPage(2);
+              },
+              iconData: FeatherIcons.chevronLeft,
+              color: black,
             ),
-            Positioned(
-              right: 0,
-              left: 0,
-              top: 100,
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 15),
-                    child: Image(
-                      image: AssetImage(
-                          'assets/images/logo/Focal Logo_Full Colored.png'),
-                      width: 150,
-                    ),
-                  ),
-                  Text(
-                    _version,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Center(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          ),
+          Positioned(
+            right: 0,
+            left: 0,
+            top: 100,
+            child: Column(
               children: <Widget>[
-                textButton(
-                  onTap: () {
-                    LaunchReview.launch(
-                        androidAppId: 'technology.focal.focal',
-                        iOSAppId: '1526256598');
-                  },
-                  text: 'Rate Focal',
+                Padding(
+                  padding: EdgeInsets.only(bottom: 15),
+                  child: Image(
+                    image:
+                        AssetImage('assets/images/Focal Logo_Full Colored.png'),
+                    width: 150,
+                  ),
                 ),
-                textButton(
-                  onTap: () {
-                    openUrl('https://getfocal.app/terms');
-                  },
-                  text: 'Terms and Conditions',
-                ),
-                textButton(
-                  onTap: () {
-                    openUrl('https://getfocal.app/privacy');
-                  },
-                  text: 'Privacy Policy',
-                ),
-                textButton(
-                  onTap: () {
-                    openUrl('https://getfocal.app');
-                  },
-                  text: 'Website',
-                ),
-              ],
-            )),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 20,
-              child: Center(
-                child: Text(
-                  '© 2020 Focal LLC',
+                Text(
+                  _version,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Theme.of(context).hintColor,
+                    color: Theme.of(context).primaryColor,
                   ),
+                ),
+              ],
+            ),
+          ),
+          Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              textButton(
+                onTap: () {
+                  LaunchReview.launch(
+                      androidAppId: 'technology.focal.focal',
+                      iOSAppId: '1526256598');
+                },
+                text: 'Rate Focal',
+              ),
+              textButton(
+                onTap: () {
+                  openUrl('https://getfocal.app/terms');
+                },
+                text: 'Terms and Conditions',
+              ),
+              textButton(
+                onTap: () {
+                  openUrl('https://getfocal.app/privacy');
+                },
+                text: 'Privacy Policy',
+              ),
+              textButton(
+                onTap: () {
+                  openUrl('https://getfocal.app');
+                },
+                text: 'Website',
+              ),
+            ],
+          )),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 20,
+            child: Center(
+              child: Text(
+                '© 2020 Focal LLC',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).hintColor,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

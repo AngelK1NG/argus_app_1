@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Focal/components/button.dart';
-import 'package:Focal/utils/size_config.dart';
+import 'package:Focal/utils/size.dart';
 import 'package:Focal/constants.dart';
 
 class OnboardingPage extends StatelessWidget {
@@ -23,8 +23,7 @@ class OnboardingPage extends StatelessWidget {
       children: <Widget>[
         end
             ? Image(
-                image: AssetImage(
-                    'assets/images/logo/Focal Logo_Full Colored.png'),
+                image: AssetImage('assets/images/Focal Logo_Full Colored.png'),
                 width: 300,
               )
             : Icon(

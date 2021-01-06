@@ -44,12 +44,9 @@ final TextStyle buttonTextStyle = TextStyle(
   color: Colors.white,
 );
 
-//loading delay
-final Duration loadingDelay = Duration(milliseconds: 2000);
-
 //animation transitions
-final Duration cardDuration = Duration(milliseconds: 200);
-final Curve cardCurve = Curves.ease;
+final Duration generalDuration = Duration(milliseconds: 200);
+final Curve generalCurve = Curves.ease;
 
 final Duration loginDuration = Duration(milliseconds: 800);
 final Curve loginCurve = Curves.ease;
@@ -62,6 +59,8 @@ final Curve buttonCurve = Curves.ease;
 
 final Duration snackbarDuration = Duration(milliseconds: 2000);
 final Duration focusNoticeDuration = Duration(milliseconds: 4000);
+
+final Duration loadingDelay = Duration(milliseconds: 2000);
 
 //algorithms
 num voltsIncrement({

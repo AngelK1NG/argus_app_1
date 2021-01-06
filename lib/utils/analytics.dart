@@ -1,30 +1,30 @@
 import 'package:Focal/constants.dart';
-import 'package:Focal/components/task_item.dart';
+import 'package:Focal/components/task.dart';
 
 class AnalyticsProvider {
   //focus
-  void logStartTask(TaskItem task, DateTime time) {
+  void logStartTask(Task task, DateTime time) {
     analytics.logEvent(
       name: 'start_task',
       parameters: <String, dynamic>{},
     );
   }
 
-  void logResumeTask(TaskItem task, DateTime time) {
+  void logResumeTask(Task task, DateTime time) {
     analytics.logEvent(
       name: 'resume_task',
       parameters: <String, dynamic>{},
     );
   }
 
-  void logCompleteTask(TaskItem task, DateTime time) {
+  void logCompleteTask(Task task, DateTime time) {
     analytics.logEvent(
       name: 'complete_task',
       parameters: <String, dynamic>{},
     );
   }
 
-  void logPauseTask(TaskItem task, DateTime time) {
+  void logPauseTask(Task task, DateTime time) {
     analytics.logEvent(
       name: 'save_task',
       parameters: <String, dynamic>{},
@@ -32,21 +32,21 @@ class AnalyticsProvider {
   }
 
   //tasks
-  void logAddTask(TaskItem task, DateTime time) {
+  void logAddTask(Task task, DateTime time) {
     analytics.logEvent(
       name: 'add_task',
       parameters: <String, dynamic>{},
     );
   }
 
-  void logDeferTask(TaskItem task, DateTime time) {
+  void logDeferTask(Task task, DateTime time) {
     analytics.logEvent(
       name: 'defer_task',
       parameters: <String, dynamic>{},
     );
   }
 
-  void logDeleteTask(TaskItem task, DateTime time) {
+  void logDeleteTask(Task task, DateTime time) {
     analytics.logEvent(
       name: 'delete_task',
       parameters: <String, dynamic>{},

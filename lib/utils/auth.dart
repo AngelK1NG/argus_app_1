@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:apple_sign_in/apple_sign_in.dart';
@@ -5,8 +6,14 @@ import 'package:apple_sign_in/apple_sign_in.dart';
 class AuthProvider {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Stream<FirebaseUser> get onAuthStateChanged {
-    return _auth.onAuthStateChanged;
+  User _userFromFirebase(FirebaseUser user) {
+    return user == null
+        ? User(signedIn: false)
+        : User(signedIn: true, uid: user.uid, email: user.email);
+  }
+
+  Stream<User> onAuthStateChanged() {
+    return _auth.onAuthStateChanged.map(_userFromFirebase);
   }
 
   Future<FirebaseUser> googleSignIn() async {
@@ -73,4 +80,12 @@ class AuthProvider {
       return null;
     }
   }
+}
+
+class User {
+  final bool signedIn;
+  final String uid;
+  final String email;
+
+  const User({@required this.signedIn, this.uid, this.email});
 }

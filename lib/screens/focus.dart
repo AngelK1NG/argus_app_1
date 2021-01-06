@@ -1,21 +1,12 @@
-import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Focal/utils/local_notifications.dart';
-import 'package:Focal/constants.dart';
 
 class FocusPage extends StatefulWidget {
   final Function goToPage;
-  final Function setLoading;
-  final Function setNav;
-  final Function setDoingTask;
 
   FocusPage({
     @required this.goToPage,
-    @required this.setLoading,
-    @required this.setNav,
-    @required this.setDoingTask,
     Key key,
   }) : super(key: key);
 
@@ -25,7 +16,6 @@ class FocusPage extends StatefulWidget {
 
 class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   LocalNotifications localNotifications;
-  bool _loading = true;
 
   void startTask() async {}
 
@@ -39,11 +29,6 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    Future.delayed(loadingDelay, () {
-      if (_loading && mounted) {
-        widget.setLoading(true);
-      }
-    });
     localNotifications = LocalNotifications();
     localNotifications.initialize();
     localNotifications.cancelDistractedNotification();
@@ -62,15 +47,10 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async => false,
-      child: AnimatedOpacity(
-        opacity: _loading ? 0 : 1,
-        duration: cardDuration,
-        curve: cardCurve,
-        child: Stack(
-          children: <Widget>[
-            Container(),
-          ],
-        ),
+      child: Stack(
+        children: <Widget>[
+          Container(),
+        ],
       ),
     );
   }

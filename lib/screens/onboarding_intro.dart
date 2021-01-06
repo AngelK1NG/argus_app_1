@@ -50,8 +50,8 @@ class _OnboardingIntroState extends State<OnboardingIntro> {
             _index--;
             _controller.animateToPage(
               _index.round(),
-              duration: cardDuration,
-              curve: cardCurve,
+              duration: generalDuration,
+              curve: generalCurve,
             );
           }
           return false;
