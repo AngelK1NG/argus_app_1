@@ -28,8 +28,7 @@ class _HomeState extends State<Home> {
   Color _backgroundColor;
   double _cardPosition = 0;
   bool _loginLoading = false;
-  AuthProvider auth = AuthProvider();
-  DatabaseProvider db = DatabaseProvider();
+  SystemUiOverlayStyle _overlayStyle = SystemUiOverlayStyle.light;
 
   void goToPage(int index) {
     setState(() {
@@ -40,7 +39,7 @@ class _HomeState extends State<Home> {
               goToPage: goToPage,
             );
             _cardPosition = 50;
-            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+            _overlayStyle = SystemUiOverlayStyle.light;
             break;
           }
         case 1:
@@ -49,7 +48,7 @@ class _HomeState extends State<Home> {
               goToPage: goToPage,
             );
             _cardPosition = 80;
-            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+            _overlayStyle = SystemUiOverlayStyle.light;
             break;
           }
 
@@ -59,7 +58,7 @@ class _HomeState extends State<Home> {
               goToPage: goToPage,
             );
             _cardPosition = 50;
-            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+            _overlayStyle = SystemUiOverlayStyle.light;
             break;
           }
         case 3:
@@ -68,7 +67,7 @@ class _HomeState extends State<Home> {
               goToPage: goToPage,
             );
             _cardPosition = SizeConfig.safeHeight;
-            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+            _overlayStyle = SystemUiOverlayStyle.light;
             break;
           }
 
@@ -76,21 +75,21 @@ class _HomeState extends State<Home> {
           {
             _child = GeneralPage(goToPage: goToPage);
             _cardPosition = 50;
-            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+            _overlayStyle = SystemUiOverlayStyle.light;
             break;
           }
         case 5:
           {
             _child = HelpPage(goToPage: goToPage);
             _cardPosition = 0;
-            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+            _overlayStyle = SystemUiOverlayStyle.dark;
             break;
           }
         case 6:
           {
             _child = AboutPage(goToPage: goToPage);
             _cardPosition = 0;
-            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+            _overlayStyle = SystemUiOverlayStyle.dark;
             break;
           }
       }
@@ -109,6 +108,20 @@ class _HomeState extends State<Home> {
     }
   }
 
+  bool _loading(UserStatus user, List uncompletedTasks, List completedTasks) {
+    return user == null ||
+        ((user != null && user.signedIn) &&
+            (uncompletedTasks == null || completedTasks == null));
+  }
+
+  bool _signedIn(UserStatus user) {
+    return user != null && user.signedIn;
+  }
+
+  bool _signedOut(UserStatus user) {
+    return user != null && !user.signedIn;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -123,109 +136,96 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     var user = Provider.of<UserStatus>(context);
     var uncompletedTasks = Provider.of<UncompletedTasks>(context).tasks;
     var completedTasks = Provider.of<CompletedTasks>(context).tasks;
-    return KeyboardVisibilityProvider(
-      child: KeyboardDismissOnTap(
-        child: NotificationListener<OverscrollIndicatorNotification>(
-          onNotification: (OverscrollIndicatorNotification overscroll) {
-            overscroll.disallowGlow();
-            return null;
-          },
-          child: Scaffold(
-            backgroundColor: Colors.white,
-            resizeToAvoidBottomInset: false,
-            body: Stack(
-              children: <Widget>[
-                AnimatedOpacity(
-                  opacity: user == null ||
-                          ((user != null && user.signedIn == true) &&
-                              (uncompletedTasks == null ||
-                                  completedTasks == null))
-                      ? 0
-                      : 1,
-                  duration: generalDuration,
-                  curve: generalCurve,
-                  child: Stack(children: <Widget>[
-                    Container(
-                      color: _backgroundColor,
-                    ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      top: _cardPosition == 0 ||
-                              (user != null && !user.signedIn ||
-                                  uncompletedTasks == null ||
-                                  completedTasks == null)
-                          ? 0
-                          : _cardPosition + MediaQuery.of(context).padding.top,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: _cardPosition == 0 ||
-                                    (user != null && !user.signedIn ||
-                                        uncompletedTasks == null ||
-                                        completedTasks == null)
-                                ? Radius.zero
-                                : Radius.circular(25),
-                            topRight: _cardPosition == 0 ||
-                                    (user != null && !user.signedIn ||
-                                        uncompletedTasks == null ||
-                                        completedTasks == null)
-                                ? Radius.zero
-                                : Radius.circular(25),
+    return AnnotatedRegion(
+      value: _signedOut(user) ? SystemUiOverlayStyle.dark : _overlayStyle,
+      child: KeyboardVisibilityProvider(
+        child: KeyboardDismissOnTap(
+          child: NotificationListener<OverscrollIndicatorNotification>(
+            onNotification: (OverscrollIndicatorNotification overscroll) {
+              overscroll.disallowGlow();
+              return null;
+            },
+            child: Scaffold(
+              backgroundColor: Colors.white,
+              resizeToAvoidBottomInset: false,
+              body: Stack(
+                children: <Widget>[
+                  AnimatedOpacity(
+                    opacity: _loading(user, uncompletedTasks, completedTasks)
+                        ? 0
+                        : 1,
+                    duration: generalDuration,
+                    curve: generalCurve,
+                    child: Stack(children: <Widget>[
+                      Container(
+                        color: _backgroundColor,
+                      ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        top: _cardPosition == 0 || _signedOut(user)
+                            ? 0
+                            : _cardPosition +
+                                MediaQuery.of(context).padding.top,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                              topLeft: _cardPosition == 0 || _signedOut(user)
+                                  ? Radius.zero
+                                  : Radius.circular(25),
+                              topRight: _cardPosition == 0 || _signedOut(user)
+                                  ? Radius.zero
+                                  : Radius.circular(25),
+                            ),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                spreadRadius: -5,
+                                blurRadius: 15,
+                              )
+                            ],
                           ),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              spreadRadius: -5,
-                              blurRadius: 15,
-                            )
+                          height: MediaQuery.of(context).size.height,
+                        ),
+                      ),
+                      SafeArea(
+                        child: SizedBox.expand(
+                          child: _signedIn(user) &&
+                                  !_loading(
+                                      user, uncompletedTasks, completedTasks)
+                              ? _child
+                              : LoginPage(
+                                  goToPage: goToPage,
+                                  setLoading: setLoginLoading,
+                                ),
+                        ),
+                      ),
+                    ]),
+                  ),
+                  AnimatedOpacity(
+                    opacity: _loading(user, uncompletedTasks, completedTasks) ||
+                            _loginLoading
+                        ? 1
+                        : 0,
+                    duration: generalDuration,
+                    curve: generalCurve,
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: GradientProgressIndicator(
+                        gradient: LinearGradient(
+                          colors: [
+                            Theme.of(context).primaryColor,
+                            Theme.of(context).primaryColorLight,
                           ],
                         ),
-                        height: MediaQuery.of(context).size.height,
-                      ),
-                    ),
-                    SafeArea(
-                      child: SizedBox.expand(
-                        child: (user != null &&
-                                user.signedIn &&
-                                uncompletedTasks != null &&
-                                completedTasks != null)
-                            ? _child
-                            : LoginPage(
-                                goToPage: goToPage,
-                                setLoading: setLoginLoading,
-                              ),
-                      ),
-                    ),
-                  ]),
-                ),
-                AnimatedOpacity(
-                  opacity: user == null ||
-                          ((user != null && user.signedIn == true) &&
-                              (uncompletedTasks == null ||
-                                  completedTasks == null)) ||
-                          _loginLoading
-                      ? 1
-                      : 0,
-                  duration: generalDuration,
-                  curve: generalCurve,
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: GradientProgressIndicator(
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context).primaryColor,
-                          Theme.of(context).primaryColorLight,
-                        ],
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

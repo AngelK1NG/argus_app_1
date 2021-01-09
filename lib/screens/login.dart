@@ -42,7 +42,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     return AnimatedOpacity(
       opacity: _visible ? 1 : 0,
       duration: loginDuration,
