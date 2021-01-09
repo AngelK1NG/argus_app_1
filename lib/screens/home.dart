@@ -166,17 +166,25 @@ class _HomeState extends State<Home> {
                       Positioned(
                         left: 0,
                         right: 0,
-                        top: _cardPosition == 0 || _signedOut(user)
+                        top: _cardPosition == 0 ||
+                                _signedOut(user) ||
+                                _loading(user, uncompletedTasks, completedTasks)
                             ? 0
                             : _cardPosition +
                                 MediaQuery.of(context).padding.top,
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.only(
-                              topLeft: _cardPosition == 0 || _signedOut(user)
+                              topLeft: _cardPosition == 0 ||
+                                      _signedOut(user) ||
+                                      _loading(user, uncompletedTasks,
+                                          completedTasks)
                                   ? Radius.zero
                                   : Radius.circular(25),
-                              topRight: _cardPosition == 0 || _signedOut(user)
+                              topRight: _cardPosition == 0 ||
+                                      _signedOut(user) ||
+                                      _loading(user, uncompletedTasks,
+                                          completedTasks)
                                   ? Radius.zero
                                   : Radius.circular(25),
                             ),
