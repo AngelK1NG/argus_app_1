@@ -15,7 +15,6 @@ import 'package:Focal/constants.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:provider/provider.dart';
 import 'package:gradient_widgets/gradient_widgets.dart';
-import 'dart:math';
 
 class Home extends StatefulWidget {
   const Home();
@@ -90,7 +89,7 @@ class _HomeState extends State<Home> {
         case 6:
           {
             _child = AboutPage(goToPage: goToPage);
-            _cardPosition = -25;
+            _cardPosition = 0;
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
             break;
           }
@@ -125,7 +124,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
-    var user = Provider.of<User>(context);
+    var user = Provider.of<UserStatus>(context);
     var uncompletedTasks = Provider.of<UncompletedTasks>(context).tasks;
     var completedTasks = Provider.of<CompletedTasks>(context).tasks;
     return KeyboardVisibilityProvider(
@@ -165,8 +164,18 @@ class _HomeState extends State<Home> {
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(25),
-                            topRight: Radius.circular(25),
+                            topLeft: _cardPosition == 0 ||
+                                    (user != null && !user.signedIn ||
+                                        uncompletedTasks == null ||
+                                        completedTasks == null)
+                                ? Radius.zero
+                                : Radius.circular(25),
+                            topRight: _cardPosition == 0 ||
+                                    (user != null && !user.signedIn ||
+                                        uncompletedTasks == null ||
+                                        completedTasks == null)
+                                ? Radius.zero
+                                : Radius.circular(25),
                           ),
                           color: Colors.white,
                           boxShadow: [

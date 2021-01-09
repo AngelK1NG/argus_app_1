@@ -3,36 +3,34 @@ import 'package:Focal/utils/auth.dart';
 import 'package:Focal/components/task.dart';
 
 class DatabaseProvider {
-  Firestore _db = Firestore.instance;
+  FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Stream<UncompletedTasks> streamUncompleted(User user) {
+  Stream<UncompletedTasks> streamUncompleted(UserStatus user) {
     if (user == null || !user.signedIn) {
       return Stream<UncompletedTasks>.value(UncompletedTasks(null));
     } else {
       return _db
           .collection('users')
-          .document(user.uid)
+          .doc(user.uid)
           .collection('uncompleted')
           .orderBy('date')
           .orderBy('index')
           .snapshots()
           .map(
             (list) => UncompletedTasks(
-              list.documents
-                  .map((doc) => Task.fromFirestore(doc, false))
-                  .toList(),
+              list.docs.map((doc) => Task.fromFirestore(doc, false)).toList(),
             ),
           );
     }
   }
 
-  Stream<CompletedTasks> streamCompleted(User user) {
+  Stream<CompletedTasks> streamCompleted(UserStatus user) {
     if (user == null || !user.signedIn) {
       return Stream<CompletedTasks>.value(CompletedTasks(null));
     } else {
       return _db
           .collection('users')
-          .document(user.uid)
+          .doc(user.uid)
           .collection('completed')
           .orderBy('date', descending: true)
           .orderBy('index', descending: true)
@@ -40,9 +38,7 @@ class DatabaseProvider {
           .snapshots()
           .map(
             (list) => CompletedTasks(
-              list.documents
-                  .map((doc) => Task.fromFirestore(doc, true))
-                  .toList(),
+              list.docs.map((doc) => Task.fromFirestore(doc, true)).toList(),
             ),
           );
     }

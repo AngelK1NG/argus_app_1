@@ -7,7 +7,7 @@ import 'dart:math';
 
 //firebase
 final FirebaseAuth auth = FirebaseAuth.instance;
-final Firestore db = Firestore.instance;
+final FirebaseFirestore db = FirebaseFirestore.instance;
 final FirebaseAnalytics analytics = FirebaseAnalytics();
 
 //local notifications

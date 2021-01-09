@@ -28,7 +28,7 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var email = Provider.of<User>(context).email;
+    var email = Provider.of<UserStatus>(context).email;
     return WillPopScope(
       onWillPop: () => this.goToPage(0),
       child: Stack(children: <Widget>[

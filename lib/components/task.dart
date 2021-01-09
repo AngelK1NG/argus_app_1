@@ -27,9 +27,9 @@ class Task extends StatelessWidget {
   }) : super(key: key);
 
   factory Task.fromFirestore(DocumentSnapshot doc, bool completed) {
-    Map data = doc.data;
+    Map data = doc.data();
     return Task(
-      id: doc.documentID,
+      id: doc.id,
       name: data['name'] ?? '',
       date: data['date'] ?? '',
       completed: completed,

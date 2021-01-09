@@ -7,7 +7,6 @@ import 'package:Focal/components/button.dart';
 import 'package:Focal/components/task.dart';
 import 'package:Focal/components/nav_button.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 
 class TasksPage extends StatefulWidget {
@@ -102,19 +101,6 @@ class _TasksPageState extends State<TasksPage> {
   @override
   void initState() {
     super.initState();
-    KeyboardVisibility.onChange.listen((bool visible) {
-      if (mounted) {
-        setState(() {
-          _keyboard = visible;
-        });
-        if (!visible) {
-          FocusScope.of(context).unfocus();
-          setState(() {
-            _addingTask = false;
-          });
-        }
-      }
-    });
   }
 
   @override

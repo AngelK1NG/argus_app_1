@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:provider/provider.dart';
 import 'package:Focal/screens/home.dart';
@@ -9,19 +10,18 @@ import 'package:Focal/constants.dart';
 import 'package:Focal/utils/auth.dart';
 import 'package:Focal/utils/database.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
+void main() async {
+  await WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]).then((_) {
-    runApp(
-      StreamProvider<User>.value(
-        value: AuthProvider().onAuthStateChanged(),
-        child: MyApp(),
-      ),
-    );
-  });
+  ]);
+  await Firebase.initializeApp();
+  runApp(
+    StreamProvider<UserStatus>.value(
+      value: AuthProvider().onAuthStateChanged(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -69,12 +69,12 @@ class MyApp extends StatelessWidget {
         providers: [
           StreamProvider<UncompletedTasks>.value(
             value: DatabaseProvider()
-                .streamUncompleted(Provider.of<User>(context)),
+                .streamUncompleted(Provider.of<UserStatus>(context)),
             initialData: UncompletedTasks(null),
           ),
           StreamProvider<CompletedTasks>.value(
-            value:
-                DatabaseProvider().streamCompleted(Provider.of<User>(context)),
+            value: DatabaseProvider()
+                .streamCompleted(Provider.of<UserStatus>(context)),
             initialData: CompletedTasks(null),
           ),
         ],
