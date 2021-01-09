@@ -28,7 +28,8 @@ class _HomeState extends State<Home> {
   Color _backgroundColor;
   double _cardPosition = 0;
   bool _loginLoading = false;
-  SystemUiOverlayStyle _overlayStyle = SystemUiOverlayStyle.light;
+  SystemUiOverlayStyle _overlayStyle =
+      SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent);
 
   void goToPage(int index) {
     setState(() {
@@ -39,7 +40,8 @@ class _HomeState extends State<Home> {
               goToPage: goToPage,
             );
             _cardPosition = 50;
-            _overlayStyle = SystemUiOverlayStyle.light;
+            _overlayStyle = SystemUiOverlayStyle.light
+                .copyWith(statusBarColor: Colors.transparent);
             break;
           }
         case 1:
@@ -48,7 +50,8 @@ class _HomeState extends State<Home> {
               goToPage: goToPage,
             );
             _cardPosition = 80;
-            _overlayStyle = SystemUiOverlayStyle.light;
+            _overlayStyle = SystemUiOverlayStyle.light
+                .copyWith(statusBarColor: Colors.transparent);
             break;
           }
 
@@ -58,7 +61,8 @@ class _HomeState extends State<Home> {
               goToPage: goToPage,
             );
             _cardPosition = 50;
-            _overlayStyle = SystemUiOverlayStyle.light;
+            _overlayStyle = SystemUiOverlayStyle.light
+                .copyWith(statusBarColor: Colors.transparent);
             break;
           }
         case 3:
@@ -67,7 +71,8 @@ class _HomeState extends State<Home> {
               goToPage: goToPage,
             );
             _cardPosition = SizeConfig.safeHeight;
-            _overlayStyle = SystemUiOverlayStyle.light;
+            _overlayStyle = SystemUiOverlayStyle.light
+                .copyWith(statusBarColor: Colors.transparent);
             break;
           }
 
@@ -75,21 +80,24 @@ class _HomeState extends State<Home> {
           {
             _child = GeneralPage(goToPage: goToPage);
             _cardPosition = 50;
-            _overlayStyle = SystemUiOverlayStyle.light;
+            _overlayStyle = SystemUiOverlayStyle.light
+                .copyWith(statusBarColor: Colors.transparent);
             break;
           }
         case 5:
           {
             _child = HelpPage(goToPage: goToPage);
             _cardPosition = 0;
-            _overlayStyle = SystemUiOverlayStyle.dark;
+            _overlayStyle = SystemUiOverlayStyle.dark
+                .copyWith(statusBarColor: Colors.transparent);
             break;
           }
         case 6:
           {
             _child = AboutPage(goToPage: goToPage);
             _cardPosition = 0;
-            _overlayStyle = SystemUiOverlayStyle.dark;
+            _overlayStyle = SystemUiOverlayStyle.dark
+                .copyWith(statusBarColor: Colors.transparent);
             break;
           }
       }
