@@ -104,14 +104,14 @@ class _TasksPageState extends State<TasksPage> {
                   ],
                 ),
                 itemGhostOpacity: 1,
-                itemGhost: Container(
-                  height: 50,
-                  width: SizeConfig.safeWidth,
+                itemGhost: Divider(
                   color: Theme.of(context).primaryColor,
+                  thickness: 2,
+                  height: 0,
                 ),
                 listGhostOpacity: 0,
                 lastListTargetSize: 0,
-                lastItemTargetHeight: 15,
+                lastItemTargetHeight: 17,
                 addLastItemTargetHeightToTop: true,
                 onItemReorder: (int oldItemIndex, int oldListIndex,
                     int newItemIndex, int newListIndex) {

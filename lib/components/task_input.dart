@@ -21,7 +21,7 @@ class _TaskInputState extends State<TaskInput> {
   bool _loading = true;
   SharedPreferences _prefs;
   FocusNode _focusNode = FocusNode();
-  final _input = TextEditingController();
+  TextEditingController _input = TextEditingController();
 
   void submit(UserStatus user, List uncompletedTasks) {
     if (_input.text.isNotEmpty) {
@@ -57,6 +57,9 @@ class _TaskInputState extends State<TaskInput> {
       setState(() {
         _prefs = prefs;
         _input.text = _prefs.getString('taskInput');
+        _input.selection = TextSelection.fromPosition(
+          TextPosition(offset: _input.text.length),
+        );
         _loading = false;
       });
     });
@@ -73,15 +76,15 @@ class _TaskInputState extends State<TaskInput> {
         children: [
           AnimatedOpacity(
             opacity: _loading ? 0 : 0.1,
-            duration: generalDuration,
-            curve: generalCurve,
+            duration: keyboardDuration,
+            curve: keyboardCurve,
             child: GestureDetector(
               onTap: () {
                 setState(() {
                   _loading = true;
                 });
                 _focusNode.unfocus();
-                Future.delayed(generalDuration, () {
+                Future.delayed(keyboardDuration, () {
                   Navigator.of(context).pop();
                 });
               },
@@ -176,6 +179,7 @@ class _TaskInputState extends State<TaskInput> {
                         child: Container(
                           height: 50,
                           width: 50,
+                          color: Colors.transparent,
                           child: Icon(
                             FeatherIcons.plusCircle,
                             size: 20,
