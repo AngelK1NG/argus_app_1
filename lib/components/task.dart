@@ -42,7 +42,7 @@ class Task extends StatelessWidget {
     );
   }
 
-  void updateDoc(UserStatus user) {
+  void updateDoc(UserStatus user, VoidCallback callback) {
     FirebaseFirestore.instance
         .collection('users')
         .doc(user.uid)
@@ -54,6 +54,8 @@ class Task extends StatelessWidget {
       'date': this.date,
       'paused': this.paused,
       'seconds': this.seconds,
+    }).then((_) {
+      callback();
     });
   }
 
@@ -69,6 +71,24 @@ class Task extends StatelessWidget {
       'paused': this.paused,
       'seconds': this.seconds,
     });
+  }
+
+  void deleteDoc(UserStatus user) {
+    if (!this.completed) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('uncompleted')
+          .doc(this.id)
+          .delete();
+    } else {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('completed')
+          .doc(this.id)
+          .delete();
+    }
   }
 
   @override
@@ -90,7 +110,7 @@ class Task extends StatelessWidget {
             padding: EdgeInsets.only(left: 15),
             alignment: AlignmentDirectional.centerStart,
             child: Icon(
-              FeatherIcons.sunrise,
+              FeatherIcons.calendar,
               color: Colors.white,
               size: 20,
             ),

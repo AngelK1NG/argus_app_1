@@ -18,7 +18,7 @@ class TaskInput extends StatefulWidget {
 }
 
 class _TaskInputState extends State<TaskInput> {
-  bool _loading = true;
+  bool _visible = false;
   SharedPreferences _prefs;
   FocusNode _focusNode = FocusNode();
   TextEditingController _input = TextEditingController();
@@ -60,7 +60,7 @@ class _TaskInputState extends State<TaskInput> {
         _input.selection = TextSelection.fromPosition(
           TextPosition(offset: _input.text.length),
         );
-        _loading = false;
+        _visible = true;
       });
     });
   }
@@ -75,13 +75,13 @@ class _TaskInputState extends State<TaskInput> {
       body: Stack(
         children: [
           AnimatedOpacity(
-            opacity: _loading ? 0 : 0.1,
+            opacity: _visible ? 0.15 : 0,
             duration: keyboardDuration,
             curve: keyboardCurve,
             child: GestureDetector(
               onTap: () {
                 setState(() {
-                  _loading = true;
+                  _visible = false;
                 });
                 _focusNode.unfocus();
                 Future.delayed(keyboardDuration, () {
@@ -97,19 +97,23 @@ class _TaskInputState extends State<TaskInput> {
             left: 0,
             right: 0,
             bottom:
-                _loading ? -100 - MediaQuery.of(context).viewInsets.bottom : 0,
+                _visible ? 0 : -100 - MediaQuery.of(context).viewInsets.bottom,
             duration: keyboardDuration,
             curve: keyboardCurve,
-            child: Container(
+            child: AnimatedContainer(
+              duration: keyboardDuration,
+              curve: keyboardCurve,
               height: 100 + MediaQuery.of(context).viewInsets.bottom,
               decoration: BoxDecoration(
                 color: white,
                 boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10,
-                    offset: Offset(0, -4),
-                    color: Theme.of(context).shadowColor,
-                  )
+                  _visible
+                      ? BoxShadow(
+                          blurRadius: 10,
+                          offset: Offset(0, -4),
+                          color: Theme.of(context).shadowColor,
+                        )
+                      : BoxShadow(color: Colors.transparent)
                 ],
               ),
               child: Column(
@@ -181,7 +185,7 @@ class _TaskInputState extends State<TaskInput> {
                           width: 50,
                           color: Colors.transparent,
                           child: Icon(
-                            FeatherIcons.plusCircle,
+                            FeatherIcons.arrowUpCircle,
                             size: 20,
                             color: _input.text.isEmpty
                                 ? Theme.of(context).hintColor

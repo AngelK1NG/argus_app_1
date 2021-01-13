@@ -28,7 +28,7 @@ class TasksPage extends StatefulWidget {
 
 class _TasksPageState extends State<TasksPage> {
   List<DragAndDropList> _tasks = [];
-  void deleteTask(Task task) {}
+  bool _saving = false;
 
   void setTasks(List<Task> uncompleted, List<Task> completed) {
     Map taskMap = {};
@@ -73,8 +73,10 @@ class _TasksPageState extends State<TasksPage> {
   Widget build(BuildContext context) {
     var user = Provider.of<UserStatus>(context);
     var keyboard = KeyboardVisibilityProvider.isKeyboardVisible(context);
-    setTasks(Provider.of<UncompletedTasks>(context).tasks,
-        Provider.of<CompletedTasks>(context).tasks);
+    if (!_saving) {
+      setTasks(Provider.of<UncompletedTasks>(context).tasks,
+          Provider.of<CompletedTasks>(context).tasks);
+    }
     return Stack(children: <Widget>[
       Nav(
         title: 'Tasks',
@@ -130,24 +132,32 @@ class _TasksPageState extends State<TasksPage> {
                       paused: movedTask.paused,
                       seconds: movedTask.seconds,
                     );
-                    _tasks[newListIndex].children.insert(
-                        newItemIndex, DragAndDropItem(child: newMovedTask));
+                    _saving = true;
+                    setState(() {
+                      _tasks[newListIndex].children.insert(
+                            newItemIndex,
+                            DragAndDropItem(child: newMovedTask),
+                          );
+                    });
                     List newTasks = [];
-                    _tasks[oldListIndex].children.forEach((task) {});
-                    for (var i = 0;
-                        i < _tasks[oldListIndex].children.length;
-                        i++) {
-                      Task task = _tasks[oldListIndex].children[i].child;
-                      Task newTask = Task(
-                        id: task.id,
-                        index: i,
-                        name: task.name,
-                        date: task.date,
-                        completed: task.completed,
-                        paused: task.paused,
-                        seconds: task.seconds,
-                      );
-                      newTasks.add(newTask);
+                    if (_tasks[oldListIndex].children.isEmpty) {
+                      _tasks.removeAt(oldListIndex);
+                    } else {
+                      for (var i = 0;
+                          i < _tasks[oldListIndex].children.length;
+                          i++) {
+                        Task task = _tasks[oldListIndex].children[i].child;
+                        Task newTask = Task(
+                          id: task.id,
+                          index: i,
+                          name: task.name,
+                          date: task.date,
+                          completed: task.completed,
+                          paused: task.paused,
+                          seconds: task.seconds,
+                        );
+                        newTasks.add(newTask);
+                      }
                     }
                     for (var i = 0;
                         i < _tasks[newListIndex].children.length;
@@ -164,7 +174,15 @@ class _TasksPageState extends State<TasksPage> {
                       );
                       newTasks.add(newTask);
                     }
-                    newTasks.forEach((task) => task.updateDoc(user));
+                    int updatedTasks = 0;
+                    newTasks.forEach((task) {
+                      task.updateDoc(user, () {
+                        updatedTasks++;
+                        if (updatedTasks == newTasks.length) {
+                          _saving = false;
+                        }
+                      });
+                    });
                   }
                 },
                 contentsWhenEmpty: Center(
