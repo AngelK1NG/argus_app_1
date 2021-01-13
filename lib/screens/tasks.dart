@@ -72,7 +72,6 @@ class _TasksPageState extends State<TasksPage> {
   @override
   Widget build(BuildContext context) {
     var user = Provider.of<UserStatus>(context);
-    var keyboard = KeyboardVisibilityProvider.isKeyboardVisible(context);
     if (!_saving) {
       setTasks(Provider.of<UncompletedTasks>(context).tasks,
           Provider.of<CompletedTasks>(context).tasks);
@@ -216,44 +215,36 @@ class _TasksPageState extends State<TasksPage> {
           Positioned(
             right: 15,
             bottom: 15,
-            child: Offstage(
-              offstage: keyboard,
-              child: AnimatedOpacity(
-                duration: keyboardDuration,
-                curve: keyboardCurve,
-                opacity: keyboard ? 0 : 1,
-                child: Button(
-                  onTap: () {
-                    Navigator.of(context).push(PageRouteBuilder(
-                      opaque: false,
-                      transitionDuration: Duration(seconds: 5),
-                      pageBuilder: (_, __, ___) {
-                        return TaskInput();
-                      },
-                    ));
+            child: Button(
+              onTap: () {
+                Navigator.of(context).push(PageRouteBuilder(
+                  opaque: false,
+                  transitionDuration: Duration(seconds: 5),
+                  pageBuilder: (_, __, ___) {
+                    return TaskInput();
                   },
-                  width: 50,
-                  row: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        FeatherIcons.plus,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ],
+                ));
+              },
+              width: 50,
+              row: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    FeatherIcons.plus,
+                    color: Colors.white,
+                    size: 20,
                   ),
-                  gradient: LinearGradient(
-                    colors: [
-                      Theme.of(context).primaryColor,
-                      Theme.of(context).primaryColorLight
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  vibrate: true,
-                ),
+                ],
               ),
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).primaryColor,
+                  Theme.of(context).primaryColorLight
+                ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              vibrate: true,
             ),
           ),
         ],
