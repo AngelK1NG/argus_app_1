@@ -31,6 +31,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double getElevation(Set<MaterialState> states) {
+      if (states.any(<MaterialState>{
+        MaterialState.pressed,
+      }.contains)) {
+        return 15;
+      }
+      return 5;
+    }
+
     return MultiProvider(
       providers: [
         StreamProvider<UncompletedTasks>.value(
@@ -64,6 +73,7 @@ class MyApp extends StatelessWidget {
                     Size(50, 50),
                   ),
                   padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  elevation: MaterialStateProperty.resolveWith(getElevation),
                   animationDuration: buttonDuration,
                 ),
               ),
