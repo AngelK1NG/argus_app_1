@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:Focal/utils/auth.dart';
 import 'package:Focal/components/task.dart';
 
@@ -41,6 +42,16 @@ class DatabaseProvider {
               list.docs.map((doc) => Task.fromFirestore(doc, true)).toList(),
             ),
           );
+    }
+  }
+
+  void createUserDocument(User user) async {
+    DocumentSnapshot doc = await _db.collection('users').doc(user.uid).get();
+    if (!doc.exists) {
+      _db.collection('users').doc(user.uid).set({
+        'name': user.displayName,
+        'email': user.email,
+      });
     }
   }
 }

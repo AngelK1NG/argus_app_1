@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:Focal/utils/database.dart';
 
 class AuthProvider {
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -9,7 +10,11 @@ class AuthProvider {
   UserStatus _userFromFirebase(User user) {
     return user == null
         ? UserStatus(signedIn: false)
-        : UserStatus(signedIn: true, uid: user.uid, email: user.email);
+        : UserStatus(
+            signedIn: true,
+            uid: user.uid,
+            email: user.email,
+          );
   }
 
   Stream<UserStatus> onAuthStateChanged() {
@@ -21,15 +26,14 @@ class AuthProvider {
       GoogleSignInAccount googleSignInAccount = await GoogleSignIn().signIn();
       GoogleSignInAuthentication googleAuth =
           await googleSignInAccount.authentication;
-
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-
       UserCredential result = await _auth.signInWithCredential(credential);
       User user = result.user;
-      print("Login successful, uid: " + user.uid);
+      DatabaseProvider().createUserDocument(user);
+      print('Login successful, uid: ' + user.uid);
       return user;
     } catch (error) {
       print(error);
@@ -51,7 +55,8 @@ class AuthProvider {
       );
       UserCredential result = await _auth.signInWithCredential(oauthCredential);
       User user = result.user;
-      print("Login successful, uid: " + user.uid);
+      DatabaseProvider().createUserDocument(user);
+      print('Login successful, uid: ' + user.uid);
       return user;
     } catch (error) {
       print(error);

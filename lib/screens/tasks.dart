@@ -196,7 +196,7 @@ class _TasksPageState extends State<TasksPage> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 20),
+                        padding: EdgeInsets.only(top: 20, left: 50, right: 50),
                         child: Text(
                           'Got something to do? Add it by tapping the + button.',
                           style: TextStyle(

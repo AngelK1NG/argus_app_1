@@ -24,6 +24,7 @@ class _TaskInputState extends State<TaskInput> {
   TextEditingController _input = TextEditingController();
 
   void submit(UserStatus user, List uncompletedTasks) {
+    _focusNode.requestFocus();
     if (_input.text.isNotEmpty) {
       int index = 0;
       uncompletedTasks.forEach((task) {
@@ -40,13 +41,9 @@ class _TaskInputState extends State<TaskInput> {
         seconds: 0,
       );
       newTask.addDoc(user);
-      _prefs.setString('taskInput', null);
+      _prefs.setString('taskInput', '');
       _input.clear();
-      _focusNode.requestFocus();
       HapticFeedback.heavyImpact();
-    } else {
-      _focusNode.requestFocus();
-      HapticFeedback.vibrate();
     }
   }
 
