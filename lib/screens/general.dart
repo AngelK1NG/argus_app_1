@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'dart:io' show Platform;
-import 'package:Focal/constants.dart';
 import 'package:Focal/components/settings_switch_item.dart';
-import 'package:Focal/components/nav_button.dart';
+import 'package:Focal/components/nav.dart';
 
 class GeneralPage extends StatefulWidget {
   final Function goToPage;
@@ -60,28 +59,18 @@ class _GeneralPageState extends State<GeneralPage> {
     return WillPopScope(
       onWillPop: () => widget.goToPage(2),
       child: Stack(children: <Widget>[
-        Container(
-          alignment: Alignment.center,
-          height: 50,
-          child: Text(
-            'General',
-            style: whiteHeaderTextStyle,
-          ),
+        Nav(
+          title: 'General',
+          color: Colors.white,
+          leftIconData: FeatherIcons.chevronLeft,
+          leftOnTap: () {
+            widget.goToPage(2);
+          },
         ),
         Positioned(
-            left: 5,
-            top: 0,
-            child: NavButton(
-              onTap: () {
-                widget.goToPage(2);
-              },
-              iconData: FeatherIcons.chevronLeft,
-              color: white,
-            )),
-        Positioned(
           top: 50,
-          left: 20,
-          right: 20,
+          left: 15,
+          right: 15,
           child: Column(
             children: <Widget>[
               SettingsSwitchItem(

@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/components/settings_item.dart';
-import 'package:Focal/components/nav_button.dart';
+import 'package:Focal/components/nav.dart';
 import 'package:Focal/utils/analytics.dart';
 import 'package:Focal/utils/auth.dart';
 
@@ -32,29 +32,18 @@ class SettingsPage extends StatelessWidget {
     return WillPopScope(
       onWillPop: () => this.goToPage(0),
       child: Stack(children: <Widget>[
-        Container(
-          alignment: Alignment.center,
-          height: 50,
-          child: Text(
-            'Settings',
-            style: whiteHeaderTextStyle,
-          ),
-        ),
-        Positioned(
-          left: 5,
-          top: 0,
-          child: NavButton(
-            onTap: () {
-              this.goToPage(0);
-            },
-            iconData: FeatherIcons.chevronLeft,
-            color: white,
-          ),
+        Nav(
+          title: 'Settings',
+          color: Colors.white,
+          leftIconData: FeatherIcons.chevronLeft,
+          leftOnTap: () {
+            this.goToPage(0);
+          },
         ),
         Positioned(
           top: 50,
-          left: 20,
-          right: 20,
+          left: 15,
+          right: 15,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[

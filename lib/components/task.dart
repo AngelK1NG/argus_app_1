@@ -2,12 +2,14 @@ import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Focal/utils/size.dart';
+import 'package:Focal/utils/auth.dart';
 import 'package:Focal/constants.dart';
 
 class Task extends StatelessWidget {
+  final int index;
   final String name;
-  final bool completed;
   final String date;
+  final bool completed;
   final bool paused;
   final int seconds;
   final String id;
@@ -15,12 +17,13 @@ class Task extends StatelessWidget {
   final Function onTap;
 
   const Task({
-    @required this.id,
+    @required this.index,
     @required this.name,
     @required this.date,
     @required this.completed,
     @required this.paused,
     @required this.seconds,
+    this.id,
     this.onDismissed,
     this.onTap,
     Key key,
@@ -30,6 +33,7 @@ class Task extends StatelessWidget {
     Map data = doc.data();
     return Task(
       id: doc.id,
+      index: data['index'] ?? 0,
       name: data['name'] ?? '',
       date: data['date'] ?? '',
       completed: completed,
@@ -38,14 +42,43 @@ class Task extends StatelessWidget {
     );
   }
 
+  void updateDoc(UserStatus user) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('uncompleted')
+        .doc(this.id)
+        .update({
+      'index': this.index,
+      'name': this.name,
+      'date': this.date,
+      'paused': this.paused,
+      'seconds': this.seconds,
+    });
+  }
+
+  void addDoc(UserStatus user) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('uncompleted')
+        .add({
+      'index': this.index,
+      'name': this.name,
+      'date': this.date,
+      'paused': this.paused,
+      'seconds': this.seconds,
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
         Positioned(
           bottom: 0,
-          left: 20,
-          right: 20,
+          left: 15,
+          right: 15,
           child: Divider(
             height: 0,
             thickness: 1,
@@ -54,7 +87,7 @@ class Task extends StatelessWidget {
         Dismissible(
           background: Container(
             color: Theme.of(context).primaryColor,
-            padding: EdgeInsets.only(left: 20),
+            padding: EdgeInsets.only(left: 15),
             alignment: AlignmentDirectional.centerStart,
             child: Icon(
               FeatherIcons.sunrise,
@@ -64,7 +97,7 @@ class Task extends StatelessWidget {
           ),
           secondaryBackground: Container(
             color: Colors.red,
-            padding: EdgeInsets.only(right: 20),
+            padding: EdgeInsets.only(right: 15),
             alignment: AlignmentDirectional.centerEnd,
             child: Icon(
               FeatherIcons.trash,
@@ -84,7 +117,7 @@ class Task extends StatelessWidget {
               child: Row(
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 15),
+                    padding: const EdgeInsets.only(left: 15, right: 15),
                     child: this.completed
                         ? Icon(
                             FeatherIcons.checkCircle,
@@ -100,7 +133,7 @@ class Task extends StatelessWidget {
                           ),
                   ),
                   SizedBox(
-                    width: SizeConfig.safeWidth - 75,
+                    width: SizeConfig.safeWidth - 65,
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(

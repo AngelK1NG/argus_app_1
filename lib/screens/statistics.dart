@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:Focal/constants.dart';
 
 class StatisticsPage extends StatefulWidget {
   final Function goToPage;
@@ -24,16 +23,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return WillPopScope(
       onWillPop: () => widget.goToPage(0),
       child: Stack(
-        children: <Widget>[
-          Container(
-            alignment: Alignment.center,
-            height: 50,
-            child: Text(
-              'Statistics',
-              style: whiteHeaderTextStyle,
-            ),
-          ),
-        ],
+        children: <Widget>[],
       ),
     );
   }

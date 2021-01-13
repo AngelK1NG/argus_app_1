@@ -26,7 +26,6 @@ dependencies:
   flutter_native_splash: ^0.2.2
   font_awesome_flutter: ^8.11.0
   google_sign_in: ^4.5.9
-  gradient_widgets: ^0.5.2
   intl: ^0.16.1
   launch_review: ^2.0.0
   package_info: ^0.4.3+2

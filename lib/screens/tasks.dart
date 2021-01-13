@@ -1,13 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Focal/utils/database.dart';
 import 'package:Focal/utils/size.dart';
+import 'package:Focal/utils/auth.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/components/button.dart';
 import 'package:Focal/components/task.dart';
-import 'package:Focal/components/nav_button.dart';
+import 'package:Focal/components/task_input.dart';
+import 'package:Focal/components/task_list_header.dart';
+import 'package:Focal/components/nav.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class TasksPage extends StatefulWidget {
   final Function goToPage;
@@ -22,20 +27,13 @@ class TasksPage extends StatefulWidget {
 }
 
 class _TasksPageState extends State<TasksPage> {
-  final _formKey = GlobalKey<FormState>();
-  FocusNode _focus = FocusNode();
-  bool _addingTask = false;
-  bool _keyboard = false;
-  List _uncompletedTasks = [];
-  List _completedTasks = [];
-  List<DragAndDropList> _dragAndDropList = [];
+  List<DragAndDropList> _tasks = [];
   void deleteTask(Task task) {}
 
   void setTasks(List<Task> uncompleted, List<Task> completed) {
     Map taskMap = {};
-    List<DragAndDropList> newList = [];
+    List<DragAndDropList> newLists = [];
     if (uncompleted != null && uncompleted.isNotEmpty) {
-      _uncompletedTasks = uncompleted;
       for (var task in uncompleted) {
         if (taskMap[task.date] == null) {
           taskMap[task.date] = [];
@@ -44,7 +42,6 @@ class _TasksPageState extends State<TasksPage> {
       }
     }
     if (completed != null && completed.isNotEmpty) {
-      _completedTasks = completed;
       taskMap['Completed'] = [];
       for (var task in completed) {
         taskMap['Completed'].add(task);
@@ -57,45 +54,14 @@ class _TasksPageState extends State<TasksPage> {
         for (var task in tasks) {
           newTasks.add(DragAndDropItem(child: task, canDrag: !task.completed));
         }
-        if (date != 'Completed') {
-          DateTime dateTime = DateTime.parse(date);
-          newList.add(DragAndDropList(
-            canDrag: false,
-            header: Container(
-              padding: EdgeInsets.only(left: 20, right: 20),
-              alignment: Alignment.centerLeft,
-              height: 20,
-              child: Text(
-                '${dateTime.month.toString()}/${dateTime.day}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            children: newTasks,
-          ));
-        } else {
-          newList.add(DragAndDropList(
-            canDrag: false,
-            header: Container(
-              padding: EdgeInsets.only(left: 20, right: 20),
-              alignment: Alignment.centerLeft,
-              height: 20,
-              child: Text(
-                'Completed',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            children: newTasks,
-          ));
-        }
+        newLists.add(DragAndDropList(
+          canDrag: false,
+          header: TaskListHeader(date: date),
+          children: newTasks,
+        ));
       });
     }
-    _dragAndDropList = newList;
+    _tasks = newLists;
   }
 
   @override
@@ -105,213 +71,257 @@ class _TasksPageState extends State<TasksPage> {
 
   @override
   Widget build(BuildContext context) {
+    var user = Provider.of<UserStatus>(context);
+    var keyboard = KeyboardVisibilityProvider.isKeyboardVisible(context);
     setTasks(Provider.of<UncompletedTasks>(context).tasks,
         Provider.of<CompletedTasks>(context).tasks);
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Stack(children: <Widget>[
-        Container(
-          alignment: Alignment.center,
-          height: 50,
-          child: Text(
-            'Tasks',
-            style: whiteHeaderTextStyle,
-          ),
-        ),
-        Positioned(
-          right: 5,
-          top: 0,
-          child: NavButton(
-            onTap: () {
-              widget.goToPage(2);
-            },
-            iconData: FeatherIcons.settings,
-            color: white,
-          ),
-        ),
-        Stack(
-          children: <Widget>[
-            Positioned(
-              right: 0,
-              left: 0,
-              top: 65,
-              child: SizedBox(
-                height: _keyboard
-                    ? SizeConfig.safeHeight -
-                        MediaQuery.of(context).viewInsets.bottom -
-                        135
-                    : SizeConfig.safeHeight - 65,
-                child: DragAndDropLists(
-                  itemDecorationWhileDragging: BoxDecoration(
-                    color: white.withOpacity(0.8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: blue.withOpacity(0.2),
-                        spreadRadius: 0,
-                        blurRadius: 20, // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  itemGhostOpacity: 1,
-                  itemGhost: Container(
-                    height: 50,
-                    width: SizeConfig.safeWidth,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  listGhostOpacity: 0,
-                  lastListTargetSize: 0,
-                  lastItemTargetHeight: 15,
-                  addLastItemTargetHeightToTop: true,
-                  onItemReorder: (_, __, ____, _____) {},
-                  contentsWhenEmpty: Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          'Start fresh.',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 20),
-                          child: Text(
-                            'Got something to do? Add it by tapping the + button.',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
+    return Stack(children: <Widget>[
+      Nav(
+        title: 'Tasks',
+        color: Colors.white,
+        rightIconData: FeatherIcons.settings,
+        rightOnTap: () {
+          widget.goToPage(2);
+        },
+      ),
+      Stack(
+        children: <Widget>[
+          Positioned(
+            right: 0,
+            left: 0,
+            top: 65,
+            child: SizedBox(
+              height: keyboard
+                  ? SizeConfig.safeHeight -
+                      MediaQuery.of(context).viewInsets.bottom -
+                      135
+                  : SizeConfig.safeHeight - 65,
+              child: DragAndDropLists(
+                itemDecorationWhileDragging: BoxDecoration(
+                  color: white.withOpacity(0.8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: blue.withOpacity(0.2),
+                      spreadRadius: 0,
+                      blurRadius: 20, // changes position of shadow
                     ),
-                  ),
-                  children: _dragAndDropList,
+                  ],
                 ),
-              ),
-            ),
-            AnimatedPositioned(
-              duration: keyboardDuration,
-              curve: keyboardCurve,
-              bottom: _addingTask
-                  ? MediaQuery.of(context).viewInsets.bottom - 75
-                  : -150,
-              left: 0,
-              right: 0,
-              child: Offstage(
-                offstage: !_addingTask,
-                child: AnimatedContainer(
-                  duration: keyboardDuration,
-                  curve: keyboardCurve,
-                  height: 150,
+                itemGhostOpacity: 1,
+                itemGhost: Container(
+                  height: 50,
                   width: SizeConfig.safeWidth,
-                  alignment: Alignment.topLeft,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(40),
-                      topRight: Radius.circular(40),
-                    ),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        spreadRadius: -5,
-                        blurRadius: 15,
-                        color: black,
+                  color: Theme.of(context).primaryColor,
+                ),
+                listGhostOpacity: 0,
+                lastListTargetSize: 0,
+                lastItemTargetHeight: 15,
+                addLastItemTargetHeightToTop: true,
+                onItemReorder: (int oldItemIndex, int oldListIndex,
+                    int newItemIndex, int newListIndex) {
+                  TaskListHeader header = _tasks[newListIndex].header;
+                  if (header.date != 'Completed') {
+                    Task movedTask = _tasks[oldListIndex]
+                        .children
+                        .removeAt(oldItemIndex)
+                        .child;
+                    Task newMovedTask = Task(
+                      id: movedTask.id,
+                      index: newItemIndex,
+                      name: movedTask.name,
+                      date: header.date,
+                      completed: movedTask.completed,
+                      paused: movedTask.paused,
+                      seconds: movedTask.seconds,
+                    );
+                    _tasks[newListIndex].children.insert(
+                        newItemIndex, DragAndDropItem(child: newMovedTask));
+                    List newTasks = [];
+                    _tasks[oldListIndex].children.forEach((task) {});
+                    for (var i = 0;
+                        i < _tasks[oldListIndex].children.length;
+                        i++) {
+                      Task task = _tasks[oldListIndex].children[i].child;
+                      Task newTask = Task(
+                        id: task.id,
+                        index: i,
+                        name: task.name,
+                        date: task.date,
+                        completed: task.completed,
+                        paused: task.paused,
+                        seconds: task.seconds,
+                      );
+                      newTasks.add(newTask);
+                    }
+                    for (var i = 0;
+                        i < _tasks[newListIndex].children.length;
+                        i++) {
+                      Task task = _tasks[newListIndex].children[i].child;
+                      Task newTask = Task(
+                        id: task.id,
+                        index: i,
+                        name: task.name,
+                        date: task.date,
+                        completed: task.completed,
+                        paused: task.paused,
+                        seconds: task.seconds,
+                      );
+                      newTasks.add(newTask);
+                    }
+                    newTasks.forEach((task) => task.updateDoc(user));
+                  }
+                },
+                contentsWhenEmpty: Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        'Start fresh.',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Text(
+                          'Got something to do? Add it by tapping the + button.',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ],
                   ),
-                  child: SizedBox(
-                    height: 75,
-                    child: Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 21, right: 11),
-                          child: Icon(
-                            FeatherIcons.plus,
-                            size: 18,
-                            color: Theme.of(context).hintColor,
-                          ),
-                        ),
-                        Container(
-                          alignment: Alignment.center,
-                          width: SizeConfig.safeWidth - 75,
-                          child: Focus(
-                            onFocusChange: (focus) {
-                              if (!focus) {
-                                setState(() {
-                                  _addingTask = false;
-                                });
-                              }
-                            },
-                            child: Form(
-                              key: _formKey,
-                              child: TextFormField(
-                                focusNode: _focus,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "Add task...",
-                                ),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: black,
-                                ),
-                                autofocus: false,
-                                onFieldSubmitted: (value) async {},
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                ),
+                children: _tasks,
+              ),
+            ),
+          ),
+          // AnimatedPositioned(
+          //   duration: keyboardDuration,
+          //   curve: keyboardCurve,
+          //   bottom: _addingTask
+          //       ? MediaQuery.of(context).viewInsets.bottom - 75
+          //       : -150,
+          //   left: 0,
+          //   right: 0,
+          //   child: Offstage(
+          //     offstage: !_addingTask,
+          //     child: AnimatedContainer(
+          //       duration: keyboardDuration,
+          //       curve: keyboardCurve,
+          //       height: 150,
+          //       width: SizeConfig.safeWidth,
+          //       alignment: Alignment.topLeft,
+          //       decoration: BoxDecoration(
+          //         borderRadius: BorderRadius.only(
+          //           topLeft: Radius.circular(40),
+          //           topRight: Radius.circular(40),
+          //         ),
+          //         color: Colors.white,
+          //         boxShadow: [
+          //           BoxShadow(
+          //             spreadRadius: -5,
+          //             blurRadius: 15,
+          //             color: black,
+          //           ),
+          //         ],
+          //       ),
+          //       child: SizedBox(
+          //         height: 75,
+          //         child: Row(
+          //           children: <Widget>[
+          //             Padding(
+          //               padding: const EdgeInsets.only(left: 21, right: 11),
+          //               child: Icon(
+          //                 FeatherIcons.plus,
+          //                 size: 18,
+          //                 color: Theme.of(context).hintColor,
+          //               ),
+          //             ),
+          //             Container(
+          //               alignment: Alignment.center,
+          //               width: SizeConfig.safeWidth - 75,
+          //               child: Focus(
+          //                 onFocusChange: (focus) {
+          //                   if (!focus) {
+          //                     setState(() {
+          //                       _addingTask = false;
+          //                     });
+          //                   }
+          //                 },
+          //                 child: Form(
+          //                   key: _formKey,
+          //                   child: TextFormField(
+          //                     focusNode: _focus,
+          //                     decoration: InputDecoration(
+          //                       border: InputBorder.none,
+          //                       hintText: "Add task...",
+          //                     ),
+          //                     style: TextStyle(
+          //                       fontSize: 16,
+          //                       fontWeight: FontWeight.w400,
+          //                       color: black,
+          //                     ),
+          //                     autofocus: false,
+          //                     onFieldSubmitted: (value) async {},
+          //                   ),
+          //                 ),
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          Positioned(
+            right: 15,
+            bottom: 15,
+            child: Offstage(
+              offstage: keyboard,
+              child: AnimatedOpacity(
+                duration: keyboardDuration,
+                curve: keyboardCurve,
+                opacity: keyboard ? 0 : 1,
+                child: Button(
+                  onTap: () {
+                    Navigator.of(context).push(PageRouteBuilder(
+                      opaque: false,
+                      transitionDuration: Duration(seconds: 5),
+                      pageBuilder: (_, __, ___) {
+                        return TaskInput();
+                      },
+                    ));
+                  },
+                  width: 50,
+                  row: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        FeatherIcons.plus,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ],
                   ),
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).primaryColor,
+                      Theme.of(context).primaryColorLight
+                    ],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  vibrate: true,
                 ),
               ),
             ),
-            Positioned(
-              right: 20,
-              bottom: 20,
-              child: Offstage(
-                offstage: _keyboard,
-                child: AnimatedOpacity(
-                  duration: keyboardDuration,
-                  curve: keyboardCurve,
-                  opacity: _keyboard ? 0 : 1,
-                  child: Button(
-                    onTap: () {
-                      setState(() {
-                        _addingTask = true;
-                      });
-                      FocusScope.of(context).requestFocus(_focus);
-                    },
-                    width: 50,
-                    row: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          FeatherIcons.plus,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ],
-                    ),
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).primaryColor,
-                        Theme.of(context).primaryColorLight
-                      ],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    vibrate: true,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ]),
-    );
+          ),
+        ],
+      ),
+    ]);
   }
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:Focal/constants.dart';
 import 'package:Focal/components/button.dart';
+import 'package:Focal/components/nav.dart';
 import 'package:Focal/utils/analytics.dart';
 import 'package:Focal/utils/size.dart';
 import 'package:Focal/utils/auth.dart';
@@ -52,13 +52,9 @@ class _LoginPageState extends State<LoginPage> {
             opacity: _visible ? 1 : 0,
             duration: loginDuration,
             curve: loginCurve,
-            child: Container(
-              alignment: Alignment.center,
-              height: 50,
-              child: Text(
-                'Welcome 👋 ',
-                style: blackHeaderTextStyle,
-              ),
+            child: Nav(
+              title: 'Welcome 👋',
+              color: Colors.black,
             ),
           ),
           AnimatedPositioned(
@@ -67,10 +63,8 @@ class _LoginPageState extends State<LoginPage> {
             left: 50,
             right: 50,
             top: _visible
-                ? SizeConfig.safeHeight * 0.5 -
-                    (SizeConfig.safeWidth - 100) * 0.4
-                : SizeConfig.safeHeight * 0.5 -
-                    (SizeConfig.safeWidth - 100) * 0.2,
+                ? SizeConfig.safeHeight * 0.3
+                : SizeConfig.safeHeight * 0.5,
             child: Image(
               image: AssetImage('assets/images/Focal Logo_Full Colored.png'),
             ),

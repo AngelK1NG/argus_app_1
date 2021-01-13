@@ -4,6 +4,7 @@ import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:provider/provider.dart';
 import 'package:Focal/screens/home.dart';
 import 'package:Focal/constants.dart';
@@ -30,55 +31,64 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: navigatorKey,
-      theme: ThemeData(
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ButtonStyle(
-            shape: MaterialStateProperty.all(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
+    return MultiProvider(
+      providers: [
+        StreamProvider<UncompletedTasks>.value(
+          value: DatabaseProvider()
+              .streamUncompleted(Provider.of<UserStatus>(context)),
+          initialData: UncompletedTasks(null),
+        ),
+        StreamProvider<CompletedTasks>.value(
+          value: DatabaseProvider()
+              .streamCompleted(Provider.of<UserStatus>(context)),
+          initialData: CompletedTasks(null),
+        ),
+      ],
+      child: KeyboardVisibilityProvider(
+        child: NotificationListener<OverscrollIndicatorNotification>(
+          onNotification: (OverscrollIndicatorNotification overscroll) {
+            overscroll.disallowGlow();
+            return null;
+          },
+          child: MaterialApp(
+            navigatorKey: navigatorKey,
+            theme: ThemeData(
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                  ),
+                  minimumSize: MaterialStateProperty.all(
+                    Size(50, 50),
+                  ),
+                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  animationDuration: buttonDuration,
+                ),
               ),
+              primarySwatch: materialBlue,
+              primaryColor: blue,
+              primaryColorLight: purple,
+              accentColor: blue,
+              dividerColor: dividerColor,
+              hintColor: hintColor,
+              cursorColor: blue,
+              splashColor: Colors.transparent,
+              shadowColor: shadowColor,
+              textSelectionColor: textSelectionColor,
+              textTheme: Theme.of(context).textTheme.apply(
+                    bodyColor: black,
+                    displayColor: black,
+                    fontFamily: 'Cabin',
+                  ),
             ),
-            minimumSize: MaterialStateProperty.all(
-              Size(50, 50),
-            ),
-            padding: MaterialStateProperty.all(EdgeInsets.zero),
-            animationDuration: buttonDuration,
+            navigatorObservers: [
+              FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
+            ],
+            home: Home(),
           ),
         ),
-        primarySwatch: materialBlue,
-        primaryColor: blue,
-        primaryColorLight: purple,
-        accentColor: blue,
-        dividerColor: dividerColor,
-        hintColor: hintColor,
-        splashColor: Colors.transparent,
-        shadowColor: shadowColor,
-        textSelectionColor: textSelectionColor,
-        textTheme: Theme.of(context).textTheme.apply(
-              bodyColor: black,
-              displayColor: black,
-              fontFamily: 'Cabin',
-            ),
-      ),
-      navigatorObservers: [
-        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
-      ],
-      home: MultiProvider(
-        providers: [
-          StreamProvider<UncompletedTasks>.value(
-            value: DatabaseProvider()
-                .streamUncompleted(Provider.of<UserStatus>(context)),
-            initialData: UncompletedTasks(null),
-          ),
-          StreamProvider<CompletedTasks>.value(
-            value: DatabaseProvider()
-                .streamCompleted(Provider.of<UserStatus>(context)),
-            initialData: CompletedTasks(null),
-          ),
-        ],
-        child: Home(),
       ),
     );
   }

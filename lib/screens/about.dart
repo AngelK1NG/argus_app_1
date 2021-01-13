@@ -1,10 +1,9 @@
-import 'package:Focal/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:launch_review/launch_review.dart';
-import 'package:Focal/components/nav_button.dart';
+import 'package:Focal/components/nav.dart';
 
 class AboutPage extends StatefulWidget {
   final Function goToPage;
@@ -59,24 +58,13 @@ class _AboutPageState extends State<AboutPage> {
       onWillPop: () => widget.goToPage(2),
       child: Stack(
         children: <Widget>[
-          Container(
-            alignment: Alignment.center,
-            height: 50,
-            child: Text(
-              'About',
-              style: blackHeaderTextStyle,
-            ),
-          ),
-          Positioned(
-            left: 5,
-            top: 0,
-            child: NavButton(
-              onTap: () {
-                widget.goToPage(2);
-              },
-              iconData: FeatherIcons.chevronLeft,
-              color: black,
-            ),
+          Nav(
+            title: 'About',
+            color: Colors.black,
+            leftIconData: FeatherIcons.chevronLeft,
+            leftOnTap: () {
+              widget.goToPage(2);
+            },
           ),
           Positioned(
             right: 0,
@@ -137,7 +125,7 @@ class _AboutPageState extends State<AboutPage> {
           Positioned(
             left: 0,
             right: 0,
-            bottom: 20,
+            bottom: 15,
             child: Center(
               child: Text(
                 '© 2020 Focal LLC',
