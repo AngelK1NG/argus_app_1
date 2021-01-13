@@ -28,6 +28,7 @@ class _HomeState extends State<Home> {
   double _cardPosition = 0;
   bool _loginLoading = false;
   bool _overlayLight = true;
+  bool _init = false;
 
   void goToPage(int index) {
     setState(() {
@@ -134,7 +135,10 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
+    if (!_init) {
+      SizeConfig().init(context);
+      _init = true;
+    }
     var user = Provider.of<UserStatus>(context);
     var uncompletedTasks = Provider.of<UncompletedTasks>(context).tasks;
     var completedTasks = Provider.of<CompletedTasks>(context).tasks;

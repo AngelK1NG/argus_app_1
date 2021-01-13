@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       if (states.any(<MaterialState>{
         MaterialState.pressed,
       }.contains)) {
-        return 15;
+        return 10;
       }
       return 5;
     }
