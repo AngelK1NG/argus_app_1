@@ -43,6 +43,7 @@ class _TaskInputState extends State<TaskInput> {
       _prefs.setString('taskInput', null);
       _input.clear();
       _focusNode.requestFocus();
+      HapticFeedback.heavyImpact();
     } else {
       _focusNode.requestFocus();
       HapticFeedback.vibrate();
@@ -66,127 +67,128 @@ class _TaskInputState extends State<TaskInput> {
     var user = Provider.of<UserStatus>(context);
     var uncompletedTasks = Provider.of<UncompletedTasks>(context).tasks;
     return Scaffold(
-      backgroundColor: black.withOpacity(0.2),
+      backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           AnimatedOpacity(
             opacity: _loading ? 0 : 0.1,
-            duration: keyboardDuration,
-            curve: keyboardCurve,
-            child: SizedBox.expand(
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  color: black,
-                ),
+            duration: generalDuration,
+            curve: generalCurve,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _loading = true;
+                });
+                _focusNode.unfocus();
+                Future.delayed(generalDuration, () {
+                  Navigator.of(context).pop();
+                });
+              },
+              child: SizedBox.expand(
+                child: Container(color: black),
               ),
             ),
           ),
           AnimatedPositioned(
             left: 0,
             right: 0,
-            bottom: _loading ? -500 : -400,
+            bottom:
+                _loading ? -100 - MediaQuery.of(context).viewInsets.bottom : 0,
             duration: keyboardDuration,
             curve: keyboardCurve,
             child: Container(
-              height: 500,
+              height: 100 + MediaQuery.of(context).viewInsets.bottom,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(25),
-                  topRight: Radius.circular(25),
-                ),
                 color: white,
                 boxShadow: [
                   BoxShadow(
-                    spreadRadius: -5,
-                    blurRadius: 15,
+                    blurRadius: 10,
+                    offset: Offset(0, -4),
+                    color: Theme.of(context).shadowColor,
                   )
                 ],
               ),
-              child: _loading
-                  ? Container()
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 15),
+                    child: Container(
+                      height: 50,
+                      width: SizeConfig.safeWidth - 30,
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Add a new task",
+                        ),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: black,
+                        ),
+                        autofocus: true,
+                        focusNode: _focusNode,
+                        controller: _input,
+                        textInputAction: TextInputAction.next,
+                        onChanged: (value) {
+                          setState(() {
+                            _prefs.setString('taskInput', value);
+                          });
+                        },
+                        onFieldSubmitted: (_) => submit(user, uncompletedTasks),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 15),
+                        child: GestureDetector(
                           child: Container(
                             height: 50,
-                            width: SizeConfig.safeWidth - 30,
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Add a new task",
-                              ),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: black,
-                              ),
-                              autofocus: true,
-                              focusNode: _focusNode,
-                              controller: _input,
-                              textInputAction: TextInputAction.next,
-                              onChanged: (value) {
-                                setState(() {
-                                  _prefs.setString('taskInput', value);
-                                });
-                              },
-                              onFieldSubmitted: (_) =>
-                                  submit(user, uncompletedTasks),
+                            width: 100,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  FeatherIcons.calendar,
+                                  size: 20,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 15),
+                                  child: Text(
+                                    'Today',
+                                    style: TextStyle(
+                                      color: Theme.of(context).primaryColor,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: 15),
-                              child: GestureDetector(
-                                child: Container(
-                                  height: 50,
-                                  width: 100,
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        FeatherIcons.calendar,
-                                        size: 20,
-                                        color: Theme.of(context).primaryColor,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(left: 15),
-                                        child: Text(
-                                          'Today',
-                                          style: TextStyle(
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => submit(user, uncompletedTasks),
-                              child: Container(
-                                height: 50,
-                                width: 50,
-                                child: Icon(
-                                  FeatherIcons.plusCircle,
-                                  size: 20,
-                                  color: _input.text.isEmpty
-                                      ? Theme.of(context).hintColor
-                                      : Theme.of(context).primaryColor,
-                                ),
-                              ),
-                            ),
-                          ],
+                      ),
+                      GestureDetector(
+                        onTap: () => submit(user, uncompletedTasks),
+                        child: Container(
+                          height: 50,
+                          width: 50,
+                          child: Icon(
+                            FeatherIcons.plusCircle,
+                            size: 20,
+                            color: _input.text.isEmpty
+                                ? Theme.of(context).hintColor
+                                : Theme.of(context).primaryColor,
+                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],

@@ -91,11 +91,7 @@ class _TasksPageState extends State<TasksPage> {
             left: 0,
             top: 65,
             child: SizedBox(
-              height: keyboard
-                  ? SizeConfig.safeHeight -
-                      MediaQuery.of(context).viewInsets.bottom -
-                      135
-                  : SizeConfig.safeHeight - 65,
+              height: SizeConfig.safeHeight - 50,
               child: DragAndDropLists(
                 itemDecorationWhileDragging: BoxDecoration(
                   color: white.withOpacity(0.8),
@@ -199,84 +195,6 @@ class _TasksPageState extends State<TasksPage> {
               ),
             ),
           ),
-          // AnimatedPositioned(
-          //   duration: keyboardDuration,
-          //   curve: keyboardCurve,
-          //   bottom: _addingTask
-          //       ? MediaQuery.of(context).viewInsets.bottom - 75
-          //       : -150,
-          //   left: 0,
-          //   right: 0,
-          //   child: Offstage(
-          //     offstage: !_addingTask,
-          //     child: AnimatedContainer(
-          //       duration: keyboardDuration,
-          //       curve: keyboardCurve,
-          //       height: 150,
-          //       width: SizeConfig.safeWidth,
-          //       alignment: Alignment.topLeft,
-          //       decoration: BoxDecoration(
-          //         borderRadius: BorderRadius.only(
-          //           topLeft: Radius.circular(40),
-          //           topRight: Radius.circular(40),
-          //         ),
-          //         color: Colors.white,
-          //         boxShadow: [
-          //           BoxShadow(
-          //             spreadRadius: -5,
-          //             blurRadius: 15,
-          //             color: black,
-          //           ),
-          //         ],
-          //       ),
-          //       child: SizedBox(
-          //         height: 75,
-          //         child: Row(
-          //           children: <Widget>[
-          //             Padding(
-          //               padding: const EdgeInsets.only(left: 21, right: 11),
-          //               child: Icon(
-          //                 FeatherIcons.plus,
-          //                 size: 18,
-          //                 color: Theme.of(context).hintColor,
-          //               ),
-          //             ),
-          //             Container(
-          //               alignment: Alignment.center,
-          //               width: SizeConfig.safeWidth - 75,
-          //               child: Focus(
-          //                 onFocusChange: (focus) {
-          //                   if (!focus) {
-          //                     setState(() {
-          //                       _addingTask = false;
-          //                     });
-          //                   }
-          //                 },
-          //                 child: Form(
-          //                   key: _formKey,
-          //                   child: TextFormField(
-          //                     focusNode: _focus,
-          //                     decoration: InputDecoration(
-          //                       border: InputBorder.none,
-          //                       hintText: "Add task...",
-          //                     ),
-          //                     style: TextStyle(
-          //                       fontSize: 16,
-          //                       fontWeight: FontWeight.w400,
-          //                       color: black,
-          //                     ),
-          //                     autofocus: false,
-          //                     onFieldSubmitted: (value) async {},
-          //                   ),
-          //                 ),
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
           Positioned(
             right: 15,
             bottom: 15,

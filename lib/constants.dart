@@ -41,8 +41,8 @@ final Curve generalCurve = Curves.ease;
 final Duration loginDuration = Duration(milliseconds: 800);
 final Curve loginCurve = Curves.ease;
 
-final Duration keyboardDuration = Duration(milliseconds: 200);
-final Curve keyboardCurve = Curves.easeInQuad;
+final Duration keyboardDuration = Duration(milliseconds: 500);
+final Curve keyboardCurve = Curves.easeOutQuart;
 
 final Duration buttonDuration = Duration(milliseconds: 200);
 final Curve buttonCurve = Curves.ease;
