@@ -77,13 +77,15 @@ class _TaskInputState extends State<TaskInput> {
             curve: keyboardCurve,
             child: GestureDetector(
               onTap: () {
-                setState(() {
-                  _visible = false;
-                });
-                _focusNode.unfocus();
-                Future.delayed(keyboardDuration, () {
-                  Navigator.of(context).pop();
-                });
+                if (_visible) {
+                  setState(() {
+                    _visible = false;
+                  });
+                  _focusNode.unfocus();
+                  Future.delayed(keyboardDuration, () {
+                    Navigator.of(context).pop();
+                  });
+                }
               },
               child: SizedBox.expand(
                 child: Container(color: black),
