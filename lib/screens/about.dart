@@ -57,7 +57,7 @@ class _AboutPageState extends State<AboutPage> {
     return WillPopScope(
       onWillPop: () => widget.goToPage(2),
       child: Stack(
-        children: <Widget>[
+        children: [
           Nav(
             title: 'About',
             color: Colors.black,
@@ -71,7 +71,7 @@ class _AboutPageState extends State<AboutPage> {
             left: 0,
             top: 100,
             child: Column(
-              children: <Widget>[
+              children: [
                 Padding(
                   padding: EdgeInsets.only(bottom: 15),
                   child: Image(
@@ -93,7 +93,7 @@ class _AboutPageState extends State<AboutPage> {
           Center(
               child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
+            children: [
               textButton(
                 onTap: () {
                   LaunchReview.launch(

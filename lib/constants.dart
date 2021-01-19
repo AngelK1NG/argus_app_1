@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'dart:io' show Platform;
 
 //firebase
 final FirebaseAuth auth = FirebaseAuth.instance;
@@ -35,20 +36,17 @@ final TextStyle buttonTextStyle = TextStyle(
 );
 
 //animation transitions
-final Duration generalDuration = Duration(milliseconds: 200);
-final Curve generalCurve = Curves.ease;
+final Duration fadeDuration = Duration(milliseconds: 200);
+final Curve fadeCurve = Curves.ease;
 
-final Duration loginDuration = Duration(milliseconds: 800);
-final Curve loginCurve = Curves.ease;
-
-final Duration keyboardDuration = Duration(milliseconds: 500);
-final Curve keyboardCurve = Curves.easeOutQuint;
+final Duration overlayDuration = Duration(milliseconds: 200);
+final Curve overlayCurve = Curves.ease;
 
 final Duration buttonDuration = Duration(milliseconds: 200);
 final Curve buttonCurve = Curves.ease;
 
-final Duration snackbarDuration = Duration(milliseconds: 2000);
-final Duration focusNoticeDuration = Duration(milliseconds: 4000);
+final Duration loginDuration = Duration(milliseconds: 800);
+final Curve loginCurve = Curves.ease;
 
 //algorithms
 num voltsIncrement({

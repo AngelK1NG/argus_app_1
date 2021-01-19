@@ -20,7 +20,7 @@ class _HelpPageState extends State<HelpPage> {
     return WillPopScope(
       onWillPop: () => widget.goToPage(2),
       child: Stack(
-        children: <Widget>[],
+        children: [],
       ),
     );
   }

@@ -22,8 +22,8 @@ class Nav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 50,
-      width: SizeConfig.safeWidth,
-      child: Stack(children: <Widget>[
+      width: SizeProvider.safeWidth,
+      child: Stack(children: [
         Center(
           child: Text(
             title,

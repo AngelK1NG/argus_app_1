@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'dart:io' show Platform;
-import 'package:Focal/components/settings_switch_item.dart';
+import 'package:Focal/components/switch_item.dart';
 import 'package:Focal/components/nav.dart';
 
 class GeneralPage extends StatefulWidget {
@@ -58,22 +58,19 @@ class _GeneralPageState extends State<GeneralPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () => widget.goToPage(2),
-      child: Stack(children: <Widget>[
-        Nav(
-          title: 'General',
-          color: Colors.white,
-          leftIconData: FeatherIcons.chevronLeft,
-          leftOnTap: () {
-            widget.goToPage(2);
-          },
-        ),
-        Positioned(
-          top: 50,
-          left: 15,
-          right: 15,
-          child: Column(
-            children: <Widget>[
-              SettingsSwitchItem(
+      child: Column(
+        children: [
+          Nav(
+            title: 'General',
+            color: Colors.white,
+            leftIconData: FeatherIcons.chevronLeft,
+            leftOnTap: () {
+              widget.goToPage(2);
+            },
+          ),
+          Column(
+            children: [
+              SwitchItem(
                 title: 'Repeatedly notify when Distracted',
                 toggle: _distractedNotification,
                 onChanged: (value) {
@@ -84,7 +81,7 @@ class _GeneralPageState extends State<GeneralPage> {
                 },
               ),
               Platform.isAndroid
-                  ? SettingsSwitchItem(
+                  ? SwitchItem(
                       title: 'Turn on Do Not Disturb when Focused',
                       toggle: _focusDnd,
                       onChanged: (value) {
@@ -96,8 +93,8 @@ class _GeneralPageState extends State<GeneralPage> {
                   : Container(),
             ],
           ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 }

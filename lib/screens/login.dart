@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
       duration: loginDuration,
       curve: loginCurve,
       child: Stack(
-        children: <Widget>[
+        children: [
           AnimatedOpacity(
             opacity: _visible ? 1 : 0,
             duration: loginDuration,
@@ -63,8 +63,8 @@ class _LoginPageState extends State<LoginPage> {
             left: 50,
             right: 50,
             top: _visible
-                ? SizeConfig.safeHeight * 0.3
-                : SizeConfig.safeHeight * 0.5,
+                ? SizeProvider.safeHeight * 0.3
+                : SizeProvider.safeHeight * 0.5,
             child: Image(
               image: AssetImage('assets/images/Focal Logo_Full Colored.png'),
             ),
@@ -97,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                                     loading: false, success: false);
                               }
                             },
-                            width: SizeConfig.safeWidth - 100,
+                            width: SizeProvider.safeWidth - 100,
                             gradient: LinearGradient(
                               colors: [black, black],
                               begin: Alignment.centerLeft,
@@ -138,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                           widget.setLoading(loading: false, success: false);
                         }
                       },
-                      width: SizeConfig.safeWidth - 100,
+                      width: SizeProvider.safeWidth - 100,
                       gradient: LinearGradient(
                         colors: [
                           Theme.of(context).primaryColor,

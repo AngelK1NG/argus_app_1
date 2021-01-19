@@ -93,17 +93,8 @@ class Task extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Positioned(
-          bottom: 0,
-          left: 15,
-          right: 15,
-          child: Divider(
-            height: 0,
-            thickness: 1,
-          ),
-        ),
+    return Column(
+      children: [
         Dismissible(
           background: Container(
             color: Theme.of(context).primaryColor,
@@ -135,7 +126,7 @@ class Task extends StatelessWidget {
             behavior: HitTestBehavior.deferToChild,
             child: Container(
               child: Row(
-                children: <Widget>[
+                children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 15, right: 15),
                     child: this.completed
@@ -153,7 +144,7 @@ class Task extends StatelessWidget {
                           ),
                   ),
                   SizedBox(
-                    width: SizeConfig.safeWidth - 65,
+                    width: SizeProvider.safeWidth - 65,
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -175,9 +166,16 @@ class Task extends StatelessWidget {
                 ],
               ),
               height: 50,
-              width: SizeConfig.safeWidth,
+              width: SizeProvider.safeWidth,
               alignment: Alignment.centerLeft,
             ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(left: 15, right: 15),
+          child: Divider(
+            height: 0,
+            thickness: 1,
           ),
         ),
       ],

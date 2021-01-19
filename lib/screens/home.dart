@@ -66,7 +66,7 @@ class _HomeState extends State<Home> {
             _child = FocusPage(
               goToPage: goToPage,
             );
-            _cardPosition = SizeConfig.safeHeight;
+            _cardPosition = SizeProvider.safeHeight;
             _overlayLight = true;
             break;
           }
@@ -108,10 +108,10 @@ class _HomeState extends State<Home> {
     }
   }
 
-  bool _loading(UserStatus user, List uncompletedTasks, List completedTasks) {
+  bool _loading(UserStatus user, List uncompleted, List completed) {
     return user == null ||
         ((user != null && user.signedIn) &&
-            (uncompletedTasks == null || completedTasks == null));
+            (uncompleted == null || completed == null));
   }
 
   bool _signedIn(UserStatus user) {
@@ -136,7 +136,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     if (!_init) {
-      SizeConfig().init(context);
+      SizeProvider().init(context);
       _init = true;
     }
     var user = Provider.of<UserStatus>(context);
@@ -158,12 +158,12 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.white,
         resizeToAvoidBottomInset: false,
         body: Stack(
-          children: <Widget>[
+          children: [
             AnimatedOpacity(
               opacity: _loading(user, uncompletedTasks, completedTasks) ? 0 : 1,
-              duration: generalDuration,
-              curve: generalCurve,
-              child: Stack(children: <Widget>[
+              duration: fadeDuration,
+              curve: fadeCurve,
+              child: Stack(children: [
                 Container(
                   color: _backgroundColor,
                 ),
@@ -218,8 +218,8 @@ class _HomeState extends State<Home> {
                       _loginLoading
                   ? 1
                   : 0,
-              duration: generalDuration,
-              curve: generalCurve,
+              duration: fadeDuration,
+              curve: fadeCurve,
               child: Center(
                 child: CircularProgressIndicator(
                   backgroundColor: Colors.transparent,

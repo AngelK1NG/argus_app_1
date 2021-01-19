@@ -23,7 +23,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return WillPopScope(
       onWillPop: () => widget.goToPage(0),
       child: Stack(
-        children: <Widget>[],
+        children: [],
       ),
     );
   }

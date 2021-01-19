@@ -29,8 +29,8 @@ class LocalNotifications {
       importance: Importance.max,
     );
     IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
-    NotificationDetails notificationDetails =
-        NotificationDetails(android: androidNotificationDetails, iOS: iosNotificationDetails);
+    NotificationDetails notificationDetails = NotificationDetails(
+        android: androidNotificationDetails, iOS: iosNotificationDetails);
     await notificationsPlugin.show(
       0,
       'You\'re getting Distracted!',
@@ -62,7 +62,7 @@ class LocalNotifications {
     return CupertinoAlertDialog(
       title: Text(title),
       content: Text(body),
-      actions: <Widget>[
+      actions: [
         CupertinoDialogAction(
           isDefaultAction: true,
           onPressed: () {},

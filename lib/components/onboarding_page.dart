@@ -20,7 +20,7 @@ class OnboardingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         end
             ? Image(
                 image: AssetImage('assets/images/Focal Logo_Full Colored.png'),
@@ -59,7 +59,7 @@ class OnboardingPage extends StatelessWidget {
             onTap: () {
               Navigator.pushReplacementNamed(context, '/home');
             },
-            width: SizeConfig.safeWidth - 100,
+            width: SizeProvider.safeWidth - 100,
             gradient: LinearGradient(
               colors: [
                 Theme.of(context).primaryColor,

@@ -2,14 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 
-class SettingsItem extends StatelessWidget {
+class MenuItem extends StatelessWidget {
   final IconData iconData;
+  final Color iconColor;
+  final bool check;
   final String text;
   final String secondaryText;
   final VoidCallback onTap;
 
-  SettingsItem({
-    this.iconData,
+  MenuItem({
+    @required this.iconData,
+    @required this.iconColor,
+    @required this.check,
     @required this.text,
     this.secondaryText,
     @required this.onTap,
@@ -17,22 +21,17 @@ class SettingsItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Column(
       children: [
-        Positioned(
-          bottom: 0,
-          left: iconData == null ? 0 : 0,
-          right: 0,
-          child: Container(height: 1, color: Theme.of(context).dividerColor),
-        ),
         GestureDetector(
           onTap: onTap,
           child: Container(
             height: 50,
+            padding: EdgeInsets.only(left: 15, right: 15),
             color: Colors.transparent,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
+              children: [
                 Row(
                   children: [
                     iconData != null
@@ -66,12 +65,28 @@ class SettingsItem extends StatelessWidget {
                             ),
                           )
                         : Container(),
-                    Icon(FeatherIcons.chevronRight,
-                        size: 20, color: Theme.of(context).hintColor),
+                    check
+                        ? Icon(
+                            FeatherIcons.check,
+                            size: 20,
+                            color: Theme.of(context).primaryColor,
+                          )
+                        : Icon(
+                            FeatherIcons.chevronRight,
+                            size: 20,
+                            color: Theme.of(context).hintColor,
+                          ),
                   ],
                 )
               ],
             ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(left: 15, right: 15),
+          child: Divider(
+            height: 0,
+            thickness: 1,
           ),
         ),
       ],

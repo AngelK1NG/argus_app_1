@@ -4,7 +4,7 @@ import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:Focal/constants.dart';
-import 'package:Focal/components/settings_item.dart';
+import 'package:Focal/components/menu_item.dart';
 import 'package:Focal/components/nav.dart';
 import 'package:Focal/utils/analytics.dart';
 import 'package:Focal/utils/auth.dart';
@@ -31,65 +31,67 @@ class SettingsPage extends StatelessWidget {
     var email = Provider.of<UserStatus>(context).email;
     return WillPopScope(
       onWillPop: () => this.goToPage(0),
-      child: Stack(children: <Widget>[
-        Nav(
-          title: 'Settings',
-          color: Colors.white,
-          leftIconData: FeatherIcons.chevronLeft,
-          leftOnTap: () {
-            this.goToPage(0);
-          },
-        ),
-        Positioned(
-          top: 50,
-          left: 15,
-          right: 15,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SettingsItem(
-                iconData: FeatherIcons.settings,
-                text: 'General',
-                onTap: () => this.goToPage(4),
-              ),
-              SettingsItem(
-                iconData: FeatherIcons.archive,
-                text: 'Feedback',
-                onTap: () => openFeedbackForm(),
-              ),
-              // SettingsTile(
-              //   iconData: FeatherIcons.helpCircle,
-              //   text: 'Help',
-              //   onTap: () => this.goToPage(5),
-              // ),
-              SettingsItem(
-                iconData: FeatherIcons.info,
-                text: 'About',
-                onTap: () => this.goToPage(6),
-              ),
-              SettingsItem(
-                iconData: FeatherIcons.logOut,
-                text: 'Sign Out',
-                onTap: () {
-                  HapticFeedback.heavyImpact();
-                  auth.signOut();
-                  AnalyticsProvider().logSignOut();
-                },
-              ),
-              Container(
-                height: 50,
-                alignment: Alignment.center,
-                child: Text(
-                  'Signed in as: ' + email,
-                  style: TextStyle(
-                    color: hintColor,
-                  ),
-                ),
-              ),
-            ],
+      child: Column(
+        children: [
+          Nav(
+            title: 'Settings',
+            color: Colors.white,
+            leftIconData: FeatherIcons.chevronLeft,
+            leftOnTap: () {
+              this.goToPage(0);
+            },
           ),
-        ),
-      ]),
+          MenuItem(
+            iconData: FeatherIcons.settings,
+            iconColor: Theme.of(context).primaryColor,
+            check: false,
+            text: 'General',
+            onTap: () => this.goToPage(4),
+          ),
+          MenuItem(
+            iconData: FeatherIcons.archive,
+            iconColor: Theme.of(context).primaryColor,
+            check: false,
+            text: 'Feedback',
+            onTap: () => openFeedbackForm(),
+          ),
+          // MenuItem(
+          //   iconData: FeatherIcons.helpCircle,
+          //   iconColor: Theme.of(context).primaryColor,
+          //   check: false,
+          //   text: 'Help',
+          //   onTap: () => this.goToPage(5),
+          // ),
+          MenuItem(
+            iconData: FeatherIcons.info,
+            iconColor: Theme.of(context).primaryColor,
+            check: false,
+            text: 'About',
+            onTap: () => this.goToPage(6),
+          ),
+          MenuItem(
+            iconData: FeatherIcons.logOut,
+            iconColor: Theme.of(context).primaryColor,
+            check: false,
+            text: 'Sign Out',
+            onTap: () {
+              HapticFeedback.heavyImpact();
+              auth.signOut();
+              AnalyticsProvider().logSignOut();
+            },
+          ),
+          Container(
+            height: 50,
+            alignment: Alignment.center,
+            child: Text(
+              'Signed in as: ' + email,
+              style: TextStyle(
+                color: hintColor,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

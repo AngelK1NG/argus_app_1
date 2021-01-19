@@ -48,7 +48,7 @@ class _FocusPageState extends State<FocusPage> with WidgetsBindingObserver {
     return WillPopScope(
       onWillPop: () async => false,
       child: Stack(
-        children: <Widget>[
+        children: [
           Container(),
         ],
       ),

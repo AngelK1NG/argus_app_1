@@ -3,29 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:Focal/utils/size.dart';
 
-class SettingsSwitchItem extends StatelessWidget {
+class SwitchItem extends StatelessWidget {
   final String title;
   final bool toggle;
   final Function onChanged;
-  SettingsSwitchItem({this.title, this.toggle, this.onChanged});
+  SwitchItem({this.title, this.toggle, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Column(
       children: [
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(height: 1, color: Theme.of(context).dividerColor),
-        ),
         Container(
           height: 50,
+          padding: EdgeInsets.only(left: 15, right: 15),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
+            children: [
               SizedBox(
-                width: SizeConfig.safeWidth - 135,
+                width: SizeProvider.safeWidth - 135,
                 child: Text(
                   title,
                   style: TextStyle(fontSize: 16),
@@ -41,6 +36,13 @@ class SettingsSwitchItem extends StatelessWidget {
                 },
               ),
             ],
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(left: 15, right: 15),
+          child: Divider(
+            height: 0,
+            thickness: 1,
           ),
         ),
       ],

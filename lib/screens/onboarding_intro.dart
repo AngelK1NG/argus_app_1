@@ -50,18 +50,18 @@ class _OnboardingIntroState extends State<OnboardingIntro> {
             _index--;
             _controller.animateToPage(
               _index.round(),
-              duration: generalDuration,
-              curve: generalCurve,
+              duration: fadeDuration,
+              curve: fadeCurve,
             );
           }
           return false;
         },
         child: SafeArea(
           child: Stack(
-            children: <Widget>[
+            children: [
               PageView(
                 controller: _controller,
-                children: <Widget>[
+                children: [
                   OnboardingPage(
                     iconData: FeatherIcons.list,
                     title: 'Tasks',
