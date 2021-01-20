@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:Focal/constants.dart';
@@ -76,13 +75,14 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
             AnimatedPositioned(
               left: 0,
               right: 0,
-              bottom: _visible ? 0 : -565,
+              bottom:
+                  _visible ? 0 : -565 - MediaQuery.of(context).padding.bottom,
               duration: overlayDuration,
               curve: overlayCurve,
               child: AnimatedContainer(
                 duration: overlayDuration,
                 curve: overlayCurve,
-                height: 565,
+                height: 565 + MediaQuery.of(context).padding.bottom,
                 decoration: BoxDecoration(
                   color: white,
                   boxShadow: [

@@ -157,62 +157,65 @@ class _AddOverlayState extends State<AddOverlay> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(PageRouteBuilder(
-                              opaque: false,
-                              transitionDuration: Duration(seconds: 5),
-                              pageBuilder: (_, __, ___) {
-                                return ScheduleOverlay(
-                                  date: _date,
-                                  setDate: (date) {
-                                    setState(() {
-                                      _date = date;
-                                    });
-                                    widget.setDate(date);
-                                  },
-                                  onPop: () {
-                                    _focusNode.requestFocus();
-                                  },
-                                );
-                              },
-                            ));
-                          },
-                          child: Container(
-                            height: 50,
-                            padding: EdgeInsets.only(left: 15, right: 15),
-                            color: Colors.transparent,
-                            child: Row(
-                              children: [
-                                Icon(
-                                  FeatherIcons.calendar,
-                                  size: 20,
-                                  color: _date == null
-                                      ? black
-                                      : Theme.of(context).primaryColor,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 5),
-                                  child: Text(
-                                    _date == DateProvider().today
-                                        ? 'Today'
-                                        : _date == DateProvider().tomorrow
-                                            ? 'Tomorrow'
-                                            : _date == null
-                                                ? 'No Date'
-                                                : DateProvider().weekdayString(
-                                                    _date,
-                                                    true,
-                                                  ),
-                                    style: TextStyle(
-                                      color: _date == null
-                                          ? black
-                                          : Theme.of(context).primaryColor,
-                                      fontSize: 16,
+                        Padding(
+                          padding: EdgeInsets.only(left: 15, right: 15),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(PageRouteBuilder(
+                                opaque: false,
+                                transitionDuration: Duration(seconds: 5),
+                                pageBuilder: (_, __, ___) {
+                                  return ScheduleOverlay(
+                                    date: _date,
+                                    setDate: (date) {
+                                      setState(() {
+                                        _date = date;
+                                      });
+                                      widget.setDate(date);
+                                    },
+                                    onPop: () {
+                                      _focusNode.requestFocus();
+                                    },
+                                  );
+                                },
+                              ));
+                            },
+                            child: Container(
+                              height: 50,
+                              color: Colors.transparent,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    FeatherIcons.calendar,
+                                    size: 20,
+                                    color: _date == null
+                                        ? black
+                                        : Theme.of(context).primaryColor,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 5),
+                                    child: Text(
+                                      _date == DateProvider().today
+                                          ? 'Today'
+                                          : _date == DateProvider().tomorrow
+                                              ? 'Tomorrow'
+                                              : _date == null
+                                                  ? 'No Date'
+                                                  : DateProvider()
+                                                      .weekdayString(
+                                                      _date,
+                                                      true,
+                                                    ),
+                                      style: TextStyle(
+                                        color: _date == null
+                                            ? black
+                                            : Theme.of(context).primaryColor,
+                                        fontSize: 16,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),

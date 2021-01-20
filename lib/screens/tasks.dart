@@ -37,15 +37,27 @@ class _TasksPageState extends State<TasksPage> {
     List<DragAndDropList> newLists = [];
     if (uncompleted != null && uncompleted.isNotEmpty) {
       for (var task in uncompleted) {
-        if (taskMap[task.date] == null) {
-          taskMap[task.date] = [];
+        if (task.date.isEmpty) {
+          if (taskMap['No Date'] == null) {
+            taskMap['No Date'] = [];
+          }
+          taskMap['No Date'].add(task);
+        } else if (DateTime.parse(task.date).isBefore(DateProvider().today)) {
+          if (taskMap['Overdue'] == null) {
+            taskMap['Overdue'] = [];
+          }
+          taskMap['Overdue'].add(task);
+        } else {
+          if (taskMap[task.date] == null) {
+            taskMap[task.date] = [];
+          }
+          taskMap[task.date].add(task);
         }
-        taskMap[task.date].add(task);
       }
     }
-    if (taskMap[''] != null && taskMap[''].isNotEmpty) {
-      var noDates = taskMap.remove('');
-      taskMap.addAll({'': noDates});
+    if (taskMap['No Date'] != null) {
+      var noDates = taskMap.remove('No Date');
+      taskMap.addAll({'No Date': noDates});
     }
     if (completed != null && completed.isNotEmpty) {
       taskMap['Completed'] = [];
@@ -138,74 +150,86 @@ class _TasksPageState extends State<TasksPage> {
               lastListTargetSize: 0,
               lastItemTargetHeight: 17,
               addLastItemTargetHeightToTop: true,
+              itemOnWillAccept: (_, target) {
+                Task task = target.child;
+                if ((task.date.isNotEmpty &&
+                        DateTime.parse(task.date)
+                            .isBefore(DateProvider().today)) ||
+                    task.completed) {
+                  return false;
+                } else {
+                  return true;
+                }
+              },
+              itemTargetOnWillAccept: (_, target) {
+                DragAndDropList list = target.parent;
+                TaskListHeader header = list.header;
+                if (header.date == 'Overdue' || header.date == 'Completed') {
+                  return false;
+                } else {
+                  return true;
+                }
+              },
               onItemReorder: (int oldItemIndex, int oldListIndex,
                   int newItemIndex, int newListIndex) {
                 TaskListHeader header = _tasks[newListIndex].header;
-                if (header.date != 'Completed') {
-                  Task movedTask = _tasks[oldListIndex]
-                      .children
-                      .removeAt(oldItemIndex)
-                      .child;
-                  Task newMovedTask = Task(
-                    id: movedTask.id,
-                    index: newItemIndex,
-                    name: movedTask.name,
-                    date: header.date,
-                    completed: movedTask.completed,
-                    paused: movedTask.paused,
-                    seconds: movedTask.seconds,
+                Task movedTask =
+                    _tasks[oldListIndex].children.removeAt(oldItemIndex).child;
+                Task newMovedTask = Task(
+                  id: movedTask.id,
+                  index: newItemIndex,
+                  name: movedTask.name,
+                  date: header.date == 'No Date' ? '' : header.date,
+                  completed: movedTask.completed,
+                  paused: movedTask.paused,
+                  seconds: movedTask.seconds,
+                );
+                _saving = true;
+                setState(() {
+                  _tasks[newListIndex].children.insert(
+                        newItemIndex,
+                        DragAndDropItem(child: newMovedTask),
+                      );
+                });
+                List newTasks = [];
+                for (var i = 0; i < _tasks[oldListIndex].children.length; i++) {
+                  Task task = _tasks[oldListIndex].children[i].child;
+                  Task newTask = Task(
+                    id: task.id,
+                    index: i,
+                    name: task.name,
+                    date: task.date,
+                    completed: task.completed,
+                    paused: task.paused,
+                    seconds: task.seconds,
                   );
-                  _saving = true;
-                  setState(() {
-                    _tasks[newListIndex].children.insert(
-                          newItemIndex,
-                          DragAndDropItem(child: newMovedTask),
-                        );
-                  });
-                  List newTasks = [];
-                  for (var i = 0;
-                      i < _tasks[oldListIndex].children.length;
-                      i++) {
-                    Task task = _tasks[oldListIndex].children[i].child;
-                    Task newTask = Task(
-                      id: task.id,
-                      index: i,
-                      name: task.name,
-                      date: task.date,
-                      completed: task.completed,
-                      paused: task.paused,
-                      seconds: task.seconds,
-                    );
-                    newTasks.add(newTask);
-                  }
-                  for (var i = 0;
-                      i < _tasks[newListIndex].children.length;
-                      i++) {
-                    Task task = _tasks[newListIndex].children[i].child;
-                    Task newTask = Task(
-                      id: task.id,
-                      index: i,
-                      name: task.name,
-                      date: task.date,
-                      completed: task.completed,
-                      paused: task.paused,
-                      seconds: task.seconds,
-                    );
-                    newTasks.add(newTask);
-                  }
-                  if (_tasks[oldListIndex].children.isEmpty) {
-                    _tasks.removeAt(oldListIndex);
-                  }
-                  int updatedTasks = 0;
-                  newTasks.forEach((task) {
-                    task.updateDoc(user, () {
-                      updatedTasks++;
-                      if (updatedTasks == newTasks.length) {
-                        _saving = false;
-                      }
-                    });
-                  });
+                  newTasks.add(newTask);
                 }
+                for (var i = 0; i < _tasks[newListIndex].children.length; i++) {
+                  Task task = _tasks[newListIndex].children[i].child;
+                  Task newTask = Task(
+                    id: task.id,
+                    index: i,
+                    name: task.name,
+                    date: task.date,
+                    completed: task.completed,
+                    paused: task.paused,
+                    seconds: task.seconds,
+                  );
+                  newTasks.add(newTask);
+                }
+                if (_tasks[oldListIndex].children.isEmpty) {
+                  _tasks.removeAt(oldListIndex);
+                }
+                int updatedTasks = 0;
+                newTasks.forEach((task) {
+                  task.updateDoc(user, () {
+                    updatedTasks++;
+                    if (updatedTasks == newTasks.length) {
+                      _saving = false;
+                    }
+                  });
+                });
               },
               contentsWhenEmpty: Center(
                 child: Column(

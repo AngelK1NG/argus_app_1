@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'dart:io' show Platform;
 
 //firebase
 final FirebaseAuth auth = FirebaseAuth.instance;
@@ -39,8 +38,8 @@ final TextStyle buttonTextStyle = TextStyle(
 final Duration fadeDuration = Duration(milliseconds: 200);
 final Curve fadeCurve = Curves.ease;
 
-final Duration overlayDuration = Duration(milliseconds: 200);
-final Curve overlayCurve = Curves.ease;
+final Duration overlayDuration = Duration(milliseconds: 500);
+final Curve overlayCurve = Curves.easeOutQuint;
 
 final Duration buttonDuration = Duration(milliseconds: 200);
 final Curve buttonCurve = Curves.ease;
