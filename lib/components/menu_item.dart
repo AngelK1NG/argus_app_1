@@ -21,11 +21,11 @@ class MenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
             height: 50,
             padding: EdgeInsets.only(left: 15, right: 15),
             color: Colors.transparent,
@@ -81,15 +81,15 @@ class MenuItem extends StatelessWidget {
               ],
             ),
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(left: 15, right: 15),
-          child: Divider(
-            height: 0,
-            thickness: 1,
+          Padding(
+            padding: EdgeInsets.only(left: 15, right: 15),
+            child: Divider(
+              height: 0,
+              thickness: 1,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

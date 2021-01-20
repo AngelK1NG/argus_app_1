@@ -128,7 +128,7 @@ class _TasksPageState extends State<TasksPage> {
           left: 0,
           top: 65,
           child: SizedBox(
-            height: SizeProvider.safeHeight - 65,
+            height: SizeProvider.safeHeight - 80,
             child: DragAndDropLists(
               itemDecorationWhileDragging: BoxDecoration(
                 color: white.withOpacity(0.8),
@@ -148,7 +148,7 @@ class _TasksPageState extends State<TasksPage> {
               ),
               listGhostOpacity: 0,
               lastListTargetSize: 0,
-              lastItemTargetHeight: 17,
+              lastItemTargetHeight: 15,
               addLastItemTargetHeightToTop: true,
               itemOnWillAccept: (_, target) {
                 Task task = target.child;

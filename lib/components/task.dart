@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Focal/utils/size.dart';
 import 'package:Focal/utils/auth.dart';
+import 'package:Focal/utils/date.dart';
 import 'package:Focal/constants.dart';
 
 class Task extends StatelessWidget {
@@ -93,38 +94,40 @@ class Task extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Dismissible(
-          background: Container(
-            color: Theme.of(context).primaryColor,
-            padding: EdgeInsets.only(left: 15),
-            alignment: AlignmentDirectional.centerStart,
-            child: Icon(
-              FeatherIcons.calendar,
-              color: Colors.white,
-              size: 20,
-            ),
-          ),
-          secondaryBackground: Container(
-            color: Colors.red,
-            padding: EdgeInsets.only(right: 15),
-            alignment: AlignmentDirectional.centerEnd,
-            child: Icon(
-              FeatherIcons.trash,
-              color: Colors.white,
-              size: 20,
-            ),
-          ),
-          key: UniqueKey(),
-          direction: this.completed
-              ? DismissDirection.endToStart
-              : DismissDirection.horizontal,
-          onDismissed: this.onDismissed,
-          child: GestureDetector(
-            onTap: () {},
-            behavior: HitTestBehavior.deferToChild,
-            child: Container(
+    return Dismissible(
+      background: Container(
+        color: Theme.of(context).primaryColor,
+        padding: EdgeInsets.only(left: 15),
+        alignment: AlignmentDirectional.centerStart,
+        child: Icon(
+          FeatherIcons.calendar,
+          color: Colors.white,
+          size: 20,
+        ),
+      ),
+      secondaryBackground: Container(
+        color: Colors.red,
+        padding: EdgeInsets.only(right: 15),
+        alignment: AlignmentDirectional.centerEnd,
+        child: Icon(
+          FeatherIcons.trash,
+          color: Colors.white,
+          size: 20,
+        ),
+      ),
+      key: UniqueKey(),
+      direction: this.completed
+          ? DismissDirection.endToStart
+          : DismissDirection.horizontal,
+      onDismissed: this.onDismissed,
+      child: GestureDetector(
+        onTap: () {},
+        child: Column(
+          children: [
+            Container(
+              height: 50,
+              width: SizeProvider.safeWidth,
+              alignment: Alignment.centerLeft,
               child: Row(
                 children: [
                   Padding(
@@ -144,7 +147,11 @@ class Task extends StatelessWidget {
                           ),
                   ),
                   SizedBox(
-                    width: SizeProvider.safeWidth - 65,
+                    width: this.date.isNotEmpty &&
+                            DateTime.parse(this.date)
+                                .isBefore(DateProvider().today)
+                        ? SizeProvider.safeWidth - 115
+                        : SizeProvider.safeWidth - 65,
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -163,22 +170,34 @@ class Task extends StatelessWidget {
                       ),
                     ),
                   ),
+                  !this.completed &&
+                          this.date.isNotEmpty &&
+                          DateTime.parse(date).isBefore(DateProvider().today)
+                      ? Container(
+                          width: 50,
+                          child: Text(
+                            '${DateProvider().monthString(DateTime.parse(date), false)} ${DateTime.parse(date).day}',
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: red,
+                            ),
+                          ),
+                        )
+                      : Container()
                 ],
               ),
-              height: 50,
-              width: SizeProvider.safeWidth,
-              alignment: Alignment.centerLeft,
             ),
-          ),
+            Padding(
+              padding: EdgeInsets.only(left: 15, right: 15),
+              child: Divider(
+                height: 0,
+                thickness: 1,
+              ),
+            ),
+          ],
         ),
-        Padding(
-          padding: EdgeInsets.only(left: 15, right: 15),
-          child: Divider(
-            height: 0,
-            thickness: 1,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

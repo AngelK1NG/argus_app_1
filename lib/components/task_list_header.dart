@@ -23,7 +23,7 @@ class TaskListHeader extends StatelessWidget {
                 ? 'Today, ${DateProvider().weekdayString(DateTime.parse(this.date), false)} ${DateProvider().monthString(DateTime.parse(this.date), false)} ${DateTime.parse(this.date).day}'
                 : DateTime.parse(this.date) == DateProvider().tomorrow
                     ? 'Tomorrow, ${DateProvider().weekdayString(DateTime.parse(this.date), false)} ${DateProvider().monthString(DateTime.parse(this.date), false)} ${DateTime.parse(this.date).day}'
-                    : '${DateProvider().weekdayString(DateTime.parse(this.date), false)} ${DateProvider().monthString(DateTime.parse(this.date), false)} ${DateTime.parse(this.date).day}',
+                    : '${DateProvider().weekdayString(DateTime.parse(this.date), false)} ${DateProvider().monthString(DateTime.parse(this.date), false)} ${DateTime.parse(this.date).day}${DateTime.parse(this.date).year != DateProvider().today.year ? ' ' + DateTime.parse(this.date).year.toString() : ''}',
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
