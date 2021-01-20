@@ -29,8 +29,8 @@ class TasksPage extends StatefulWidget {
 class _TasksPageState extends State<TasksPage> {
   List<DragAndDropList> _tasks = [];
   bool _saving = false;
-  String _addText = '';
-  DateTime _addDate = DateProvider().today;
+  String _text = '';
+  DateTime _date = DateProvider().today;
 
   void setTasks(List<Task> uncompleted, List<Task> completed) {
     Map taskMap = {};
@@ -42,6 +42,10 @@ class _TasksPageState extends State<TasksPage> {
         }
         taskMap[task.date].add(task);
       }
+    }
+    if (taskMap[''] != null && taskMap[''].isNotEmpty) {
+      var noDates = taskMap.remove('');
+      taskMap.addAll({'': noDates});
     }
     if (completed != null && completed.isNotEmpty) {
       taskMap['Completed'] = [];
@@ -69,19 +73,20 @@ class _TasksPageState extends State<TasksPage> {
   void submitTask(String text) {
     int index = 0;
     Provider.of<UncompletedTasks>(context, listen: false).tasks.forEach((task) {
-      if (task.date == DateProvider().dateString(DateTime.now())) {
+      if (task.date == DateProvider().dateString(_date)) {
         index += 1;
       }
     });
     Task newTask = Task(
       index: index,
       name: text,
-      date: DateProvider().dateString(DateTime.now()),
+      date: DateProvider().dateString(_date),
       completed: false,
       paused: false,
       seconds: 0,
     );
     newTask.addDoc(Provider.of<UserStatus>(context, listen: false));
+    _date = DateProvider().today;
   }
 
   @override
@@ -111,7 +116,7 @@ class _TasksPageState extends State<TasksPage> {
           left: 0,
           top: 65,
           child: SizedBox(
-            height: SizeProvider.safeHeight - 50,
+            height: SizeProvider.safeHeight - 65,
             child: DragAndDropLists(
               itemDecorationWhileDragging: BoxDecoration(
                 color: white.withOpacity(0.8),
@@ -240,10 +245,10 @@ class _TasksPageState extends State<TasksPage> {
                 transitionDuration: Duration(seconds: 5),
                 pageBuilder: (_, __, ___) {
                   return AddOverlay(
-                    text: _addText,
-                    setText: (text) => _addText = text,
-                    date: _addDate,
-                    setDate: (date) => _addDate = date,
+                    text: _text,
+                    setText: (text) => _text = text,
+                    date: _date,
+                    setDate: (date) => _date = date,
                     submit: submitTask,
                   );
                 },

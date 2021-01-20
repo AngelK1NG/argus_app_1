@@ -10,10 +10,12 @@ import 'package:Focal/utils/date.dart';
 class ScheduleOverlay extends StatefulWidget {
   final DateTime date;
   final Function setDate;
+  final VoidCallback onPop;
 
   ScheduleOverlay({
     @required this.date,
     @required this.setDate,
+    @required this.onPop,
     Key key,
   }) : super(key: key);
 
@@ -25,8 +27,16 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
   bool _visible = false;
   DateTime _date;
 
-  void submit() {
-    HapticFeedback.heavyImpact();
+  void pop() {
+    if (_visible) {
+      setState(() {
+        _visible = false;
+      });
+      Future.delayed(overlayDuration, () {
+        Navigator.of(context).pop();
+      });
+      widget.onPop();
+    }
   }
 
   @override
@@ -44,14 +54,7 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (_visible) {
-          setState(() {
-            _visible = false;
-          });
-          Future.delayed(overlayDuration, () {
-            Navigator.of(context).pop();
-          });
-        }
+        pop();
         return false;
       },
       child: Scaffold(
@@ -64,16 +67,7 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
               duration: overlayDuration,
               curve: overlayCurve,
               child: GestureDetector(
-                onTap: () {
-                  if (_visible) {
-                    setState(() {
-                      _visible = false;
-                    });
-                    Future.delayed(overlayDuration, () {
-                      Navigator.of(context).pop();
-                    });
-                  }
-                },
+                onTap: () => pop(),
                 child: SizedBox.expand(
                   child: Container(color: black),
                 ),
@@ -115,16 +109,7 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                           fontSize: 16,
                         ),
                       ),
-                      leftOnTap: () {
-                        if (_visible) {
-                          setState(() {
-                            _visible = false;
-                          });
-                          Future.delayed(overlayDuration, () {
-                            Navigator.of(context).pop();
-                          });
-                        }
-                      },
+                      leftOnTap: () => pop(),
                       rightText: Text(
                         'Save',
                         style: TextStyle(
@@ -135,13 +120,8 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                       rightOnTap: () {
                         if (_visible) {
                           widget.setDate(_date);
-                          setState(() {
-                            _visible = false;
-                          });
-                          Future.delayed(overlayDuration, () {
-                            Navigator.of(context).pop();
-                          });
                         }
+                        pop();
                       },
                     ),
                     MenuItem(
@@ -150,18 +130,12 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                       check: _date == DateProvider().today,
                       text: 'Today',
                       secondaryText: DateProvider()
-                          .weekdayString(DateProvider().today, true),
+                          .weekdayString(DateProvider().today, false),
                       onTap: () {
                         if (_visible) {
-                          _date = DateProvider().today;
-                          widget.setDate(_date);
-                          setState(() {
-                            _visible = false;
-                          });
-                          Future.delayed(overlayDuration, () {
-                            Navigator.of(context).pop();
-                          });
+                          widget.setDate(DateProvider().today);
                         }
+                        pop();
                       },
                     ),
                     MenuItem(
@@ -170,18 +144,12 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                       check: _date == DateProvider().tomorrow,
                       text: 'Tomorrow',
                       secondaryText: DateProvider()
-                          .weekdayString(DateProvider().tomorrow, true),
+                          .weekdayString(DateProvider().tomorrow, false),
                       onTap: () {
                         if (_visible) {
-                          _date = DateProvider().tomorrow;
-                          widget.setDate(_date);
-                          setState(() {
-                            _visible = false;
-                          });
-                          Future.delayed(overlayDuration, () {
-                            Navigator.of(context).pop();
-                          });
+                          widget.setDate(DateProvider().tomorrow);
                         }
+                        pop();
                       },
                     ),
                     MenuItem(
@@ -190,18 +158,12 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                       check: _date == DateProvider().nextWeek,
                       text: 'Next Week',
                       secondaryText: DateProvider()
-                          .weekdayString(DateProvider().nextWeek, true),
+                          .weekdayString(DateProvider().nextWeek, false),
                       onTap: () {
                         if (_visible) {
-                          _date = DateProvider().nextWeek;
-                          widget.setDate(_date);
-                          setState(() {
-                            _visible = false;
-                          });
-                          Future.delayed(overlayDuration, () {
-                            Navigator.of(context).pop();
-                          });
+                          widget.setDate(DateProvider().nextWeek);
                         }
+                        pop();
                       },
                     ),
                     MenuItem(
@@ -211,15 +173,9 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                       text: 'No Date',
                       onTap: () {
                         if (_visible) {
-                          _date = null;
-                          widget.setDate(_date);
-                          setState(() {
-                            _visible = false;
-                          });
-                          Future.delayed(overlayDuration, () {
-                            Navigator.of(context).pop();
-                          });
+                          widget.setDate(null);
                         }
+                        pop();
                       },
                     ),
                     SfDateRangePicker(

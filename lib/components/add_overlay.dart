@@ -32,12 +32,27 @@ class _AddOverlayState extends State<AddOverlay> {
   TextEditingController _input = TextEditingController();
   DateTime _date;
 
+  void pop() {
+    if (_visible) {
+      setState(() {
+        _visible = false;
+      });
+      _focusNode.unfocus();
+      Future.delayed(overlayDuration, () {
+        Navigator.of(context).pop();
+      });
+    }
+  }
+
   void submit() {
     _focusNode.requestFocus();
     if (_input.text.isNotEmpty) {
       widget.setText('');
       widget.submit(_input.text);
-      _input.clear();
+      setState(() {
+        _input.clear();
+        _date = DateProvider().today;
+      });
       HapticFeedback.heavyImpact();
     }
   }
@@ -61,15 +76,7 @@ class _AddOverlayState extends State<AddOverlay> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (_visible) {
-          setState(() {
-            _visible = false;
-          });
-          _focusNode.unfocus();
-          Future.delayed(overlayDuration, () {
-            Navigator.of(context).pop();
-          });
-        }
+        pop();
         return false;
       },
       child: Scaffold(
@@ -82,17 +89,7 @@ class _AddOverlayState extends State<AddOverlay> {
               duration: overlayDuration,
               curve: overlayCurve,
               child: GestureDetector(
-                onTap: () {
-                  if (_visible) {
-                    setState(() {
-                      _visible = false;
-                    });
-                    _focusNode.unfocus();
-                    Future.delayed(overlayDuration, () {
-                      Navigator.of(context).pop();
-                    });
-                  }
-                },
+                onTap: () => pop(),
                 child: SizedBox.expand(
                   child: Container(color: black),
                 ),
@@ -160,60 +157,62 @@ class _AddOverlayState extends State<AddOverlay> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 15),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(PageRouteBuilder(
-                                opaque: false,
-                                transitionDuration: Duration(seconds: 5),
-                                pageBuilder: (_, __, ___) {
-                                  return ScheduleOverlay(
-                                    date: _date,
-                                    setDate: (date) {
-                                      setState(() {
-                                        _date = date;
-                                      });
-                                      widget.setDate(date);
-                                    },
-                                  );
-                                },
-                              ));
-                            },
-                            child: Container(
-                              height: 50,
-                              width: 100,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    FeatherIcons.calendar,
-                                    size: 20,
-                                    color: _date == null
-                                        ? black
-                                        : Theme.of(context).primaryColor,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 5),
-                                    child: Text(
-                                      _date == DateProvider().today
-                                          ? 'Today'
-                                          : _date == DateProvider().tomorrow
-                                              ? 'Tomorrow'
-                                              : _date == null
-                                                  ? 'No Date'
-                                                  : DateProvider()
-                                                      .weekdayString(
-                                                          _date, false),
-                                      style: TextStyle(
-                                        color: _date == null
-                                            ? black
-                                            : Theme.of(context).primaryColor,
-                                        fontSize: 16,
-                                      ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(PageRouteBuilder(
+                              opaque: false,
+                              transitionDuration: Duration(seconds: 5),
+                              pageBuilder: (_, __, ___) {
+                                return ScheduleOverlay(
+                                  date: _date,
+                                  setDate: (date) {
+                                    setState(() {
+                                      _date = date;
+                                    });
+                                    widget.setDate(date);
+                                  },
+                                  onPop: () {
+                                    _focusNode.requestFocus();
+                                  },
+                                );
+                              },
+                            ));
+                          },
+                          child: Container(
+                            height: 50,
+                            padding: EdgeInsets.only(left: 15, right: 15),
+                            color: Colors.transparent,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  FeatherIcons.calendar,
+                                  size: 20,
+                                  color: _date == null
+                                      ? black
+                                      : Theme.of(context).primaryColor,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 5),
+                                  child: Text(
+                                    _date == DateProvider().today
+                                        ? 'Today'
+                                        : _date == DateProvider().tomorrow
+                                            ? 'Tomorrow'
+                                            : _date == null
+                                                ? 'No Date'
+                                                : DateProvider().weekdayString(
+                                                    _date,
+                                                    true,
+                                                  ),
+                                    style: TextStyle(
+                                      color: _date == null
+                                          ? black
+                                          : Theme.of(context).primaryColor,
+                                      fontSize: 16,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),

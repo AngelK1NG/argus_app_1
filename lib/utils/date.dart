@@ -13,54 +13,109 @@ class DateProvider {
   }
 
   String dateString(DateTime date) {
-    String day = date.day.toString().padLeft(2, '0');
-    String month = date.month.toString().padLeft(2, '0');
-    String year = date.year.toString();
-    return year + month + day;
+    if (date == null) {
+      return '';
+    } else {
+      String day = date.day.toString().padLeft(2, '0');
+      String month = date.month.toString().padLeft(2, '0');
+      String year = date.year.toString();
+      return year + month + day;
+    }
   }
 
-  String dateTimeString(DateTime date) {
-    String day = date.day.toString().padLeft(2, '0');
-    String month = date.month.toString().padLeft(2, '0');
-    String year = date.year.toString();
-    String hour = date.hour.toString().padLeft(2, '0');
-    String minute = date.minute.toString().padLeft(2, '0');
-    String second = date.second.toString().padLeft(2, '0');
-    return year + month + day + ' $hour:$minute:$second';
-  }
-
-  String weekdayString(DateTime date, bool short) {
+  String weekdayString(DateTime date, bool full) {
     if (date == null) {
       return '';
     } else {
       switch (date.weekday) {
         case 1:
           {
-            return short ? 'Mon' : 'Monday';
+            return full ? 'Monday' : 'Mon';
           }
         case 2:
           {
-            return short ? 'Tue' : 'Tuesday';
+            return full ? 'Tuesday' : 'Tue';
           }
         case 3:
           {
-            return short ? 'Wed' : 'Wednesday';
+            return full ? 'Wednesday' : 'Wed';
           }
         case 4:
           {
-            return short ? 'Thu' : 'Thursday';
+            return full ? 'Thursday' : 'Thu';
           }
         case 5:
           {
-            return short ? 'Fri' : 'Friday';
+            return full ? 'Friday' : 'Fri';
           }
         case 6:
           {
-            return short ? 'Sat' : 'Saturday';
+            return full ? 'Saturday' : 'Sat';
           }
         case 7:
           {
-            return short ? 'Sun' : 'Sunday';
+            return full ? 'Sunday' : 'Sun';
+          }
+        default:
+          {
+            return '';
+          }
+      }
+    }
+  }
+
+  String monthString(DateTime date, bool full) {
+    if (date == null) {
+      return '';
+    } else {
+      switch (date.month) {
+        case 1:
+          {
+            return full ? 'January' : 'Jan';
+          }
+        case 2:
+          {
+            return full ? 'Februray' : 'Feb';
+          }
+        case 3:
+          {
+            return full ? 'March' : 'Mar';
+          }
+        case 4:
+          {
+            return full ? 'April' : 'Apr';
+          }
+        case 5:
+          {
+            return full ? 'May' : 'May';
+          }
+        case 6:
+          {
+            return full ? 'June' : 'Jun';
+          }
+        case 7:
+          {
+            return full ? 'July' : 'Jul';
+          }
+        case 8:
+          {
+            return full ? 'August' : 'Aug';
+          }
+        case 9:
+          {
+            return full ? 'September' : 'Sep';
+          }
+        case 10:
+          {
+            return full ? 'October' : 'Oct';
+          }
+        case 11:
+          {
+            return full ? 'November' : 'Nov';
+          }
+        case 12:
+          {
+            return full ? 'December' : 'Dec';
           }
         default:
           {
