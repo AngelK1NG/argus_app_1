@@ -43,7 +43,7 @@ class Task extends StatelessWidget {
     );
   }
 
-  void updateDoc(UserStatus user, VoidCallback callback) {
+  void updateDoc(UserStatus user) {
     FirebaseFirestore.instance
         .collection('users')
         .doc(user.uid)
@@ -55,8 +55,6 @@ class Task extends StatelessWidget {
       'date': this.date,
       'paused': this.paused,
       'seconds': this.seconds,
-    }).then((_) {
-      callback();
     });
   }
 

@@ -47,8 +47,9 @@ class _AddOverlayState extends State<AddOverlay> {
   void submit() {
     _focusNode.requestFocus();
     if (_input.text.isNotEmpty) {
+      widget.setText(_input.text);
+      widget.submit();
       widget.setText('');
-      widget.submit(_input.text);
       setState(() {
         _input.clear();
         _date = DateProvider().today;
