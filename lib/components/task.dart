@@ -43,8 +43,8 @@ class Task extends StatelessWidget {
     );
   }
 
-  void updateDoc(UserStatus user) {
-    FirebaseFirestore.instance
+  Future<void> updateDoc(UserStatus user) async {
+    await FirebaseFirestore.instance
         .collection('users')
         .doc(user.uid)
         .collection('uncompleted')
@@ -58,8 +58,8 @@ class Task extends StatelessWidget {
     });
   }
 
-  void addDoc(UserStatus user) {
-    FirebaseFirestore.instance
+  Future<void> addDoc(UserStatus user) async {
+    await FirebaseFirestore.instance
         .collection('users')
         .doc(user.uid)
         .collection('uncompleted')
@@ -72,16 +72,16 @@ class Task extends StatelessWidget {
     });
   }
 
-  void deleteDoc(UserStatus user) {
+  Future<void> deleteDoc(UserStatus user) async {
     if (!this.completed) {
-      FirebaseFirestore.instance
+      await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('uncompleted')
           .doc(this.id)
           .delete();
     } else {
-      FirebaseFirestore.instance
+      await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('completed')
