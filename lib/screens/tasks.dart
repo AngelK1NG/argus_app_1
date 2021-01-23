@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Focal/utils/database.dart';
-import 'package:Focal/utils/size.dart';
 import 'package:Focal/utils/auth.dart';
 import 'package:Focal/utils/date.dart';
 import 'package:Focal/constants.dart';
@@ -11,7 +10,6 @@ import 'package:Focal/components/task.dart';
 import 'package:Focal/components/add_overlay.dart';
 import 'package:Focal/components/schedule_overlay.dart';
 import 'package:Focal/components/task_list_header.dart';
-import 'package:Focal/components/nav.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 
@@ -32,6 +30,7 @@ class _TasksPageState extends State<TasksPage> {
   bool _saving = false;
   String _text = '';
   DateTime _date = DateProvider().today;
+  ScrollController _scrollController = ScrollController();
 
   void setTasks(List<Task> uncompleted, List<Task> completed) {
     Map taskMap = {};
@@ -278,154 +277,123 @@ class _TasksPageState extends State<TasksPage> {
     }
     return Stack(
       children: [
-        Nav(
-          title: 'Tasks',
-          rightIconData: FeatherIcons.settings,
-          rightOnTap: () {
-            widget.goToPage(2);
-          },
-        ),
-        Positioned(
-          right: 0,
-          left: 0,
-          top: 65,
-          child: SizedBox(
-            height: SizeProvider.safeHeight - 80,
-            child: DragAndDropLists(
-              itemDecorationWhileDragging: BoxDecoration(
-                color: Theme.of(context).backgroundColor.withOpacity(0.8),
+        CustomScrollView(
+          slivers: [
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: TasksSliverAppBar(
+                leftOnTap: () {},
+                rightOnTap: () => widget.goToPage(2),
               ),
-              itemGhostOpacity: 1,
-              itemGhost: Divider(
-                color: Theme.of(context).primaryColor,
-                thickness: 2,
-                height: 0,
-              ),
-              listGhostOpacity: 0,
-              lastListTargetSize: 15,
-              lastItemTargetHeight: 15,
-              addLastItemTargetHeightToTop: false,
-              itemOnWillAccept: (_, target) {
-                Task task = target.child;
-                if ((task.date.isNotEmpty &&
-                        DateTime.parse(task.date)
-                            .isBefore(DateProvider().today)) ||
-                    task.completed) {
-                  return false;
-                } else {
-                  return true;
-                }
-              },
-              itemTargetOnWillAccept: (_, target) {
-                DragAndDropList list = target.parent;
-                TaskListHeader header = list.header;
-                if (header.date == 'Overdue' || header.date == 'Completed') {
-                  return false;
-                } else {
-                  return true;
-                }
-              },
-              onItemReorder: (int oldItemIndex, int oldListIndex,
-                  int newItemIndex, int newListIndex) async {
-                _saving = true;
-                TaskListHeader oldListHeader = _tasks[oldListIndex].header;
-                TaskListHeader newListHeader = _tasks[newListIndex].header;
-                Task movedTask =
-                    _tasks[oldListIndex].children.removeAt(oldItemIndex).child;
-                Task newMovedTask;
-                newMovedTask = Task(
-                  id: movedTask.id,
-                  index: newItemIndex,
-                  name: movedTask.name,
-                  date:
-                      newListHeader.date == 'No Date' ? '' : newListHeader.date,
-                  completed: movedTask.completed,
-                  paused: movedTask.paused,
-                  seconds: movedTask.seconds,
-                  onDismissed: (direction) =>
-                      onDismissed(direction, newMovedTask),
-                );
-                setState(() {
-                  _tasks[newListIndex].children.insert(
-                        newItemIndex,
-                        DragAndDropItem(child: newMovedTask),
-                      );
-                });
-                List<DragAndDropItem> oldListTasks = [];
-                List<DragAndDropItem> newListTasks = [];
-                for (var i = 0; i < _tasks[oldListIndex].children.length; i++) {
-                  Task task = _tasks[oldListIndex].children[i].child;
-                  Task newTask;
-                  newTask = Task(
-                    id: task.id,
-                    index: i,
-                    name: task.name,
-                    date: task.date,
-                    completed: task.completed,
-                    paused: task.paused,
-                    seconds: task.seconds,
-                    onDismissed: (direction) => onDismissed(direction, newTask),
-                  );
-                  oldListTasks.add(DragAndDropItem(child: newTask));
-                }
-                for (var i = 0; i < _tasks[newListIndex].children.length; i++) {
-                  Task task = _tasks[newListIndex].children[i].child;
-                  Task newTask;
-                  newTask = Task(
-                    id: task.id,
-                    index: i,
-                    name: task.name,
-                    date: task.date,
-                    completed: task.completed,
-                    paused: task.paused,
-                    seconds: task.seconds,
-                    onDismissed: (direction) => onDismissed(direction, newTask),
-                  );
-                  newListTasks.add(DragAndDropItem(child: newTask));
-                }
-                DragAndDropList removedOldList = _tasks.removeAt(oldListIndex);
-                if (oldListIndex == newListIndex) {
-                  setState(() {
-                    _tasks.insert(
-                      oldListIndex,
-                      DragAndDropList(
-                        canDrag: false,
-                        header: TaskListHeader(date: oldListHeader.date),
-                        children: oldListTasks,
-                      ),
-                    );
-                  });
-                  await Future.forEach(oldListTasks, (item) async {
-                    Task task = item.child;
-                    await task.updateDoc(user);
-                  });
-                } else {
-                  if (oldListIndex > newListIndex) {
-                    _tasks.removeAt(newListIndex);
-                    setState(() {
-                      _tasks.insert(
-                        newListIndex,
-                        DragAndDropList(
-                          canDrag: false,
-                          header: TaskListHeader(date: newListHeader.date),
-                          children: newListTasks,
-                        ),
-                      );
-                    });
+            ),
+            SliverPadding(
+              padding: EdgeInsets.only(top: 15),
+              sliver: DragAndDropLists(
+                itemDecorationWhileDragging: BoxDecoration(
+                  color: Theme.of(context).backgroundColor.withOpacity(0.8),
+                ),
+                itemGhostOpacity: 1,
+                itemGhost: Divider(
+                  color: Theme.of(context).primaryColor,
+                  thickness: 2,
+                  height: 0,
+                ),
+                listGhostOpacity: 0,
+                lastListTargetSize: 15,
+                lastItemTargetHeight: 15,
+                addLastItemTargetHeightToTop: false,
+                sliverList: true,
+                scrollController: _scrollController,
+                itemOnWillAccept: (_, target) {
+                  Task task = target.child;
+                  if ((task.date.isNotEmpty &&
+                          DateTime.parse(task.date)
+                              .isBefore(DateProvider().today)) ||
+                      task.completed) {
+                    return false;
                   } else {
-                    _tasks.removeAt(newListIndex - 1);
-                    setState(() {
-                      _tasks.insert(
-                        newListIndex - 1,
-                        DragAndDropList(
-                          canDrag: false,
-                          header: TaskListHeader(date: newListHeader.date),
-                          children: newListTasks,
-                        ),
-                      );
-                    });
+                    return true;
                   }
-                  if (removedOldList.children.isNotEmpty) {
+                },
+                itemTargetOnWillAccept: (_, target) {
+                  DragAndDropList list = target.parent;
+                  TaskListHeader header = list.header;
+                  if (header.date == 'Overdue' || header.date == 'Completed') {
+                    return false;
+                  } else {
+                    return true;
+                  }
+                },
+                onItemReorder: (int oldItemIndex, int oldListIndex,
+                    int newItemIndex, int newListIndex) async {
+                  _saving = true;
+                  TaskListHeader oldListHeader = _tasks[oldListIndex].header;
+                  TaskListHeader newListHeader = _tasks[newListIndex].header;
+                  Task movedTask = _tasks[oldListIndex]
+                      .children
+                      .removeAt(oldItemIndex)
+                      .child;
+                  Task newMovedTask;
+                  newMovedTask = Task(
+                    id: movedTask.id,
+                    index: newItemIndex,
+                    name: movedTask.name,
+                    date: newListHeader.date == 'No Date'
+                        ? ''
+                        : newListHeader.date,
+                    completed: movedTask.completed,
+                    paused: movedTask.paused,
+                    seconds: movedTask.seconds,
+                    onDismissed: (direction) =>
+                        onDismissed(direction, newMovedTask),
+                  );
+                  setState(() {
+                    _tasks[newListIndex].children.insert(
+                          newItemIndex,
+                          DragAndDropItem(child: newMovedTask),
+                        );
+                  });
+                  List<DragAndDropItem> oldListTasks = [];
+                  List<DragAndDropItem> newListTasks = [];
+                  for (var i = 0;
+                      i < _tasks[oldListIndex].children.length;
+                      i++) {
+                    Task task = _tasks[oldListIndex].children[i].child;
+                    Task newTask;
+                    newTask = Task(
+                      id: task.id,
+                      index: i,
+                      name: task.name,
+                      date: task.date,
+                      completed: task.completed,
+                      paused: task.paused,
+                      seconds: task.seconds,
+                      onDismissed: (direction) =>
+                          onDismissed(direction, newTask),
+                    );
+                    oldListTasks.add(DragAndDropItem(child: newTask));
+                  }
+                  for (var i = 0;
+                      i < _tasks[newListIndex].children.length;
+                      i++) {
+                    Task task = _tasks[newListIndex].children[i].child;
+                    Task newTask;
+                    newTask = Task(
+                      id: task.id,
+                      index: i,
+                      name: task.name,
+                      date: task.date,
+                      completed: task.completed,
+                      paused: task.paused,
+                      seconds: task.seconds,
+                      onDismissed: (direction) =>
+                          onDismissed(direction, newTask),
+                    );
+                    newListTasks.add(DragAndDropItem(child: newTask));
+                  }
+                  DragAndDropList removedOldList =
+                      _tasks.removeAt(oldListIndex);
+                  if (oldListIndex == newListIndex) {
                     setState(() {
                       _tasks.insert(
                         oldListIndex,
@@ -440,64 +408,89 @@ class _TasksPageState extends State<TasksPage> {
                       Task task = item.child;
                       await task.updateDoc(user);
                     });
-                    await Future.forEach(newListTasks, (item) async {
-                      Task task = item.child;
-                      await task.updateDoc(user);
-                    });
                   } else {
-                    await Future.forEach(newListTasks, (item) async {
-                      Task task = item.child;
-                      await task.updateDoc(user);
-                    });
+                    if (oldListIndex > newListIndex) {
+                      _tasks.removeAt(newListIndex);
+                      setState(() {
+                        _tasks.insert(
+                          newListIndex,
+                          DragAndDropList(
+                            canDrag: false,
+                            header: TaskListHeader(date: newListHeader.date),
+                            children: newListTasks,
+                          ),
+                        );
+                      });
+                    } else {
+                      _tasks.removeAt(newListIndex - 1);
+                      setState(() {
+                        _tasks.insert(
+                          newListIndex - 1,
+                          DragAndDropList(
+                            canDrag: false,
+                            header: TaskListHeader(date: newListHeader.date),
+                            children: newListTasks,
+                          ),
+                        );
+                      });
+                    }
+                    if (removedOldList.children.isNotEmpty) {
+                      setState(() {
+                        _tasks.insert(
+                          oldListIndex,
+                          DragAndDropList(
+                            canDrag: false,
+                            header: TaskListHeader(date: oldListHeader.date),
+                            children: oldListTasks,
+                          ),
+                        );
+                      });
+                      await Future.forEach(oldListTasks, (item) async {
+                        Task task = item.child;
+                        await task.updateDoc(user);
+                      });
+                      await Future.forEach(newListTasks, (item) async {
+                        Task task = item.child;
+                        await task.updateDoc(user);
+                      });
+                    } else {
+                      await Future.forEach(newListTasks, (item) async {
+                        Task task = item.child;
+                        await task.updateDoc(user);
+                      });
+                    }
                   }
-                }
-                setState(() => _saving = false);
-              },
-              contentsWhenEmpty: Center(
-                child: Column(
-                  children: [
-                    Text(
-                      'Start fresh.',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 20, left: 50, right: 50),
-                      child: Text(
-                        'Got something to do? Add it by tapping the + button.',
+                  setState(() => _saving = false);
+                },
+                contentsWhenEmpty: Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        'Start fresh.',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                    ),
-                  ],
+                      Padding(
+                        padding: EdgeInsets.only(top: 20, left: 50, right: 50),
+                        child: Text(
+                          'Got something to do? Add it by tapping the + button.',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                children: _tasks,
               ),
-              children: _tasks,
             ),
-          ),
+          ],
         ),
-        // Positioned(
-        //   right: 10,
-        //   bottom: 10,
-        //   child: AnimatedOpacity(
-        //     opacity: _saving ? 1 : 0,
-        //     duration: fadeDuration,
-        //     curve: fadeCurve,
-        //     child: SizedBox(
-        //       height: 60,
-        //       width: 60,
-        //       child: CircularProgressIndicator(
-        //         backgroundColor: Colors.transparent,
-        //         strokeWidth: 2,
-        //       ),
-        //     ),
-        //   ),
-        // ),
         Positioned(
           right: 15,
           bottom: 15,
@@ -535,4 +528,129 @@ class _TasksPageState extends State<TasksPage> {
       ],
     );
   }
+}
+
+class TasksSliverAppBar extends SliverPersistentHeaderDelegate {
+  final VoidCallback leftOnTap;
+  final VoidCallback rightOnTap;
+
+  TasksSliverAppBar({@required this.leftOnTap, @required this.rightOnTap});
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    var user = Provider.of<UserStatus>(context);
+    return Stack(
+      fit: StackFit.expand,
+      overflow: Overflow.visible,
+      children: [
+        Container(
+          color: Theme.of(context).backgroundColor,
+        ),
+        Center(
+          child: Opacity(
+            opacity: shrinkOffset < 40
+                ? 0
+                : shrinkOffset > 60
+                    ? 1
+                    : (shrinkOffset - 40) / 20,
+            child: Text(
+              'Tasks',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          left: 15,
+          bottom: 22,
+          child: Opacity(
+            opacity: shrinkOffset < 40
+                ? 1
+                : shrinkOffset > 60
+                    ? 0
+                    : (60 - shrinkOffset) / 20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${TimeOfDay.now().hour < 13 ? 'Good Morning' : TimeOfDay.now().hour < 18 ? 'Good Afternoon' : 'Good Evening'}${user.displayName != null ? ', ' + user.displayName : ''}',
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  '${DateProvider().weekdayString(DateTime.now(), true)}, ${DateProvider().monthString(DateTime.now(), true)} ${DateTime.now().day}',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
+          left: 0,
+          top: 0,
+          child: GestureDetector(
+            onTap: leftOnTap,
+            child: Container(
+              width: 50,
+              height: 50,
+              color: Colors.transparent,
+              child: Icon(
+                FeatherIcons.barChart2,
+                size: 20,
+                color: MediaQuery.of(context).platformBrightness ==
+                        Brightness.light
+                    ? black
+                    : white,
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          child: GestureDetector(
+            onTap: rightOnTap,
+            child: Container(
+              width: 50,
+              height: 50,
+              color: Colors.transparent,
+              child: Icon(
+                FeatherIcons.settings,
+                size: 20,
+                color: MediaQuery.of(context).platformBrightness ==
+                        Brightness.light
+                    ? black
+                    : white,
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          left: 15,
+          right: 15,
+          bottom: 0,
+          child: Divider(
+            height: 0,
+            thickness: 1,
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  double get maxExtent => 150;
+
+  @override
+  double get minExtent => 50;
+
+  @override
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => true;
 }

@@ -14,6 +14,7 @@ class AuthProvider {
             signedIn: true,
             uid: user.uid,
             email: user.email,
+            displayName: user.displayName,
           );
   }
 
@@ -69,6 +70,8 @@ class UserStatus {
   final bool signedIn;
   final String uid;
   final String email;
+  final String displayName;
 
-  const UserStatus({@required this.signedIn, this.uid, this.email});
+  const UserStatus(
+      {@required this.signedIn, this.uid, this.email, this.displayName});
 }
