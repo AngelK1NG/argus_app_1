@@ -54,7 +54,10 @@ class _LoginPageState extends State<LoginPage> {
             curve: loginCurve,
             child: Nav(
               title: 'Welcome 👋',
-              color: Colors.black,
+              color:
+                  MediaQuery.of(context).platformBrightness == Brightness.light
+                      ? black
+                      : white,
             ),
           ),
           AnimatedPositioned(
@@ -66,7 +69,10 @@ class _LoginPageState extends State<LoginPage> {
                 ? SizeProvider.safeHeight * 0.3
                 : SizeProvider.safeHeight * 0.5,
             child: Image(
-              image: AssetImage('assets/images/Focal Logo_Full Colored.png'),
+              image:
+                  MediaQuery.of(context).platformBrightness == Brightness.light
+                      ? AssetImage('assets/images/Focal Logo_Full Colored.png')
+                      : AssetImage('assets/images/Focal Logo_Full White.png'),
             ),
           ),
           Positioned(
@@ -98,11 +104,10 @@ class _LoginPageState extends State<LoginPage> {
                               }
                             },
                             width: SizeProvider.safeWidth - 100,
-                            gradient: LinearGradient(
-                              colors: [black, black],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
+                            color: MediaQuery.of(context).platformBrightness ==
+                                    Brightness.light
+                                ? black
+                                : white,
                             row: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -110,13 +115,23 @@ class _LoginPageState extends State<LoginPage> {
                                   padding: EdgeInsets.only(right: 15),
                                   child: FaIcon(
                                     FontAwesomeIcons.apple,
-                                    color: Colors.white,
+                                    color: MediaQuery.of(context)
+                                                .platformBrightness ==
+                                            Brightness.light
+                                        ? white
+                                        : black,
                                     size: 20,
                                   ),
                                 ),
                                 Text(
                                   'Sign in with Apple',
-                                  style: buttonTextStyle,
+                                  style: buttonTextStyle.apply(
+                                    color: MediaQuery.of(context)
+                                                .platformBrightness ==
+                                            Brightness.light
+                                        ? white
+                                        : black,
+                                  ),
                                 ),
                               ],
                             ),
@@ -139,14 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       },
                       width: SizeProvider.safeWidth - 100,
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context).primaryColor,
-                          Theme.of(context).primaryColorLight,
-                        ],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
+                      color: Theme.of(context).primaryColor,
                       row: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

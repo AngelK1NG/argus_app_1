@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Focal/utils/size.dart';
+import 'package:Focal/constants.dart';
 
 class Nav extends StatelessWidget {
   final String title;
@@ -27,16 +28,16 @@ class Nav extends StatelessWidget {
         Center(
           child: Text(
             title,
-            style: this.color == Colors.white
+            style: this.color == white
                 ? TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: white,
                   )
                 : TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                    color: black,
                   ),
           ),
         ),

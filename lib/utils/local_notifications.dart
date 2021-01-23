@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:Focal/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalNotifications {
   SharedPreferences _prefs;
+  FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   void initialize() async {
     var initializationSettingsAndroid =
@@ -14,7 +15,7 @@ class LocalNotifications {
         onDidReceiveLocalNotification: onDidReceiveLocalNotification);
     var initializationSettings = InitializationSettings(
         android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
-    await notificationsPlugin.initialize(initializationSettings,
+    await _notificationsPlugin.initialize(initializationSettings,
         onSelectNotification: selectNotification);
     _prefs = await SharedPreferences.getInstance();
   }
@@ -31,14 +32,14 @@ class LocalNotifications {
     IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
     NotificationDetails notificationDetails = NotificationDetails(
         android: androidNotificationDetails, iOS: iosNotificationDetails);
-    await notificationsPlugin.show(
+    await _notificationsPlugin.show(
       0,
       'You\'re getting Distracted!',
       'You\'re losing Volts, come back before it\'s too late!',
       notificationDetails,
     );
     if (_prefs.getBool('repeatDistractedNotification')) {
-      await notificationsPlugin.periodicallyShow(
+      await _notificationsPlugin.periodicallyShow(
         0,
         'You\'re still Distracted!',
         'Are you still doing your task? You\'re losing Volts!',
@@ -50,7 +51,7 @@ class LocalNotifications {
   }
 
   void cancelDistractedNotification() async {
-    await notificationsPlugin.cancel(0);
+    await _notificationsPlugin.cancel(0);
   }
 
   Future selectNotification(String payLoad) {

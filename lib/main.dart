@@ -52,35 +52,17 @@ class MyApp extends StatelessWidget {
           },
           child: MaterialApp(
             navigatorKey: navigatorKey,
-            theme: ThemeData(
-              elevatedButtonTheme: ElevatedButtonThemeData(
-                style: ButtonStyle(
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                  ),
-                  minimumSize: MaterialStateProperty.all(
-                    Size(50, 50),
-                  ),
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
-                  elevation: MaterialStateProperty.all(5),
-                  animationDuration: buttonDuration,
-                ),
-              ),
-              primarySwatch: materialBlue,
-              primaryColor: blue,
-              primaryColorLight: purple,
-              accentColor: blue,
-              dividerColor: dividerColor,
-              hintColor: hintColor,
-              cursorColor: blue,
-              splashColor: Colors.transparent,
-              shadowColor: shadowColor,
-              textSelectionColor: textSelectionColor,
+            theme: lightTheme.copyWith(
               textTheme: Theme.of(context).textTheme.apply(
                     bodyColor: black,
                     displayColor: black,
+                    fontFamily: 'Cabin',
+                  ),
+            ),
+            darkTheme: darkTheme.copyWith(
+              textTheme: Theme.of(context).textTheme.apply(
+                    bodyColor: white,
+                    displayColor: white,
                     fontFamily: 'Cabin',
                   ),
             ),

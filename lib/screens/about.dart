@@ -4,6 +4,7 @@ import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:Focal/components/nav.dart';
+import 'package:Focal/constants.dart';
 
 class AboutPage extends StatefulWidget {
   final Function goToPage;
@@ -60,7 +61,9 @@ class _AboutPageState extends State<AboutPage> {
         children: [
           Nav(
             title: 'About',
-            color: Colors.black,
+            color: MediaQuery.of(context).platformBrightness == Brightness.light
+                ? black
+                : white,
             leftIconData: FeatherIcons.chevronLeft,
             leftOnTap: () {
               widget.goToPage(2);
@@ -75,8 +78,11 @@ class _AboutPageState extends State<AboutPage> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 15),
                   child: Image(
-                    image:
-                        AssetImage('assets/images/Focal Logo_Full Colored.png'),
+                    image: MediaQuery.of(context).platformBrightness ==
+                            Brightness.light
+                        ? AssetImage(
+                            'assets/images/Focal Logo_Full Colored.png')
+                        : AssetImage('assets/images/Focal Logo_Full White.png'),
                     width: 150,
                   ),
                 ),
@@ -84,7 +90,10 @@ class _AboutPageState extends State<AboutPage> {
                   _version,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Theme.of(context).primaryColor,
+                    color: MediaQuery.of(context).platformBrightness ==
+                            Brightness.light
+                        ? Theme.of(context).primaryColor
+                        : white,
                   ),
                 ),
               ],

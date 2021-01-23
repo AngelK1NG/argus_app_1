@@ -60,14 +60,7 @@ class OnboardingPage extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/home');
             },
             width: SizeProvider.safeWidth - 100,
-            gradient: LinearGradient(
-              colors: [
-                Theme.of(context).primaryColor,
-                Theme.of(context).primaryColorLight,
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
+            color: Theme.of(context).primaryColor,
             row: Row(
               children: [
                 Text(

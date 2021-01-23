@@ -84,9 +84,11 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                 curve: overlayCurve,
                 height: 565 + MediaQuery.of(context).padding.bottom,
                 decoration: BoxDecoration(
-                  color: white,
+                  color: Theme.of(context).cardColor,
                   boxShadow: [
-                    _visible
+                    _visible &&
+                            MediaQuery.of(context).platformBrightness ==
+                                Brightness.light
                         ? BoxShadow(
                             blurRadius: 10,
                             offset: Offset(0, -4),
@@ -193,7 +195,10 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                       headerStyle: DateRangePickerHeaderStyle(
                         textAlign: TextAlign.center,
                         textStyle: TextStyle(
-                          color: black,
+                          color: MediaQuery.of(context).platformBrightness ==
+                                  Brightness.light
+                              ? black
+                              : white,
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
                           fontFamily: 'Cabin',
@@ -209,7 +214,10 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                       monthCellStyle: DateRangePickerMonthCellStyle(
                         textStyle: TextStyle(
                           fontSize: 14,
-                          color: black,
+                          color: MediaQuery.of(context).platformBrightness ==
+                                  Brightness.light
+                              ? black
+                              : white,
                           fontFamily: 'Cabin',
                         ),
                         todayTextStyle: TextStyle(
@@ -228,7 +236,10 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                       yearCellStyle: DateRangePickerYearCellStyle(
                         textStyle: TextStyle(
                           fontSize: 14,
-                          color: black,
+                          color: MediaQuery.of(context).platformBrightness ==
+                                  Brightness.light
+                              ? black
+                              : white,
                           fontFamily: 'Cabin',
                         ),
                         todayTextStyle: TextStyle(
@@ -253,7 +264,10 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                         viewHeaderStyle: DateRangePickerViewHeaderStyle(
                           textStyle: TextStyle(
                             fontSize: 14,
-                            color: black,
+                            color: MediaQuery.of(context).platformBrightness ==
+                                    Brightness.light
+                                ? black
+                                : white,
                             fontFamily: 'Cabin',
                           ),
                         ),

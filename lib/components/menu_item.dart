@@ -37,9 +37,11 @@ class MenuItem extends StatelessWidget {
                     iconData != null
                         ? Padding(
                             padding: EdgeInsets.only(right: 15),
-                            child: Icon(iconData,
-                                size: 20,
-                                color: Theme.of(context).primaryColor),
+                            child: Icon(
+                              iconData,
+                              size: 20,
+                              color: Theme.of(context).primaryColor,
+                            ),
                           )
                         : Container(),
                     SizedBox(

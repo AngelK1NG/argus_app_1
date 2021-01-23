@@ -297,7 +297,7 @@ class _TasksPageState extends State<TasksPage> {
                 color: white.withOpacity(0.8),
                 boxShadow: [
                   BoxShadow(
-                    color: blue.withOpacity(0.2),
+                    color: Theme.of(context).primaryColor.withOpacity(0.2),
                     spreadRadius: 0,
                     blurRadius: 20, // changes position of shadow
                   ),
@@ -536,14 +536,7 @@ class _TasksPageState extends State<TasksPage> {
                 ),
               ],
             ),
-            gradient: LinearGradient(
-              colors: [
-                Theme.of(context).primaryColor,
-                Theme.of(context).primaryColorLight
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
+            color: Theme.of(context).primaryColor,
             vibrate: true,
           ),
         ),

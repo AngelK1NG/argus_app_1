@@ -24,7 +24,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   Widget _child;
-  Color _backgroundColor;
   double _cardPosition = 0;
   bool _loginLoading = false;
   bool _overlayLight = true;
@@ -127,9 +126,6 @@ class _HomeState extends State<Home> {
     super.initState();
     Future.delayed(Duration.zero, () {
       goToPage(0);
-      setState(() {
-        _backgroundColor = Theme.of(context).primaryColor;
-      });
     });
   }
 
@@ -143,19 +139,26 @@ class _HomeState extends State<Home> {
     var uncompletedTasks = Provider.of<UncompletedTasks>(context).tasks;
     var completedTasks = Provider.of<CompletedTasks>(context).tasks;
     return AnnotatedRegion(
-      value: (_signedOut(user) || !_overlayLight)
+      value: (MediaQuery.of(context).platformBrightness == Brightness.light &&
+              (_signedOut(user) || !_overlayLight))
           ? SystemUiOverlayStyle.dark.copyWith(
               statusBarColor: Colors.transparent,
-              systemNavigationBarColor: Colors.transparent,
-              systemNavigationBarIconBrightness: Brightness.dark,
+              systemNavigationBarColor: Theme.of(context).backgroundColor,
+              systemNavigationBarIconBrightness:
+                  MediaQuery.of(context).platformBrightness == Brightness.light
+                      ? Brightness.dark
+                      : Brightness.light,
             )
           : SystemUiOverlayStyle.light.copyWith(
               statusBarColor: Colors.transparent,
-              systemNavigationBarColor: Colors.transparent,
-              systemNavigationBarIconBrightness: Brightness.dark,
+              systemNavigationBarColor: Theme.of(context).backgroundColor,
+              systemNavigationBarIconBrightness:
+                  MediaQuery.of(context).platformBrightness == Brightness.light
+                      ? Brightness.dark
+                      : Brightness.light,
             ),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).backgroundColor,
         resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
@@ -165,14 +168,16 @@ class _HomeState extends State<Home> {
               curve: fadeCurve,
               child: Stack(children: [
                 Container(
-                  color: _backgroundColor,
+                  color: Theme.of(context).primaryColor,
                 ),
                 Positioned(
                   left: 0,
                   right: 0,
                   top: _cardPosition == 0 ||
                           _signedOut(user) ||
-                          _loading(user, uncompletedTasks, completedTasks)
+                          _loading(user, uncompletedTasks, completedTasks) ||
+                          MediaQuery.of(context).platformBrightness ==
+                              Brightness.dark
                       ? 0
                       : _cardPosition + MediaQuery.of(context).padding.top,
                   child: Container(
@@ -180,16 +185,22 @@ class _HomeState extends State<Home> {
                       borderRadius: BorderRadius.only(
                         topLeft: _cardPosition == 0 ||
                                 _signedOut(user) ||
-                                _loading(user, uncompletedTasks, completedTasks)
+                                _loading(
+                                    user, uncompletedTasks, completedTasks) ||
+                                MediaQuery.of(context).platformBrightness ==
+                                    Brightness.dark
                             ? Radius.zero
                             : Radius.circular(25),
                         topRight: _cardPosition == 0 ||
                                 _signedOut(user) ||
-                                _loading(user, uncompletedTasks, completedTasks)
+                                _loading(
+                                    user, uncompletedTasks, completedTasks) ||
+                                MediaQuery.of(context).platformBrightness ==
+                                    Brightness.dark
                             ? Radius.zero
                             : Radius.circular(25),
                       ),
-                      color: Colors.white,
+                      color: Theme.of(context).backgroundColor,
                       boxShadow: [
                         BoxShadow(
                           spreadRadius: -5,

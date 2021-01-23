@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:Focal/constants.dart';
 import 'package:Focal/components/menu_item.dart';
 import 'package:Focal/components/nav.dart';
 import 'package:Focal/utils/analytics.dart';
@@ -76,7 +76,7 @@ class SettingsPage extends StatelessWidget {
             text: 'Sign Out',
             onTap: () {
               HapticFeedback.heavyImpact();
-              auth.signOut();
+              FirebaseAuth.instance.signOut();
               AnalyticsProvider().logSignOut();
             },
           ),
@@ -86,7 +86,7 @@ class SettingsPage extends StatelessWidget {
             child: Text(
               'Signed in as: ' + email,
               style: TextStyle(
-                color: hintColor,
+                color: Theme.of(context).hintColor,
               ),
             ),
           ),

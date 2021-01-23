@@ -1,31 +1,69 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 
-//firebase
-final FirebaseAuth auth = FirebaseAuth.instance;
-final FirebaseFirestore db = FirebaseFirestore.instance;
-final FirebaseAnalytics analytics = FirebaseAnalytics();
+//light theme
+final ThemeData lightTheme = ThemeData(
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ButtonStyle(
+      shape: MaterialStateProperty.all(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+        ),
+      ),
+      minimumSize: MaterialStateProperty.all(
+        Size(50, 50),
+      ),
+      padding: MaterialStateProperty.all(EdgeInsets.zero),
+      elevation: MaterialStateProperty.all(5),
+      animationDuration: buttonDuration,
+    ),
+  ),
+  primaryColor: Color(0xff3c25d7),
+  accentColor: Color(0xff3c25d7),
+  hintColor: Color(0xffb0b0b0),
+  dividerColor: Color(0xffe5e5e5),
+  shadowColor: Color(0xff111111).withOpacity(0.2),
+  textSelectionColor: Color(0xffddddff),
+  backgroundColor: Color(0xffffffff),
+  cardColor: Color(0xffffffff),
+  cursorColor: Color(0xff3c25d7),
+  splashColor: Colors.transparent,
+);
 
-//local notifications
-final FlutterLocalNotificationsPlugin notificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+//dark theme
+final ThemeData darkTheme = ThemeData(
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ButtonStyle(
+      shape: MaterialStateProperty.all(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+        ),
+      ),
+      minimumSize: MaterialStateProperty.all(
+        Size(50, 50),
+      ),
+      padding: MaterialStateProperty.all(EdgeInsets.zero),
+      elevation: MaterialStateProperty.all(5),
+      animationDuration: buttonDuration,
+    ),
+  ),
+  primaryColor: Color(0xff7c4efd),
+  accentColor: Color(0xff7c4efd),
+  hintColor: Color(0xff888888),
+  dividerColor: Color(0xff2e2e2e),
+  shadowColor: black.withOpacity(0.2),
+  textSelectionColor: Color(0xffddddff),
+  backgroundColor: Color(0xff111111),
+  cardColor: Color(0xff202020),
+  cursorColor: Color(0xff3c25d7),
+  splashColor: Colors.transparent,
+);
 
-//main colors
+//colors
 final Color black = Color(0xff111111);
 final Color white = Color(0xffffffff);
 final Color blue = Color(0xff3c25d7);
 final Color purple = Color(0xff7c4efd);
 final Color red = Color(0xfff44236);
-
-//utility colors
-final Color hintColor = Color(0xffb0b0b0);
-final Color shadowColor = black.withOpacity(0.2);
-final Color dividerColor = Color(0xffe5e5e5);
-final Color textSelectionColor = Color(0xffddddff);
 
 //text styles
 final TextStyle buttonTextStyle = TextStyle(
@@ -46,48 +84,3 @@ final Curve buttonCurve = Curves.ease;
 
 final Duration loginDuration = Duration(milliseconds: 800);
 final Curve loginCurve = Curves.ease;
-
-//algorithms
-num voltsIncrement({
-  @required int secondsFocused,
-  @required int secondsDistracted,
-  @required int numPaused,
-  @required int completedTasks,
-  @required int totalTasks,
-  @required num volts,
-}) {
-  num increment = 0;
-  increment = 0.005 *
-      (secondsFocused - secondsDistracted) *
-      pow(100 * (completedTasks + 1) / totalTasks, 0.1) *
-      pow(totalTasks, 0.1) /
-      pow(numPaused + 1, 0.2);
-  if (-increment < volts) {
-    return increment;
-  } else {
-    return -volts;
-  }
-}
-
-num voltsDecay({
-  @required int seconds,
-  @required int completedTasks,
-  @required int startedTasks,
-  @required int totalTasks,
-  @required num volts,
-}) {
-  num decay = 0;
-  if (startedTasks != 0 && completedTasks != totalTasks) {
-    decay = 0.1 *
-            pow(seconds, 0.5) *
-            pow(100 * startedTasks / totalTasks, 0.1) *
-            pow(totalTasks, 0.1) +
-        pow((seconds % 4) + 1, 0.03) * pow((seconds % 5) + 1, 0.03) -
-        1;
-  }
-  if (decay < volts) {
-    return decay;
-  } else {
-    return volts;
-  }
-}

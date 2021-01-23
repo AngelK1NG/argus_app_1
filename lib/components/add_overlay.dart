@@ -113,9 +113,11 @@ class _AddOverlayState extends State<AddOverlay> {
                     topLeft: Radius.circular(25),
                     topRight: Radius.circular(25),
                   ),
-                  color: white,
+                  color: Theme.of(context).cardColor,
                   boxShadow: [
-                    _visible
+                    _visible &&
+                            MediaQuery.of(context).platformBrightness ==
+                                Brightness.light
                         ? BoxShadow(
                             blurRadius: 10,
                             offset: Offset(0, -4),
@@ -136,11 +138,6 @@ class _AddOverlayState extends State<AddOverlay> {
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: "Add a new task",
-                          ),
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: black,
                           ),
                           autofocus: true,
                           focusNode: _focusNode,
@@ -190,7 +187,11 @@ class _AddOverlayState extends State<AddOverlay> {
                                     FeatherIcons.calendar,
                                     size: 20,
                                     color: _date == null
-                                        ? black
+                                        ? MediaQuery.of(context)
+                                                    .platformBrightness ==
+                                                Brightness.light
+                                            ? black
+                                            : white
                                         : Theme.of(context).primaryColor,
                                   ),
                                   Padding(
@@ -209,7 +210,11 @@ class _AddOverlayState extends State<AddOverlay> {
                                                     ),
                                       style: TextStyle(
                                         color: _date == null
-                                            ? black
+                                            ? MediaQuery.of(context)
+                                                        .platformBrightness ==
+                                                    Brightness.light
+                                                ? black
+                                                : white
                                             : Theme.of(context).primaryColor,
                                         fontSize: 16,
                                       ),

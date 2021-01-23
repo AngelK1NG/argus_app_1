@@ -6,14 +6,14 @@ class Button extends StatelessWidget {
   final VoidCallback onTap;
   final double width;
   final Row row;
-  final LinearGradient gradient;
+  final Color color;
   final bool vibrate;
 
   const Button({
     this.onTap,
     @required this.width,
     @required this.row,
-    @required this.gradient,
+    @required this.color,
     @required this.vibrate,
   });
 
@@ -33,7 +33,7 @@ class Button extends StatelessWidget {
         height: 50,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          gradient: gradient,
+          color: color,
           borderRadius: BorderRadius.all(Radius.circular(25)),
         ),
         child: Center(

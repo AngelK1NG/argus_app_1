@@ -139,9 +139,7 @@ class Task extends StatelessWidget {
                         : Icon(
                             FeatherIcons.circle,
                             size: 20,
-                            color: this.paused
-                                ? Theme.of(context).primaryColor
-                                : black,
+                            color: Theme.of(context).primaryColor,
                           ),
                   ),
                   SizedBox(
@@ -163,7 +161,6 @@ class Task extends StatelessWidget {
                             : TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
-                                color: black,
                               ),
                       ),
                     ),
