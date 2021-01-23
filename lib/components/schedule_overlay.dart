@@ -62,7 +62,7 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
         body: Stack(
           children: [
             AnimatedOpacity(
-              opacity: _visible ? 0.15 : 0,
+              opacity: _visible ? 0.2 : 0,
               duration: overlayDuration,
               curve: overlayCurve,
               child: GestureDetector(
@@ -85,17 +85,6 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                 height: 565 + MediaQuery.of(context).padding.bottom,
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
-                  boxShadow: [
-                    _visible &&
-                            MediaQuery.of(context).platformBrightness ==
-                                Brightness.light
-                        ? BoxShadow(
-                            blurRadius: 10,
-                            offset: Offset(0, -4),
-                            color: Theme.of(context).shadowColor,
-                          )
-                        : BoxShadow(color: Colors.transparent)
-                  ],
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(25),
                     topRight: Radius.circular(25),

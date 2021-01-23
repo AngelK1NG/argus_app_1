@@ -24,6 +24,7 @@ final ThemeData lightTheme = ThemeData(
   shadowColor: Color(0xff111111).withOpacity(0.2),
   textSelectionColor: Color(0xffddddff),
   backgroundColor: Color(0xffffffff),
+  cardColor: Color(0xffffffff),
   cursorColor: Color(0xff3c25d7),
   splashColor: Colors.transparent,
 );
@@ -52,6 +53,7 @@ final ThemeData darkTheme = ThemeData(
   shadowColor: black.withOpacity(0.2),
   textSelectionColor: Color(0xffddddff),
   backgroundColor: Color(0xff111111),
+  cardColor: Color(0xff222222),
   cursorColor: Color(0xff7c4efd),
   splashColor: Colors.transparent,
 );
