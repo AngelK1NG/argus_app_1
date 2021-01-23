@@ -294,14 +294,7 @@ class _TasksPageState extends State<TasksPage> {
             height: SizeProvider.safeHeight - 80,
             child: DragAndDropLists(
               itemDecorationWhileDragging: BoxDecoration(
-                color: white.withOpacity(0.8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(context).primaryColor.withOpacity(0.2),
-                    spreadRadius: 0,
-                    blurRadius: 20, // changes position of shadow
-                  ),
-                ],
+                color: Theme.of(context).backgroundColor.withOpacity(0.8),
               ),
               itemGhostOpacity: 1,
               itemGhost: Divider(
@@ -310,9 +303,9 @@ class _TasksPageState extends State<TasksPage> {
                 height: 0,
               ),
               listGhostOpacity: 0,
-              lastListTargetSize: 0,
+              lastListTargetSize: 15,
               lastItemTargetHeight: 15,
-              addLastItemTargetHeightToTop: true,
+              addLastItemTargetHeightToTop: false,
               itemOnWillAccept: (_, target) {
                 Task task = target.child;
                 if ((task.date.isNotEmpty &&
