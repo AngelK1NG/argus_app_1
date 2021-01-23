@@ -62,7 +62,6 @@ class _GeneralPageState extends State<GeneralPage> {
         children: [
           Nav(
             title: 'General',
-            color: Colors.white,
             leftIconData: FeatherIcons.chevronLeft,
             leftOnTap: () {
               widget.goToPage(2);

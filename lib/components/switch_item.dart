@@ -38,13 +38,6 @@ class SwitchItem extends StatelessWidget {
             ],
           ),
         ),
-        Padding(
-          padding: EdgeInsets.only(left: 15, right: 0),
-          child: Divider(
-            height: 0,
-            thickness: 1,
-          ),
-        ),
       ],
     );
   }

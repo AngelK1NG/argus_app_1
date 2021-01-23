@@ -35,7 +35,6 @@ class SettingsPage extends StatelessWidget {
         children: [
           Nav(
             title: 'Settings',
-            color: Colors.white,
             leftIconData: FeatherIcons.chevronLeft,
             leftOnTap: () {
               this.goToPage(0);

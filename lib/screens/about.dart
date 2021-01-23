@@ -61,13 +61,11 @@ class _AboutPageState extends State<AboutPage> {
         children: [
           Nav(
             title: 'About',
-            color: MediaQuery.of(context).platformBrightness == Brightness.light
-                ? black
-                : white,
             leftIconData: FeatherIcons.chevronLeft,
             leftOnTap: () {
               widget.goToPage(2);
             },
+            hideDivider: true,
           ),
           Positioned(
             right: 0,

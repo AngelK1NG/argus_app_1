@@ -24,9 +24,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   Widget _child;
-  double _cardPosition = 0;
   bool _loginLoading = false;
-  bool _overlayLight = true;
   bool _init = false;
 
   void goToPage(int index) {
@@ -34,61 +32,39 @@ class _HomeState extends State<Home> {
       switch (index) {
         case 0:
           {
-            _child = TasksPage(
-              goToPage: goToPage,
-            );
-            _cardPosition = 50;
-            _overlayLight = true;
+            _child = TasksPage(goToPage: goToPage);
             break;
           }
         case 1:
           {
-            _child = StatisticsPage(
-              goToPage: goToPage,
-            );
-            _cardPosition = 80;
-            _overlayLight = true;
+            _child = StatisticsPage(goToPage: goToPage);
             break;
           }
 
         case 2:
           {
-            _child = SettingsPage(
-              goToPage: goToPage,
-            );
-            _cardPosition = 50;
-            _overlayLight = true;
+            _child = SettingsPage(goToPage: goToPage);
             break;
           }
         case 3:
           {
-            _child = FocusPage(
-              goToPage: goToPage,
-            );
-            _cardPosition = SizeProvider.safeHeight;
-            _overlayLight = true;
+            _child = FocusPage(goToPage: goToPage);
             break;
           }
 
         case 4:
           {
             _child = GeneralPage(goToPage: goToPage);
-            _cardPosition = 50;
-            _overlayLight = true;
             break;
           }
         case 5:
           {
             _child = HelpPage(goToPage: goToPage);
-            _cardPosition = 0;
-            _overlayLight = false;
             break;
           }
         case 6:
           {
             _child = AboutPage(goToPage: goToPage);
-            _cardPosition = 0;
-            _overlayLight = false;
             break;
           }
       }
@@ -117,10 +93,6 @@ class _HomeState extends State<Home> {
     return user != null && user.signedIn;
   }
 
-  bool _signedOut(UserStatus user) {
-    return user != null && !user.signedIn;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -139,8 +111,7 @@ class _HomeState extends State<Home> {
     var uncompletedTasks = Provider.of<UncompletedTasks>(context).tasks;
     var completedTasks = Provider.of<CompletedTasks>(context).tasks;
     return AnnotatedRegion(
-      value: (MediaQuery.of(context).platformBrightness == Brightness.light &&
-              (_signedOut(user) || !_overlayLight))
+      value: MediaQuery.of(context).platformBrightness == Brightness.light
           ? SystemUiOverlayStyle.dark.copyWith(
               statusBarColor: Colors.transparent,
               systemNavigationBarColor: Theme.of(context).backgroundColor,
@@ -166,63 +137,17 @@ class _HomeState extends State<Home> {
               opacity: _loading(user, uncompletedTasks, completedTasks) ? 0 : 1,
               duration: fadeDuration,
               curve: fadeCurve,
-              child: Stack(children: [
-                Container(
-                  color: Theme.of(context).primaryColor,
+              child: SafeArea(
+                child: SizedBox.expand(
+                  child: _signedIn(user) &&
+                          !_loading(user, uncompletedTasks, completedTasks)
+                      ? _child
+                      : LoginPage(
+                          goToPage: goToPage,
+                          setLoading: setLoginLoading,
+                        ),
                 ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: _cardPosition == 0 ||
-                          _signedOut(user) ||
-                          _loading(user, uncompletedTasks, completedTasks) ||
-                          MediaQuery.of(context).platformBrightness ==
-                              Brightness.dark
-                      ? 0
-                      : _cardPosition + MediaQuery.of(context).padding.top,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: _cardPosition == 0 ||
-                                _signedOut(user) ||
-                                _loading(
-                                    user, uncompletedTasks, completedTasks) ||
-                                MediaQuery.of(context).platformBrightness ==
-                                    Brightness.dark
-                            ? Radius.zero
-                            : Radius.circular(25),
-                        topRight: _cardPosition == 0 ||
-                                _signedOut(user) ||
-                                _loading(
-                                    user, uncompletedTasks, completedTasks) ||
-                                MediaQuery.of(context).platformBrightness ==
-                                    Brightness.dark
-                            ? Radius.zero
-                            : Radius.circular(25),
-                      ),
-                      color: Theme.of(context).backgroundColor,
-                      boxShadow: [
-                        BoxShadow(
-                          spreadRadius: -5,
-                          blurRadius: 15,
-                        )
-                      ],
-                    ),
-                    height: MediaQuery.of(context).size.height,
-                  ),
-                ),
-                SafeArea(
-                  child: SizedBox.expand(
-                    child: _signedIn(user) &&
-                            !_loading(user, uncompletedTasks, completedTasks)
-                        ? _child
-                        : LoginPage(
-                            goToPage: goToPage,
-                            setLoading: setLoginLoading,
-                          ),
-                  ),
-                ),
-              ]),
+              ),
             ),
             AnimatedOpacity(
               opacity: _loading(user, uncompletedTasks, completedTasks) ||

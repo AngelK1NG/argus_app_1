@@ -280,7 +280,6 @@ class _TasksPageState extends State<TasksPage> {
       children: [
         Nav(
           title: 'Tasks',
-          color: Colors.white,
           rightIconData: FeatherIcons.settings,
           rightOnTap: () {
             widget.goToPage(2);

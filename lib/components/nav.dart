@@ -4,19 +4,19 @@ import 'package:Focal/constants.dart';
 
 class Nav extends StatelessWidget {
   final String title;
-  final Color color;
   final IconData leftIconData;
   final VoidCallback leftOnTap;
   final IconData rightIconData;
   final VoidCallback rightOnTap;
+  final bool hideDivider;
 
   const Nav({
     @required this.title,
-    @required this.color,
     this.leftIconData,
     this.leftOnTap,
     this.rightIconData,
     this.rightOnTap,
+    this.hideDivider,
   });
 
   @override
@@ -24,62 +24,78 @@ class Nav extends StatelessWidget {
     return Container(
       height: 50,
       width: SizeProvider.safeWidth,
-      child: Stack(children: [
-        Center(
-          child: Text(
-            title,
-            style: this.color == white
-                ? TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: white,
-                  )
-                : TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: black,
-                  ),
+      child: Stack(
+        children: [
+          Center(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: MediaQuery.of(context).platformBrightness ==
+                        Brightness.light
+                    ? black
+                    : white,
+              ),
+            ),
           ),
-        ),
-        this.leftIconData == null
-            ? Container()
-            : Positioned(
-                left: 0,
-                top: 0,
-                child: GestureDetector(
-                  onTap: this.leftOnTap,
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.transparent,
-                    child: Icon(
-                      this.leftIconData,
-                      size: 20,
-                      color: this.color,
+          this.leftIconData == null
+              ? Container()
+              : Positioned(
+                  left: 0,
+                  top: 0,
+                  child: GestureDetector(
+                    onTap: this.leftOnTap,
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      color: Colors.transparent,
+                      child: Icon(
+                        this.leftIconData,
+                        size: 20,
+                        color: MediaQuery.of(context).platformBrightness ==
+                                Brightness.light
+                            ? black
+                            : white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-        this.rightIconData == null
-            ? Container()
-            : Positioned(
-                right: 0,
-                top: 0,
-                child: GestureDetector(
-                  onTap: this.rightOnTap,
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.transparent,
-                    child: Icon(
-                      this.rightIconData,
-                      size: 20,
-                      color: this.color,
+          this.rightIconData == null
+              ? Container()
+              : Positioned(
+                  right: 0,
+                  top: 0,
+                  child: GestureDetector(
+                    onTap: this.rightOnTap,
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      color: Colors.transparent,
+                      child: Icon(
+                        this.rightIconData,
+                        size: 20,
+                        color: MediaQuery.of(context).platformBrightness ==
+                                Brightness.light
+                            ? black
+                            : white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-      ]),
+          this.hideDivider == true
+              ? Container()
+              : Positioned(
+                  left: 15,
+                  right: 15,
+                  bottom: 0,
+                  child: Divider(
+                    height: 0,
+                    thickness: 1,
+                  ),
+                ),
+        ],
+      ),
     );
   }
 }

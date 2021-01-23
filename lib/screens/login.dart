@@ -54,10 +54,7 @@ class _LoginPageState extends State<LoginPage> {
             curve: loginCurve,
             child: Nav(
               title: 'Welcome 👋',
-              color:
-                  MediaQuery.of(context).platformBrightness == Brightness.light
-                      ? black
-                      : white,
+              hideDivider: true,
             ),
           ),
           AnimatedPositioned(
