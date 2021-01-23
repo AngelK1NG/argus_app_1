@@ -65,7 +65,6 @@ class _AboutPageState extends State<AboutPage> {
             leftOnTap: () {
               widget.goToPage(2);
             },
-            hideDivider: true,
           ),
           Positioned(
             right: 0,

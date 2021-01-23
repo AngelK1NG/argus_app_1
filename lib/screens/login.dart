@@ -54,7 +54,6 @@ class _LoginPageState extends State<LoginPage> {
             curve: loginCurve,
             child: Nav(
               title: 'Welcome 👋',
-              hideDivider: true,
             ),
           ),
           AnimatedPositioned(

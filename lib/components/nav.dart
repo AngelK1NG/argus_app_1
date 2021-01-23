@@ -8,7 +8,6 @@ class Nav extends StatelessWidget {
   final VoidCallback leftOnTap;
   final IconData rightIconData;
   final VoidCallback rightOnTap;
-  final bool hideDivider;
 
   const Nav({
     @required this.title,
@@ -16,7 +15,6 @@ class Nav extends StatelessWidget {
     this.leftOnTap,
     this.rightIconData,
     this.rightOnTap,
-    this.hideDivider,
   });
 
   @override
@@ -81,17 +79,6 @@ class Nav extends StatelessWidget {
                             : white,
                       ),
                     ),
-                  ),
-                ),
-          this.hideDivider == true
-              ? Container()
-              : Positioned(
-                  left: 15,
-                  right: 15,
-                  bottom: 0,
-                  child: Divider(
-                    height: 0,
-                    thickness: 1,
                   ),
                 ),
         ],

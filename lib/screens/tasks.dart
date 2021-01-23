@@ -576,7 +576,7 @@ class TasksSliverAppBar extends SliverPersistentHeaderDelegate {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${TimeOfDay.now().hour < 13 ? 'Good Morning' : TimeOfDay.now().hour < 18 ? 'Good Afternoon' : 'Good Evening'}${user.displayName != null ? ', ' + user.displayName : ''}',
+                  '${TimeOfDay.now().hour < 13 ? 'Good morning' : TimeOfDay.now().hour < 18 ? 'Good afternoon' : 'Good evening'}${user.displayName != null ? ', ' + user.displayName : ''}',
                   style: TextStyle(
                     fontSize: 16,
                   ),
@@ -630,15 +630,6 @@ class TasksSliverAppBar extends SliverPersistentHeaderDelegate {
                     : white,
               ),
             ),
-          ),
-        ),
-        Positioned(
-          left: 15,
-          right: 15,
-          bottom: 0,
-          child: Divider(
-            height: 0,
-            thickness: 1,
           ),
         ),
       ],
