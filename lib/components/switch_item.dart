@@ -27,7 +27,7 @@ class SwitchItem extends StatelessWidget {
                 ),
               ),
               CupertinoSwitch(
-                activeColor: Theme.of(context).primaryColor,
+                activeColor: Theme.of(context).accentColor,
                 trackColor: Colors.grey,
                 value: toggle,
                 onChanged: (value) {

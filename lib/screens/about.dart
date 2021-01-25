@@ -4,7 +4,6 @@ import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:Focal/components/nav.dart';
-import 'package:Focal/constants.dart';
 
 class AboutPage extends StatefulWidget {
   final Function goToPage;
@@ -77,22 +76,12 @@ class _AboutPageState extends State<AboutPage> {
                   child: Image(
                     image: MediaQuery.of(context).platformBrightness ==
                             Brightness.light
-                        ? AssetImage(
-                            'assets/images/Focal Logo_Full Colored.png')
-                        : AssetImage('assets/images/Focal Logo_Full White.png'),
+                        ? AssetImage('assets/images/Logo Large Light.png')
+                        : AssetImage('assets/images/Logo Large Dark.png'),
                     width: 150,
                   ),
                 ),
-                Text(
-                  _version,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: MediaQuery.of(context).platformBrightness ==
-                            Brightness.light
-                        ? Theme.of(context).primaryColor
-                        : white,
-                  ),
-                ),
+                Text(_version),
               ],
             ),
           ),

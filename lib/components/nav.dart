@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:Focal/utils/size.dart';
-import 'package:Focal/constants.dart';
 
 class Nav extends StatelessWidget {
   final String title;
@@ -30,10 +29,6 @@ class Nav extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: MediaQuery.of(context).platformBrightness ==
-                        Brightness.light
-                    ? black
-                    : white,
               ),
             ),
           ),
@@ -51,10 +46,7 @@ class Nav extends StatelessWidget {
                       child: Icon(
                         this.leftIconData,
                         size: 20,
-                        color: MediaQuery.of(context).platformBrightness ==
-                                Brightness.light
-                            ? black
-                            : white,
+                        color: Theme.of(context).primaryColor,
                       ),
                     ),
                   ),
@@ -73,10 +65,7 @@ class Nav extends StatelessWidget {
                       child: Icon(
                         this.rightIconData,
                         size: 20,
-                        color: MediaQuery.of(context).platformBrightness ==
-                                Brightness.light
-                            ? black
-                            : white,
+                        color: Theme.of(context).primaryColor,
                       ),
                     ),
                   ),

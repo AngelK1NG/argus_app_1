@@ -67,8 +67,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Image(
               image:
                   MediaQuery.of(context).platformBrightness == Brightness.light
-                      ? AssetImage('assets/images/Focal Logo_Full Colored.png')
-                      : AssetImage('assets/images/Focal Logo_Full White.png'),
+                      ? AssetImage('assets/images/Logo Large Light.png')
+                      : AssetImage('assets/images/Logo Large Dark.png'),
             ),
           ),
           Positioned(
@@ -100,10 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                               }
                             },
                             width: SizeProvider.safeWidth - 100,
-                            color: MediaQuery.of(context).platformBrightness ==
-                                    Brightness.light
-                                ? black
-                                : white,
+                            color: Theme.of(context).primaryColor,
                             row: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -111,22 +108,14 @@ class _LoginPageState extends State<LoginPage> {
                                   padding: EdgeInsets.only(right: 15),
                                   child: FaIcon(
                                     FontAwesomeIcons.apple,
-                                    color: MediaQuery.of(context)
-                                                .platformBrightness ==
-                                            Brightness.light
-                                        ? white
-                                        : black,
+                                    color: Theme.of(context).backgroundColor,
                                     size: 20,
                                   ),
                                 ),
                                 Text(
                                   'Sign in with Apple',
                                   style: buttonTextStyle.apply(
-                                    color: MediaQuery.of(context)
-                                                .platformBrightness ==
-                                            Brightness.light
-                                        ? white
-                                        : black,
+                                    color: Theme.of(context).backgroundColor,
                                   ),
                                 ),
                               ],
@@ -150,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       },
                       width: SizeProvider.safeWidth - 100,
-                      color: Theme.of(context).primaryColor,
+                      color: Theme.of(context).accentColor,
                       row: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -158,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                             padding: EdgeInsets.only(right: 15),
                             child: FaIcon(
                               FontAwesomeIcons.google,
-                              color: Colors.white,
+                              color: white,
                               size: 20,
                             ),
                           ),
@@ -183,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                           TextSpan(
                             text: 'Terms and Conditions',
                             style: TextStyle(
-                              color: Theme.of(context).primaryColor,
+                              color: Theme.of(context).accentColor,
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap =
@@ -195,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                           TextSpan(
                             text: 'Privacy Policy',
                             style: TextStyle(
-                              color: Theme.of(context).primaryColor,
+                              color: Theme.of(context).accentColor,
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap =

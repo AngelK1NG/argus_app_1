@@ -3,7 +3,7 @@ description: Focal
 
 publish_to: "none"
 
-version: 1.1.0+12
+version: 2.0.0+12
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -74,6 +74,8 @@ flutter:
           weight: 700
 
 flutter_native_splash:
-  image: assets/images/Focal Logo_Full Colored.png
+  image: assets/images/Logo Small Light.png
   color: "ffffff"
+  image_dark: assets/images/Logo Small Dark.png
+  color_dark: "000000"
   android_disable_fullscreen: true

@@ -40,7 +40,7 @@ class MenuItem extends StatelessWidget {
                             child: Icon(
                               iconData,
                               size: 20,
-                              color: Theme.of(context).primaryColor,
+                              color: Theme.of(context).accentColor,
                             ),
                           )
                         : Container(),
@@ -71,7 +71,7 @@ class MenuItem extends StatelessWidget {
                         ? Icon(
                             FeatherIcons.check,
                             size: 20,
-                            color: Theme.of(context).primaryColor,
+                            color: Theme.of(context).accentColor,
                           )
                         : Icon(
                             FeatherIcons.chevronRight,

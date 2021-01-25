@@ -176,12 +176,8 @@ class _AddOverlayState extends State<AddOverlay> {
                                     FeatherIcons.calendar,
                                     size: 20,
                                     color: _date == null
-                                        ? MediaQuery.of(context)
-                                                    .platformBrightness ==
-                                                Brightness.light
-                                            ? black
-                                            : white
-                                        : Theme.of(context).primaryColor,
+                                        ? Theme.of(context).primaryColor
+                                        : Theme.of(context).accentColor,
                                   ),
                                   Padding(
                                     padding: EdgeInsets.only(left: 5),
@@ -199,12 +195,8 @@ class _AddOverlayState extends State<AddOverlay> {
                                                     ),
                                       style: TextStyle(
                                         color: _date == null
-                                            ? MediaQuery.of(context)
-                                                        .platformBrightness ==
-                                                    Brightness.light
-                                                ? black
-                                                : white
-                                            : Theme.of(context).primaryColor,
+                                            ? Theme.of(context).primaryColor
+                                            : Theme.of(context).accentColor,
                                         fontSize: 16,
                                       ),
                                     ),
@@ -225,7 +217,7 @@ class _AddOverlayState extends State<AddOverlay> {
                               size: 20,
                               color: _input.text.isEmpty
                                   ? Theme.of(context).hintColor
-                                  : Theme.of(context).primaryColor,
+                                  : Theme.of(context).accentColor,
                             ),
                           ),
                         ),

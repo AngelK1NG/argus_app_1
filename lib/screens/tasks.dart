@@ -294,7 +294,7 @@ class _TasksPageState extends State<TasksPage> {
                 ),
                 itemGhostOpacity: 1,
                 itemGhost: Divider(
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).accentColor,
                   thickness: 2,
                   height: 0,
                 ),
@@ -516,12 +516,12 @@ class _TasksPageState extends State<TasksPage> {
               children: [
                 Icon(
                   FeatherIcons.plus,
-                  color: Colors.white,
+                  color: white,
                   size: 20,
                 ),
               ],
             ),
-            color: Theme.of(context).primaryColor,
+            color: Theme.of(context).accentColor,
             vibrate: true,
           ),
         ),
@@ -604,10 +604,7 @@ class TasksSliverAppBar extends SliverPersistentHeaderDelegate {
               child: Icon(
                 FeatherIcons.barChart2,
                 size: 20,
-                color: MediaQuery.of(context).platformBrightness ==
-                        Brightness.light
-                    ? black
-                    : white,
+                color: Theme.of(context).primaryColor,
               ),
             ),
           ),
@@ -624,10 +621,7 @@ class TasksSliverAppBar extends SliverPersistentHeaderDelegate {
               child: Icon(
                 FeatherIcons.settings,
                 size: 20,
-                color: MediaQuery.of(context).platformBrightness ==
-                        Brightness.light
-                    ? black
-                    : white,
+                color: Theme.of(context).primaryColor,
               ),
             ),
           ),

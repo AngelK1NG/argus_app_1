@@ -23,12 +23,12 @@ class OnboardingPage extends StatelessWidget {
       children: [
         end
             ? Image(
-                image: AssetImage('assets/images/Focal Logo_Full Colored.png'),
+                image: AssetImage('assets/images/Logo Large Light.png'),
                 width: 300,
               )
             : Icon(
                 iconData,
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).accentColor,
                 size: 150,
               ),
         Padding(
@@ -41,7 +41,7 @@ class OnboardingPage extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 36,
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).accentColor,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -60,7 +60,7 @@ class OnboardingPage extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/home');
             },
             width: SizeProvider.safeWidth - 100,
-            color: Theme.of(context).primaryColor,
+            color: Theme.of(context).accentColor,
             row: Row(
               children: [
                 Text(

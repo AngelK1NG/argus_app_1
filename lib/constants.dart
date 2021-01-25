@@ -17,11 +17,10 @@ final ThemeData lightTheme = ThemeData(
       animationDuration: buttonDuration,
     ),
   ),
-  primaryColor: Color(0xff3c25d7),
+  primaryColor: Color(0xff000000),
   accentColor: Color(0xff3c25d7),
   hintColor: Color(0xffbbbbbb),
   dividerColor: Color(0xffdddddd),
-  shadowColor: Color(0xff111111).withOpacity(0.2),
   textSelectionColor: Color(0xffddddff),
   backgroundColor: Color(0xffffffff),
   cardColor: Color(0xffffffff),
@@ -46,20 +45,19 @@ final ThemeData darkTheme = ThemeData(
       animationDuration: buttonDuration,
     ),
   ),
-  primaryColor: Color(0xff7c4efd),
+  primaryColor: Color(0xffffffff),
   accentColor: Color(0xff7c4efd),
   hintColor: Color(0xff888888),
   dividerColor: Color(0xff333333),
-  shadowColor: black.withOpacity(0.2),
   textSelectionColor: Color(0xffddddff),
-  backgroundColor: Color(0xff111111),
+  backgroundColor: Color(0xff000000),
   cardColor: Color(0xff222222),
   cursorColor: Color(0xff7c4efd),
   splashColor: Colors.transparent,
 );
 
 //colors
-final Color black = Color(0xff111111);
+final Color black = Color(0xff000000);
 final Color white = Color(0xffffffff);
 final Color blue = Color(0xff3c25d7);
 final Color purple = Color(0xff7c4efd);
@@ -69,7 +67,7 @@ final Color red = Color(0xfff44236);
 final TextStyle buttonTextStyle = TextStyle(
   fontSize: 20,
   fontWeight: FontWeight.w600,
-  color: Colors.white,
+  color: white,
 );
 
 //animation transitions

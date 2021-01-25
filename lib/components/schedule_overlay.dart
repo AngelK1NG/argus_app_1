@@ -105,7 +105,7 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                         'Save',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).accentColor,
                         ),
                       ),
                       rightOnTap: () {
@@ -117,7 +117,7 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                     ),
                     MenuItem(
                       iconData: FeatherIcons.sun,
-                      iconColor: Theme.of(context).primaryColor,
+                      iconColor: Theme.of(context).accentColor,
                       check: _date == DateProvider().today,
                       text: 'Today',
                       secondaryText: DateProvider()
@@ -131,7 +131,7 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                     ),
                     MenuItem(
                       iconData: FeatherIcons.sunrise,
-                      iconColor: Theme.of(context).primaryColor,
+                      iconColor: Theme.of(context).accentColor,
                       check: _date == DateProvider().tomorrow,
                       text: 'Tomorrow',
                       secondaryText: DateProvider()
@@ -145,7 +145,7 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                     ),
                     MenuItem(
                       iconData: FeatherIcons.calendar,
-                      iconColor: Theme.of(context).primaryColor,
+                      iconColor: Theme.of(context).accentColor,
                       check: _date == DateProvider().nextWeek,
                       text: 'Next Week',
                       secondaryText: DateProvider()
@@ -159,7 +159,7 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                     ),
                     MenuItem(
                       iconData: FeatherIcons.xCircle,
-                      iconColor: Theme.of(context).primaryColor,
+                      iconColor: Theme.of(context).accentColor,
                       check: _date == null,
                       text: 'No Date',
                       onTap: () {
@@ -184,10 +184,7 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                       headerStyle: DateRangePickerHeaderStyle(
                         textAlign: TextAlign.center,
                         textStyle: TextStyle(
-                          color: MediaQuery.of(context).platformBrightness ==
-                                  Brightness.light
-                              ? black
-                              : white,
+                          color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
                           fontFamily: 'Cabin',
@@ -203,16 +200,13 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                       monthCellStyle: DateRangePickerMonthCellStyle(
                         textStyle: TextStyle(
                           fontSize: 14,
-                          color: MediaQuery.of(context).platformBrightness ==
-                                  Brightness.light
-                              ? black
-                              : white,
+                          color: Theme.of(context).primaryColor,
                           fontFamily: 'Cabin',
                         ),
                         todayTextStyle: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).accentColor,
                           fontFamily: 'Cabin',
                         ),
                         todayCellDecoration: BoxDecoration(),
@@ -225,16 +219,13 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                       yearCellStyle: DateRangePickerYearCellStyle(
                         textStyle: TextStyle(
                           fontSize: 14,
-                          color: MediaQuery.of(context).platformBrightness ==
-                                  Brightness.light
-                              ? black
-                              : white,
+                          color: Theme.of(context).primaryColor,
                           fontFamily: 'Cabin',
                         ),
                         todayTextStyle: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).accentColor,
                           fontFamily: 'Cabin',
                         ),
                         todayCellDecoration: BoxDecoration(),
@@ -253,10 +244,7 @@ class _ScheduleOverlayState extends State<ScheduleOverlay> {
                         viewHeaderStyle: DateRangePickerViewHeaderStyle(
                           textStyle: TextStyle(
                             fontSize: 14,
-                            color: MediaQuery.of(context).platformBrightness ==
-                                    Brightness.light
-                                ? black
-                                : white,
+                            color: Theme.of(context).primaryColor,
                             fontFamily: 'Cabin',
                           ),
                         ),

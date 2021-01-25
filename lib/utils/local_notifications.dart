@@ -9,8 +9,7 @@ class LocalNotifications {
       FlutterLocalNotificationsPlugin();
 
   void initialize() async {
-    var initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
+    var initializationSettingsAndroid = AndroidInitializationSettings('splash');
     var initializationSettingsIOS = IOSInitializationSettings(
         onDidReceiveLocalNotification: onDidReceiveLocalNotification);
     var initializationSettings = InitializationSettings(

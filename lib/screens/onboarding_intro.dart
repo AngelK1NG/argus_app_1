@@ -76,7 +76,7 @@ class _OnboardingIntroState extends State<OnboardingIntro> {
                           TextSpan(
                             text: 'Focused',
                             style: TextStyle(
-                              color: Theme.of(context).primaryColor,
+                              color: Theme.of(context).accentColor,
                             ),
                           ),
                           TextSpan(
@@ -99,7 +99,7 @@ class _OnboardingIntroState extends State<OnboardingIntro> {
                           TextSpan(
                             text: 'Focus',
                             style: TextStyle(
-                              color: Theme.of(context).primaryColor,
+                              color: Theme.of(context).accentColor,
                             ),
                           ),
                           TextSpan(
@@ -109,7 +109,7 @@ class _OnboardingIntroState extends State<OnboardingIntro> {
                           TextSpan(
                             text: 'Distracted',
                             style: TextStyle(
-                              color: Colors.red,
+                              color: red,
                             ),
                           ),
                           TextSpan(
@@ -135,7 +135,7 @@ class _OnboardingIntroState extends State<OnboardingIntro> {
                           TextSpan(
                             text: 'Distracted',
                             style: TextStyle(
-                              color: Colors.red,
+                              color: red,
                             ),
                           ),
                           TextSpan(
@@ -163,10 +163,10 @@ class _OnboardingIntroState extends State<OnboardingIntro> {
                   position: _index,
                   decorator: DotsDecorator(
                     color: Colors.transparent,
-                    activeColor: Theme.of(context).primaryColor,
+                    activeColor: Theme.of(context).accentColor,
                     shape: CircleBorder(
                         side: BorderSide(
-                            color: Theme.of(context).primaryColor, width: 2)),
+                            color: Theme.of(context).accentColor, width: 2)),
                   ),
                 ),
               ),

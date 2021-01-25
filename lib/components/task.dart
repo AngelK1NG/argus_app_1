@@ -94,7 +94,7 @@ class Task extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dismissible(
       background: Container(
-        color: Theme.of(context).primaryColor,
+        color: Theme.of(context).accentColor,
         padding: EdgeInsets.only(left: 15),
         alignment: AlignmentDirectional.centerStart,
         child: Icon(
@@ -139,7 +139,7 @@ class Task extends StatelessWidget {
                         : Icon(
                             FeatherIcons.circle,
                             size: 20,
-                            color: Theme.of(context).primaryColor,
+                            color: Theme.of(context).accentColor,
                           ),
                   ),
                   SizedBox(
