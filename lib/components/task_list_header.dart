@@ -12,7 +12,7 @@ class TaskListHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 35,
+      height: 20,
       padding: EdgeInsets.only(left: 15, right: 15),
       child: Text(
         this.date == 'Overdue' ||

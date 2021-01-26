@@ -49,7 +49,7 @@ final ThemeData darkTheme = ThemeData(
   accentColor: Color(0xff7c4efd),
   hintColor: Color(0xff888888),
   dividerColor: Color(0xff333333),
-  textSelectionColor: Color(0xffddddff),
+  textSelectionColor: Color(0xff333355),
   backgroundColor: Color(0xff000000),
   cardColor: Color(0xff222222),
   cursorColor: Color(0xff7c4efd),

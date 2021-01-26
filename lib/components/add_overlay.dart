@@ -132,6 +132,9 @@ class _AddOverlayState extends State<AddOverlay> {
                           focusNode: _focusNode,
                           controller: _input,
                           textInputAction: TextInputAction.next,
+                          cursorColor: Theme.of(context).cursorColor,
+                          keyboardAppearance:
+                              MediaQuery.of(context).platformBrightness,
                           onChanged: (value) {
                             setState(() {
                               widget.setText(value);

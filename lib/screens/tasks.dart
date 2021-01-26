@@ -301,7 +301,7 @@ class _TasksPageState extends State<TasksPage> {
                 listGhostOpacity: 0,
                 lastListTargetSize: 15,
                 lastItemTargetHeight: 15,
-                addLastItemTargetHeightToTop: false,
+                addLastItemTargetHeightToTop: true,
                 sliverList: true,
                 scrollController: _scrollController,
                 itemOnWillAccept: (_, target) {

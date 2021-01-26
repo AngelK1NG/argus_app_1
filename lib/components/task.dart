@@ -152,6 +152,8 @@ class Task extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         this.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: this.completed
                             ? TextStyle(
                                 fontSize: 16,
