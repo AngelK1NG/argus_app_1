@@ -79,8 +79,6 @@ class _AboutPageState extends State<AboutPage> {
                         ? AssetImage('assets/images/Logo Large Light.png')
                         : AssetImage('assets/images/Logo Large Dark.png'),
                     width: 150,
-                    color: Color.fromRGBO(255, 255, 255, 0.9),
-                    colorBlendMode: BlendMode.modulate,
                   ),
                 ),
                 Text(_version),
