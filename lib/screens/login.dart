@@ -69,6 +69,8 @@ class _LoginPageState extends State<LoginPage> {
                   MediaQuery.of(context).platformBrightness == Brightness.light
                       ? AssetImage('assets/images/Logo Large Light.png')
                       : AssetImage('assets/images/Logo Large Dark.png'),
+              color: Color.fromRGBO(255, 255, 255, 0.9),
+              colorBlendMode: BlendMode.modulate,
             ),
           ),
           Positioned(

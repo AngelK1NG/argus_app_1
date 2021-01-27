@@ -1,4 +1,4 @@
-[<img align="right" alt="Focal" width="56px" src="assets/images/logo/Focal%20Logo_Colored.png" />][focal]
+[<img align="right" alt="Focal" width="56px" src="assets/images/Logo%20Small%20Light />][focal]
 <h1>Focal</h1>
 
 ### Tasks in Focus
