@@ -13,7 +13,7 @@ final ThemeData lightTheme = ThemeData(
         Size(50, 50),
       ),
       padding: MaterialStateProperty.all(EdgeInsets.zero),
-      elevation: MaterialStateProperty.all(5),
+      elevation: MaterialStateProperty.resolveWith(getElevation),
       animationDuration: buttonDuration,
     ),
   ),
@@ -41,7 +41,7 @@ final ThemeData darkTheme = ThemeData(
         Size(50, 50),
       ),
       padding: MaterialStateProperty.all(EdgeInsets.zero),
-      elevation: MaterialStateProperty.all(5),
+      elevation: MaterialStateProperty.resolveWith(getElevation),
       animationDuration: buttonDuration,
     ),
   ),
@@ -55,6 +55,13 @@ final ThemeData darkTheme = ThemeData(
   cursorColor: Color(0xff7c4efd),
   splashColor: Colors.transparent,
 );
+
+double getElevation(Set<MaterialState> states) {
+  if (states.any([MaterialState.pressed].contains)) {
+    return 5;
+  }
+  return 10;
+}
 
 //colors
 final Color black = Color(0xff000000);
@@ -78,7 +85,7 @@ final Duration overlayDuration = Duration(milliseconds: 500);
 final Curve overlayCurve = Curves.easeOutQuint;
 
 final Duration buttonDuration = Duration(milliseconds: 200);
-final Curve buttonCurve = Curves.ease;
+final Curve buttonCurve = Curves.easeOut;
 
 final Duration loginDuration = Duration(milliseconds: 800);
 final Curve loginCurve = Curves.ease;

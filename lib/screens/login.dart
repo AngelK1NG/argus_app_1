@@ -120,7 +120,6 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ],
                             ),
-                            vibrate: true,
                           ),
                         )
                       : Container(),
@@ -157,7 +156,6 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ],
                       ),
-                      vibrate: true,
                     ),
                   ),
                   Container(

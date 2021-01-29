@@ -69,7 +69,6 @@ class OnboardingPage extends StatelessWidget {
                 )
               ],
             ),
-            vibrate: true,
           ),
         ),
       ],

@@ -522,7 +522,6 @@ class _TasksPageState extends State<TasksPage> {
               ],
             ),
             color: Theme.of(context).accentColor,
-            vibrate: true,
           ),
         ),
       ],

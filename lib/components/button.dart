@@ -7,23 +7,19 @@ class Button extends StatelessWidget {
   final double width;
   final Row row;
   final Color color;
-  final bool vibrate;
 
   const Button({
     this.onTap,
     @required this.width,
     @required this.row,
     @required this.color,
-    @required this.vibrate,
   });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        if (vibrate) {
-          HapticFeedback.heavyImpact();
-        }
+        HapticFeedback.heavyImpact();
         onTap();
       },
       child: AnimatedContainer(
