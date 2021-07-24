@@ -9,7 +9,7 @@ import 'package:Focal/constants.dart';
 class Task extends StatelessWidget {
   final int index;
   final String name;
-  final String date;
+  final DateTime date;
   final bool completed;
   final bool paused;
   final int seconds;
@@ -36,7 +36,7 @@ class Task extends StatelessWidget {
       id: doc.id,
       index: data['index'] ?? 0,
       name: data['name'] ?? '',
-      date: data['date'] ?? '',
+      date: data['date'] != null ? data['date'].toDate() : null,
       completed: completed,
       paused: data['paused'] ?? false,
       seconds: data['seconds'] ?? 0,
@@ -143,9 +143,8 @@ class Task extends StatelessWidget {
                           ),
                   ),
                   SizedBox(
-                    width: this.date.isNotEmpty &&
-                            DateTime.parse(this.date)
-                                .isBefore(DateProvider().today)
+                    width: this.date != null &&
+                            this.date.isBefore(DateProvider().today)
                         ? SizeProvider.safeWidth - 115
                         : SizeProvider.safeWidth - 65,
                     child: Align(
@@ -168,12 +167,12 @@ class Task extends StatelessWidget {
                     ),
                   ),
                   !this.completed &&
-                          this.date.isNotEmpty &&
-                          DateTime.parse(date).isBefore(DateProvider().today)
+                          this.date != null &&
+                          date.isBefore(DateProvider().today)
                       ? Container(
                           width: 50,
                           child: Text(
-                            '${DateProvider().monthString(DateTime.parse(date), false)} ${DateTime.parse(date).day}',
+                            '${DateProvider().monthString(this.date, false)} ${this.date.day}',
                             textAlign: TextAlign.right,
                             style: TextStyle(
                               fontSize: 16,

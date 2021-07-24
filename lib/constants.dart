@@ -58,9 +58,9 @@ final ThemeData darkTheme = ThemeData(
 
 double getElevation(Set<MaterialState> states) {
   if (states.any([MaterialState.pressed].contains)) {
-    return 5;
+    return 0;
   }
-  return 10;
+  return 5;
 }
 
 //colors
@@ -85,7 +85,7 @@ final Duration overlayDuration = Duration(milliseconds: 500);
 final Curve overlayCurve = Curves.easeOutQuint;
 
 final Duration buttonDuration = Duration(milliseconds: 200);
-final Curve buttonCurve = Curves.easeOut;
+final Curve buttonCurve = Curves.ease;
 
 final Duration loginDuration = Duration(milliseconds: 800);
 final Curve loginCurve = Curves.ease;

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:Focal/utils/date.dart';
 
 class TaskListHeader extends StatelessWidget {
-  final date;
+  final dynamic title;
 
   const TaskListHeader({
-    @required this.date,
+    this.title,
     Key key,
   }) : super(key: key);
 
@@ -15,15 +15,13 @@ class TaskListHeader extends StatelessWidget {
       height: 20,
       padding: EdgeInsets.only(left: 15, right: 15),
       child: Text(
-        this.date == 'Overdue' ||
-                this.date == 'No Date' ||
-                this.date == 'Completed'
-            ? this.date
-            : DateTime.parse(this.date) == DateProvider().today
-                ? 'Today, ${DateProvider().weekdayString(DateTime.parse(this.date), false)} ${DateProvider().monthString(DateTime.parse(this.date), false)} ${DateTime.parse(this.date).day}'
-                : DateTime.parse(this.date) == DateProvider().tomorrow
-                    ? 'Tomorrow, ${DateProvider().weekdayString(DateTime.parse(this.date), false)} ${DateProvider().monthString(DateTime.parse(this.date), false)} ${DateTime.parse(this.date).day}'
-                    : '${DateProvider().weekdayString(DateTime.parse(this.date), false)} ${DateProvider().monthString(DateTime.parse(this.date), false)} ${DateTime.parse(this.date).day}${DateTime.parse(this.date).year != DateProvider().today.year ? ' ' + DateTime.parse(this.date).year.toString() : ''}',
+        this.title is String
+            ? this.title
+            : this.title == DateProvider().today
+                ? 'Today, ${DateProvider().weekdayString(this.title, false)} ${DateProvider().monthString(this.title, false)} ${this.title.day}'
+                : this.title == DateProvider().tomorrow
+                    ? 'Tomorrow, ${DateProvider().weekdayString(this.title, false)} ${DateProvider().monthString(this.title, false)} ${this.title.day}'
+                    : '${DateProvider().weekdayString(this.title, false)} ${DateProvider().monthString(this.title, false)} ${this.title.day}${this.title.year != DateProvider().today.year ? ' ' + this.title.year.toString() : ''}',
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,

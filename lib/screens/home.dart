@@ -158,7 +158,6 @@ class _HomeState extends State<Home> {
               curve: fadeCurve,
               child: Center(
                 child: CircularProgressIndicator(
-                  backgroundColor: Colors.transparent,
                   strokeWidth: 2,
                 ),
               ),
