@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:Focal/constants.dart';
+import 'package:vivi/constants.dart';
 
 class Button extends StatelessWidget {
   final VoidCallback onTap;

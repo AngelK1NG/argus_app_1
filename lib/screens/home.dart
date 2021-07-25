@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:Focal/utils/size.dart';
-import 'package:Focal/utils/auth.dart';
-import 'package:Focal/utils/database.dart';
-import 'package:Focal/screens/focus.dart';
-import 'package:Focal/screens/tasks.dart';
-import 'package:Focal/screens/statistics.dart';
-import 'package:Focal/screens/settings.dart';
-import 'package:Focal/screens/general.dart';
-import 'package:Focal/screens/help.dart';
-import 'package:Focal/screens/about.dart';
-import 'package:Focal/screens/login.dart';
-import 'package:Focal/constants.dart';
+import 'package:vivi/utils/size.dart';
+import 'package:vivi/utils/auth.dart';
+import 'package:vivi/utils/database.dart';
+import 'package:vivi/screens/alarms.dart';
+import 'package:vivi/screens/settings.dart';
+import 'package:vivi/screens/login.dart';
+import 'package:vivi/constants.dart';
 
 import 'package:provider/provider.dart';
 
@@ -32,39 +27,12 @@ class _HomeState extends State<Home> {
       switch (index) {
         case 0:
           {
-            _child = TasksPage(goToPage: goToPage);
+            _child = AlarmsPage(goToPage: goToPage);
             break;
           }
         case 1:
           {
-            _child = StatisticsPage(goToPage: goToPage);
-            break;
-          }
-
-        case 2:
-          {
             _child = SettingsPage(goToPage: goToPage);
-            break;
-          }
-        case 3:
-          {
-            _child = FocusPage(goToPage: goToPage);
-            break;
-          }
-
-        case 4:
-          {
-            _child = GeneralPage(goToPage: goToPage);
-            break;
-          }
-        case 5:
-          {
-            _child = HelpPage(goToPage: goToPage);
-            break;
-          }
-        case 6:
-          {
-            _child = AboutPage(goToPage: goToPage);
             break;
           }
       }
@@ -83,10 +51,9 @@ class _HomeState extends State<Home> {
     }
   }
 
-  bool _loading(UserStatus user, List uncompleted, List completed) {
+  bool _loading(UserStatus user, List completed) {
     return user == null ||
-        ((user != null && user.signedIn) &&
-            (uncompleted == null || completed == null));
+        ((user != null && user.signedIn) && completed == null);
   }
 
   bool _signedIn(UserStatus user) {
@@ -108,61 +75,57 @@ class _HomeState extends State<Home> {
       _init = true;
     }
     var user = Provider.of<UserStatus>(context);
-    var uncompletedTasks = Provider.of<UncompletedTasks>(context).tasks;
     var completedTasks = Provider.of<CompletedTasks>(context).tasks;
     return AnnotatedRegion(
-      value: MediaQuery.of(context).platformBrightness == Brightness.light
-          ? SystemUiOverlayStyle.dark.copyWith(
-              statusBarColor: Colors.transparent,
-              systemNavigationBarColor: Theme.of(context).backgroundColor,
-              systemNavigationBarIconBrightness:
-                  MediaQuery.of(context).platformBrightness == Brightness.light
-                      ? Brightness.dark
-                      : Brightness.light,
-            )
-          : SystemUiOverlayStyle.light.copyWith(
-              statusBarColor: Colors.transparent,
-              systemNavigationBarColor: Theme.of(context).backgroundColor,
-              systemNavigationBarIconBrightness:
-                  MediaQuery.of(context).platformBrightness == Brightness.light
-                      ? Brightness.dark
-                      : Brightness.light,
-            ),
-      child: Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
-        resizeToAvoidBottomInset: false,
-        body: Stack(
-          children: [
-            AnimatedOpacity(
-              opacity: _loading(user, uncompletedTasks, completedTasks) ? 0 : 1,
-              duration: fadeDuration,
-              curve: fadeCurve,
-              child: SafeArea(
-                child: SizedBox.expand(
-                  child: _signedIn(user) &&
-                          !_loading(user, uncompletedTasks, completedTasks)
-                      ? _child
-                      : LoginPage(
-                          goToPage: goToPage,
-                          setLoading: setLoginLoading,
-                        ),
+      value: SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Theme.of(context).backgroundColor,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.center,
+            colors: [
+              Color(0xffa6dae8),
+              Color(0xffdce5e8),
+            ],
+          ),
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          resizeToAvoidBottomInset: false,
+          body: Stack(
+            children: [
+              AnimatedOpacity(
+                opacity: _loading(user, completedTasks) ? 0 : 1,
+                duration: fadeDuration,
+                curve: fadeCurve,
+                child: SafeArea(
+                  child: SizedBox.expand(
+                    child: _signedIn(user) && !_loading(user, completedTasks)
+                        ? _child
+                        : LoginPage(
+                            goToPage: goToPage,
+                            setLoading: setLoginLoading,
+                          ),
+                  ),
                 ),
               ),
-            ),
-            AnimatedOpacity(
-              opacity: _loading(user, uncompletedTasks, completedTasks) ||
-                      _loginLoading
-                  ? 1
-                  : 0,
-              duration: fadeDuration,
-              curve: fadeCurve,
-              child: Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
+              AnimatedOpacity(
+                opacity:
+                    _loading(user, completedTasks) || _loginLoading ? 1 : 0,
+                duration: fadeDuration,
+                curve: fadeCurve,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

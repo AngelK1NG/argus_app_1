@@ -1,9 +1,9 @@
-name: Focal
-description: Focal
+name: vivi
+description: vivi
 
 publish_to: "none"
 
-version: 2.0.0+12
+version: 1.0.0+1
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -76,6 +76,4 @@ flutter:
 flutter_native_splash:
   image: assets/images/Logo Small Light.png
   color: "ffffff"
-  image_dark: assets/images/Logo Small Dark.png
-  color_dark: "000000"
   android_disable_fullscreen: true

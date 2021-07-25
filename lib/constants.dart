@@ -17,42 +17,10 @@ final ThemeData lightTheme = ThemeData(
       animationDuration: buttonDuration,
     ),
   ),
-  primaryColor: Color(0xff000000),
-  backgroundColor: Color(0xffffffff),
-  accentColor: Color(0xff3c25d7),
-  hintColor: Color(0xffbbbbbb),
-  dividerColor: Color(0xffdddddd),
-  textSelectionColor: Color(0xffddddff),
-  cardColor: Color(0xffffffff),
-  cursorColor: Color(0xff3c25d7),
-  splashColor: Colors.transparent,
-);
-
-//dark theme
-final ThemeData darkTheme = ThemeData(
-  elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ButtonStyle(
-      shape: MaterialStateProperty.all(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
-        ),
-      ),
-      minimumSize: MaterialStateProperty.all(
-        Size(50, 50),
-      ),
-      padding: MaterialStateProperty.all(EdgeInsets.zero),
-      elevation: MaterialStateProperty.resolveWith(getElevation),
-      animationDuration: buttonDuration,
-    ),
-  ),
-  primaryColor: Color(0xffffffff),
-  backgroundColor: Color(0xff181a20),
-  accentColor: Color(0xff7c4efd),
+  primaryColor: Color(0xff111133),
+  backgroundColor: Color(0xffdce5e8),
+  accentColor: Color(0xff1aafd8),
   hintColor: Color(0xff888888),
-  dividerColor: Color(0xff333333),
-  textSelectionColor: Color(0xff333355),
-  cardColor: Color(0xff202228),
-  cursorColor: Color(0xff7c4efd),
   splashColor: Colors.transparent,
 );
 
@@ -64,7 +32,7 @@ double getElevation(Set<MaterialState> states) {
 }
 
 //colors
-final Color black = Color(0xff000000);
+final Color black = Color(0xff111133);
 final Color white = Color(0xffffffff);
 final Color blue = Color(0xff3c25d7);
 final Color purple = Color(0xff7c4efd);

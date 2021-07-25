@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:Focal/constants.dart';
-import 'package:Focal/components/button.dart';
-import 'package:Focal/components/nav.dart';
-import 'package:Focal/utils/analytics.dart';
-import 'package:Focal/utils/size.dart';
-import 'package:Focal/utils/auth.dart';
+import 'package:vivi/constants.dart';
+import 'package:vivi/components/button.dart';
+import 'package:vivi/components/nav.dart';
+import 'package:vivi/utils/size.dart';
+import 'package:vivi/utils/auth.dart';
 import 'dart:io' show Platform;
 
 class LoginPage extends StatefulWidget {
@@ -62,13 +61,10 @@ class _LoginPageState extends State<LoginPage> {
             left: 50,
             right: 50,
             top: _visible
-                ? SizeProvider.safeHeight * 0.3
+                ? SizeProvider.safeHeight * 0.25
                 : SizeProvider.safeHeight * 0.5,
             child: Image(
-              image:
-                  MediaQuery.of(context).platformBrightness == Brightness.light
-                      ? AssetImage('assets/images/Logo Large Light.png')
-                      : AssetImage('assets/images/Logo Large Dark.png'),
+              image: AssetImage('assets/images/Logo Large Light.png'),
             ),
           ),
           Positioned(
@@ -90,7 +86,6 @@ class _LoginPageState extends State<LoginPage> {
                               dynamic result =
                                   await AuthProvider().appleSignIn();
                               if (result != null) {
-                                AnalyticsProvider().logAppleSignIn();
                                 widget.setLoading(
                                     loading: false, success: true);
                                 widget.goToPage(0);
@@ -130,7 +125,6 @@ class _LoginPageState extends State<LoginPage> {
                         widget.setLoading(loading: true);
                         dynamic result = await AuthProvider().googleSignIn();
                         if (result != null) {
-                          AnalyticsProvider().logGoogleSignIn();
                           widget.setLoading(loading: false, success: true);
                           widget.goToPage(0);
                         } else {
@@ -158,44 +152,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  Container(
-                    height: 50,
-                    alignment: Alignment.center,
-                    child: Text.rich(
-                      TextSpan(
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: 'By continuing you agree to Focal\'s ',
-                          ),
-                          TextSpan(
-                            text: 'Terms and Conditions',
-                            style: TextStyle(
-                              color: Theme.of(context).accentColor,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap =
-                                  () => openUrl('https://getfocal.app/terms'),
-                          ),
-                          TextSpan(
-                            text: ' and ',
-                          ),
-                          TextSpan(
-                            text: 'Privacy Policy',
-                            style: TextStyle(
-                              color: Theme.of(context).accentColor,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap =
-                                  () => openUrl('https://getfocal.app/privacy'),
-                          ),
-                          TextSpan(
-                            text: '.',
-                          ),
-                        ],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  )
                 ],
               ),
             ),

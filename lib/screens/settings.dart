@@ -4,10 +4,9 @@ import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:Focal/components/menu_item.dart';
-import 'package:Focal/components/nav.dart';
-import 'package:Focal/utils/analytics.dart';
-import 'package:Focal/utils/auth.dart';
+import 'package:vivi/components/menu_item.dart';
+import 'package:vivi/components/nav.dart';
+import 'package:vivi/utils/auth.dart';
 
 class SettingsPage extends StatelessWidget {
   final Function goToPage;
@@ -41,34 +40,6 @@ class SettingsPage extends StatelessWidget {
             },
           ),
           MenuItem(
-            iconData: FeatherIcons.settings,
-            iconColor: Theme.of(context).accentColor,
-            check: false,
-            text: 'General',
-            onTap: () => this.goToPage(4),
-          ),
-          MenuItem(
-            iconData: FeatherIcons.archive,
-            iconColor: Theme.of(context).accentColor,
-            check: false,
-            text: 'Feedback',
-            onTap: () => openFeedbackForm(),
-          ),
-          // MenuItem(
-          //   iconData: FeatherIcons.helpCircle,
-          //   iconColor: Theme.of(context).accentColor,
-          //   check: false,
-          //   text: 'Help',
-          //   onTap: () => this.goToPage(5),
-          // ),
-          MenuItem(
-            iconData: FeatherIcons.info,
-            iconColor: Theme.of(context).accentColor,
-            check: false,
-            text: 'About',
-            onTap: () => this.goToPage(6),
-          ),
-          MenuItem(
             iconData: FeatherIcons.logOut,
             iconColor: Theme.of(context).accentColor,
             check: false,
@@ -76,7 +47,6 @@ class SettingsPage extends StatelessWidget {
             onTap: () {
               HapticFeedback.heavyImpact();
               FirebaseAuth.instance.signOut();
-              AnalyticsProvider().logSignOut();
             },
           ),
           Container(

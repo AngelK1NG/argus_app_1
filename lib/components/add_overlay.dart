@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
-import 'package:Focal/constants.dart';
-import 'package:Focal/utils/size.dart';
-import 'package:Focal/utils/date.dart';
-import 'package:Focal/components/schedule_overlay.dart';
+import 'package:vivi/constants.dart';
+import 'package:vivi/utils/size.dart';
+import 'package:vivi/utils/date.dart';
 
 class AddOverlay extends StatefulWidget {
   final String text;
@@ -150,26 +149,7 @@ class _AddOverlayState extends State<AddOverlay> {
                         Padding(
                           padding: EdgeInsets.only(left: 15, right: 15),
                           child: GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(PageRouteBuilder(
-                                opaque: false,
-                                transitionDuration: Duration(seconds: 5),
-                                pageBuilder: (_, __, ___) {
-                                  return ScheduleOverlay(
-                                    date: _date,
-                                    setDate: (date) {
-                                      setState(() {
-                                        _date = date;
-                                      });
-                                      widget.setDate(date);
-                                    },
-                                    onPop: () {
-                                      _focusNode.requestFocus();
-                                    },
-                                  );
-                                },
-                              ));
-                            },
+                            onTap: () {},
                             child: Container(
                               height: 50,
                               color: Colors.transparent,

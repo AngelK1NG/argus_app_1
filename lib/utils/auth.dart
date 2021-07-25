@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:Focal/utils/database.dart';
+import 'package:vivi/utils/database.dart';
 
 class AuthProvider {
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -15,6 +15,7 @@ class AuthProvider {
             uid: user.uid,
             email: user.email,
             displayName: user.displayName,
+            photoURL: user.photoURL,
           );
   }
 
@@ -71,7 +72,13 @@ class UserStatus {
   final String uid;
   final String email;
   final String displayName;
+  final String photoURL;
 
-  const UserStatus(
-      {@required this.signedIn, this.uid, this.email, this.displayName});
+  const UserStatus({
+    @required this.signedIn,
+    this.uid,
+    this.email,
+    this.displayName,
+    this.photoURL,
+  });
 }

@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Focal</string>
+	<string>vivi</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -50,7 +50,7 @@
 	<key>FacebookAppID</key>
 	<string>1597319037142790</string>
 	<key>FacebookDisplayName</key>
-	<string>Focal</string>
+	<string>vivi</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>itms</string>
@@ -58,7 +58,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Focal needs access to the photo library to save shared content.</string>
+	<string>vivi needs access to the photo library to save shared content.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

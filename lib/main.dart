@@ -6,10 +6,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:provider/provider.dart';
-import 'package:Focal/screens/home.dart';
-import 'package:Focal/constants.dart';
-import 'package:Focal/utils/auth.dart';
-import 'package:Focal/utils/database.dart';
+import 'package:vivi/screens/home.dart';
+import 'package:vivi/constants.dart';
+import 'package:vivi/utils/auth.dart';
+import 'package:vivi/utils/database.dart';
 
 void main() async {
   await WidgetsFlutterBinding.ensureInitialized();
@@ -33,11 +33,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        StreamProvider<UncompletedTasks>.value(
-          value: DatabaseProvider()
-              .streamUncompleted(Provider.of<UserStatus>(context)),
-          initialData: UncompletedTasks(null),
-        ),
         StreamProvider<CompletedTasks>.value(
           value: DatabaseProvider()
               .streamCompleted(Provider.of<UserStatus>(context)),
@@ -56,13 +51,6 @@ class MyApp extends StatelessWidget {
               textTheme: Theme.of(context).textTheme.apply(
                     bodyColor: black,
                     displayColor: black,
-                    fontFamily: 'Cabin',
-                  ),
-            ),
-            darkTheme: darkTheme.copyWith(
-              textTheme: Theme.of(context).textTheme.apply(
-                    bodyColor: white,
-                    displayColor: white,
                     fontFamily: 'Cabin',
                   ),
             ),

@@ -1,29 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:Focal/utils/auth.dart';
-import 'package:Focal/components/task.dart';
+import 'package:vivi/utils/auth.dart';
+import 'package:vivi/components/alarm.dart';
 
 class DatabaseProvider {
   FirebaseFirestore _db = FirebaseFirestore.instance;
-
-  Stream<UncompletedTasks> streamUncompleted(UserStatus user) {
-    if (user == null || !user.signedIn) {
-      return Stream<UncompletedTasks>.value(UncompletedTasks(null));
-    } else {
-      return _db
-          .collection('users')
-          .doc(user.uid)
-          .collection('uncompleted')
-          .orderBy('date')
-          .orderBy('index')
-          .snapshots()
-          .map(
-            (list) => UncompletedTasks(
-              list.docs.map((doc) => Task.fromFirestore(doc, false)).toList(),
-            ),
-          );
-    }
-  }
 
   Stream<CompletedTasks> streamCompleted(UserStatus user) {
     if (user == null || !user.signedIn) {
@@ -39,7 +20,7 @@ class DatabaseProvider {
           .snapshots()
           .map(
             (list) => CompletedTasks(
-              list.docs.map((doc) => Task.fromFirestore(doc, true)).toList(),
+              list.docs.map((doc) => Alarm.fromFirestore(doc, true)).toList(),
             ),
           );
     }

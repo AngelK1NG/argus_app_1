@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:Focal/utils/size.dart';
+import 'package:vivi/utils/size.dart';
 
 class Nav extends StatelessWidget {
   final String title;

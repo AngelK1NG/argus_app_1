@@ -80,12 +80,12 @@ android {
     productFlavors {
         dev {
             dimension "app"
-            resValue "string", "app_name", "Focal Dev"
+            resValue "string", "app_name", "vivi Dev"
             applicationIdSuffix ".dev"
         }
         prod {
             dimension "app"
-            resValue "string", "app_name", "Focal"
+            resValue "string", "app_name", "vivi"
         }
     }
 }
