@@ -141,14 +141,12 @@ Serial.print(myLocalTime.second());
 Serial.println();
 
 if (currentHour == alarmHour && currentMinute == alarmMinute && myLocalTime.second()==0) {
- ring = true;
-}
+ while (ring) {
+  play();
   if (digitalRead(buttonPin) == LOW) {
    ring = false;
   }
- if (ring) {
-  play();
-  }
+ }
 }
 
 //if (currentHour == milky.getInt("Hour") && currentMinute == milky.getInt("Minute")) {
