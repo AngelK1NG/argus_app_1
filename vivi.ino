@@ -1,7 +1,11 @@
- //#include <ESP8266Firebase.h>
+#include "FirebaseESP8266.h"
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ezTime.h>
+
+
+#define FIREBASE_HOST "vivi11-default-rtdb.firebaseio.com"
+#define FIREBASE_AUTH "4abb4Th3MwHrAjbjK2EXAPYLQIctxMF0YKhbencd"
 
 #define  a3f    208     // 208 Hz
 #define  b3f    233     // 233 Hz
@@ -19,8 +23,8 @@
 #define  f5     698     // 698 Hz 
 #define  f5s    740     // 740 Hz
 #define  a5f    831     // 831 Hz 
-
 #define rest    -1
+
 
 volatile int beatlength = 100; // determines tempo
 float beatseparationconstant = 0.3;
@@ -85,17 +89,15 @@ int song1_chorus_rhythmn[] =
 
 
 
-//#define Project_ID "vivi11"
 Timezone myLocalTime; 
 
-const char* ssid = "boku no"; //SSID of wifi network
-const char* password = "pico";// Password for wifi network
-const int alarmHour= 8; // just while we don't have firebase or app to set it
-const int alarmMinute= 50; // ^^^^^ (sets minute for alarm)
+const char* ssid = "hanime.com"; //SSID of wifi network
+const char* password = "boku no pico";// Password for wifi network
+const int alarmHour= 10; // just while we don't have firebase or app to set it
+const int alarmMinute= 19; // ^^^^^ (sets minute for alarm)
 const int buzzerPin = 14; // pin of buzzer (D5 on NodeMCU)
 const int buttonPin = 12; //D6
 
-//Firebase milky(Project_ID);
 
 void setup() {
   // put your setup code here, to run once:
@@ -125,8 +127,6 @@ Serial.println("connected");
 Serial.println("synced");
   delay(2000);
 
-//  milky.setInt("Hour", 4 ); // just while we get the app to write times into the database
-//  milky.setInt("Minute", 32); //^^^^
 }
 
 void loop() {
@@ -140,11 +140,12 @@ Serial.print(myLocalTime.second());
 Serial.println();
 
 if (currentHour == alarmHour && currentMinute == alarmMinute && myLocalTime.second()==0) {
- bool ring = true;
+  bool ring = true;
  while (ring) {
   play();
   if (digitalRead(buttonPin) == LOW) {
    ring = false;
+// Firebase.pushBool("alarm active", false);
   }
  }
 }
