@@ -81,7 +81,7 @@ int song1_chorus_rhythmn[] =
   3, 3, 3, 1, 2, 2, 2, 4, 8, 4
 };
 
-int val;
+bool ring;
 
 
 
@@ -141,16 +141,16 @@ Serial.print(myLocalTime.second());
 Serial.println();
 
 if (currentHour == alarmHour && currentMinute == alarmMinute && myLocalTime.second()==0) {
+ ring = true;
+}
   if (digitalRead(buttonPin) == LOW) {
-   val = LOW;
+   ring = false;
   }
- if(val != LOW){
+ if (ring) {
   play();
   }
 }
- }
 
-}
 //if (currentHour == milky.getInt("Hour") && currentMinute == milky.getInt("Minute")) {
 //  digitalWrite( buzzerPin, HIGH);
 //  delay(2000);
