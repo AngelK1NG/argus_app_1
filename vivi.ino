@@ -81,7 +81,6 @@ int song1_chorus_rhythmn[] =
   3, 3, 3, 1, 2, 2, 2, 4, 8, 4
 };
 
-bool ring;
 
 
 
@@ -141,6 +140,7 @@ Serial.print(myLocalTime.second());
 Serial.println();
 
 if (currentHour == alarmHour && currentMinute == alarmMinute && myLocalTime.second()==0) {
+ bool ring = true;
  while (ring) {
   play();
   if (digitalRead(buttonPin) == LOW) {
