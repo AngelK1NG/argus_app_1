@@ -11,7 +11,7 @@ const char* password = "pico";// Password for wifi network
 const int alarmHour= 19; // just while we don't have firebase or app to set it
 const int alarmMinute= 7; // ^^^^^ (sets minute for alarm)
 const int buzzerPin = 14; // pin of buzzer (D5 on NodeMCU)
-
+const int buttonPin = 12; //D6
 
 //Firebase milky(Project_ID);
 
@@ -19,6 +19,7 @@ void setup() {
   // put your setup code here, to run once:
  
  pinMode (buzzerPin, OUTPUT);
+ pinMode (buttonPin, INPUT);
  
  Serial.begin(115200);
   // WiFi configuration
@@ -52,9 +53,16 @@ Serial.print(myLocalTime.minute());
 Serial.println();
 
 if (currentHour == alarmHour && currentMinute == alarmMinute) {
+  int val= digitalRead(buttonPin);
+ while(val != LOW){
   digitalWrite(buzzerPin, HIGH);
-  delay(2000);
+  delay(1000);
   digitalWrite(buzzerPin, LOW);
+  val= digitalRead(buttonPin);
+  if(val == LOW){
+    break;
+  }
+ }
 }
 //if (currentHour == milky.getInt("Hour") && currentMinute == milky.getInt("Minute")) {
 //  digitalWrite( buzzerPin, HIGH);
