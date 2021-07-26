@@ -88,8 +88,8 @@ int song1_chorus_rhythmn[] =
 //#define Project_ID "vivi11"
 Timezone myLocalTime; 
 
-const char* ssid = "NETGEAR62"; //SSID of wifi network
-const char* password = "purpleflower145";// Password for wifi network
+const char* ssid = "boku no"; //SSID of wifi network
+const char* password = "pico";// Password for wifi network
 const int alarmHour= 8; // just while we don't have firebase or app to set it
 const int alarmMinute= 28; // ^^^^^ (sets minute for alarm)
 const int buzzerPin = 14; // pin of buzzer (D5 on NodeMCU)
