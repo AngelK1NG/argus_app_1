@@ -50,9 +50,11 @@ void loop() {
 Serial.print(myLocalTime.hour());
 Serial.print(":");
 Serial.print(myLocalTime.minute());
+Serial.print(":");
+Serial.print(myLocalTime.second());
 Serial.println();
 
-if (currentHour == alarmHour && currentMinute == alarmMinute) {
+if (currentHour == alarmHour && currentMinute == alarmMinute && myLocalTime.second()==0) {
   int val= digitalRead(buttonPin);
  while(val != LOW){
   digitalWrite(buzzerPin, HIGH);
