@@ -1,74 +1,43 @@
 {
   "project_info": {
-    "project_number": "644707158790",
-    "firebase_url": "https://focal-technology.firebaseio.com",
-    "project_id": "focal-technology",
-    "storage_bucket": "focal-technology.appspot.com"
+    "project_number": "321822660604",
+    "firebase_url": "https://vivi11-default-rtdb.firebaseio.com",
+    "project_id": "vivi11",
+    "storage_bucket": "vivi11.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:644707158790:android:467de3d46bb48fad98ec87",
+        "mobilesdk_app_id": "1:321822660604:android:43dd5e4dd80fa9eb3b4479",
         "android_client_info": {
-          "package_name": "technology.focal.focal"
+          "package_name": "com.vivialarm.vivi"
         }
       },
       "oauth_client": [
         {
-          "client_id": "644707158790-0coqhhta7020up9m2ipeu1vign8ratff.apps.googleusercontent.com",
+          "client_id": "321822660604-qkk0de1nfhcnmac3udbu7e3e2qesmlpu.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "technology.focal.focal",
-            "certificate_hash": "a13a089f33572812a5ea656b7e73f3092b7d6429"
-          }
-        },
-        {
-          "client_id": "644707158790-0rr7de0s0177b5ji3dm0emh5ntqqka4a.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "technology.focal.focal",
-            "certificate_hash": "b52cfd05e64ca98294523c669935a6f042ea9f35"
-          }
-        },
-        {
-          "client_id": "644707158790-hnqivo4pme2oj87975l5sn0fusl4l1id.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "technology.focal.focal",
-            "certificate_hash": "eaa0afc4f1f6c61857d8f0c05f4e87a5525acf15"
-          }
-        },
-        {
-          "client_id": "644707158790-j9rr98fvp1ucin53vel1vr0b1pnviffa.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "technology.focal.focal",
+            "package_name": "com.vivialarm.vivi",
             "certificate_hash": "f5728a8dec62a7302f23b562a11d3166603bfac1"
           }
         },
         {
-          "client_id": "644707158790-pf9mhpgnvee0qnp4lin8jrop2eeh8jcl.apps.googleusercontent.com",
+          "client_id": "321822660604-aik3rqbmhkesuefougbc38ppe6oaa5a1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBzml2gbzqqndEkkWRiRxPrDHF4vsc8Q6k"
+          "current_key": "AIzaSyAGUjYYZWWHRunqOIJTcxxfvE6modweORM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "644707158790-pf9mhpgnvee0qnp4lin8jrop2eeh8jcl.apps.googleusercontent.com",
+              "client_id": "321822660604-aik3rqbmhkesuefougbc38ppe6oaa5a1.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "644707158790-426nqtrd54ahhnptdesgv4qhpcmkg5gh.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "technology.focal.focal"
-              }
             }
           ]
         }

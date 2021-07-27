@@ -1,39 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vivi/utils/size.dart';
 import 'package:vivi/constants.dart';
 import 'package:vivi/components/alarm_detail.dart';
 
 class Alarm extends StatefulWidget {
-  final String name;
-  final DateTime time;
-  final bool enabled;
   final String id;
+  final String name;
+  final TimeOfDay time;
+  final bool enabled;
+  final int place;
+  final int total;
   final Function onTap;
 
   const Alarm({
+    @required this.id,
     @required this.name,
     @required this.time,
     @required this.enabled,
-    @required this.id,
+    this.place,
+    this.total,
     @required this.onTap,
     Key key,
   }) : super(key: key);
-
-  factory Alarm.fromFirestore(DocumentSnapshot doc, bool completed) {
-    Map data = doc.data();
-    // return Alarm(
-    //   id: doc.id,
-    //   index: data['index'] ?? 0,
-    //   name: data['name'] ?? '',
-    //   date: data['date'] != null ? data['date'].toDate() : null,
-    //   completed: completed,
-    //   paused: data['paused'] ?? false,
-    //   seconds: data['seconds'] ?? 0,
-    // );
-  }
 
   @override
   _AlarmState createState() => _AlarmState();
@@ -98,14 +88,19 @@ class _AlarmState extends State<Alarm> {
                 children: [
                   RichText(
                     text: TextSpan(
-                      text: '7:00',
+                      text: widget.time.hour == 0 || widget.time.hour == 12
+                          ? '12:' +
+                              widget.time.minute.toString().padLeft(2, '0')
+                          : widget.time.hour.remainder(12).toString() +
+                              ':' +
+                              widget.time.minute.toString().padLeft(2, '0'),
                       style: Theme.of(context).textTheme.bodyText1.copyWith(
                             fontSize: 30,
                             fontWeight: FontWeight.w600,
                           ),
                       children: [
                         TextSpan(
-                          text: ' AM',
+                          text: widget.time.hour < 12 ? ' AM' : 'PM',
                           style: TextStyle(fontSize: 18),
                         ),
                       ],
@@ -116,34 +111,34 @@ class _AlarmState extends State<Alarm> {
                     child: Row(
                       children: [
                         Text(
-                          'Friends',
+                          widget.name,
                           style: TextStyle(fontSize: 16),
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10),
-                          child: RichText(
-                            text: TextSpan(
-                              text: '2',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText1
-                                  .copyWith(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(context).accentColor,
-                                  ),
-                              children: [
-                                TextSpan(
-                                  text: '/6',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Theme.of(context).hintColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        // Padding(
+                        //   padding: EdgeInsets.only(left: 10),
+                        //   child: RichText(
+                        //     text: TextSpan(
+                        //       text: '2',
+                        //       style: Theme.of(context)
+                        //           .textTheme
+                        //           .bodyText1
+                        //           .copyWith(
+                        //             fontSize: 16,
+                        //             fontWeight: FontWeight.w600,
+                        //             color: Theme.of(context).accentColor,
+                        //           ),
+                        //       children: [
+                        //         TextSpan(
+                        //           text: '/6',
+                        //           style: TextStyle(
+                        //             fontSize: 12,
+                        //             color: Theme.of(context).hintColor,
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),

@@ -1,58 +1,42 @@
 {
   "project_info": {
-    "project_number": "185754393263",
-    "firebase_url": "https://focal-technology-dev.firebaseio.com",
-    "project_id": "focal-technology-dev",
-    "storage_bucket": "focal-technology-dev.appspot.com"
+    "project_number": "253608416740",
+    "project_id": "vivi11-dev",
+    "storage_bucket": "vivi11-dev.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:185754393263:android:6175db456ca6e8bab3525a",
+        "mobilesdk_app_id": "1:253608416740:android:1855fb442d12ad591323f1",
         "android_client_info": {
-          "package_name": "technology.focal.focal.dev"
+          "package_name": "com.vivialarm.vivi.dev"
         }
       },
       "oauth_client": [
         {
-          "client_id": "185754393263-fqh6cac2e2mcba4mah0e64qq5grcsvmf.apps.googleusercontent.com",
+          "client_id": "253608416740-g3pv27puce043bh325mt8l9kchcnbkhs.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "technology.focal.focal.dev",
-            "certificate_hash": "b52cfd05e64ca98294523c669935a6f042ea9f35"
-          }
-        },
-        {
-          "client_id": "185754393263-j20skj9r86762ruae4hen4a1t62vaom6.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "technology.focal.focal.dev",
+            "package_name": "com.vivialarm.vivi.dev",
             "certificate_hash": "f5728a8dec62a7302f23b562a11d3166603bfac1"
           }
         },
         {
-          "client_id": "185754393263-t5tluf0m4a6qss0f9qt4hna80fook03u.apps.googleusercontent.com",
+          "client_id": "253608416740-ssl59dr1r19acsvt9rk4dau9ed69dvuu.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAERKY_JQBQ46vSe6oJ4woWzGI6j0CYmBY"
+          "current_key": "AIzaSyAlii_5PEWRf0yB32PllbvCS8WZbU95nkk"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "185754393263-6uuv8kjmt42bh3hi9on0jai8097ffkrm.apps.googleusercontent.com",
+              "client_id": "253608416740-ssl59dr1r19acsvt9rk4dau9ed69dvuu.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "185754393263-rb69c2um48d164u77ts4npuql1kci6n2.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "asdasd"
-              }
             }
           ]
         }

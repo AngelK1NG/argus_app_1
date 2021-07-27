@@ -163,7 +163,7 @@ class _AlarmDetailState extends State<AlarmDetail> {
                           children: [
                             LeaderboardItem(
                               place: 1,
-                              score: 69,
+                              score: 727,
                               name: 'Justin',
                               self: true,
                               photoURL:
@@ -171,11 +171,17 @@ class _AlarmDetailState extends State<AlarmDetail> {
                             ),
                             LeaderboardItem(
                               place: 2,
-                              score: 10,
-                              name: 'Fucker',
+                              score: 420,
+                              name: 'Stella',
                               self: false,
-                              photoURL:
-                                  'https://play-lh.googleusercontent.com/T_vA5l9W1-XYTmgr3gCB2MBd7QmA-iG0wcm09_IFWNB-4gOpnS-tYNEmcalwdixSyw',
+                              photoURL: 'https://imgur.com/jZAuzkJ.jpg',
+                            ),
+                            LeaderboardItem(
+                              place: 3,
+                              score: 69,
+                              name: 'Angel',
+                              self: false,
+                              photoURL: 'https://i.imgur.com/eeB1kK0.jpg',
                             ),
                           ],
                         ),

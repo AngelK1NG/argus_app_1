@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_analytics/observer.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:facebook_app_events/facebook_app_events.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:provider/provider.dart';
 import 'package:vivi/screens/home.dart';
 import 'package:vivi/constants.dart';
 import 'package:vivi/utils/auth.dart';
-import 'package:vivi/utils/database.dart';
 
 void main() async {
   await WidgetsFlutterBinding.ensureInitialized();
@@ -27,39 +22,24 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final navigatorKey = GlobalKey<NavigatorState>();
-  final facebookAppEvents = FacebookAppEvents();
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        StreamProvider<CompletedTasks>.value(
-          value: DatabaseProvider()
-              .streamCompleted(Provider.of<UserStatus>(context)),
-          initialData: CompletedTasks(null),
+    return NotificationListener<OverscrollIndicatorNotification>(
+      onNotification: (OverscrollIndicatorNotification overscroll) {
+        overscroll.disallowGlow();
+        return null;
+      },
+      child: MaterialApp(
+        navigatorKey: navigatorKey,
+        theme: lightTheme.copyWith(
+          textTheme: Theme.of(context).textTheme.apply(
+                bodyColor: black,
+                displayColor: black,
+                fontFamily: 'Cabin',
+              ),
         ),
-      ],
-      child: KeyboardVisibilityProvider(
-        child: NotificationListener<OverscrollIndicatorNotification>(
-          onNotification: (OverscrollIndicatorNotification overscroll) {
-            overscroll.disallowGlow();
-            return null;
-          },
-          child: MaterialApp(
-            navigatorKey: navigatorKey,
-            theme: lightTheme.copyWith(
-              textTheme: Theme.of(context).textTheme.apply(
-                    bodyColor: black,
-                    displayColor: black,
-                    fontFamily: 'Cabin',
-                  ),
-            ),
-            navigatorObservers: [
-              FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
-            ],
-            home: Home(),
-          ),
-        ),
+        home: Home(),
       ),
     );
   }

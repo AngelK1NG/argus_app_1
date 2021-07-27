@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vivi/utils/size.dart';
 import 'package:vivi/utils/auth.dart';
-import 'package:vivi/utils/database.dart';
 import 'package:vivi/screens/alarms.dart';
 import 'package:vivi/screens/settings.dart';
 import 'package:vivi/screens/create_alarm.dart';
@@ -20,7 +19,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Widget _child;
+  Widget _child = AlarmsPage(goToPage: null);
   bool _loginLoading = false;
   bool _init = false;
 
@@ -63,11 +62,6 @@ class _HomeState extends State<Home> {
     }
   }
 
-  bool _loading(UserStatus user, List completed) {
-    return user == null ||
-        ((user != null && user.signedIn) && completed == null);
-  }
-
   bool _signedIn(UserStatus user) {
     return user != null && user.signedIn;
   }
@@ -87,7 +81,6 @@ class _HomeState extends State<Home> {
       _init = true;
     }
     var user = Provider.of<UserStatus>(context);
-    var completedTasks = Provider.of<CompletedTasks>(context).tasks;
     return AnnotatedRegion(
       value: SystemUiOverlayStyle.dark.copyWith(
         statusBarColor: Colors.transparent,
@@ -111,11 +104,11 @@ class _HomeState extends State<Home> {
           body: Stack(
             children: [
               AnimatedOpacity(
-                opacity: _loading(user, completedTasks) ? 0 : 1,
+                opacity: _signedIn(user) ? 1 : 0,
                 duration: fadeDuration,
                 curve: fadeCurve,
                 child: SafeArea(
-                  child: _signedIn(user) && !_loading(user, completedTasks)
+                  child: _signedIn(user)
                       ? _child
                       : LoginPage(
                           goToPage: goToPage,
@@ -124,8 +117,7 @@ class _HomeState extends State<Home> {
                 ),
               ),
               AnimatedOpacity(
-                opacity:
-                    _loading(user, completedTasks) || _loginLoading ? 1 : 0,
+                opacity: !_signedIn(user) || _loginLoading ? 1 : 0,
                 duration: fadeDuration,
                 curve: fadeCurve,
                 child: Center(

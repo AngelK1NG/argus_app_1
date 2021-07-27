@@ -1,4 +1,4 @@
-package technology.focal.focal
+package com.vivialarm.vivi
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity

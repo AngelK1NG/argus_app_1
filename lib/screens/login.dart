@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:vivi/constants.dart';
 import 'package:vivi/components/button.dart';
 import 'package:vivi/components/header.dart';
@@ -22,19 +21,13 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _visible = false;
 
-  void openUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      print('Couldn\'t find url');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      setState(() => _visible = true);
+      if (mounted) {
+        setState(() => _visible = true);
+      }
     });
   }
 

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:provider/provider.dart';
 import 'package:vivi/components/header.dart';
 import 'package:vivi/components/footer.dart';
+import 'package:vivi/utils/auth.dart';
 import 'package:vivi/utils/size.dart';
 import 'package:vivi/constants.dart';
 
-class CreateAlarmPage extends StatelessWidget {
+class CreateAlarmPage extends StatefulWidget {
   final Function goToPage;
 
   CreateAlarmPage({
@@ -13,9 +16,19 @@ class CreateAlarmPage extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _CreateAlarmPageState createState() => _CreateAlarmPageState();
+}
+
+class _CreateAlarmPageState extends State<CreateAlarmPage> {
+  DatabaseReference _db = FirebaseDatabase.instance.reference();
+  TimeOfDay _time = TimeOfDay(hour: TimeOfDay.now().hour + 1, minute: 0);
+  String _name = 'Alarm';
+
+  @override
   Widget build(BuildContext context) {
+    var user = Provider.of<UserStatus>(context);
     return WillPopScope(
-      onWillPop: () => this.goToPage(0),
+      onWillPop: () => this.widget.goToPage(0),
       child: Center(
         child: Container(
           height: SizeProvider.safeHeight - 30,
@@ -42,11 +55,22 @@ class CreateAlarmPage extends StatelessWidget {
                   Footer(
                     redString: 'Cancel',
                     redOnTap: () {
-                      this.goToPage(0);
+                      this.widget.goToPage(0);
                     },
                     blackString: 'Create',
                     blackOnTap: () {
-                      this.goToPage(0);
+                      _db.child('alarms').push().set({
+                        'name': _name,
+                        'hour': _time.hour,
+                        'minute': _time.minute,
+                        'members': {
+                          user.uid: {
+                            'enabled': true,
+                            'name': user.displayName,
+                            'score': 0,
+                          }
+                        }
+                      }).then((_) => this.widget.goToPage(0));
                     },
                   ),
                 ],
@@ -69,6 +93,17 @@ class CreateAlarmPage extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
+                      onTap: () async {
+                        TimeOfDay newTime = await showTimePicker(
+                          context: context,
+                          initialTime: _time,
+                        );
+                        if (newTime != null) {
+                          setState(() {
+                            _time = newTime;
+                          });
+                        }
+                      },
                       child: Container(
                         width: 300,
                         height: 100,
@@ -76,7 +111,12 @@ class CreateAlarmPage extends StatelessWidget {
                         alignment: Alignment.center,
                         child: RichText(
                           text: TextSpan(
-                            text: '7:00',
+                            text: _time.hour == 0 || _time.hour == 12
+                                ? '12:' +
+                                    _time.minute.toString().padLeft(2, '0')
+                                : _time.hour.remainder(12).toString() +
+                                    ':' +
+                                    _time.minute.toString().padLeft(2, '0'),
                             style:
                                 Theme.of(context).textTheme.bodyText1.copyWith(
                                       fontSize: 64,
@@ -84,7 +124,7 @@ class CreateAlarmPage extends StatelessWidget {
                                     ),
                             children: [
                               TextSpan(
-                                text: ' AM',
+                                text: _time.hour < 12 ? ' AM' : 'PM',
                                 style: TextStyle(fontSize: 36),
                               ),
                             ],
@@ -99,7 +139,7 @@ class CreateAlarmPage extends StatelessWidget {
                         color: Colors.transparent,
                         alignment: Alignment.center,
                         child: Text(
-                          'Friends',
+                          _name,
                           style: TextStyle(
                             fontSize: 16,
                             color: Theme.of(context).primaryColor,

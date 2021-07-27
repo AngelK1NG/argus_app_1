@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:vivi/utils/database.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:vivi/utils/auth.dart';
 import 'package:vivi/utils/date.dart';
 import 'package:vivi/constants.dart';
@@ -25,7 +25,29 @@ class AlarmsPage extends StatefulWidget {
 }
 
 class _AlarmsPageState extends State<AlarmsPage> {
-  void getAlarms() {}
+  DatabaseReference _db = FirebaseDatabase.instance.reference();
+  List<Alarm> _alarms = [];
+
+  void getAlarms() {
+    List<Alarm> alarms = [];
+    var user = context.read<UserStatus>();
+    _db.child('alarms').once().then((DataSnapshot snapshot) {
+      Map<dynamic, dynamic> values = snapshot.value;
+      values.forEach((key, values) {
+        alarms.add(
+          Alarm(
+            id: key,
+            name: values['name'],
+            time: TimeOfDay(hour: values['hour'], minute: values['minute']),
+            enabled: values['members'][user.uid]['enabled'],
+          ),
+        );
+      });
+      setState(() {
+        _alarms = alarms;
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -35,7 +57,6 @@ class _AlarmsPageState extends State<AlarmsPage> {
 
   @override
   Widget build(BuildContext context) {
-    var user = Provider.of<UserStatus>(context);
     return Stack(
       children: [
         CustomScrollView(
@@ -64,9 +85,7 @@ class _AlarmsPageState extends State<AlarmsPage> {
                 right: 15,
               ),
               sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  Alarm(enabled: true),
-                ]),
+                delegate: SliverChildListDelegate(_alarms),
               ),
             ),
           ],

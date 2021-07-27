@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:vivi/components/header.dart';
 import 'package:vivi/components/footer.dart';
+import 'package:vivi/utils/auth.dart';
 import 'package:vivi/utils/size.dart';
 import 'package:vivi/constants.dart';
 
-class JoinAlarmPage extends StatelessWidget {
+class JoinAlarmPage extends StatefulWidget {
   final Function goToPage;
 
   JoinAlarmPage({
@@ -13,9 +16,31 @@ class JoinAlarmPage extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _JoinAlarmPageState createState() => _JoinAlarmPageState();
+}
+
+class _JoinAlarmPageState extends State<JoinAlarmPage> {
+  DatabaseReference _db = FirebaseDatabase.instance.reference();
+  String _id = '';
+
+  void submit() async {
+    var user = context.read<UserStatus>();
+    DataSnapshot snapshot = await _db.child('alarms').child(_id).once();
+    if (snapshot != null) {
+      await _db.child('alarms').child(_id).child('members').set({
+        user.uid: {
+          'enabled': true,
+          'name': user.displayName,
+          'score': 0,
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () => this.goToPage(0),
+      onWillPop: () => this.widget.goToPage(0),
       child: Center(
         child: Container(
           height: SizeProvider.safeHeight - 30,
@@ -42,56 +67,37 @@ class JoinAlarmPage extends StatelessWidget {
                   Footer(
                     redString: 'Cancel',
                     redOnTap: () {
-                      this.goToPage(0);
+                      this.widget.goToPage(0);
                     },
                     blackString: 'Join',
-                    blackOnTap: () {
-                      this.goToPage(0);
+                    blackOnTap: () async {
+                      await submit();
+                      this.widget.goToPage(0);
                     },
                   ),
                 ],
               ),
               Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 300,
-                      height: 50,
-                      color: Colors.transparent,
-                      alignment: Alignment.center,
-                      child: Text(
-                        'Alarm ID',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).hintColor,
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      child: Container(
-                        width: 300,
-                        height: 100,
-                        color: Colors.transparent,
-                        alignment: Alignment.center,
-                        child: Text(
-                          'a84930',
-                          style: TextStyle(
-                            fontSize: 64,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      child: Container(
-                        width: 100,
-                        height: 50,
-                        color: Colors.transparent,
-                        alignment: Alignment.center,
-                      ),
-                    ),
-                  ],
+                child: TextFormField(
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "Alarm ID",
+                  ),
+                  autofocus: true,
+                  textInputAction: TextInputAction.next,
+                  keyboardAppearance: MediaQuery.of(context).platformBrightness,
+                  onChanged: (value) {
+                    _id = value;
+                  },
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  onFieldSubmitted: (_) async {
+                    await submit();
+                    this.widget.goToPage(0);
+                  },
                 ),
               ),
             ],

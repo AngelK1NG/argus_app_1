@@ -58,6 +58,7 @@ class LeaderboardItem extends StatelessWidget {
                             photoURL,
                             width: 40,
                             height: 40,
+                            fit: BoxFit.cover,
                           ),
                         ),
                 ),
