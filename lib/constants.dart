@@ -49,8 +49,8 @@ final TextStyle buttonTextStyle = TextStyle(
 final Duration fadeDuration = Duration(milliseconds: 200);
 final Curve fadeCurve = Curves.ease;
 
-final Duration overlayDuration = Duration(milliseconds: 500);
-final Curve overlayCurve = Curves.easeOutQuint;
+final Duration overlayDuration = Duration(milliseconds: 200);
+final Curve overlayCurve = Curves.ease;
 
 final Duration buttonDuration = Duration(milliseconds: 200);
 final Curve buttonCurve = Curves.ease;

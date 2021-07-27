@@ -9,6 +9,7 @@ import 'package:vivi/utils/date.dart';
 import 'package:vivi/constants.dart';
 import 'package:vivi/components/button.dart';
 import 'package:vivi/components/alarm.dart';
+import 'package:vivi/components/add_overlay.dart';
 import 'package:feather_icons_flutter/feather_icons_flutter.dart';
 
 class AlarmsPage extends StatefulWidget {
@@ -24,9 +25,6 @@ class AlarmsPage extends StatefulWidget {
 }
 
 class _AlarmsPageState extends State<AlarmsPage> {
-  DateTime _date = DateProvider().today;
-  ScrollController _scrollController = ScrollController();
-
   void getAlarms() {}
 
   @override
@@ -78,21 +76,17 @@ class _AlarmsPageState extends State<AlarmsPage> {
           bottom: 15,
           child: Button(
             onTap: () {
-              // Navigator.of(context).push(
-              //   PageRouteBuilder(
-              //     opaque: false,
-              //     transitionDuration: Duration(seconds: 5),
-              //     pageBuilder: (_, __, ___) {
-              //       return AddOverlay(
-              //         text: _text,
-              //         setText: (text) => _text = text,
-              //         date: _date,
-              //         setDate: (date) => _date = date,
-              //         submit: addTask,
-              //       );
-              //     },
-              //   ),
-              // );
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  opaque: false,
+                  transitionDuration: Duration(seconds: 5),
+                  pageBuilder: (_, __, ___) {
+                    return AddOverlay(
+                      goToPage: widget.goToPage,
+                    );
+                  },
+                ),
+              );
             },
             width: 50,
             row: Row(
@@ -202,6 +196,7 @@ class TasksSliverAppBar extends SliverPersistentHeaderDelegate {
                 child: Container(
                   width: 50,
                   height: 50,
+                  alignment: Alignment.center,
                   color: Colors.transparent,
                   child: user.photoURL == null
                       ? Icon(
@@ -209,7 +204,14 @@ class TasksSliverAppBar extends SliverPersistentHeaderDelegate {
                           size: 20,
                           color: Theme.of(context).primaryColor,
                         )
-                      : Image.network(user.photoURL),
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(
+                            user.photoURL,
+                            width: 20,
+                            height: 20,
+                          ),
+                        ),
                 ),
               ),
             ),

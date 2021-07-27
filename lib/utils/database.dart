@@ -37,11 +37,6 @@ class DatabaseProvider {
   }
 }
 
-class UncompletedTasks {
-  final List tasks;
-  UncompletedTasks(this.tasks);
-}
-
 class CompletedTasks {
   final List tasks;
   CompletedTasks(this.tasks);

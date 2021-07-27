@@ -5,6 +5,8 @@ import 'package:vivi/utils/auth.dart';
 import 'package:vivi/utils/database.dart';
 import 'package:vivi/screens/alarms.dart';
 import 'package:vivi/screens/settings.dart';
+import 'package:vivi/screens/create_alarm.dart';
+import 'package:vivi/screens/join_alarm.dart';
 import 'package:vivi/screens/login.dart';
 import 'package:vivi/constants.dart';
 
@@ -33,6 +35,16 @@ class _HomeState extends State<Home> {
         case 1:
           {
             _child = SettingsPage(goToPage: goToPage);
+            break;
+          }
+        case 2:
+          {
+            _child = CreateAlarmPage(goToPage: goToPage);
+            break;
+          }
+        case 3:
+          {
+            _child = JoinAlarmPage(goToPage: goToPage);
             break;
           }
       }
@@ -103,14 +115,12 @@ class _HomeState extends State<Home> {
                 duration: fadeDuration,
                 curve: fadeCurve,
                 child: SafeArea(
-                  child: SizedBox.expand(
-                    child: _signedIn(user) && !_loading(user, completedTasks)
-                        ? _child
-                        : LoginPage(
-                            goToPage: goToPage,
-                            setLoading: setLoginLoading,
-                          ),
-                  ),
+                  child: _signedIn(user) && !_loading(user, completedTasks)
+                      ? _child
+                      : LoginPage(
+                          goToPage: goToPage,
+                          setLoading: setLoginLoading,
+                        ),
                 ),
               ),
               AnimatedOpacity(

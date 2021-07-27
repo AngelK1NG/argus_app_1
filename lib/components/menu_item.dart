@@ -23,67 +23,63 @@ class MenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            height: 50,
-            padding: EdgeInsets.only(left: 15, right: 15),
-            color: Colors.transparent,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Container(
+        height: 50,
+        padding: EdgeInsets.only(left: 15, right: 15),
+        color: Colors.transparent,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    iconData != null
-                        ? Padding(
-                            padding: EdgeInsets.only(right: 15),
-                            child: Icon(
-                              iconData,
-                              size: 20,
-                              color: Theme.of(context).accentColor,
-                            ),
-                          )
-                        : Container(),
-                    SizedBox(
-                      width: 200,
-                      child: Text(
-                        text,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ],
+                iconData != null
+                    ? Padding(
+                        padding: EdgeInsets.only(right: 15),
+                        child: Icon(
+                          iconData,
+                          size: 20,
+                          color: Theme.of(context).accentColor,
+                        ),
+                      )
+                    : Container(),
+                SizedBox(
+                  width: 200,
+                  child: Text(
+                    text,
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
-                Row(
-                  children: [
-                    secondaryText != null
-                        ? Padding(
-                            padding: EdgeInsets.only(right: 5),
-                            child: Text(
-                              secondaryText,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Theme.of(context).hintColor,
-                              ),
-                            ),
-                          )
-                        : Container(),
-                    check
-                        ? Icon(
-                            FeatherIcons.check,
-                            size: 20,
-                            color: Theme.of(context).accentColor,
-                          )
-                        : Icon(
-                            FeatherIcons.chevronRight,
-                            size: 20,
-                            color: Theme.of(context).hintColor,
-                          ),
-                  ],
-                )
               ],
             ),
-          ),
-        ],
+            Row(
+              children: [
+                secondaryText != null
+                    ? Padding(
+                        padding: EdgeInsets.only(right: 5),
+                        child: Text(
+                          secondaryText,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Theme.of(context).hintColor,
+                          ),
+                        ),
+                      )
+                    : Container(),
+                check
+                    ? Icon(
+                        FeatherIcons.check,
+                        size: 20,
+                        color: Theme.of(context).accentColor,
+                      )
+                    : Icon(
+                        FeatherIcons.chevronRight,
+                        size: 20,
+                        color: Theme.of(context).hintColor,
+                      ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
