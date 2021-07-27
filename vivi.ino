@@ -1,9 +1,8 @@
 
 #include <ESP8266WiFi.h>
-#include <FirebaseArduino.h>
 #include <ESP8266WebServer.h>
+#include <FirebaseArduino.h>
 #include <ezTime.h>
-
 
 #define FIREBASE_HOST "vivi11-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "4abb4Th3MwHrAjbjK2EXAPYLQIctxMF0YKhbencd"
@@ -26,10 +25,10 @@
 #define  a5f    831     // 831 Hz 
 #define rest    -1
 
-const char* ssid = "NETGEAR62"; //SSID of wifi network
-const char* password = "purpleflower145";// Password for wifi network
-const int alarmHour= 6; // just while we don't have firebase or app to set it
-const int alarmMinute= 40; // ^^^^^ (sets minute for alarm)
+const char* ssid = "sunWiFiG"; //SSID of wifi network
+const char* password = "wifiMima99!";// Password for wifi network
+const int alarmHour= 16; // just while we don't have firebase or app to set it
+const int alarmMinute= 14; // ^^^^^ (sets minute for alarm)
 const int buzzerPin = 14; // pin of buzzer (D5 on NodeMCU)
 const int buttonPin = 12; //D6
 const int hapticPin = 15; //D8
@@ -41,8 +40,6 @@ int threshold;
 int a; // part index
 int b; // song index
 int c; // lyric index
-
-
 
 int song1_intro_melody[] =
 {c5s, e5f, e5f, f5, a5f, f5s, f5, e5f, c5s, e5f, rest, a4f, a4f};
@@ -92,75 +89,75 @@ int song1_chorus_rhythmn[] =
   3, 3, 3, 1, 2, 2, 2, 4, 8, 4
 };
 
-Timezone myLocalTime; 
+Timezone myLocalTime;
 
+int counter;
 
 void setup() {
-  // put your setup code here, to run once:
+  pinMode (buzzerPin, OUTPUT);
+  pinMode (buttonPin, INPUT);
  
- pinMode (buzzerPin, OUTPUT);
- pinMode (buttonPin, INPUT);
- 
- Serial.begin(115200);
-  // WiFi configuration
+  Serial.begin(115200);
 
   a = 4;
   b = 0;
   c = 0;
  
   WiFi.begin(ssid, password);
-
-  // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
   }
-Serial.println("connected");
-  // Set desired time zone for Timezone object declared in the beginning
-  myLocalTime.setLocation(F("America/Los_Angeles")); // set your time zone
-
-  // Sync NTP time for ezTime library
+  Serial.println("connected");
+  myLocalTime.setLocation(F("America/Los_Angeles"));
   waitForSync(); 
-Serial.println("synced");
+  Serial.println("synced");
   delay(2000);
-Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+
+  counter = 0;
 }
 
 void loop() {
   int currentHour = myLocalTime.hour();
   int currentMinute = myLocalTime.minute();
-Serial.print(myLocalTime.hour());
-Serial.print(":");
-Serial.print(myLocalTime.minute());
-Serial.print(":");
-Serial.print(myLocalTime.second());
-Serial.println();
-
-if (Firebase.failed()) { 
-     Serial.print("pushing /logs failed:"); 
-     Serial.println(Firebase.error());   
-     return; 
- }
-Firebase.setBool("alarm active",false);
-if (currentHour == alarmHour && currentMinute == alarmMinute && myLocalTime.second()==0) {
-  bool ring = true;
-  Firebase.setBool("alarm active",true);
- while (ring) {
-  digitalWrite(hapticPin, HIGH);
-  play();
-  if (digitalRead(buttonPin) == LOW) {
-   ring = false;
-Firebase.setBool("alarm active",false);
+  int currentSecond = myLocalTime.second();
+  
+  Serial.print(currentHour);
+  Serial.print(":");
+  Serial.print(currentMinute);
+  Serial.print(":");
+  Serial.print(currentSecond);
+  Serial.println();
+  Serial.println(counter);
+  
+  if (Firebase.failed()) {
+    Serial.print("pushing /logs failed:");
+    Serial.println(Firebase.error());
+    return; 
   }
- }
+  Firebase.setBool("alarm active",false);
+  
+  if (currentHour == alarmHour && currentMinute == alarmMinute && currentSecond == 0) {
+    if (counter == 0) {
+      counter++;
+      bool ring = true;
+      Firebase.setBool("alarm active",true);
+      digitalWrite(hapticPin, HIGH);
+      while (ring) {
+        play();
+        if (digitalRead(buttonPin) == LOW) {
+          ring = false;
+          Firebase.setBool("alarm active",false);
+        }
+      }
+    }
+  } else {
+    counter = 0;
+  }
+  
+  delay(250);
 }
 
-//if (currentHour == milky.getInt("Hour") && currentMinute == milky.getInt("Minute")) {
-//  digitalWrite( buzzerPin, HIGH);
-//  delay(2000);
-//  digitalWrite(buzzerPin, LOW);
-//}
-delay(1000);
-}
 void play() {
   int notelength;
   if (a == 1 || a == 2) {
@@ -181,8 +178,6 @@ void play() {
     // verse
     notelength = beatlength * 2 * song1_verse1_rhythmn[b];
     if (song1_verse1_melody[b] > 0) {
-     
-      
       tone(buzzerPin, song1_verse1_melody[b], notelength);
       c++;
     }
@@ -197,14 +192,11 @@ void play() {
     // chorus
     notelength = beatlength * song1_chorus_rhythmn[b];
     if (song1_chorus_melody[b] > 0) {
-     
-      
       tone(buzzerPin, song1_chorus_melody[b], notelength);
       c++;
     }
     b++;
     if (b >= sizeof(song1_chorus_melody) / sizeof(int)) {
-     
       a++;
       b = 0;
       c = 0;
