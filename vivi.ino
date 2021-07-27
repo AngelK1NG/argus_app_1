@@ -28,10 +28,10 @@
 const char* ssid = "sunWiFiG"; //SSID of wifi network
 const char* password = "wifiMima99!";// Password for wifi network
 const int alarmHour= 16; // just while we don't have firebase or app to set it
-const int alarmMinute= 14; // ^^^^^ (sets minute for alarm)
+const int alarmMinute= 45; // ^^^^^ (sets minute for alarm)
 const int buzzerPin = 14; // pin of buzzer (D5 on NodeMCU)
 const int buttonPin = 12; //D6
-const int hapticPin = 15; //D8
+const int hapticPin = 4; //D2
 volatile int beatlength = 100; // determines tempo
 float beatseparationconstant = 0.3;
 
@@ -94,8 +94,9 @@ Timezone myLocalTime;
 int counter;
 
 void setup() {
-  pinMode (buzzerPin, OUTPUT);
-  pinMode (buttonPin, INPUT);
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(buttonPin, INPUT);
+  pinMode(hapticPin, OUTPUT);
  
   Serial.begin(115200);
 
@@ -140,12 +141,13 @@ void loop() {
   if (currentHour == alarmHour && currentMinute == alarmMinute && currentSecond == 0) {
     if (counter == 0) {
       counter++;
+      digitalWrite(hapticPin, HIGH);
       bool ring = true;
       Firebase.setBool("alarm active",true);
-      digitalWrite(hapticPin, HIGH);
       while (ring) {
         play();
         if (digitalRead(buttonPin) == LOW) {
+          digitalWrite(hapticPin, LOW);
           ring = false;
           Firebase.setBool("alarm active",false);
         }
