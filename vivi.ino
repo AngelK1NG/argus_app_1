@@ -1,5 +1,6 @@
-#include "FirebaseESP8266.h"
+
 #include <ESP8266WiFi.h>
+#include <FirebaseArduino.h>
 #include <ESP8266WebServer.h>
 #include <ezTime.h>
 
@@ -25,6 +26,12 @@
 #define  a5f    831     // 831 Hz 
 #define rest    -1
 
+const char* ssid = "NETGEAR62"; //SSID of wifi network
+const char* password = "purpleflower145";// Password for wifi network
+const int alarmHour= 17; // just while we don't have firebase or app to set it
+const int alarmMinute= 7; // ^^^^^ (sets minute for alarm)
+const int buzzerPin = 14; // pin of buzzer (D5 on NodeMCU)
+const int buttonPin = 12; //D6
 
 volatile int beatlength = 100; // determines tempo
 float beatseparationconstant = 0.3;
@@ -85,18 +92,7 @@ int song1_chorus_rhythmn[] =
   3, 3, 3, 1, 2, 2, 2, 4, 8, 4
 };
 
-
-
-
-
 Timezone myLocalTime; 
-
-const char* ssid = "hanime.com"; //SSID of wifi network
-const char* password = "boku no pico";// Password for wifi network
-const int alarmHour= 10; // just while we don't have firebase or app to set it
-const int alarmMinute= 19; // ^^^^^ (sets minute for alarm)
-const int buzzerPin = 14; // pin of buzzer (D5 on NodeMCU)
-const int buttonPin = 12; //D6
 
 
 void setup() {
@@ -126,7 +122,7 @@ Serial.println("connected");
   waitForSync(); 
 Serial.println("synced");
   delay(2000);
-
+Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
 }
 
 void loop() {
@@ -139,13 +135,20 @@ Serial.print(":");
 Serial.print(myLocalTime.second());
 Serial.println();
 
+if (Firebase.failed()) { 
+     Serial.print("pushing /logs failed:"); 
+     Serial.println(Firebase.error());   
+     return; 
+ }
+Firebase.setBool("alarm active",false);
 if (currentHour == alarmHour && currentMinute == alarmMinute && myLocalTime.second()==0) {
   bool ring = true;
+  Firebase.setBool("alarm active",true);
  while (ring) {
   play();
   if (digitalRead(buttonPin) == LOW) {
    ring = false;
-// Firebase.pushBool("alarm active", false);
+Firebase.setBool("alarm active",false);
   }
  }
 }
