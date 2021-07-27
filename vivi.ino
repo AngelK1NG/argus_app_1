@@ -28,11 +28,11 @@
 
 const char* ssid = "NETGEAR62"; //SSID of wifi network
 const char* password = "purpleflower145";// Password for wifi network
-const int alarmHour= 17; // just while we don't have firebase or app to set it
-const int alarmMinute= 7; // ^^^^^ (sets minute for alarm)
+const int alarmHour= 6; // just while we don't have firebase or app to set it
+const int alarmMinute= 40; // ^^^^^ (sets minute for alarm)
 const int buzzerPin = 14; // pin of buzzer (D5 on NodeMCU)
 const int buttonPin = 12; //D6
-
+const int hapticPin = 15; //D8
 volatile int beatlength = 100; // determines tempo
 float beatseparationconstant = 0.3;
 
@@ -145,6 +145,7 @@ if (currentHour == alarmHour && currentMinute == alarmMinute && myLocalTime.seco
   bool ring = true;
   Firebase.setBool("alarm active",true);
  while (ring) {
+  digitalWrite(hapticPin, HIGH);
   play();
   if (digitalRead(buttonPin) == LOW) {
    ring = false;
