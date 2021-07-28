@@ -7,32 +7,30 @@
 #define FIREBASE_HOST "vivi11-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "4abb4Th3MwHrAjbjK2EXAPYLQIctxMF0YKhbencd"
 
-#define  a3f    208     // 208 Hz
-#define  b3f    233     // 233 Hz
-#define  b3     247     // 247 Hz
-#define  c4     261     // 261 Hz MIDDLE C
-#define  c4s    277     // 277 Hz
-#define  e4f    311     // 311 Hz    
-#define  f4     349     // 349 Hz 
-#define  a4f    415     // 415 Hz  
-#define  b4f    466     // 466 Hz 
-#define  b4     493     // 493 Hz 
-#define  c5     523     // 523 Hz 
-#define  c5s    554     // 554 Hz
-#define  e5f    622     // 622 Hz  
-#define  f5     698     // 698 Hz 
-#define  f5s    740     // 740 Hz
-#define  a5f    831     // 831 Hz 
-#define rest    -1
+#define a3f 208 // 208 Hz
+#define b3f 233 // 233 Hz
+#define b3 247  // 247 Hz
+#define c4 261  // 261 Hz MIDDLE C
+#define c4s 277 // 277 Hz
+#define e4f 311 // 311 Hz
+#define f4 349  // 349 Hz
+#define a4f 415 // 415 Hz
+#define b4f 466 // 466 Hz
+#define b4 493  // 493 Hz
+#define c5 523  // 523 Hz
+#define c5s 554 // 554 Hz
+#define e5f 622 // 622 Hz
+#define f5 698  // 698 Hz
+#define f5s 740 // 740 Hz
+#define a5f 831 // 831 Hz
+#define rest -1
 
-const char* ssid = "sunWiFiG"; //SSID of wifi network
-const char* password = "wifiMima99!";// Password for wifi network
-const int alarmHour= 16; // just while we don't have firebase or app to set it
-const int alarmMinute= 45; // ^^^^^ (sets minute for alarm)
-const int buzzerPin = 14; // pin of buzzer (D5 on NodeMCU)
-const int buttonPin = 12; //D6
-const int hapticPin = 4; //D2
-volatile int beatlength = 100; // determines tempo
+const char *ssid = "sunWiFiG";        //SSID of wifi network
+const char *password = "wifiMima99!"; // Password for wifi network
+const int buzzerPin = 14;             // pin of buzzer (D5 on NodeMCU)
+const int buttonPin = 12;             //D6
+const int hapticPin = 4;              //D2
+volatile int beatlength = 100;        // determines tempo
 float beatseparationconstant = 0.3;
 
 int threshold;
@@ -91,73 +89,67 @@ int song1_chorus_rhythmn[] =
 
 Timezone myLocalTime;
 
-int counter;
+bool enabled = false;
+bool dismissed = false;
+int alarmHour;
+int alarmMinute;
 
 void setup() {
   pinMode(buzzerPin, OUTPUT);
   pinMode(buttonPin, INPUT);
   pinMode(hapticPin, OUTPUT);
- 
+
   Serial.begin(115200);
 
   a = 4;
   b = 0;
   c = 0;
- 
+
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
   }
   Serial.println("connected");
   myLocalTime.setLocation(F("America/Los_Angeles"));
-  waitForSync(); 
+  waitForSync();
   Serial.println("synced");
   delay(2000);
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
-
-  counter = 0;
+  alarmHour = Firebase.getInt("/alarms/abcdefg/hour");
+  alarmMinute = Firebase.getInt("/alarms/abcdefg/minute");
 }
 
 void loop() {
   int currentHour = myLocalTime.hour();
   int currentMinute = myLocalTime.minute();
   int currentSecond = myLocalTime.second();
-  
+
   Serial.print(currentHour);
   Serial.print(":");
   Serial.print(currentMinute);
   Serial.print(":");
   Serial.print(currentSecond);
   Serial.println();
-  Serial.println(counter);
-  
-  if (Firebase.failed()) {
-    Serial.print("pushing /logs failed:");
-    Serial.println(Firebase.error());
-    return; 
-  }
-  Firebase.setBool("alarm active",false);
-  
+
   if (currentHour == alarmHour && currentMinute == alarmMinute && currentSecond == 0) {
-    if (counter == 0) {
-      counter++;
-      digitalWrite(hapticPin, HIGH);
-      bool ring = true;
-      Firebase.setBool("alarm active",true);
-      while (ring) {
-        play();
-        if (digitalRead(buttonPin) == LOW) {
-          digitalWrite(hapticPin, LOW);
-          ring = false;
-          Firebase.setBool("alarm active",false);
-        }
-      }
-    }
+    digitalWrite(hapticPin, HIGH);
+    enabled = true;
+    dismissed = false;
+    tone(buzzerPin, c5s);
   } else {
-    counter = 0;
+    if (digitalRead(buttonPin) == LOW && enabled && !dismissed) {
+      Firebase.setInt("/alarms/abcdefg/count", Firebase.getInt("/alarms/abcdefg/count") + 1);
+      dismissed = true;
+    }
+    if (Firebase.getInt("/alarms/abcdefg/count") == 5) {
+      noTone(buzzerPin);
+      digitalWrite(hapticPin, LOW);
+      enabled = false;
+    }
   }
   
-  delay(250);
+  delay(500);
 }
 
 void play() {
@@ -166,7 +158,6 @@ void play() {
     // intro
     notelength = beatlength * song1_intro_rhythmn[b];
     if (song1_intro_melody[b] > 0) {
-      
       tone(buzzerPin, song1_intro_melody[b], notelength);
     }
     b++;
@@ -175,8 +166,7 @@ void play() {
       b = 0;
       c = 0;
     }
-  }
-  else if (a == 3 || a == 5) {
+  } else if (a == 3 || a == 5) {
     // verse
     notelength = beatlength * 2 * song1_verse1_rhythmn[b];
     if (song1_verse1_melody[b] > 0) {
@@ -189,8 +179,7 @@ void play() {
       b = 0;
       c = 0;
     }
-  }
-  else if (a == 4 || a == 6) {
+  } else if (a == 4 || a == 6) {
     // chorus
     notelength = beatlength * song1_chorus_rhythmn[b];
     if (song1_chorus_melody[b] > 0) {
@@ -206,7 +195,6 @@ void play() {
   }
   delay(notelength);
   noTone(buzzerPin);
- 
   delay(notelength * beatseparationconstant);
   if (a == 7) { // loop back around to beginning of song
     a = 1;
