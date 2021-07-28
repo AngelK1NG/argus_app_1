@@ -62,10 +62,6 @@ class _HomeState extends State<Home> {
     }
   }
 
-  bool _signedIn(UserStatus user) {
-    return user != null && user.signedIn;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -103,21 +99,16 @@ class _HomeState extends State<Home> {
           resizeToAvoidBottomInset: false,
           body: Stack(
             children: [
-              AnimatedOpacity(
-                opacity: _signedIn(user) ? 1 : 0,
-                duration: fadeDuration,
-                curve: fadeCurve,
-                child: SafeArea(
-                  child: _signedIn(user)
-                      ? _child
-                      : LoginPage(
-                          goToPage: goToPage,
-                          setLoading: setLoginLoading,
-                        ),
-                ),
+              SafeArea(
+                child: user != null && user.signedIn
+                    ? _child
+                    : LoginPage(
+                        goToPage: goToPage,
+                        setLoading: setLoginLoading,
+                      ),
               ),
               AnimatedOpacity(
-                opacity: !_signedIn(user) || _loginLoading ? 1 : 0,
+                opacity: user == null || _loginLoading ? 1 : 0,
                 duration: fadeDuration,
                 curve: fadeCurve,
                 child: Center(

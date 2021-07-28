@@ -34,14 +34,16 @@ class _AlarmsPageState extends State<AlarmsPage> {
     _db.child('alarms').once().then((DataSnapshot snapshot) {
       Map<dynamic, dynamic> values = snapshot.value;
       values.forEach((key, values) {
-        alarms.add(
-          Alarm(
-            id: key,
-            name: values['name'],
-            time: TimeOfDay(hour: values['hour'], minute: values['minute']),
-            enabled: values['members'][user.uid]['enabled'],
-          ),
-        );
+        if (values['members'][user.uid] != null) {
+          alarms.add(
+            Alarm(
+              id: key,
+              name: values['name'],
+              time: TimeOfDay(hour: values['hour'], minute: values['minute']),
+              enabled: values['members'][user.uid]['enabled'],
+            ),
+          );
+        }
       });
       setState(() {
         _alarms = alarms;

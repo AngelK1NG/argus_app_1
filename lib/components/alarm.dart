@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:provider/provider.dart';
+import 'package:vivi/utils/auth.dart';
 import 'package:vivi/utils/size.dart';
 import 'package:vivi/constants.dart';
 import 'package:vivi/components/alarm_detail.dart';
@@ -12,7 +15,6 @@ class Alarm extends StatefulWidget {
   final bool enabled;
   final int place;
   final int total;
-  final Function onTap;
 
   const Alarm({
     @required this.id,
@@ -21,7 +23,6 @@ class Alarm extends StatefulWidget {
     @required this.enabled,
     this.place,
     this.total,
-    @required this.onTap,
     Key key,
   }) : super(key: key);
 
@@ -30,6 +31,7 @@ class Alarm extends StatefulWidget {
 }
 
 class _AlarmState extends State<Alarm> {
+  DatabaseReference _db = FirebaseDatabase.instance.reference();
   bool _enabled;
 
   @override
@@ -40,6 +42,7 @@ class _AlarmState extends State<Alarm> {
 
   @override
   Widget build(BuildContext context) {
+    var user = context.read<UserStatus>();
     return Padding(
       padding: EdgeInsets.only(bottom: 15),
       child: GestureDetector(
@@ -146,7 +149,14 @@ class _AlarmState extends State<Alarm> {
               ),
               CupertinoSwitch(
                 value: _enabled,
-                onChanged: (value) {
+                onChanged: (value) async {
+                  await _db
+                      .child('alarms')
+                      .child(widget.id)
+                      .child('members')
+                      .child(user.uid)
+                      .child('enabled')
+                      .set(value);
                   setState(() {
                     _enabled = value;
                   });

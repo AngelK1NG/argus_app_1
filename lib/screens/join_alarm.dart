@@ -26,14 +26,33 @@ class _JoinAlarmPageState extends State<JoinAlarmPage> {
   void submit() async {
     var user = context.read<UserStatus>();
     DataSnapshot snapshot = await _db.child('alarms').child(_id).once();
-    if (snapshot != null) {
-      await _db.child('alarms').child(_id).child('members').set({
+    if (snapshot.value != null) {
+      await _db.child('alarms').child(_id).child('members').update({
         user.uid: {
           'enabled': true,
           'name': user.displayName,
           'score': 0,
         }
       });
+      this.widget.goToPage(0);
+    } else {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Invalid ID'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Cancel', style: TextStyle(color: red)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -70,9 +89,8 @@ class _JoinAlarmPageState extends State<JoinAlarmPage> {
                       this.widget.goToPage(0);
                     },
                     blackString: 'Join',
-                    blackOnTap: () async {
-                      await submit();
-                      this.widget.goToPage(0);
+                    blackOnTap: () {
+                      submit();
                     },
                   ),
                 ],
@@ -94,9 +112,8 @@ class _JoinAlarmPageState extends State<JoinAlarmPage> {
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
                   ),
-                  onFieldSubmitted: (_) async {
-                    await submit();
-                    this.widget.goToPage(0);
+                  onFieldSubmitted: (_) {
+                    submit();
                   },
                 ),
               ),
