@@ -52,7 +52,9 @@ class _AlarmState extends State<Alarm> {
               opaque: false,
               transitionDuration: Duration(seconds: 5),
               pageBuilder: (_, __, ___) {
-                return AlarmDetail(id: widget.id);
+                return AlarmDetail(
+                  id: widget.id,
+                );
               },
             ),
           );

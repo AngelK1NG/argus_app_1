@@ -1,9 +1,14 @@
+import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:provider/provider.dart';
 import 'package:vivi/components/header.dart';
 import 'package:vivi/components/footer.dart';
 import 'package:vivi/components/leaderboard_item.dart';
+import 'package:vivi/utils/auth.dart';
 import 'package:vivi/utils/size.dart';
 import 'package:vivi/constants.dart';
 
@@ -20,10 +25,60 @@ class AlarmDetail extends StatefulWidget {
 }
 
 class _AlarmDetailState extends State<AlarmDetail> {
+  DatabaseReference _db = FirebaseDatabase.instance.reference();
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  String _name = '';
+  TimeOfDay _time = TimeOfDay.now();
   bool _enabled = true;
+  List<LeaderboardItem> _leaderboard = [];
+
+  void getAlarm() {
+    List<LeaderboardItem> leaderboard = [];
+    var user = context.read<UserStatus>();
+    _db.child('alarms').child(widget.id).once().then((DataSnapshot snapshot) {
+      Map<dynamic, dynamic> value = snapshot.value;
+      _name = value['name'];
+      _time = TimeOfDay(hour: value['hour'], minute: value['minute']);
+      _enabled = value['members'][user.uid]['enabled'];
+      Map<dynamic, dynamic> members = value['members'];
+      // SplayTreeMap sorted = SplayTreeMap.from(
+      //   members,
+      //   (a, b) {
+      //     var result = members[a]['score'].compareTo(members[b]['score']);
+      //     print(result);
+      //     return result == 0 ? 1 : result;
+      //   },
+      // );
+      var sortedKeys = members.keys.toList(growable: false)
+        ..sort((a, b) => -members[a]['score'].compareTo(members[b]['score']));
+      LinkedHashMap sortedMap = new LinkedHashMap.fromIterable(
+        sortedKeys,
+        key: (k) => k,
+        value: (k) => members[k],
+      );
+      sortedMap.forEach((key, value) {
+        leaderboard.add(LeaderboardItem(
+          place: leaderboard.length + 1,
+          score: value['score'],
+          name: value['name'],
+          self: key == user.uid,
+        ));
+      });
+      setState(() {
+        _leaderboard = leaderboard;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getAlarm();
+  }
 
   @override
   Widget build(BuildContext context) {
+    var user = context.read<UserStatus>();
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -61,7 +116,7 @@ class _AlarmDetailState extends State<AlarmDetail> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Header(
-                      title: '21h 19m remaining',
+                      title: '',
                     ),
                     Footer(
                       redString: 'Leave',
@@ -84,7 +139,12 @@ class _AlarmDetailState extends State<AlarmDetail> {
                         children: [
                           RichText(
                             text: TextSpan(
-                              text: '7:00',
+                              text: _time.hour == 0 || _time.hour == 12
+                                  ? '12:' +
+                                      _time.minute.toString().padLeft(2, '0')
+                                  : _time.hour.remainder(12).toString() +
+                                      ':' +
+                                      _time.minute.toString().padLeft(2, '0'),
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyText1
@@ -102,7 +162,14 @@ class _AlarmDetailState extends State<AlarmDetail> {
                           ),
                           CupertinoSwitch(
                             value: _enabled,
-                            onChanged: (value) {
+                            onChanged: (value) async {
+                              await _db
+                                  .child('alarms')
+                                  .child(widget.id)
+                                  .child('members')
+                                  .child(user.uid)
+                                  .child('enabled')
+                                  .set(value);
                               setState(() {
                                 _enabled = value;
                               });
@@ -119,39 +186,39 @@ class _AlarmDetailState extends State<AlarmDetail> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Friends',
+                              _name,
                               style: TextStyle(fontSize: 16),
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(left: 10),
-                              child: RichText(
-                                text: TextSpan(
-                                  text: '2',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      .copyWith(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Theme.of(context).accentColor,
-                                      ),
-                                  children: [
-                                    TextSpan(
-                                      text: '/6',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Theme.of(context).hintColor,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            // Padding(
+                            //   padding: EdgeInsets.only(left: 10),
+                            //   child: RichText(
+                            //     text: TextSpan(
+                            //       text: '2',
+                            //       style: Theme.of(context)
+                            //           .textTheme
+                            //           .bodyText1
+                            //           .copyWith(
+                            //             fontSize: 16,
+                            //             fontWeight: FontWeight.w600,
+                            //             color: Theme.of(context).accentColor,
+                            //           ),
+                            //       children: [
+                            //         TextSpan(
+                            //           text: '/6',
+                            //           style: TextStyle(
+                            //             fontSize: 12,
+                            //             color: Theme.of(context).hintColor,
+                            //           ),
+                            //         ),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
                       Text(
-                        'a84930',
+                        widget.id,
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(context).hintColor,
@@ -160,30 +227,7 @@ class _AlarmDetailState extends State<AlarmDetail> {
                       Padding(
                         padding: EdgeInsets.only(top: 25),
                         child: Column(
-                          children: [
-                            LeaderboardItem(
-                              place: 1,
-                              score: 727,
-                              name: 'Justin',
-                              self: true,
-                              photoURL:
-                                  'https://justinsun.me/static/ec79ca2aed51046658a46fd598c54629/f3583/Profile.png',
-                            ),
-                            LeaderboardItem(
-                              place: 2,
-                              score: 420,
-                              name: 'Stella',
-                              self: false,
-                              photoURL: 'https://imgur.com/jZAuzkJ.jpg',
-                            ),
-                            LeaderboardItem(
-                              place: 3,
-                              score: 69,
-                              name: 'Angel',
-                              self: false,
-                              photoURL: 'https://i.imgur.com/eeB1kK0.jpg',
-                            ),
-                          ],
+                          children: _leaderboard,
                         ),
                       ),
                     ],
