@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:provider/provider.dart';
 import 'package:vivi/components/header.dart';
@@ -26,7 +25,6 @@ class AlarmDetail extends StatefulWidget {
 
 class _AlarmDetailState extends State<AlarmDetail> {
   DatabaseReference _db = FirebaseDatabase.instance.reference();
-  FirebaseAuth _auth = FirebaseAuth.instance;
   String _name = '';
   TimeOfDay _time = TimeOfDay.now();
   bool _enabled = true;
@@ -41,14 +39,6 @@ class _AlarmDetailState extends State<AlarmDetail> {
       _time = TimeOfDay(hour: value['hour'], minute: value['minute']);
       _enabled = value['members'][user.uid]['enabled'];
       Map<dynamic, dynamic> members = value['members'];
-      // SplayTreeMap sorted = SplayTreeMap.from(
-      //   members,
-      //   (a, b) {
-      //     var result = members[a]['score'].compareTo(members[b]['score']);
-      //     print(result);
-      //     return result == 0 ? 1 : result;
-      //   },
-      // );
       var sortedKeys = members.keys.toList(growable: false)
         ..sort((a, b) => -members[a]['score'].compareTo(members[b]['score']));
       LinkedHashMap sortedMap = new LinkedHashMap.fromIterable(

@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -33,7 +34,15 @@ class _AlarmsPageState extends State<AlarmsPage> {
     var user = context.read<UserStatus>();
     _db.child('alarms').once().then((DataSnapshot snapshot) {
       Map<dynamic, dynamic> values = snapshot.value;
-      values.forEach((key, value) {
+      var sortedKeys = values.keys.toList(growable: false)
+        ..sort((a, b) => values[a]['minute'].compareTo(values[b]['minute']))
+        ..sort((a, b) => values[a]['hour'].compareTo(values[b]['hour']));
+      LinkedHashMap sortedMap = new LinkedHashMap.fromIterable(
+        sortedKeys,
+        key: (k) => k,
+        value: (k) => values[k],
+      );
+      sortedMap.forEach((key, value) {
         if (value['members'][user.uid] != null) {
           alarms.add(
             Alarm(
