@@ -91,8 +91,6 @@ Timezone myLocalTime;
 
 bool enabled = false;
 bool dismissed = false;
-int alarmHour;
-int alarmMinute;
 
 void setup() {
   pinMode(buzzerPin, OUTPUT);
@@ -116,14 +114,14 @@ void setup() {
   Serial.println("synced");
   delay(2000);
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
-  alarmHour = Firebase.getInt("/alarms/abcdefg/hour");
-  alarmMinute = Firebase.getInt("/alarms/abcdefg/minute");
 }
 
 void loop() {
   int currentHour = myLocalTime.hour();
   int currentMinute = myLocalTime.minute();
   int currentSecond = myLocalTime.second();
+  int alarmHour = Firebase.getInt("/alarms/abcdefg/hour");
+  int alarmMinute = Firebase.getInt("/alarms/abcdefg/minute");
 
   Serial.print(currentHour);
   Serial.print(":");
