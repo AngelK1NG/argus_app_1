@@ -1,4 +1,3 @@
-
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <FirebaseArduino.h>
@@ -24,13 +23,13 @@
 #define f5s 740 // 740 Hz
 #define a5f 831 // 831 Hz
 #define rest -1
-
-const char *ssid = "sunWiFiG";        //SSID of wifi network
-const char *password = "wifiMima99!"; // Password for wifi network
+const String userName = "oniichan";
+const char *ssid = "boku no";        //SSID of wifi network
+const char *password = "pico"; // Password for wifi network
 const int buzzerPin = 14;             // pin of buzzer (D5 on NodeMCU)
 const int buttonPin = 12;             //D6
 const int hapticPin = 4;              //D2
-volatile int beatlength = 100;        // determines tempo
+volatile int beatlength = 200;     // determines tempo
 float beatseparationconstant = 0.3;
 
 int threshold;
@@ -91,7 +90,7 @@ Timezone myLocalTime;
 
 bool enabled = false;
 bool dismissed = false;
-
+bool checker = true;
 void setup() {
   pinMode(buzzerPin, OUTPUT);
   pinMode(buttonPin, INPUT);
@@ -122,33 +121,39 @@ void loop() {
   int currentSecond = myLocalTime.second();
   int alarmHour = Firebase.getInt("/alarms/abcdefg/hour");
   int alarmMinute = Firebase.getInt("/alarms/abcdefg/minute");
-
+  
   Serial.print(currentHour);
   Serial.print(":");
   Serial.print(currentMinute);
   Serial.print(":");
   Serial.print(currentSecond);
   Serial.println();
-
-  if (currentHour == alarmHour && currentMinute == alarmMinute && currentSecond == 0) {
-    digitalWrite(hapticPin, HIGH);
-    enabled = true;
-    dismissed = false;
-    tone(buzzerPin, c5s);
-  } else {
-    if (digitalRead(buttonPin) == LOW && enabled && !dismissed) {
-      Firebase.setInt("/alarms/abcdefg/count", Firebase.getInt("/alarms/abcdefg/count") + 1);
-      dismissed = true;
-    }
-    if (Firebase.getInt("/alarms/abcdefg/count") == 5) {
-      noTone(buzzerPin);
-      digitalWrite(hapticPin, LOW);
-      enabled = false;
-    }
+ if(Firebase.get("/alarms/abcdefg/members/" + userName).success()){
+    checker = false;
   }
   
-  delay(500);
-}
+    if (currentHour == alarmHour && currentMinute == alarmMinute && currentSecond == 0) {
+      
+      enabled = true;
+      dismissed = false;
+      
+    } 
+    if(checker){
+     while(enabled){
+        play();
+        digitalWrite(hapticPin, HIGH);
+         if (digitalRead(buttonPin) == LOW && enabled && !dismissed) {
+        Firebase.setInt("/alarms/abcdefg/count", Firebase.getInt("/alarms/abcdefg/count") + 1);
+        dismissed = true;
+       
+      }
+         if (Firebase.getInt("/alarms/abcdefg/count") == 1) {
+        enabled = false;
+      }
+     }
+  }
+    delay(250);
+  }
 
 void play() {
   int notelength;
