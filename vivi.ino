@@ -23,9 +23,9 @@
 #define f5s 740 // 740 Hz
 #define a5f 831 // 831 Hz
 #define rest -1
-const String userName = "oniichan";
-const char *ssid = "boku no";        //SSID of wifi network
-const char *password = "pico"; // Password for wifi network
+const String userName = "angel";
+const char *ssid = "NETGEAR62";        //SSID of wifi network
+const char *password = "purpleflower145"; // Password for wifi network
 const int buzzerPin = 14;             // pin of buzzer (D5 on NodeMCU)
 const int buttonPin = 12;             //D6
 const int hapticPin = 4;              //D2
@@ -90,7 +90,7 @@ Timezone myLocalTime;
 
 bool enabled = false;
 bool dismissed = false;
-bool checker = true;
+
 void setup() {
   pinMode(buzzerPin, OUTPUT);
   pinMode(buttonPin, INPUT);
@@ -128,9 +128,9 @@ void loop() {
   Serial.print(":");
   Serial.print(currentSecond);
   Serial.println();
- if(Firebase.get("/alarms/abcdefg/members/" + userName).success()){
-    checker = false;
-  }
+ //if(Firebase.get("/alarms/abcdefg/members/" + userName).failed()){
+    //checker = false;
+  //}
   
     if (currentHour == alarmHour && currentMinute == alarmMinute && currentSecond == 0) {
       
@@ -152,6 +152,7 @@ void loop() {
       }
      }
   }
+    digitalWrite(hapticPin, LOW);
     delay(250);
   }
 
